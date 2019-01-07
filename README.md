@@ -1,1 +1,1 @@
-# fiji-plugin
+# table-utils
