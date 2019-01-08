@@ -17,6 +17,7 @@ import javax.swing.event.MouseInputAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class TableBdvConnector
@@ -66,7 +67,7 @@ public class TableBdvConnector
 			{
 				if( me.isControlDown() )
 				{
-					final int selectedRow = table.convertRowIndexToModel( table.getSelectedRow() );
+					final int selectedRow = table.getSelectedRow();
 
 					bdvSelectionEventHandler.addSelection(
 									objectTablePanel.getObjectCoordinate(
@@ -164,17 +165,19 @@ public class TableBdvConnector
 		return converter;
 	}
 
-	private LinearMappingARGBConverter createLinearMappingARGBConverter( String selectedColumn )
+	public LinearMappingARGBConverter createLinearMappingARGBConverter( String selectedColumn )
 	{
-		final int selectedColumnIndex = objectTablePanel.getTable().getColumnModel().getColumnIndex( selectedColumn );
+		final ConcurrentHashMap< Object, Object > map = objectTablePanel.getLabelHashMap(
+				objectTablePanel.getCoordinateColumn( ObjectCoordinate.Label ),
+				selectedColumn );
 
 		final Function< Double, Double > labelColumnMapper = new Function< Double, Double >()
 		{
 			@Override
 			public Double apply( Double objectLabel )
 			{
-				final int row = objectTablePanel.getRowIndex( objectLabel );
-				return (Double) objectTablePanel.getTable().getValueAt( row, selectedColumnIndex );
+				if ( ! map.containsKey( objectLabel ) )  return 0.0;
+				return ( Double ) map.get( objectLabel );
 			};
 		};
 

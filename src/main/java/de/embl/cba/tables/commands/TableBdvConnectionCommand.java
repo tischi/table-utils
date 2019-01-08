@@ -28,7 +28,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-@Plugin(type = Command.class, menuPath = "Plugins>Measurements>Linked Table And Image Visualisation" )
+@Plugin(type = Command.class, menuPath = "Plugins>Measurement>Browse Table And Image" )
 public class TableBdvConnectionCommand implements Command
 {
 	@Parameter ( label = "Results table" )

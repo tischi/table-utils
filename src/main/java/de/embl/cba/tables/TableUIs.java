@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 
-public class UIs
+public class TableUIs
 {
 	public static void addColumnUI( ObjectTablePanel objectTablePanel )
 	{

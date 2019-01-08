@@ -2,7 +2,7 @@ package de.embl.cba.tables.objects;
 
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.UIs;
+import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.models.ColumnClassAwareTableModel;
 
 import javax.swing.*;
@@ -15,8 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.TreeMap;
-
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ObjectTablePanel extends JPanel
 {
@@ -30,7 +29,7 @@ public class ObjectTablePanel extends JPanel
     private JScrollPane scrollPane;
     private JMenuBar menuBar;
     private HashMap< ObjectCoordinate, String > objectCoordinateColumnMap;
-	private TreeMap< Double, Integer > labelRowMap;
+	private ConcurrentHashMap< Double, Integer > labelRowMap;
 	private HashMap< String, double[] > columnsMinMaxMap;
 
 	public ObjectTablePanel( JTable table )
@@ -109,9 +108,9 @@ public class ObjectTablePanel extends JPanel
 	public void addMenu( JMenuItem menuItem )
 	{
 		menuBar.add( menuItem );
-		SwingUtilities.updateComponentTreeUI( frame );
-	}
 
+		if ( frame != null ) SwingUtilities.updateComponentTreeUI( frame );
+	}
 
 	private JMenu createTableMenuItem()
     {
@@ -134,7 +133,7 @@ public class ObjectTablePanel extends JPanel
 			{
 				try
 				{
-					UIs.saveTableUI( table );
+					TableUIs.saveTableUI( table );
 				}
 				catch ( IOException e1 )
 				{
@@ -155,7 +154,7 @@ public class ObjectTablePanel extends JPanel
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
-				UIs.addColumnUI( objectTablePanel );
+				TableUIs.addColumnUI( objectTablePanel );
 			}
 		} );
 
@@ -255,7 +254,7 @@ public class ObjectTablePanel extends JPanel
 
 	private void createLabelRowMap()
 	{
-		labelRowMap = new TreeMap();
+		labelRowMap = new ConcurrentHashMap();
 
 		final int labelColumnIndex =
 				table.getColumnModel().getColumnIndex( getCoordinateColumn( ObjectCoordinate.Label ) );
@@ -264,17 +263,36 @@ public class ObjectTablePanel extends JPanel
 		for ( int row = 0; row < rowCount; row++ )
 		{
 			labelRowMap.put(
-					( Double ) table.getValueAt( row, labelColumnIndex ),
-					( Integer ) row );
+					( double ) table.getValueAt( row, labelColumnIndex ),
+					( int ) row );
 		}
+	}
+
+	public ConcurrentHashMap< Object, Object > getLabelHashMap( String column0, String column1 )
+	{
+		final ConcurrentHashMap map = new ConcurrentHashMap();
+
+		final int labelColumnIndex0 = table.getColumnModel().getColumnIndex( column0 );
+		final int labelColumnIndex1 = table.getColumnModel().getColumnIndex( column1 );
+
+		final int rowCount = table.getRowCount();
+
+		for ( int row = 0; row < rowCount; row++ )
+		{
+			map.put( getValueAt( row, labelColumnIndex0 ), getValueAt( row, labelColumnIndex1 ));
+		}
+
+		return map;
+	}
+
+	private synchronized Object getValueAt( int row, int col )
+	{
+		return table.getValueAt( row, col );
 	}
 
 	public int getRowIndex( double objectLabel )
 	{
-		if ( labelRowMap == null )
-		{
-			createLabelRowMap();
-		}
+		if ( labelRowMap == null ) createLabelRowMap();
 
 		return labelRowMap.get( objectLabel );
 	}

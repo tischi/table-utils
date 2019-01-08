@@ -7,6 +7,16 @@ public class ColumnClassAwareTableModel extends DefaultTableModel
 {
 	ArrayList< Class > columnClasses;
 
+	public ColumnClassAwareTableModel( )
+	{
+		super();
+	}
+
+	public ColumnClassAwareTableModel( int rowCount, int columnCount )
+	{
+		super( rowCount, columnCount );
+	}
+
 	@Override
 	public Class getColumnClass( int column )
 	{
