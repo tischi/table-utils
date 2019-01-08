@@ -176,7 +176,6 @@ public class TableBdvConnector
 			@Override
 			public Double apply( Double objectLabel )
 			{
-				if ( ! map.containsKey( objectLabel ) )  return 0.0;
 				return ( Double ) map.get( objectLabel );
 			};
 		};
@@ -192,15 +191,17 @@ public class TableBdvConnector
 
 	private CategoricalMappingARGBConverter createCategoricalMappingRandomARGBConverter( String selectedColumn )
 	{
-		final int selectedColumnIndex = objectTablePanel.getTable().getColumnModel().getColumnIndex( selectedColumn );
+
+		final ConcurrentHashMap< Object, Object > map = objectTablePanel.getLabelHashMap(
+				objectTablePanel.getCoordinateColumn( ObjectCoordinate.Label ),
+				selectedColumn );
 
 		final Function< Double, Object > labelColumnMapper = new Function< Double, Object >()
 		{
 			@Override
 			public Object apply( Double objectLabel )
 			{
-				final int row = objectTablePanel.getRowIndex( objectLabel );
-				return objectTablePanel.getTable().getValueAt( row, selectedColumnIndex );
+				return map.get( objectLabel );
 			};
 		};
 
