@@ -14,6 +14,5 @@ public class TestTableLoading
 		final JTable jTable = TableUtils.loadTable( file, "\t" );
 
 		new ObjectTablePanel( jTable ).showPanel();
-
 	}
 }

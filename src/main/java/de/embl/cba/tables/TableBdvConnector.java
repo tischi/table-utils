@@ -1,5 +1,7 @@
 package de.embl.cba.tables;
 
+import bdv.util.Bdv;
+import de.embl.cba.bdv.utils.BdvUserInterfaceUtils;
 import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.converters.CategoricalMappingARGBConverter;
 import de.embl.cba.bdv.utils.converters.LinearMappingARGBConverter;
@@ -26,6 +28,7 @@ public class TableBdvConnector
 	final private BdvSelectionEventHandler bdvSelectionEventHandler;
 	private final JTable table;
 	private final Converter< RealType, VolatileARGBType > originalConverter;
+	private final Bdv bdv;
 
 	public TableBdvConnector( ObjectTablePanel objectTablePanel,
 							  BdvSelectionEventHandler bdvSelectionEventHandler )
@@ -33,6 +36,8 @@ public class TableBdvConnector
 		this.bdvSelectionEventHandler = bdvSelectionEventHandler;
 		this.objectTablePanel = objectTablePanel;
 		this.table = objectTablePanel.getTable();
+
+		this.bdv = bdvSelectionEventHandler.getBdv();
 
 		originalConverter = bdvSelectionEventHandler.getSelectableConverter().getWrappedConverter();
 
@@ -94,7 +99,7 @@ public class TableBdvConnector
 			if ( t == null ) t = 0.0;
 
 			BdvUtils.moveToPosition(
-					bdvSelectionEventHandler.getBdv(),
+					bdv,
 					new double[]{ x, y, z},
 					Double.valueOf( t ).intValue(),
 					500);
@@ -182,11 +187,15 @@ public class TableBdvConnector
 
 		final double[] minMaxValues = objectTablePanel.getMinMaxValues( selectedColumn );
 
-		return new LinearMappingARGBConverter(
-				labelColumnMapper,
+		final LinearMappingARGBConverter converter = new LinearMappingARGBConverter(
 				minMaxValues[ 0 ],
 				minMaxValues[ 1 ],
-				Luts.BLUE_WHITE_RED );
+				Luts.BLUE_WHITE_RED,
+				labelColumnMapper );
+
+		BdvUserInterfaceUtils.showBrightnessDialog( bdv, selectedColumn, converter );
+
+		return converter;
 	}
 
 	private CategoricalMappingARGBConverter createCategoricalMappingRandomARGBConverter( String selectedColumn )

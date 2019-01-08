@@ -31,7 +31,7 @@ public class ExampleLargeTableLargeImage
 		SpimData labels = new XmlIoSpimData().load( "/Volumes/arendt/EM_6dpf_segmentation/EM-Prospr/em-segmented-cells-labels.xml" );
 
 		final LinearMappingARGBConverter linearMappingARGBConverter =
-				new LinearMappingARGBConverter( d -> d + 1, 0, 50, Luts.BLUE_WHITE_RED  );
+				new LinearMappingARGBConverter( 0, 50, Luts.BLUE_WHITE_RED, d -> d + 1  );
 
 		final SelectableVolatileARGBConverter selectableVolatileARGBConverter =
 				new SelectableVolatileARGBConverter( linearMappingARGBConverter );
@@ -73,24 +73,7 @@ public class ExampleLargeTableLargeImage
 
 		final LinearMappingARGBConverter tableMapping = tableBdvConnector.createLinearMappingARGBConverter( "com_x_microns" );
 
-//		final JTable table = objectTablePanel.getTable();
-
-//		final LinearMappingARGBConverter otherMapping = new LinearMappingARGBConverter( new Function< Double, Double >()
-//		{
-//			@Override
-//			public Double apply( Double aDouble )
-//			{
-//				final int rowIndex = objectTablePanel.getRowIndex( aDouble );
-//				final Double valueAt = ( Double ) table.getValueAt( rowIndex, 3 );
-//
-//				return null;
-//			}
-//		}, 0, 1000, Luts.BLUE_WHITE_RED );
-
-
 		labelSource.getSelectableConverter().setWrappedConverter( tableMapping );
-
-		//bdvSelectionEventHandler.getSelectableConverter().setWrappedConverter( mappingARGBConverter );
 
 		BdvUtils.repaint( bdvHandle );
 
