@@ -3,8 +3,10 @@ package de.embl.cba.tables;
 import bdv.util.Bdv;
 import de.embl.cba.bdv.utils.BdvUserInterfaceUtils;
 import de.embl.cba.bdv.utils.BdvUtils;
-import de.embl.cba.bdv.utils.converters.CategoricalMappingARGBConverter;
-import de.embl.cba.bdv.utils.converters.LinearMappingARGBConverter;
+import de.embl.cba.bdv.utils.behaviour.BehaviourRandomColorShufflingEventHandler;
+import de.embl.cba.bdv.utils.converters.MappingLinearARGBConverter;
+import de.embl.cba.bdv.utils.converters.MappingRandomARGBConverter;
+import de.embl.cba.bdv.utils.converters.RandomARGBConverter;
 import de.embl.cba.bdv.utils.lut.Luts;
 import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
 import de.embl.cba.bdv.utils.selection.SelectionEventListener;
@@ -156,11 +158,12 @@ public class TableBdvConnector
 
 		if ( firstValueInColumn instanceof Number )
 		{
-			converter = createLinearMappingARGBConverter( colorByColumn );
+			converter = createMappingLinearARGBConverter( colorByColumn );
 		}
 		else if ( firstValueInColumn instanceof String )
 		{
-			converter = createCategoricalMappingRandomARGBConverter( colorByColumn );
+			converter = createMappingRandomARGBConverter( colorByColumn );
+			new BehaviourRandomColorShufflingEventHandler( bdv, ( RandomARGBConverter ) converter, "colorByColumn" );
 		}
 		else
 		{
@@ -170,7 +173,7 @@ public class TableBdvConnector
 		return converter;
 	}
 
-	public LinearMappingARGBConverter createLinearMappingARGBConverter( String selectedColumn )
+	public MappingLinearARGBConverter createMappingLinearARGBConverter( String selectedColumn )
 	{
 		final ConcurrentHashMap< Object, Object > map = objectTablePanel.getLabelHashMap(
 				objectTablePanel.getCoordinateColumn( ObjectCoordinate.Label ),
@@ -187,7 +190,7 @@ public class TableBdvConnector
 
 		final double[] minMaxValues = objectTablePanel.getMinMaxValues( selectedColumn );
 
-		final LinearMappingARGBConverter converter = new LinearMappingARGBConverter(
+		final MappingLinearARGBConverter converter = new MappingLinearARGBConverter(
 				minMaxValues[ 0 ],
 				minMaxValues[ 1 ],
 				Luts.BLUE_WHITE_RED,
@@ -198,7 +201,7 @@ public class TableBdvConnector
 		return converter;
 	}
 
-	private CategoricalMappingARGBConverter createCategoricalMappingRandomARGBConverter( String selectedColumn )
+	private MappingRandomARGBConverter createMappingRandomARGBConverter( String selectedColumn )
 	{
 
 		final ConcurrentHashMap< Object, Object > map = objectTablePanel.getLabelHashMap(
@@ -214,7 +217,7 @@ public class TableBdvConnector
 			};
 		};
 
-		return new CategoricalMappingARGBConverter(
+		return new MappingRandomARGBConverter(
 				labelColumnMapper,
 				Luts.GLASBEY
 		);

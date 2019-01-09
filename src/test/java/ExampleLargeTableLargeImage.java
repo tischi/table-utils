@@ -3,7 +3,7 @@ import bdv.util.BdvFunctions;
 import bdv.util.BdvHandle;
 import bdv.util.BdvOptions;
 import de.embl.cba.bdv.utils.BdvUtils;
-import de.embl.cba.bdv.utils.converters.LinearMappingARGBConverter;
+import de.embl.cba.bdv.utils.converters.MappingLinearARGBConverter;
 import de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter;
 import de.embl.cba.bdv.utils.lut.Luts;
 import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
@@ -15,14 +15,10 @@ import de.embl.cba.tables.objects.ObjectTablePanel;
 import mpicbg.spim.data.SpimData;
 import mpicbg.spim.data.SpimDataException;
 import mpicbg.spim.data.XmlIoSpimData;
-import net.imglib2.converter.Converter;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.type.volatiles.VolatileARGBType;
 
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.function.Function;
 
 public class ExampleLargeTableLargeImage
 {
@@ -30,8 +26,8 @@ public class ExampleLargeTableLargeImage
 	{
 		SpimData labels = new XmlIoSpimData().load( "/Volumes/arendt/EM_6dpf_segmentation/EM-Prospr/em-segmented-cells-labels.xml" );
 
-		final LinearMappingARGBConverter linearMappingARGBConverter =
-				new LinearMappingARGBConverter( 0, 50, Luts.BLUE_WHITE_RED, d -> d + 1  );
+		final MappingLinearARGBConverter linearMappingARGBConverter =
+				new MappingLinearARGBConverter( 0, 50, Luts.BLUE_WHITE_RED, d -> d + 1  );
 
 		final SelectableVolatileARGBConverter selectableVolatileARGBConverter =
 				new SelectableVolatileARGBConverter( linearMappingARGBConverter );
@@ -71,7 +67,7 @@ public class ExampleLargeTableLargeImage
 		//
 		final TableBdvConnector tableBdvConnector = new TableBdvConnector( objectTablePanel, bdvSelectionEventHandler );
 
-		final LinearMappingARGBConverter tableMapping = tableBdvConnector.createLinearMappingARGBConverter( "com_x_microns" );
+		final MappingLinearARGBConverter tableMapping = tableBdvConnector.createMappingLinearARGBConverter( "com_x_microns" );
 
 		labelSource.getSelectableConverter().setWrappedConverter( tableMapping );
 
