@@ -17,6 +17,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ *
+ *
+ *
+ * Notes:
+ * - https://coderanch.com/t/345383/java/JTable-Paging
+ */
+
 public class ObjectTablePanel extends JPanel
 {
 	final private JTable table;
@@ -268,18 +276,18 @@ public class ObjectTablePanel extends JPanel
 		}
 	}
 
-	public ConcurrentHashMap< Object, Object > getLabelHashMap( String column0, String column1 )
+	public ConcurrentHashMap< Double, Object > getLabelHashMap( String column1 )
 	{
 		final ConcurrentHashMap map = new ConcurrentHashMap();
 
-		final int labelColumnIndex0 = table.getColumnModel().getColumnIndex( column0 );
+		final int labelColumnIndex0 = table.getColumnModel().getColumnIndex( getCoordinateColumn( ObjectCoordinate.Label ) );
 		final int labelColumnIndex1 = table.getColumnModel().getColumnIndex( column1 );
 
 		final int rowCount = table.getRowCount();
 
 		for ( int row = 0; row < rowCount; row++ )
 		{
-			map.put( getValueAt( row, labelColumnIndex0 ), getValueAt( row, labelColumnIndex1 ));
+			map.put( (Double) getValueAt( row, labelColumnIndex0 ), getValueAt( row, labelColumnIndex1 ));
 		}
 
 		return map;

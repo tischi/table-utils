@@ -64,7 +64,8 @@ public class TableBdvConnectionCommand implements Command
 				bdv,
 				labelsSource );
 
-		new TableBdvConnector( objectTablePanel, bdvSelectionEventHandler );
+		final TableBdvConnector tableBdvConnector = new TableBdvConnector( objectTablePanel, bdvSelectionEventHandler );
+		tableBdvConnector.setSelectionByAttribute( true );
 
 		new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
 	}

@@ -18,9 +18,11 @@ import net.imglib2.type.volatiles.VolatileARGBType;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
+import javax.swing.text.html.parser.Entity;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -31,15 +33,21 @@ public class TableBdvConnector
 	private final JTable table;
 	private final Converter< RealType, VolatileARGBType > originalConverter;
 	private final Bdv bdv;
+	private boolean isCategoricalColoring;
+	private ConcurrentHashMap< Double, Object > currentObjectAttributeMap;
+	private boolean isSelectionByAttribute;
 
 	public TableBdvConnector( ObjectTablePanel objectTablePanel,
 							  BdvSelectionEventHandler bdvSelectionEventHandler )
 	{
 		this.bdvSelectionEventHandler = bdvSelectionEventHandler;
 		this.objectTablePanel = objectTablePanel;
-		this.table = objectTablePanel.getTable();
 
+		this.table = objectTablePanel.getTable();
 		this.bdv = bdvSelectionEventHandler.getBdv();
+
+		isCategoricalColoring = false;
+		isSelectionByAttribute = false;
 
 		originalConverter = bdvSelectionEventHandler.getSelectableConverter().getWrappedConverter();
 
@@ -48,6 +56,11 @@ public class TableBdvConnector
 		configureTableBdvConnection();
 
 		objectTablePanel.addMenu( createColoringMenuItem() );
+	}
+
+	public void setSelectionByAttribute( boolean selectionByAttribute )
+	{
+		isSelectionByAttribute = selectionByAttribute;
 	}
 
 	private void configureBdvTableConnection()
@@ -62,8 +75,28 @@ public class TableBdvConnector
 				table.setRowSelectionInterval( row, row );
 
 				table.scrollRectToVisible( table.getCellRect( row,0, true ) );
+
+				if ( isCategoricalColoring && isSelectionByAttribute )
+				{
+					selectAllObjectsWithSameAttribute( objectLabel, currentObjectAttributeMap, bdvSelectionEventHandler );
+				}
 			}
 		} );
+	}
+
+	public static void selectAllObjectsWithSameAttribute( double objectLabel, ConcurrentHashMap< Double, Object > currentObjectAttributeMap, BdvSelectionEventHandler bdvSelectionEventHandler )
+	{
+		final Object objectAttribute = currentObjectAttributeMap.get( objectLabel );
+
+		for ( Map.Entry< Double, Object > entry : currentObjectAttributeMap.entrySet() )
+		{
+			if ( entry.getValue().equals( objectAttribute ) )
+			{
+				bdvSelectionEventHandler.addSelection( entry.getKey() );
+			}
+		}
+
+		bdvSelectionEventHandler.requestRepaint();
 	}
 
 	private void configureTableBdvConnection( )
@@ -162,6 +195,7 @@ public class TableBdvConnector
 		}
 		else if ( firstValueInColumn instanceof String )
 		{
+			isCategoricalColoring = true;
 			converter = createMappingRandomARGBConverter( colorByColumn );
 			new BehaviourRandomColorShufflingEventHandler( bdv, ( RandomARGBConverter ) converter, "colorByColumn" );
 		}
@@ -175,16 +209,14 @@ public class TableBdvConnector
 
 	public MappingLinearARGBConverter createMappingLinearARGBConverter( String selectedColumn )
 	{
-		final ConcurrentHashMap< Object, Object > map = objectTablePanel.getLabelHashMap(
-				objectTablePanel.getCoordinateColumn( ObjectCoordinate.Label ),
-				selectedColumn );
+		currentObjectAttributeMap = objectTablePanel.getLabelHashMap( selectedColumn );
 
 		final Function< Double, Double > labelColumnMapper = new Function< Double, Double >()
 		{
 			@Override
 			public Double apply( Double objectLabel )
 			{
-				return ( Double ) map.get( objectLabel );
+				return ( Double ) currentObjectAttributeMap.get( objectLabel );
 			};
 		};
 
@@ -203,17 +235,14 @@ public class TableBdvConnector
 
 	private MappingRandomARGBConverter createMappingRandomARGBConverter( String selectedColumn )
 	{
-
-		final ConcurrentHashMap< Object, Object > map = objectTablePanel.getLabelHashMap(
-				objectTablePanel.getCoordinateColumn( ObjectCoordinate.Label ),
-				selectedColumn );
+		currentObjectAttributeMap = objectTablePanel.getLabelHashMap( selectedColumn );
 
 		final Function< Double, Object > labelColumnMapper = new Function< Double, Object >()
 		{
 			@Override
 			public Object apply( Double objectLabel )
 			{
-				return map.get( objectLabel );
+				return currentObjectAttributeMap.get( objectLabel );
 			};
 		};
 
