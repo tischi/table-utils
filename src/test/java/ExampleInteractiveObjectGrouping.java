@@ -3,7 +3,7 @@ import bdv.util.BdvFunctions;
 import bdv.util.BdvOptions;
 import bdv.util.RandomAccessibleIntervalSource;
 import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
-import de.embl.cba.bdv.utils.sources.SelectableVolatileARGBConvertedRealSource;
+import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
 import de.embl.cba.tables.objects.ObjectCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import de.embl.cba.tables.objects.attributes.AssignObjectAttributesUI;
@@ -39,8 +39,8 @@ public class ExampleInteractiveObjectGrouping
 
 		final RandomAccessibleIntervalSource raiSource = Examples.load2D16BitLabelMask();
 
-		final SelectableVolatileARGBConvertedRealSource selectableSource =
-				new SelectableVolatileARGBConvertedRealSource( raiSource );
+		final SelectableARGBConvertedRealSource selectableSource =
+				new SelectableARGBConvertedRealSource( raiSource );
 
 		Bdv bdv = BdvFunctions.show( selectableSource, BdvOptions.options().is2D() ).getBdvHandle();
 

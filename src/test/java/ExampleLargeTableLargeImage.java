@@ -7,7 +7,7 @@ import de.embl.cba.bdv.utils.converters.MappingLinearARGBConverter;
 import de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter;
 import de.embl.cba.bdv.utils.lut.Luts;
 import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
-import de.embl.cba.bdv.utils.sources.SelectableVolatileARGBConvertedRealSource;
+import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
 import de.embl.cba.tables.TableBdvConnector;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.objects.ObjectCoordinate;
@@ -34,8 +34,8 @@ public class ExampleLargeTableLargeImage
 
 		final VolatileSpimSource volatileSpimSource = new VolatileSpimSource( labels, 0, "name" );
 
-		final SelectableVolatileARGBConvertedRealSource labelSource =
-				new SelectableVolatileARGBConvertedRealSource(
+		final SelectableARGBConvertedRealSource labelSource =
+				new SelectableARGBConvertedRealSource(
 						volatileSpimSource,
 						selectableVolatileARGBConverter );
 

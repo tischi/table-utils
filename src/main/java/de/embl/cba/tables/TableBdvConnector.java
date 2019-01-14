@@ -12,13 +12,16 @@ import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
 import de.embl.cba.bdv.utils.selection.SelectionEventListener;
 import de.embl.cba.tables.objects.ObjectCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
+import de.embl.cba.tables.objects.attributes.AssignObjectAttributesUI;
 import net.imglib2.converter.Converter;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.volatiles.VolatileARGBType;
+import org.scijava.ui.behaviour.ClickBehaviour;
+import org.scijava.ui.behaviour.io.InputTriggerConfig;
+import org.scijava.ui.behaviour.util.Behaviours;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
-import javax.swing.text.html.parser.Entity;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -36,6 +39,9 @@ public class TableBdvConnector
 	private boolean isCategoricalColoring;
 	private ConcurrentHashMap< Double, Object > currentObjectAttributeMap;
 	private boolean isSelectionByAttribute;
+
+	public static final String OBJECT_GROUPING_TRIGGER = "ctrl G";
+
 
 	public TableBdvConnector( ObjectTablePanel objectTablePanel,
 							  BdvSelectionEventHandler bdvSelectionEventHandler )
@@ -55,7 +61,25 @@ public class TableBdvConnector
 
 		configureTableBdvConnection();
 
+		installObjectAttributeAssignment();
+
 		objectTablePanel.addMenu( createColoringMenuItem() );
+	}
+
+	public void installObjectAttributeAssignment()
+	{
+
+		final AssignObjectAttributesUI assignObjectAttributesUI = new AssignObjectAttributesUI( objectTablePanel );
+
+		final Behaviours behaviours = new Behaviours( new InputTriggerConfig() );
+		behaviours.install( bdv.getBdvHandle().getTriggerbindings(),
+				"bdv-object-attributes-" + objectTablePanel.getName() );
+
+		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
+		{
+			assignObjectAttributesUI.showUI( bdvSelectionEventHandler.getSelectedValues()  );
+		}
+		, "fetch-selected-objects-" + objectTablePanel.getName(), OBJECT_GROUPING_TRIGGER );
 	}
 
 	public void setSelectionByAttribute( boolean selectionByAttribute )

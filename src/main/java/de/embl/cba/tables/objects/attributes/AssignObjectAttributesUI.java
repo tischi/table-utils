@@ -1,14 +1,13 @@
 package de.embl.cba.tables.objects.attributes;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import de.embl.cba.tables.SwingUtils;
 import de.embl.cba.tables.objects.ObjectTablePanel;
+import org.fife.rsta.ac.js.Logger;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,10 +21,9 @@ public class AssignObjectAttributesUI extends JPanel
 	private JFrame frame;
 
 	private String selectedColumn;
-	private Object selectedAttribute;
-	private Set< Object > selectedAttributes;
+	private String selectedAttribute;
+	private Set< String > selectedAttributes;
 	private Point location;
-
 
 	public AssignObjectAttributesUI( ObjectTablePanel objectTablePanel )
 	{
@@ -46,6 +44,7 @@ public class AssignObjectAttributesUI extends JPanel
 	public void showUI( Set< Double > objectLabels )
 	{
 		this.objectLabels = objectLabels;
+		updateColumnComboBox();
 		showFrame();
 	}
 
@@ -58,7 +57,7 @@ public class AssignObjectAttributesUI extends JPanel
 			public void actionPerformed( ActionEvent e )
 			{
 				selectedColumn = ( String ) columnComboBox.getSelectedItem();
-				selectedAttribute = attributeComboBox.getSelectedItem();
+				selectedAttribute = ( String ) attributeComboBox.getSelectedItem();
 
 				assignAttributes(
 						selectedColumn,
@@ -126,15 +125,7 @@ public class AssignObjectAttributesUI extends JPanel
 
 		horizontalLayoutPanel.add( columnComboBox );
 
-		for ( String name : objectTablePanel.getColumnNames() )
-		{
-			columnComboBox.addItem( name );
-		}
-
-		if ( selectedColumn != null )
-		{
-			columnComboBox.setSelectedItem( selectedColumn );
-		}
+		updateColumnComboBox();
 
 		columnComboBox.addActionListener( new ActionListener()
 		{
@@ -148,7 +139,21 @@ public class AssignObjectAttributesUI extends JPanel
 		return horizontalLayoutPanel;
 	}
 
-	private void assignAttributes( final String column, final Set< Double > objectLabels, final Object attribute )
+	private void updateColumnComboBox()
+	{
+		columnComboBox.removeAllItems();
+		for ( String name : objectTablePanel.getColumnNames() )
+		{
+			columnComboBox.addItem( name );
+		}
+
+		if ( selectedColumn != null )
+		{
+			columnComboBox.setSelectedItem( selectedColumn );
+		}
+	}
+
+	private void assignAttributes( final String column, final Set< Double > objectLabels, final String attribute )
 	{
 		for ( Double objectLabel : objectLabels )
 		{
@@ -156,15 +161,39 @@ public class AssignObjectAttributesUI extends JPanel
 		}
 	}
 
-	private void assignAttribute( String column, Double objectLabel, Object attribute )
+	private void assignAttribute( String column, Double objectLabel, String attribute )
 	{
-//		if ( ! exists( attribute ) ) groups.add( attribute );
+		final int rowIndex = objectTablePanel.getRowIndex( objectLabel );
+		final int columnIndex = getColumnIndex( column );
 
-		objectTablePanel.getTable().getModel().setValueAt(
-				attribute,
-				objectTablePanel.getRowIndex( objectLabel ),
-				getColumnIndex( column ) );
+		final Object previousValue = objectTablePanel.getTable().getModel().getValueAt(
+				rowIndex,
+				columnIndex
+		);
+
+		if ( previousValue.getClass().equals( Double.class ) )
+		{
+			try
+			{
+				final double parseDouble = Double.parseDouble( attribute );
+				objectTablePanel.getTable().getModel().setValueAt(
+						parseDouble,
+						rowIndex,
+						columnIndex );
+			} catch ( Exception e )
+			{
+				Logger.logError( "Entered value must be numeric for column: " + column );
+			}
+		}
+		else
+		{
+			objectTablePanel.getTable().getModel().setValueAt(
+					attribute,
+					rowIndex,
+					columnIndex );
+		}
 	}
+
 
 	private int getColumnIndex( String column )
 	{

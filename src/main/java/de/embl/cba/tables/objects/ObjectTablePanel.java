@@ -28,8 +28,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ObjectTablePanel extends JPanel
 {
 	final private JTable table;
-	final String name;
 
+	final String name;
 	public static final String NO_COLUMN_SELECTED = "No column selected";
 
 	private final TableModel model;

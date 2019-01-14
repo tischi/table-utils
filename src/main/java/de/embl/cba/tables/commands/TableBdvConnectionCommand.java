@@ -5,7 +5,7 @@ import bdv.util.BdvFunctions;
 import bdv.util.BdvOptions;
 import bdv.util.RandomAccessibleIntervalSource4D;
 import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
-import de.embl.cba.bdv.utils.sources.SelectableVolatileARGBConvertedRealSource;
+import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableBdvConnector;
 import de.embl.cba.tables.TableUtils;
@@ -44,7 +44,7 @@ public class TableBdvConnectionCommand implements Command
 	public File inputIntensitiesFile;
 
 	public  ObjectTablePanel objectTablePanel;
-	private SelectableVolatileARGBConvertedRealSource labelsSource;
+	private SelectableARGBConvertedRealSource labelsSource;
 	private JTable table;
 	private Bdv bdv;
 	private BdvSelectionEventHandler bdvSelectionEventHandler;
@@ -90,7 +90,7 @@ public class TableBdvConnectionCommand implements Command
 	public void loadLabels()
 	{
 		final RandomAccessibleIntervalSource4D labels = loadImage( inputLabelMasksFile );
-		labelsSource = new SelectableVolatileARGBConvertedRealSource( labels );
+		labelsSource = new SelectableARGBConvertedRealSource( labels );
 	}
 
 	public JTable loadTable( File file )
