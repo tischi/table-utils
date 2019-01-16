@@ -1,0 +1,7 @@
+label_id	x	y	t	type
+1	31	26	0	circle
+1	36	26	1	circle
+1	43	26	2	circle
+2	55	79	0	square
+2	61	79	1	square
+2	72	79	2	square

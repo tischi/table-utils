@@ -4,8 +4,10 @@ import bdv.util.Bdv;
 import bdv.util.BdvFunctions;
 import bdv.util.BdvOptions;
 import bdv.util.RandomAccessibleIntervalSource4D;
+import bdv.viewer.Source;
 import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
+import de.embl.cba.bdv.utils.wrap.Wraps;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableBdvConnector;
 import de.embl.cba.tables.TableUtils;
@@ -16,6 +18,7 @@ import ij.IJ;
 import ij.ImagePlus;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.display.imagej.ImageJFunctions;
+import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
@@ -26,16 +29,15 @@ import org.scijava.plugin.Plugin;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 @Plugin(type = Command.class, menuPath = "Plugins>Measurement>Browse Table And Image" )
-public class TableBdvConnectionCommand implements Command
+public class TableBdvConnectionCommand < R extends RealType< R > & NativeType< R > >
+		implements Command
 {
 	@Parameter ( label = "Results table" )
 	public File inputTableFile;
-
-	@Parameter ( label = "Object label column index" )
-	public Integer objectLabelsColumnIndex = 0;
 
 	@Parameter ( label = "Label mask (single channel, 2D+t or 3D+t)" )
 	public File inputLabelMasksFile;
@@ -43,54 +45,72 @@ public class TableBdvConnectionCommand implements Command
 	@Parameter ( label = "Intensities (optional)", required = false )
 	public File inputIntensitiesFile;
 
-	public  ObjectTablePanel objectTablePanel;
-	private SelectableARGBConvertedRealSource labelsSource;
-	private JTable table;
-	private Bdv bdv;
-	private BdvSelectionEventHandler bdvSelectionEventHandler;
-
 	@Override
 	public void run()
 	{
-		loadTable();
+		final JTable table = loadTable( inputTableFile );
 
-		loadLabels();
+		final SelectableARGBConvertedRealSource labelsSource = loadLabels();
 
-		showImagesWithBdv();
+		final Bdv bdv = showImagesWithBdv( labelsSource );
 
-		showTablePanel();
+		ObjectTablePanel objectTablePanel = createAndShowTablePanel( table );
 
-		bdvSelectionEventHandler = new BdvSelectionEventHandler(
-				bdv,
-				labelsSource );
+		TableBdvConnector tableBdvConnector = new TableBdvConnector(
+				objectTablePanel,
+				new BdvSelectionEventHandler(
+						bdv,
+						labelsSource )
+		);
 
-		final TableBdvConnector tableBdvConnector = new TableBdvConnector( objectTablePanel, bdvSelectionEventHandler );
 		tableBdvConnector.setSelectionByAttribute( true );
 
 		new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
 	}
 
-	public void showTablePanel()
+	public ObjectTablePanel createAndShowTablePanel( JTable table )
 	{
-		objectTablePanel = new ObjectTablePanel( table, inputTableFile.getName() );
+		ObjectTablePanel objectTablePanel = new ObjectTablePanel( table, inputTableFile.getName() );
 		objectTablePanel.showPanel();
-		objectTablePanel.setCoordinateColumn( ObjectCoordinate.Label, table.getColumnName( objectLabelsColumnIndex ) );
+		return objectTablePanel;
 	}
 
-	public void showImagesWithBdv()
+	public Bdv showImagesWithBdv( SelectableARGBConvertedRealSource labelsSource )
 	{
-		bdv = BdvFunctions.show( labelsSource, BdvOptions.options().is2D() ).getBdvHandle();
+		int nT = getNumTimePoints( labelsSource );
+
+		final long nZ = labelsSource.getSource( 0, 0 ).dimension( 2 );
+
+		BdvOptions bdvOptions = BdvOptions.options();
+
+		if ( nZ == 1 ) bdvOptions = bdvOptions.is2D();
+
+		return BdvFunctions.show(
+					labelsSource,
+					nT,
+					bdvOptions ).getBdvHandle();
 	}
 
-	public void loadTable()
+	public static int getNumTimePoints( Source labelsSource )
 	{
-		table = loadTable( inputTableFile );
+		int nT = 0;
+		while ( labelsSource.isPresent( nT  ) ) nT++;
+		return nT;
 	}
 
-	public void loadLabels()
+
+	public SelectableARGBConvertedRealSource loadLabels()
 	{
-		final RandomAccessibleIntervalSource4D labels = loadImage( inputLabelMasksFile );
-		labelsSource = new SelectableARGBConvertedRealSource( labels );
+		final ArrayList< RandomAccessibleIntervalSource4D< R > > sources =
+				Wraps.imagePlusAsSource4DChannelList( IJ.openImage( inputLabelMasksFile.toString() ) );
+
+		if ( sources.size() > 1 )
+		{
+			Logger.error( "Label input image must be single channel!" );
+			return null;
+		}
+
+		return new SelectableARGBConvertedRealSource( sources.get( 0 ) );
 	}
 
 	public JTable loadTable( File file )

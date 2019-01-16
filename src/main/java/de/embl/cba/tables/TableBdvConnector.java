@@ -3,7 +3,7 @@ package de.embl.cba.tables;
 import bdv.util.Bdv;
 import de.embl.cba.bdv.utils.BdvUserInterfaceUtils;
 import de.embl.cba.bdv.utils.BdvUtils;
-import de.embl.cba.bdv.utils.behaviour.BehaviourRandomColorShufflingEventHandler;
+import de.embl.cba.bdv.utils.behaviour.BehaviourRandomColorLutSeedChangeEventHandler;
 import de.embl.cba.bdv.utils.converters.MappingLinearARGBConverter;
 import de.embl.cba.bdv.utils.converters.MappingRandomARGBConverter;
 import de.embl.cba.bdv.utils.converters.RandomARGBConverter;
@@ -25,7 +25,9 @@ import javax.swing.event.MouseInputAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -37,11 +39,11 @@ public class TableBdvConnector
 	private final Converter< RealType, VolatileARGBType > originalConverter;
 	private final Bdv bdv;
 	private boolean isCategoricalColoring;
-	private ConcurrentHashMap< Double, Object > currentObjectAttributeMap;
+	private ConcurrentHashMap< Object, Object > currentObjectAttributeMap;
 	private boolean isSelectionByAttribute;
 
-	public static final String OBJECT_GROUPING_TRIGGER = "ctrl G";
-
+	public static final String OBJECT_ATTRIBUTE_ASSIGNMENT_TRIGGER = "ctrl A";
+	private Set< Integer > selectedRows;
 
 	public TableBdvConnector( ObjectTablePanel objectTablePanel,
 							  BdvSelectionEventHandler bdvSelectionEventHandler )
@@ -54,6 +56,8 @@ public class TableBdvConnector
 
 		isCategoricalColoring = false;
 		isSelectionByAttribute = false;
+
+		selectedRows = new HashSet<>(  );
 
 		originalConverter = bdvSelectionEventHandler.getSelectableConverter().getWrappedConverter();
 
@@ -68,7 +72,6 @@ public class TableBdvConnector
 
 	public void installObjectAttributeAssignment()
 	{
-
 		final AssignObjectAttributesUI assignObjectAttributesUI = new AssignObjectAttributesUI( objectTablePanel );
 
 		final Behaviours behaviours = new Behaviours( new InputTriggerConfig() );
@@ -77,9 +80,12 @@ public class TableBdvConnector
 
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
 		{
-			assignObjectAttributesUI.showUI( bdvSelectionEventHandler.getSelectedValues()  );
+			if ( selectedRows.size() > 0 )
+			{
+				assignObjectAttributesUI.showUI( selectedRows );
+			}
 		}
-		, "fetch-selected-objects-" + objectTablePanel.getName(), OBJECT_GROUPING_TRIGGER );
+		, "fetch-selected-objects-" + objectTablePanel.getName(), OBJECT_ATTRIBUTE_ASSIGNMENT_TRIGGER );
 	}
 
 	public void setSelectionByAttribute( boolean selectionByAttribute )
@@ -92,31 +98,63 @@ public class TableBdvConnector
 		bdvSelectionEventHandler.addSelectionEventListener( new SelectionEventListener()
 		{
 			@Override
-			public void valueSelected( double objectLabel )
+			public void valueSelected( double label, int timepoint )
 			{
-				final int row = objectTablePanel.getRowIndex( objectLabel );
+				int row = getRow( label, timepoint );
+				selectedRows.add( row );
 
-				table.setRowSelectionInterval( row, row );
+				final int rowInView = table.convertRowIndexToView( row );
+				table.setRowSelectionInterval( rowInView, rowInView );
 
-				table.scrollRectToVisible( table.getCellRect( row,0, true ) );
+				table.scrollRectToVisible( table.getCellRect( rowInView,0, true ) );
 
 				if ( isCategoricalColoring && isSelectionByAttribute )
 				{
-					selectAllObjectsWithSameAttribute( objectLabel, currentObjectAttributeMap, bdvSelectionEventHandler );
+					selectAllObjectsWithSameAttribute( label, currentObjectAttributeMap, bdvSelectionEventHandler );
 				}
+			}
+
+			@Override
+			public void valueUnselected( double objectLabel, int timepoint )
+			{
+				int row = getRow( objectLabel, timepoint );
+				selectedRows.remove( row );
+			}
+
+			public int getRow( double objectLabel, int timepoint )
+			{
+				int row;
+
+				if ( objectTablePanel.hasCoordinate( ObjectCoordinate.T ) )
+				{
+					row = objectTablePanel.getRowIndex( objectLabel, timepoint );
+				}
+				else
+				{
+					row = objectTablePanel.getRowIndex( objectLabel );
+				}
+				return row;
+			}
+
+			public int getCurrentTimepoint()
+			{
+				return bdvSelectionEventHandler.getBdv().getBdvHandle().getViewerPanel().getState().getCurrentTimepoint();
 			}
 		} );
 	}
 
-	public static void selectAllObjectsWithSameAttribute( double objectLabel, ConcurrentHashMap< Double, Object > currentObjectAttributeMap, BdvSelectionEventHandler bdvSelectionEventHandler )
+	public static void selectAllObjectsWithSameAttribute(
+			double objectLabel,
+			ConcurrentHashMap< Object, Object > currentObjectAttributeMap,
+			BdvSelectionEventHandler bdvSelectionEventHandler )
 	{
 		final Object objectAttribute = currentObjectAttributeMap.get( objectLabel );
 
-		for ( Map.Entry< Double, Object > entry : currentObjectAttributeMap.entrySet() )
+		for ( Map.Entry< Object, Object > entry : currentObjectAttributeMap.entrySet() )
 		{
 			if ( entry.getValue().equals( objectAttribute ) )
 			{
-				bdvSelectionEventHandler.addSelection( entry.getKey() );
+				bdvSelectionEventHandler.addSelection( (Double) entry.getKey() );
 			}
 		}
 
@@ -131,13 +169,20 @@ public class TableBdvConnector
 			{
 				if( me.isControlDown() )
 				{
-					final int selectedRow = table.getSelectedRow();
+					if ( objectTablePanel.hasCoordinate( ObjectCoordinate.Label ) )
+					{
+						final int selectedRow = table.getSelectedRow();
 
-					bdvSelectionEventHandler.addSelection(
-									objectTablePanel.getObjectCoordinate(
-											ObjectCoordinate.Label, selectedRow ) );
+						bdvSelectionEventHandler.addSelection(
+								objectTablePanel.getObjectCoordinate(
+										ObjectCoordinate.Label, selectedRow ) );
 
-					moveBdvToObjectPosition( selectedRow );
+						moveBdvToObjectPosition( selectedRow );
+					}
+					else
+					{
+						Logger.error( "Please specify the Object Label column!" );
+					}
 				}
 			}
 		});
@@ -188,7 +233,7 @@ public class TableBdvConnector
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
-				if ( ! objectTablePanel.isCoordinateColumnSet( ObjectCoordinate.Label ) )
+				if ( ! objectTablePanel.hasCoordinate( ObjectCoordinate.Label ) )
 				{
 					Logger.warn( "Please specify the object label column:\n" +
 							"[ Objects > Select coordinates... ]" );
@@ -221,7 +266,7 @@ public class TableBdvConnector
 		{
 			isCategoricalColoring = true;
 			converter = createMappingRandomARGBConverter( colorByColumn );
-			new BehaviourRandomColorShufflingEventHandler( bdv, ( RandomARGBConverter ) converter, "colorByColumn" );
+			new BehaviourRandomColorLutSeedChangeEventHandler( bdv, ( RandomARGBConverter ) converter, "colorByColumn" );
 		}
 		else
 		{

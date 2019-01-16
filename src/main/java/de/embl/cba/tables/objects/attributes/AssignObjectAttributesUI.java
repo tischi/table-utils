@@ -15,7 +15,7 @@ public class AssignObjectAttributesUI extends JPanel
 {
 	public static final String NEW_ATTRIBUTE = "None";
 	final ObjectTablePanel objectTablePanel;
-	Set< Double > objectLabels;
+	Set< Integer > selectedRows;
 	private JComboBox attributeComboBox;
 	private JComboBox columnComboBox;
 	private JFrame frame;
@@ -41,9 +41,9 @@ public class AssignObjectAttributesUI extends JPanel
 		this.add( okButton );
 	}
 
-	public void showUI( Set< Double > objectLabels )
+	public void showUI( Set< Integer > selectedRows )
 	{
-		this.objectLabels = objectLabels;
+		this.selectedRows = selectedRows;
 		updateColumnComboBox();
 		showFrame();
 	}
@@ -61,7 +61,7 @@ public class AssignObjectAttributesUI extends JPanel
 
 				assignAttributes(
 						selectedColumn,
-						objectLabels,
+						selectedRows,
 						selectedAttribute
 						);
 
@@ -153,21 +153,20 @@ public class AssignObjectAttributesUI extends JPanel
 		}
 	}
 
-	private void assignAttributes( final String column, final Set< Double > objectLabels, final String attribute )
+	private void assignAttributes( final String column, final Set< Integer > rows, final String attribute )
 	{
-		for ( Double objectLabel : objectLabels )
+		for ( Integer row : rows )
 		{
-			assignAttribute( column, objectLabel, attribute );
+			assignAttribute( column, row, attribute );
 		}
 	}
 
-	private void assignAttribute( String column, Double objectLabel, String attribute )
+	private void assignAttribute( String column, Integer row, String attribute )
 	{
-		final int rowIndex = objectTablePanel.getRowIndex( objectLabel );
 		final int columnIndex = getColumnIndex( column );
 
 		final Object previousValue = objectTablePanel.getTable().getModel().getValueAt(
-				rowIndex,
+				row,
 				columnIndex
 		);
 
@@ -178,7 +177,7 @@ public class AssignObjectAttributesUI extends JPanel
 				final double parseDouble = Double.parseDouble( attribute );
 				objectTablePanel.getTable().getModel().setValueAt(
 						parseDouble,
-						rowIndex,
+						row,
 						columnIndex );
 			} catch ( Exception e )
 			{
@@ -189,7 +188,7 @@ public class AssignObjectAttributesUI extends JPanel
 		{
 			objectTablePanel.getTable().getModel().setValueAt(
 					attribute,
-					rowIndex,
+					row,
 					columnIndex );
 		}
 	}

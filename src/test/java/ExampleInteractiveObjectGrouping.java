@@ -64,18 +64,21 @@ public class ExampleInteractiveObjectGrouping
 		final BdvSelectionEventHandler bdvSelectionEventHandler =
 				new BdvSelectionEventHandler( bdv, selectableSource );
 
+
 		// Define additional behaviour: assigning attributes by Ctrl + G
 		//
-		final Behaviours behaviours = new Behaviours( new InputTriggerConfig() );
-		behaviours.install( bdv.getBdvHandle().getTriggerbindings(), "bdv-object-attributes-" + selectableSource.getName() );
-
-		final AssignObjectAttributesUI assignObjectAttributesUI = new AssignObjectAttributesUI( objectTablePanel );
-
-		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
-		{
-			assignObjectAttributesUI.showUI( bdvSelectionEventHandler.getSelectedValues()  );
-		}
-		, "fetch-curently-selected-objects-" + selectableSource.getName(), Examples.OBJECT_GROUPING_TRIGGER  );
+		// Broken: needs a fix
+//		final Behaviours behaviours = new Behaviours( new InputTriggerConfig() );
+//		behaviours.install( bdv.getBdvHandle().getTriggerbindings(), "bdv-object-attributes-" + selectableSource.getName() );
+//
+//		final AssignObjectAttributesUI assignObjectAttributesUI
+//				= new AssignObjectAttributesUI( objectTablePanel );
+//
+//		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
+//		{
+//			assignObjectAttributesUI.showUI( bdvSelectionEventHandler.getSelectedValues()  );
+//		}
+//		, "fetch-curently-selected-objects-" + selectableSource.getName(), Examples.OBJECT_GROUPING_TRIGGER  );
 
 	}
 }

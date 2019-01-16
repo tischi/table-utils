@@ -4,6 +4,7 @@ import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.models.ColumnClassAwareTableModel;
+import net.imglib2.ops.parse.token.Int;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -37,7 +38,7 @@ public class ObjectTablePanel extends JPanel
     private JScrollPane scrollPane;
     private JMenuBar menuBar;
     private HashMap< ObjectCoordinate, String > objectCoordinateColumnMap;
-	private ConcurrentHashMap< Double, Integer > labelRowMap;
+	private ConcurrentHashMap< String, Integer > objectRowMap;
 	private HashMap< String, double[] > columnsMinMaxMap;
 
 	public ObjectTablePanel( JTable table )
@@ -215,7 +216,7 @@ public class ObjectTablePanel extends JPanel
         return table.convertRowIndexToModel( table.getSelectedRow() );
     }
 
-    public boolean isCoordinateColumnSet( ObjectCoordinate objectCoordinate )
+    public boolean hasCoordinate( ObjectCoordinate objectCoordinate )
     {
         if( objectCoordinateColumnMap.get( objectCoordinate ) == NO_COLUMN_SELECTED ) return false;
         return true;
@@ -259,24 +260,54 @@ public class ObjectTablePanel extends JPanel
 		return table;
 	}
 
-
-	private void createLabelRowMap()
+	private void createObjectRowMap()
 	{
-		labelRowMap = new ConcurrentHashMap();
+		objectRowMap = new ConcurrentHashMap();
 
 		final int labelColumnIndex =
 				table.getColumnModel().getColumnIndex( getCoordinateColumn( ObjectCoordinate.Label ) );
 
+		int timeColumnIndex = getTimeColumnIndex();
+
 		final int rowCount = table.getRowCount();
 		for ( int row = 0; row < rowCount; row++ )
 		{
-			labelRowMap.put(
-					( double ) table.getValueAt( row, labelColumnIndex ),
-					( int ) row );
+			String key = createObjectKey( labelColumnIndex, timeColumnIndex, row );
+			objectRowMap.put( key, row );
 		}
 	}
 
-	public ConcurrentHashMap< Double, Object > getLabelHashMap( String column1 )
+	private String createObjectKey( final int labelColumnIndex, final int timeColumnIndex, final int rowInView )
+	{
+		final int rowInModel = table.convertRowIndexToModel( rowInView );
+		final Double label = ( Double ) table.getValueAt( rowInModel, labelColumnIndex );
+
+		String key;
+		if ( timeColumnIndex == -1 )
+		{
+			key = getObjectKey( label );
+		}
+		else
+		{
+			final Double timePoint = ( Double ) table.getValueAt( rowInModel, timeColumnIndex );
+			key = getObjectKey( label, timePoint.intValue() );
+		}
+
+		return key;
+	}
+
+	private int getTimeColumnIndex()
+	{
+		int timeColumnIndex = -1;
+		if ( hasCoordinate( ObjectCoordinate.T ) )
+		{
+			timeColumnIndex = table.getColumnModel().getColumnIndex(
+					getCoordinateColumn( ObjectCoordinate.T ) );
+		}
+		return timeColumnIndex;
+	}
+
+	public ConcurrentHashMap< Object, Object > getLabelHashMap( String column1 )
 	{
 		final ConcurrentHashMap map = new ConcurrentHashMap();
 
@@ -287,7 +318,7 @@ public class ObjectTablePanel extends JPanel
 
 		for ( int row = 0; row < rowCount; row++ )
 		{
-			map.put( (Double) getValueAt( row, labelColumnIndex0 ), getValueAt( row, labelColumnIndex1 ));
+			map.put( getValueAt( row, labelColumnIndex0 ), getValueAt( row, labelColumnIndex1 ));
 		}
 
 		return map;
@@ -298,11 +329,32 @@ public class ObjectTablePanel extends JPanel
 		return table.getValueAt( row, col );
 	}
 
-	public int getRowIndex( double objectLabel )
+	public int getRowIndex( double label )
 	{
-		if ( labelRowMap == null ) createLabelRowMap();
+		return getRowIndex( label, null );
+	}
 
-		return labelRowMap.get( objectLabel );
+	public int getRowIndex( Double label, Integer timepoint )
+	{
+		if ( objectRowMap == null ) createObjectRowMap();
+
+		final String objectKey = getObjectKey( label, timepoint );
+
+		final Integer rowIndex = objectRowMap.get( objectKey );
+
+		return rowIndex;
+	}
+
+
+	private String getObjectKey( Double label )
+	{
+		return getObjectKey( label, null );
+	}
+
+	private String getObjectKey( Double label, Integer time )
+	{
+		if ( time == null ) return label.toString();
+		else return label.toString() + "_" + time.toString();
 	}
 
 	public double[] getMinMaxValues( String selectedColumn )

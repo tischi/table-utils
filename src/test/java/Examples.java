@@ -17,7 +17,7 @@ import java.io.IOException;
 public abstract class Examples
 {
 
-	public static final String OBJECT_GROUPING_TRIGGER = "ctrl G";
+	public static final String OBJECT_GROUPING_TRIGGER = "ctrl A";
 
 	public static JTable loadObjectTableFor2D16BitLabelMask() throws IOException
 	{
