@@ -6,11 +6,7 @@ import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
 import de.embl.cba.tables.objects.ObjectCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
-import de.embl.cba.tables.objects.attributes.AssignObjectAttributesUI;
 import net.imagej.ImageJ;
-import org.scijava.ui.behaviour.ClickBehaviour;
-import org.scijava.ui.behaviour.io.InputTriggerConfig;
-import org.scijava.ui.behaviour.util.Behaviours;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -51,7 +47,7 @@ public class ExampleInteractiveObjectGrouping
 		final JTable jTable = Examples.loadObjectTableFor2D16BitLabelMask();
 
 		final ObjectTablePanel objectTablePanel = new ObjectTablePanel( jTable, "Table" );
-		objectTablePanel.showPanel();
+		objectTablePanel.showTable();
 		objectTablePanel.setCoordinateColumn( ObjectCoordinate.Label, jTable.getColumnName( 0 ) );
 		objectTablePanel.addColumn( "MyGrouping", "None" );
 

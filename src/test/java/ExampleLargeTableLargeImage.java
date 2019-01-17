@@ -56,7 +56,7 @@ public class ExampleLargeTableLargeImage
 		objectTablePanel.setCoordinateColumn( ObjectCoordinate.Y, "com_y_microns" );
 		objectTablePanel.setCoordinateColumn( ObjectCoordinate.Z, "com_z_microns" );
 
-		// objectTablePanel.showPanel();
+		// objectTablePanel.showTable();
 
 		final BdvSelectionEventHandler bdvSelectionEventHandler =
 				new BdvSelectionEventHandler(

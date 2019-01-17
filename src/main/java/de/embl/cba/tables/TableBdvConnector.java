@@ -14,6 +14,7 @@ import de.embl.cba.tables.objects.ObjectCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import de.embl.cba.tables.objects.attributes.AssignObjectAttributesUI;
 import net.imglib2.converter.Converter;
+import net.imglib2.ops.parse.token.Int;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.volatiles.VolatileARGBType;
 import org.scijava.ui.behaviour.ClickBehaviour;
@@ -110,7 +111,11 @@ public class TableBdvConnector
 
 				if ( isCategoricalColoring && isSelectionByAttribute )
 				{
-					selectAllObjectsWithSameAttribute( label, currentObjectAttributeMap, bdvSelectionEventHandler );
+					selectAllObjectsWithSameAttribute(
+							label,
+							getCurrentTimepoint(),
+							currentObjectAttributeMap,
+							bdvSelectionEventHandler );
 				}
 			}
 
@@ -145,6 +150,7 @@ public class TableBdvConnector
 
 	public static void selectAllObjectsWithSameAttribute(
 			double objectLabel,
+			int currentTimepoint,
 			ConcurrentHashMap< Object, Object > currentObjectAttributeMap,
 			BdvSelectionEventHandler bdvSelectionEventHandler )
 	{
@@ -154,7 +160,7 @@ public class TableBdvConnector
 		{
 			if ( entry.getValue().equals( objectAttribute ) )
 			{
-				bdvSelectionEventHandler.addSelection( (Double) entry.getKey() );
+				bdvSelectionEventHandler.addSelection( (Double) entry.getKey(), currentTimepoint  );
 			}
 		}
 
@@ -173,9 +179,11 @@ public class TableBdvConnector
 					{
 						final int selectedRow = table.getSelectedRow();
 
-						bdvSelectionEventHandler.addSelection(
-								objectTablePanel.getObjectCoordinate(
-										ObjectCoordinate.Label, selectedRow ) );
+						final Double objectLabel = objectTablePanel.getObjectCoordinate( ObjectCoordinate.Label, selectedRow );
+
+						Integer timepoint = getTimepoint( selectedRow );
+
+						bdvSelectionEventHandler.addSelection( objectLabel, timepoint );
 
 						moveBdvToObjectPosition( selectedRow );
 					}
@@ -187,6 +195,17 @@ public class TableBdvConnector
 			}
 		});
 
+	}
+
+	public Integer getTimepoint( int selectedRow )
+	{
+		Integer timepoint = 0;
+		if ( objectTablePanel.hasCoordinate( ObjectCoordinate.Label.T ) )
+		{
+			final Double timepointDouble = (Double) objectTablePanel.getObjectCoordinate( ObjectCoordinate.Label.T, selectedRow );
+			timepoint = timepointDouble.intValue();
+		}
+		return timepoint;
 	}
 
 	private void moveBdvToObjectPosition( int row )

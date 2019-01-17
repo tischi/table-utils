@@ -16,7 +16,7 @@ public class TestObjectCoordinateColumnsSelectionUI
 
 		final ObjectTablePanel objectTablePanel = new ObjectTablePanel( table, "Table" );
 
-		objectTablePanel.showPanel();
+		objectTablePanel.showTable();
 
 		new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
 

@@ -192,7 +192,7 @@ public class ObjectTablePanel extends JPanel
 		return menu;
 	}
 
-    public void showPanel() {
+    public void showTable() {
 
         //Create and set up the window.
         frame = new JFrame( name );

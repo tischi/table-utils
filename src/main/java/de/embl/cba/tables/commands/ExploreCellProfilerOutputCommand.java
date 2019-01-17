@@ -5,14 +5,10 @@ import bdv.util.BdvFunctions;
 import bdv.util.BdvOptions;
 import bdv.util.RandomAccessibleIntervalSource4D;
 import bdv.viewer.Source;
-import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
-import de.embl.cba.bdv.utils.wrap.Wraps;
 import de.embl.cba.tables.Logger;
-import de.embl.cba.tables.TableBdvConnector;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.objects.ObjectTablePanel;
-import de.embl.cba.tables.objects.ObjectCoordinateColumnsSelectionUI;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imglib2.RandomAccessibleInterval;
@@ -28,43 +24,37 @@ import org.scijava.plugin.Plugin;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 
-@Plugin(type = Command.class, menuPath = "Plugins>Measurement>Browse Table And Image" )
-public class TableBdvConnectionCommand < R extends RealType< R > & NativeType< R > >
+@Plugin(type = Command.class, menuPath = "Plugins>Screening>Explore CellProfiler Output" )
+public class ExploreCellProfilerOutputCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {
-	@Parameter ( label = "Results table" )
+	@Parameter ( label = "CellProfiler Table" )
 	public File inputTableFile;
-
-	@Parameter ( label = "Label mask (single channel, 2D+t or 3D+t)" )
-	public File inputLabelMasksFile;
-
-	@Parameter ( label = "Intensities (optional)", required = false )
-	public File inputIntensitiesFile;
 
 	@Override
 	public void run()
 	{
 		final JTable table = loadTable( inputTableFile );
 
-		final SelectableARGBConvertedRealSource labelsSource = loadLabels();
 
-		final Bdv bdv = showImagesWithBdv( labelsSource );
-
-		ObjectTablePanel objectTablePanel = createAndShowTablePanel( table );
-
-		TableBdvConnector tableBdvConnector = new TableBdvConnector(
-				objectTablePanel,
-				new BdvSelectionEventHandler(
-						bdv,
-						labelsSource )
-		);
-
-		tableBdvConnector.setSelectionByAttribute( true );
-
-		new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
+//		final SelectableARGBConvertedRealSource labelsSource = loadLabels();
+//
+//		final Bdv bdv = showImagesWithBdv( labelsSource );
+//
+//		ObjectTablePanel objectTablePanel = createAndShowTablePanel( table );
+//
+//		TableBdvConnector tableBdvConnector = new TableBdvConnector(
+//				objectTablePanel,
+//				new BdvSelectionEventHandler(
+//						bdv,
+//						labelsSource )
+//		);
+//
+//		tableBdvConnector.setSelectionByAttribute( true );
+//
+//		new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
 	}
 
 	public ObjectTablePanel createAndShowTablePanel( JTable table )
@@ -97,20 +87,20 @@ public class TableBdvConnectionCommand < R extends RealType< R > & NativeType< R
 		return nT;
 	}
 
-
-	public SelectableARGBConvertedRealSource loadLabels()
-	{
-		final ArrayList< RandomAccessibleIntervalSource4D< R > > sources =
-				Wraps.imagePlusAsSource4DChannelList( IJ.openImage( inputLabelMasksFile.toString() ) );
-
-		if ( sources.size() > 1 )
-		{
-			Logger.error( "Label input image must be single channel!" );
-			return null;
-		}
-
-		return new SelectableARGBConvertedRealSource( sources.get( 0 ) );
-	}
+//
+//	public SelectableARGBConvertedRealSource loadLabels()
+//	{
+//		final ArrayList< RandomAccessibleIntervalSource4D< R > > sources =
+//				Wraps.imagePlusAsSource4DChannelList( IJ.openImage( inputLabelMasksFile.toString() ) );
+//
+//		if ( sources.size() > 1 )
+//		{
+//			Logger.error( "Label input image must be single channel!" );
+//			return null;
+//		}
+//
+//		return new SelectableARGBConvertedRealSource( sources.get( 0 ) );
+//	}
 
 	public JTable loadTable( File file )
 	{

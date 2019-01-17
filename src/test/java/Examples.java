@@ -42,7 +42,7 @@ public abstract class Examples
 	{
 		final ObjectTablePanel objectTablePanel = new ObjectTablePanel( jTable );
 
-		objectTablePanel.showPanel();
+		objectTablePanel.showTable();
 
 		objectTablePanel.setCoordinateColumn( ObjectCoordinate.Label, jTable.getColumnName( 0 ) );
 	}
