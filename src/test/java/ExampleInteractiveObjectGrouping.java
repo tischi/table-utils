@@ -41,7 +41,7 @@ public class ExampleInteractiveObjectGrouping
 		Bdv bdv = BdvFunctions.show( selectableSource, BdvOptions.options().is2D() ).getBdvHandle();
 
 		/**
-		 * Load table and add a group column
+		 * Load table and add a group valueInTableColumn
 		 */
 
 		final JTable jTable = Examples.loadObjectTableFor2D16BitLabelMask();
@@ -70,7 +70,7 @@ public class ExampleInteractiveObjectGrouping
 //		final AssignObjectAttributesUI assignObjectAttributesUI
 //				= new AssignObjectAttributesUI( objectTablePanel );
 //
-//		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
+//		behaviours.behaviour( ( ClickBehaviour ) ( labelImageIndex, y ) ->
 //		{
 //			assignObjectAttributesUI.showUI( bdvSelectionEventHandler.getSelectedValues()  );
 //		}

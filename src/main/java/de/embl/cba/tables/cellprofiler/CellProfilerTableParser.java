@@ -7,20 +7,24 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ParseCellProfilerTable
+public class CellProfilerTableParser
 {
 
 	public static final String DATASET_INDEX = "ImageNumber";
 	public static final String FOLDER = "PathName_";
 	public static final String FILE = "FileName_";
+
+	public static final String OBJECTS = "Objects_";
+
+
 	private ArrayList< String > columns;
 	private HashMap< Object, CellProfilerDataset > datasets;
 
-	public ParseCellProfilerTable( JTable table )
+	public CellProfilerTableParser( JTable table )
 	{
-		ArrayList< String > columns = TableUtils.getColumnNames( table );
+		columns = TableUtils.getColumnNames( table );
 
-		final HashMap< String, FolderAndFileColumn > images = getImageFileAndFolderColumns( columns );
+		final HashMap< String, FolderAndFileColumn > images = getImageFileAndFolderColumns( );
 
 		datasets = getDatasets( table, table.getColumnModel().getColumnIndex( DATASET_INDEX ), images );
 	}
@@ -51,7 +55,15 @@ public class ParseCellProfilerTable
 							table.getColumnModel().getColumnIndex( fileColumn ) );
 
 					final String pathName = folderName + File.separator + fileName;
-					dataset.addImagePath( pathName );
+
+					String type = CellProfilerDataset.INTENSITY_IMAGE;
+
+					if ( image.contains( OBJECTS ) )
+					{
+						type = CellProfilerDataset.OBJECT_LABEL_MASK;
+					}
+
+					dataset.addImagePath( type, pathName );
 				}
 
 				datasets.put( datasetIndex, dataset );
@@ -62,7 +74,7 @@ public class ParseCellProfilerTable
 		return datasets;
 	}
 
-	public HashMap< String, FolderAndFileColumn > getImageFileAndFolderColumns( ArrayList< String > columns )
+	public HashMap< String, FolderAndFileColumn > getImageFileAndFolderColumns( )
 	{
 		final HashMap< String, FolderAndFileColumn > images = new HashMap<>();
 		for ( String column : columns )

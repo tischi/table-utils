@@ -1,4 +1,5 @@
 import bdv.util.RandomAccessibleIntervalSource;
+import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.objects.ObjectCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
@@ -37,6 +38,13 @@ public abstract class Examples
 
 		return new RandomAccessibleIntervalSource( wrap, Util.getTypeFromInterval( wrap ), imagePlus.getTitle() );
 	}
+
+
+	public static SelectableARGBConvertedRealSource loadSelectableSource()
+	{
+		return ( new SelectableARGBConvertedRealSource( Examples.load2D16BitLabelMask() ) );
+	}
+
 
 	public static void createInteractiveTablePanel( JTable jTable )
 	{

@@ -57,9 +57,7 @@ public class TableBdvConnectionCommand < R extends RealType< R > & NativeType< R
 
 		TableBdvConnector tableBdvConnector = new TableBdvConnector(
 				objectTablePanel,
-				new BdvSelectionEventHandler(
-						bdv,
-						labelsSource )
+				new BdvSelectionEventHandler( bdv, labelsSource )
 		);
 
 		tableBdvConnector.setSelectionByAttribute( true );

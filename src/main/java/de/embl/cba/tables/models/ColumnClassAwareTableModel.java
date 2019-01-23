@@ -30,7 +30,7 @@ public class ColumnClassAwareTableModel extends DefaultTableModel
 	}
 
 	/**
-	 * Determines column classes from entries in 1st row.
+	 * Determines valueInTableColumn classes from entries in 1st row.
 	 */
 	public void refreshColumnClasses()
 	{

@@ -1,18 +1,22 @@
-package de.embl.cba.tables.objects;
+package de.embl.cba.tables.tablebdvobject;
 
 import de.embl.cba.tables.Logger;
-import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.TableUIs;
-import de.embl.cba.tables.tablebdvobject.TableView;
+import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.objects.ObjectCoordinate;
+import de.embl.cba.tables.objects.ObjectCoordinateColumnsSelectionUI;
 
 import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -23,40 +27,44 @@ import java.util.concurrent.ConcurrentHashMap;
  * - https://coderanch.com/t/345383/java/JTable-Paging
  */
 
-public class ObjectTablePanel extends JPanel
+public class TableView < T extends TableRow > extends JPanel implements SelectionListener< T >
 {
+	private final SelectionModel< T > selectionModel;
+	private final SegmentationInstancesModel model;
+	private final Listeners.List< SelectionListener > listeners;
+
 	final private JTable table;
 
 	final String name;
 	public static final String NO_COLUMN_SELECTED = "No valueInTableColumn selected";
 
-	private final TableModel model;
+	private final TableModel tableModel;
 	private JFrame frame;
     private JScrollPane scrollPane;
     private JMenuBar menuBar;
     private HashMap< ObjectCoordinate, String > objectCoordinateColumnMap;
 	private ConcurrentHashMap< String, Integer > objectRowMap;
 	private HashMap< String, double[] > columnsMinMaxMap;
+	private int highlightedRow;
 
-	public ObjectTablePanel( JTable table )
+	public TableView( SegmentationInstancesModel model, SelectionModel< T > selectionModel )
 	{
 		super( new GridLayout(1, 0 ) );
-		this.table = table;
+
+		this.model = model;
+		this.selectionModel = selectionModel;
+
+		this.table = model.getTable();
+		this.tableModel = model.getTable().getModel();
 		this.name = "Table";
-		init();
-		model = table.getModel();
+
+		listeners = new Listeners.SynchronizedList< SelectionListener >(  );
+
+		prepareTableView();
+		showTable();
 	}
 
-	public ObjectTablePanel( JTable table, String name )
-    {
-        super( new GridLayout(1, 0 ) );
-        this.table = table;
-		this.name = name;
-		init();
-		model = table.getModel();
-	}
-
-	private void init()
+	private void prepareTableView()
     {
         table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
         table.setFillsViewportHeight( true );
@@ -154,7 +162,7 @@ public class ObjectTablePanel extends JPanel
 	{
 		final JMenuItem menuItem = new JMenuItem( "Add valueInTableColumn..." );
 
-		final ObjectTablePanel objectTablePanel = this;
+		final TableView objectTablePanel = this;
 		menuItem.addActionListener( new ActionListener()
 		{
 			@Override
@@ -172,7 +180,7 @@ public class ObjectTablePanel extends JPanel
 	{
 		JMenu menu = new JMenu( "Objects" );
 
-		final ObjectTablePanel objectTablePanel = this;
+		final TableView objectTablePanel = this;
 
 		final JMenuItem coordinatesMenuItem = new JMenuItem( "Select coordinates..." );
 		coordinatesMenuItem.addActionListener( new ActionListener()
@@ -234,7 +242,7 @@ public class ObjectTablePanel extends JPanel
 
 	public void addColumn( String column, Object defaultValue )
 	{
-		TableUtils.addColumn( model, column, defaultValue );
+		TableUtils.addColumn( tableModel, column, defaultValue );
 	}
 
 	public ArrayList< String > getColumnNames()
@@ -294,22 +302,6 @@ public class ObjectTablePanel extends JPanel
 		return timeColumnIndex;
 	}
 
-	public ConcurrentHashMap< Object, Object > getLabelHashMap( String column1 )
-	{
-		final ConcurrentHashMap map = new ConcurrentHashMap();
-
-		final int labelColumnIndex0 = table.getColumnModel().getColumnIndex( getCoordinateColumn( ObjectCoordinate.Label ) );
-		final int labelColumnIndex1 = table.getColumnModel().getColumnIndex( column1 );
-
-		final int rowCount = table.getRowCount();
-
-		for ( int row = 0; row < rowCount; row++ )
-		{
-			map.put( getValueAt( row, labelColumnIndex0 ), getValueAt( row, labelColumnIndex1 ));
-		}
-
-		return map;
-	}
 
 	private synchronized Object getValueAt( int row, int col )
 	{
@@ -373,11 +365,92 @@ public class ObjectTablePanel extends JPanel
 		columnsMinMaxMap.put( selectedColumn, new double[]{ min, max } );
 	}
 
-
 	public void highlightRow( int row )
 	{
-		final int rowInView = table.convertRowIndexToView( row );
-		table.setRowSelectionInterval( rowInView, rowInView );
-		table.scrollRectToVisible( table.getCellRect( rowInView,0, true ) );
+		if ( row != highlightedRow  )
+		{
+			final int rowInView = table.convertRowIndexToView( row );
+			table.setRowSelectionInterval( rowInView, rowInView );
+			table.scrollRectToVisible( table.getCellRect( rowInView, 0, true ) );
+
+			selectionModel.setSelected( (T) model.getSegmentationInstance( row ) , true );
+
+			highlightedRow = row;
+		}
+	}
+
+	public int getHighlightedRow()
+	{
+		return highlightedRow;
+	}
+
+	public void highlightRowOfMostRecentSelection( SelectionModel< T > selection )
+	{
+		final Set< T > selected = selection.getSelected();
+		final T lastSelection = ( T ) selected.toArray()[ selected.size() - 1 ];
+		this.highlightRow( lastSelection.tableRowIndex() );
+	}
+
+	public Listeners< SelectionListener > listeners()
+	{
+		return listeners;
+	}
+
+	public void installRowSelectionListener()
+	{
+		table.addMouseListener(new MouseInputAdapter()
+		{
+			public void mousePressed( MouseEvent me )
+			{
+				if ( me.isControlDown() )
+				{
+					if ( hasCoordinate( ObjectCoordinate.Label ) )
+					{
+						final int selectedRow = table.getSelectedRow();
+
+						final Double label = getObjectCoordinate( ObjectCoordinate.Label, selectedRow );
+
+						Integer timePoint = getTimePoint( selectedRow );
+
+						selectionModel.setSelected(
+								( T ) model.getSegmentationInstance( label, timePoint  ),
+								true );
+					}
+					else
+					{
+						Logger.error( "Please specify the Object Label Column!" );
+					}
+				}
+			}
+		} );
+	}
+
+
+	public Integer getTimePoint( int row )
+	{
+		Integer timepoint = 0;
+		if ( hasCoordinate( ObjectCoordinate.Label.T ) )
+		{
+			final Double timepointDouble = (Double) getObjectCoordinate( ObjectCoordinate.Label.T, row );
+			timepoint = timepointDouble.intValue();
+		}
+		return timepoint;
+	}
+
+	@Override
+	public void selectionChanged()
+	{
+	}
+
+	@Override
+	public void selectionAdded( T selection )
+	{
+		highlightRow( selection.tableRowIndex() );
+	}
+
+	@Override
+	public void selectionRemoved( T selection )
+	{
+
 	}
 }

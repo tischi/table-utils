@@ -1,15 +1,15 @@
 package de.embl.cba.tables;
 
 import de.embl.cba.tables.models.ColumnClassAwareTableModel;
-import de.embl.cba.tables.objects.ObjectTablePanel;
-import ij.gui.GenericDialog;
 import org.scijava.table.GenericTable;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 
 public class TableUtils
 {
@@ -40,7 +40,19 @@ public class TableUtils
 	}
 
 
-	public static void saveTable( JTable table, File file ) throws IOException
+	public static void saveTable( JTable table, File tableOutputFile )
+	{
+		try
+		{
+			TableUtils.saveTableWithIOException( table, tableOutputFile );
+		}
+		catch ( IOException e )
+		{
+			e.printStackTrace();
+		}
+	}
+
+	private static void saveTableWithIOException( JTable table, File file ) throws IOException
 	{
 		BufferedWriter bfw = new BufferedWriter( new FileWriter( file ) );
 
@@ -71,7 +83,7 @@ public class TableUtils
 		return createJTableFromStringList( rows, delim );
 	}
 
-	private static ArrayList< String > readRows( File file )
+	public static ArrayList< String > readRows( File file )
 	{
 		ArrayList< String > rows = new ArrayList<>();
 
@@ -235,5 +247,46 @@ public class TableUtils
 
 		return max;
 	}
+
+	public static void addColumn( JTable table, String column, Object defaultValue )
+	{
+		addColumn( table.getModel(), column, defaultValue );
+	}
+
+	public static void addColumn( TableModel model, String column, Object defaultValue )
+	{
+		if ( model instanceof ColumnClassAwareTableModel )
+		{
+			((ColumnClassAwareTableModel ) model ).addColumnClass( defaultValue );
+		}
+
+		if ( model instanceof DefaultTableModel )
+		{
+			final Object[] rows = new Object[ model.getRowCount() ];
+			Arrays.fill( rows, defaultValue );
+			((DefaultTableModel) model ).addColumn( column, rows );
+		}
+	}
+
+	public static void addRelativeImagePathColumn(
+			JTable table,
+			File tableFile,
+			File imageFile,
+			String imageName )
+	{
+		if ( imageFile == null ) return;
+		final Path relativeImagePath = getRelativeImagePath( tableFile, imageFile );
+		TableUtils.addColumn( table, "RelativeImagePath_" + imageName, relativeImagePath );
+	}
+
+	public static Path getRelativeImagePath( File tableFile, File imageFile )
+	{
+		final Path imagePath = Paths.get( imageFile.toString() );
+		final Path tablePath = Paths.get( tableFile.toString() );
+
+		return tablePath.relativize( imagePath );
+	}
+
+
 
 }

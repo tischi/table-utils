@@ -101,13 +101,12 @@ public class TableBdvConnector
 			@Override
 			public void valueSelected( double label, int timepoint )
 			{
+				if ( ! objectTablePanel.hasCoordinate( ObjectCoordinate.Label ) ) return;
+
 				int row = getRow( label, timepoint );
 				selectedRows.add( row );
 
-				final int rowInView = table.convertRowIndexToView( row );
-				table.setRowSelectionInterval( rowInView, rowInView );
-
-				table.scrollRectToVisible( table.getCellRect( rowInView,0, true ) );
+				objectTablePanel.highlightRow( row );
 
 				if ( isCategoricalColoring && isSelectionByAttribute )
 				{
@@ -122,6 +121,8 @@ public class TableBdvConnector
 			@Override
 			public void valueUnselected( double objectLabel, int timepoint )
 			{
+				if ( ! objectTablePanel.hasCoordinate( ObjectCoordinate.Label ) ) return;
+
 				int row = getRow( objectLabel, timepoint );
 				selectedRows.remove( row );
 			}
@@ -147,6 +148,8 @@ public class TableBdvConnector
 			}
 		} );
 	}
+
+
 
 	public static void selectAllObjectsWithSameAttribute(
 			double objectLabel,
@@ -189,7 +192,7 @@ public class TableBdvConnector
 					}
 					else
 					{
-						Logger.error( "Please specify the Object Label column!" );
+						Logger.error( "Please specify the Object Label valueInTableColumn!" );
 					}
 				}
 			}
@@ -254,7 +257,7 @@ public class TableBdvConnector
 			{
 				if ( ! objectTablePanel.hasCoordinate( ObjectCoordinate.Label ) )
 				{
-					Logger.warn( "Please specify the object label column:\n" +
+					Logger.warn( "Please specify the object label valueInTableColumn:\n" +
 							"[ Objects > Select coordinates... ]" );
 					return;
 				}

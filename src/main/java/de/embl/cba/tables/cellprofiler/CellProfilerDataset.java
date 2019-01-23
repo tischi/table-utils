@@ -4,23 +4,27 @@ import java.util.ArrayList;
 
 public class CellProfilerDataset
 {
+	// TODO: make enum
+	public static final String OBJECT_LABEL_MASK = "Object Label Mask";
+	public static final String INTENSITY_IMAGE = "Intensity Image";
+
 	final private Object datasetIndex;
-	final private ArrayList< String > imagePaths;
+	final private ArrayList< ImageTypeAndPath > images;
 
 	public CellProfilerDataset( Object datasetIndex )
 	{
 		this.datasetIndex = datasetIndex;
-		imagePaths = new ArrayList<String>();
+		images = new ArrayList<>();
 	}
 
-	public void addImagePath( String path )
+	public void addImagePath( String type, String path )
 	{
-		imagePaths.add( path );
+		images.add( new ImageTypeAndPath( type, path ) );
 	}
 
-	public ArrayList< String > getImagePaths()
+	public ArrayList< ImageTypeAndPath > getImages()
 	{
-		return imagePaths;
+		return images;
 	}
 
 	public Object getDatasetIndex()
@@ -28,5 +32,15 @@ public class CellProfilerDataset
 		return datasetIndex;
 	}
 
+	class ImageTypeAndPath
+	{
+		String type;
+		String path;
 
+		public ImageTypeAndPath( String type, String path )
+		{
+			this.type = type;
+			this.path = path;
+		}
+	}
 }

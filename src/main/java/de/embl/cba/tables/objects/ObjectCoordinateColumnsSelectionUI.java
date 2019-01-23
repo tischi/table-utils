@@ -3,6 +3,7 @@ package de.embl.cba.tables.objects;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.objects.ObjectCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
+import de.embl.cba.tables.tablebdvobject.TableView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,13 +16,31 @@ import static de.embl.cba.tables.SwingUtils.horizontalLayoutPanel;
 
 public class ObjectCoordinateColumnsSelectionUI extends JPanel
 {
-	private final ObjectTablePanel objectTablePanel;
+	private final TableView objectTablePanel;
 
 	private ArrayList< String > choices;
 	private JFrame frame;
 	private static Point frameLocation;
 
 	public ObjectCoordinateColumnsSelectionUI( ObjectTablePanel objectTablePanel )
+	{
+		this.objectTablePanel = null;
+
+		this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
+
+		initColumnChoices();
+
+		for ( ObjectCoordinate coordinate : ObjectCoordinate.values())
+		{
+			addColumnSelectionUI( this, coordinate );
+		}
+
+		addOKButton();
+
+		showUI();
+	}
+
+	public ObjectCoordinateColumnsSelectionUI( TableView objectTablePanel )
 	{
 		this.objectTablePanel = objectTablePanel;
 
@@ -76,7 +95,7 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 			jComboBox.addItem( choice );
 		}
 
-		// +1 is due to the option to select no column
+		// +1 is due to the option to select no valueInTableColumn
 		jComboBox.setSelectedItem( objectTablePanel.getCoordinateColumn( coordinate ) );
 
 		jComboBox.addActionListener( new ActionListener()

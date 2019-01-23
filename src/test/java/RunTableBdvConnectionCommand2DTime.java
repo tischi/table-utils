@@ -15,11 +15,11 @@ public class RunTableBdvConnectionCommand2DTime
 		final HashMap< String, Object > parameters = new HashMap<>();
 
 		parameters.put( "inputTableFile",
-				new File( RunTableBdvConnectionCommand2D.class.getResource(
+				new File( RunTableBdvConnectionCommand.class.getResource(
 						"2d+t-8bit-labelMasks-table.txt" ).getFile() ) );
 
 		parameters.put( "inputLabelMasksFile",
-				new File( RunTableBdvConnectionCommand2D.class.getResource(
+				new File( RunTableBdvConnectionCommand.class.getResource(
 						"2d+t-8bit-labelMasks.zip" ).getFile() ) );
 
 		parameters.put( "inputIntensitiesFile", null );

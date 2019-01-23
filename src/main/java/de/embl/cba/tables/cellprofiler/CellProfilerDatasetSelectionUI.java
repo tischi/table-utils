@@ -54,12 +54,14 @@ public class CellProfilerDatasetSelectionUI extends JPanel
 			jComboBox.addItem( datasetIndex );
 		}
 
+
+
 		jComboBox.addActionListener( new ActionListener()
 		{
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
-				explorer.loadImages( datasets.get( jComboBox.getSelectedItem() ) );
+				explorer.showImages( datasets.get( jComboBox.getSelectedItem() ) );
 			}
 		} );
 

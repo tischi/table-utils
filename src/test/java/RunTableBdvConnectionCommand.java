@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 
-public class RunTableBdvConnectionCommand2D
+public class RunTableBdvConnectionCommand
 {
 	public static void main( String[] args ) throws ExecutionException, InterruptedException
 	{
@@ -16,14 +16,12 @@ public class RunTableBdvConnectionCommand2D
 		final HashMap< String, Object > parameters = new HashMap<>();
 
 		parameters.put( "inputTableFile",
-				new File( RunTableBdvConnectionCommand2D.class.getResource(
+				new File( RunTableBdvConnectionCommand.class.getResource(
 						"2d-16bit-labelMask-Morphometry.csv" ).getFile() ) );
 
 		parameters.put( "inputLabelMasksFile",
-				new File( RunTableBdvConnectionCommand2D.class.getResource(
+				new File( RunTableBdvConnectionCommand.class.getResource(
 						"2d-16bit-labelMask.tif" ).getFile() ) );
-
-		parameters.put( "labelColumn", 0 );
 
 		parameters.put( "inputIntensitiesFile", null );
 

@@ -1,18 +1,15 @@
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.cellprofiler.CellProfilerDataset;
 import de.embl.cba.tables.cellprofiler.CellProfilerOutputExplorer;
-import de.embl.cba.tables.cellprofiler.FolderAndFileColumn;
-import de.embl.cba.tables.cellprofiler.ParseCellProfilerTable;
-import de.embl.cba.tables.objects.ObjectTablePanel;
+import de.embl.cba.tables.cellprofiler.CellProfilerTableParser;
 
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
-public class DevelopParseCellProfilerTable
+public class ExploreCellProfilerOutputDevelop
 {
 
 	public static final String DATASET_INDEX = "ImageNumber";
@@ -24,10 +21,14 @@ public class DevelopParseCellProfilerTable
 	{
 		//final File file = new File( TestTableLoading.class.getResource( "cellprofiler-table.txt" ).getFileColumn() );
 
-		final File file = new File("/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt");
+//		final File file = new File("/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt");
+
+		final File file = new File("/Volumes/cba/exchange/Daja-Christian/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt" );
 		final JTable table = TableUtils.loadTable( file, "\t" );
 
-		final HashMap< Object, CellProfilerDataset > datasets = new ParseCellProfilerTable( table ).getDatasets();
+		final CellProfilerTableParser cellProfilerTableParser = new CellProfilerTableParser( table );
+
+		final HashMap< Object, CellProfilerDataset > datasets = cellProfilerTableParser.getDatasets();
 
 		new CellProfilerOutputExplorer( table, datasets );
 
