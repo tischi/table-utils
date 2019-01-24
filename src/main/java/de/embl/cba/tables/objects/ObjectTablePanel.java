@@ -277,7 +277,7 @@ public class ObjectTablePanel extends JPanel
 		else
 		{
 			final Double timePoint = ( Double ) table.getValueAt( rowInModel, timeColumnIndex );
-			key = SegmentUtils.getSegmentKey( label, timePoint.intValue() );
+			key = SegmentUtils.getKey( label, timePoint.intValue() );
 		}
 
 		return key;
@@ -325,7 +325,7 @@ public class ObjectTablePanel extends JPanel
 	{
 		if ( objectRowMap == null ) createObjectRowMap();
 
-		final String objectKey = SegmentUtils.getSegmentKey( label, timepoint );
+		final String objectKey = SegmentUtils.getKey( label, timepoint );
 
 		final Integer rowIndex = objectRowMap.get( objectKey );
 
@@ -335,7 +335,7 @@ public class ObjectTablePanel extends JPanel
 
 	private String getObjectKey( Double label )
 	{
-		return SegmentUtils.getSegmentKey( label, null );
+		return SegmentUtils.getKey( label, null );
 	}
 
 	public double[] getMinMaxValues( String selectedColumn )

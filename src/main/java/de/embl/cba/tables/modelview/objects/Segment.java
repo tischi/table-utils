@@ -4,54 +4,57 @@ import de.embl.cba.tables.modelview.datamodels.SegmentModel;
 
 import java.util.ArrayList;
 
-public class Segment implements FeatureList, ImageSegment
+public class Segment // implements FeatureList, ImageSegment
 {
 	private final ArrayList< String > featureNames; // Does it sense to keep it here? (one could also take it from segmentModel)
-	private final ArrayList< String > featureValues;
-	private final SegmentModel< Segment > segmentModel;
+	private final String[] featureValues;
+	private final SegmentModel< ? extends Segment > segmentModel;
 
-	public Segment( SegmentModel< Segment > segmentModel,
+
+	public Segment( SegmentModel< ? extends Segment > segmentModel,
 					ArrayList< String > featureNames,
-					ArrayList< String > featureValues )
+					String[] featureValues )
 	{
 		this.segmentModel = segmentModel;
 		this.featureNames = featureNames;
 		this.featureValues = featureValues;
 	}
 
-	@Override
+	//@Override
 	public ArrayList< String > featureNames()
 	{
 		return featureNames;
 	}
 
-	@Override
+	//@Override
 	public Object featureValue( String featureName )
 	{
-		return featureValues.get( featureNames.indexOf( featureName ) );
+		return featureValues[ featureNames.indexOf( featureName ) ];
 	}
 
 
-	@Override
+	//@Override
 	public double getLabel()
 	{
 		return Double.parseDouble(
-				featureValues.get(
+				featureValues[
 						featureNames.indexOf(
-								segmentModel.getLabelFeatureName() ) ) );
+								segmentModel.getLabelFeatureName() ) ] );
 	}
 
-	@Override
+	//@Override
 	public int getTimePoint()
 	{
 		return Integer.parseInt(
-				featureValues.get(
+				featureValues[
 						featureNames.indexOf(
-								segmentModel.getTimePointFeatureName() ) ) );
+								segmentModel.getTimePointFeatureName() ) ] );
 	}
 
-	public ArrayList< String > getFeatureValues()
+	public String[] getFeatureValues()
 	{
 		return featureValues;
 	}
+
+
 }

@@ -8,8 +8,8 @@ import de.embl.cba.bdv.utils.converters.MappingLinearARGBConverter;
 import de.embl.cba.bdv.utils.converters.MappingRandomARGBConverter;
 import de.embl.cba.bdv.utils.converters.RandomARGBConverter;
 import de.embl.cba.bdv.utils.lut.Luts;
+import de.embl.cba.bdv.utils.selection.BdvLabelSourceSelectionListener;
 import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
-import de.embl.cba.bdv.utils.selection.SelectionEventListener;
 import de.embl.cba.tables.objects.SegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import de.embl.cba.tables.objects.attributes.AssignObjectAttributesUI;
@@ -95,10 +95,10 @@ public class TableBdvConnector
 
 	private void configureBdvTableConnection()
 	{
-		bdvSelectionEventHandler.addSelectionEventListener( new SelectionEventListener()
+		bdvSelectionEventHandler.addSelectionEventListener( new BdvLabelSourceSelectionListener()
 		{
 			@Override
-			public void valueSelected( double label, int timepoint )
+			public void selectionChanged( double label, int timepoint, boolean selected )
 			{
 				if ( ! objectTablePanel.hasCoordinate( SegmentCoordinate.Label ) ) return;
 
@@ -117,7 +117,7 @@ public class TableBdvConnector
 				}
 			}
 
-			@Override
+			//@Override
 			public void valueUnselected( double objectLabel, int timepoint )
 			{
 				if ( ! objectTablePanel.hasCoordinate( SegmentCoordinate.Label ) ) return;
@@ -162,7 +162,7 @@ public class TableBdvConnector
 		{
 			if ( entry.getValue().equals( objectAttribute ) )
 			{
-				bdvSelectionEventHandler.addSelection( (Double) entry.getKey(), currentTimepoint  );
+				bdvSelectionEventHandler.selectionChanged( (Double) entry.getKey(), currentTimepoint, true  );
 			}
 		}
 
@@ -185,7 +185,7 @@ public class TableBdvConnector
 
 						Integer timepoint = getTimepoint( selectedRow );
 
-						bdvSelectionEventHandler.addSelection( objectLabel, timepoint );
+						bdvSelectionEventHandler.selectionChanged( objectLabel, timepoint, true );
 
 						moveBdvToObjectPosition( selectedRow );
 					}

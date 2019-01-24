@@ -243,9 +243,9 @@ public class BehaviourInteractiveConverterEventHandler
 
 	public void selectionChanged( double label, int timepoint, boolean selected )
 	{
-		if ( isNewSelection( selected, timepoint  ) )
+		if ( isNewSelection( label, timepoint  ) )
 		{
-			selectableConverter.selectionChanged( selected, timepoint );
+			selectableConverter.selectionChanged( label, timepoint, true );
 		}
 	}
 

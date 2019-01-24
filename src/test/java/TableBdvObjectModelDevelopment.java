@@ -1,6 +1,6 @@
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
+import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.datamodels.LabelImageSource;
-import de.embl.cba.tables.modelview.datamodels.SegmentsFeaturesModel;
 import de.embl.cba.tables.modelview.datamodels.SegmentModel;
 import de.embl.cba.tables.modelview.objects.Segment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
@@ -9,6 +9,7 @@ import de.embl.cba.tables.modelview.views.SegmentModelBdvView;
 import de.embl.cba.tables.modelview.views.SegmentModelTableView;
 
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 
 public class TableBdvObjectModelDevelopment
@@ -16,14 +17,18 @@ public class TableBdvObjectModelDevelopment
 	public static void main( String[] args ) throws IOException
 	{
 
-		final JTable table = Examples.loadObjectTableFor2D16BitLabelMask();
 		final SelectableARGBConvertedRealSource source = Examples.loadSelectableSource();
-
 		final LabelImageSource labelImageSource = new LabelImageSource( source, true );
 
+		final File tableFile = new File( Examples.class.getResource( "2d-16bit-labelMask-Morphometry.csv" ).getFile() );
+
 		final SegmentModel model = new SegmentModel(
-				segmentsFeaturesModel,
+				"MyModel",
+				tableFile,
+				"Label",
+				null,
 				labelImageSource );
+
 
 		final SelectionModel< Segment > selectionModel = new DefaultSelectionModel<>();
 

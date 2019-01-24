@@ -1,7 +1,10 @@
 package de.embl.cba.tables;
 
 import de.embl.cba.tables.models.ColumnClassAwareTableModel;
+import de.embl.cba.tables.modelview.datamodels.SegmentModel;
+import de.embl.cba.tables.modelview.datamodels.SegmentUtils;
 import de.embl.cba.tables.modelview.objects.Segment;
+import mdbtools.libmdb.file;
 import org.scijava.table.GenericTable;
 
 import javax.swing.*;
@@ -198,8 +201,47 @@ public class TableUtils
 		return new JTable( model );
 	}
 
-	public static JTable jTableFromSegmentList(
-			ArrayList< ? extends Segment > segments )
+	public static void segmentsFromTableFile (
+			SegmentModel< Segment > segmentModel,
+			File file,
+			String delim,
+			ArrayList< Segment > segments, // output
+			ArrayList< String > featureNames // output
+	)
+	{
+
+		final ArrayList< String > tableRows = readRows( file );
+
+		delim = autoFixDelim( delim, tableRows );
+
+		ArrayList< String > columns = getColumnNames( tableRows, delim );
+
+		for ( String column : columns )
+		{
+			featureNames.add( column );
+		}
+
+		StringTokenizer st;
+
+		int numColumns = columns.size();
+
+		for ( int row = 1; row < tableRows.size(); ++row )
+		{
+			final String[] rowEntries = new String[ numColumns ];
+
+			st = new StringTokenizer( tableRows.get( row ), delim );
+
+			for ( int iCol = 0; iCol < numColumns; iCol++ )
+			{
+				rowEntries[ iCol ] = st.nextToken();
+			}
+
+			segments.add( new Segment( segmentModel, columns, rowEntries ) );
+		}
+
+	}
+
+	public static JTable jTableFromSegmentList( ArrayList< ? extends Segment > segments )
 	{
 
 		/**
@@ -215,33 +257,14 @@ public class TableUtils
 			model.addColumn( column );
 		}
 
-		int numCols = columns.size();
-
 		/**
-		 * Add rows entries
+		 * Add rows, which are just references to the segments feature values.
+		 * Thus not data duplication happens here.
 		 */
 
 		for ( int row = 0; row < segments.size(); ++row )
 		{
-			model.addRow( new Object[ numCols ] );
-
-			final ArrayList< String > featureValues = segments.get( row ).getFeatureValues();
-
-			for ( int col = 0; col < numCols; col++ )
-			{
-				final String stringValue = featureValues.get( col );
-
-				try
-				{
-					final Double numericValue = Double.parseDouble( stringValue );
-					model.setValueAt( numericValue, row, col );
-				}
-				catch ( Exception e )
-				{
-					model.setValueAt( stringValue, row, col );
-				}
-			}
-
+			model.addRow( segments.get( row ).getFeatureValues() );
 		}
 
 		model.refreshColumnClasses();

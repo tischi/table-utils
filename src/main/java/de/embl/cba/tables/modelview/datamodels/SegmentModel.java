@@ -1,7 +1,9 @@
 package de.embl.cba.tables.modelview.datamodels;
 
+import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.objects.Segment;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,16 +23,26 @@ public class SegmentModel< T extends Segment >
 	private Map< Object, T > labelTimePointKeyToSegmentMap;
 
 	public SegmentModel(
-			String name, ArrayList< T > segments,
-			ArrayList< String > featureNames,
+			String name,
+			File tableFile,
 			String labelFeatureName,
 			String timePointFeatureName,
 			LabelImageSource labelImageSource )
 	{
 		this.name = name;
-		this.segments = segments;
-		this.featureNames = featureNames;
 		this.labelImageSource = labelImageSource;
+
+		segments = new ArrayList< >(  );
+		featureNames = new ArrayList<>(  );
+
+		TableUtils.segmentsFromTableFile(
+				this,
+				tableFile,
+				"\t",
+				segments,
+				featureNames
+				);
+
 
 		createKeyMap();
 
