@@ -1,6 +1,7 @@
 package de.embl.cba.tables;
 
 import de.embl.cba.tables.models.ColumnClassAwareTableModel;
+import de.embl.cba.tables.modelview.objects.Segment;
 import org.scijava.table.GenericTable;
 
 import javax.swing.*;
@@ -83,6 +84,7 @@ public class TableUtils
 		return createJTableFromStringList( rows, delim );
 	}
 
+	
 	public static ArrayList< String > readRows( File file )
 	{
 		ArrayList< String > rows = new ArrayList<>();
@@ -107,10 +109,63 @@ public class TableUtils
 		return rows;
 	}
 
+	// String[] columnNames = ObjectTableModel.getColumnNames();
+	// ArrayList< TableRowX > list = ObjectTableModel.getTableData();
 
-	public static JTable createJTableFromStringList( ArrayList< String > strings, String delim )
+	// 1) Filename --> ArrayList< TableRowX >
+	// 2) ArrayList< TableRowX > --> JTable
+
+	public static ArrayList< Segment > segmentsFromTableFile( 
+			File file, 
+			String delim,
+			String labelIndexColumn )
 	{
 
+		final ArrayList< String > tableRows = readRows( file );
+
+		delim = autoFixDelim( delim, tableRows );
+
+		ArrayList< String > columnNames = getColumnNames( tableRows, delim );
+
+		final ArrayList< Segment > segments = new ArrayList<>();
+
+		StringTokenizer st;
+		
+		int numColumns = columnNames.size();
+		
+		for ( int row = 1; row < tableRows.size(); ++row )
+		{
+			final String[] rowEntries = new String[ numColumns ];
+
+			st = new StringTokenizer( tableRows.get( row ), delim );
+
+			for ( int iCol = 0; iCol < numColumns; iCol++ )
+			{
+				rowEntries[ iCol ] = st.nextToken();
+			}
+
+			new Segment( segments, row, label, timePoint );
+
+		}
+
+		return new JTable( model );
+	}
+
+	public static ArrayList< String > getColumnNames( ArrayList< String > strings, String delim )
+	{
+		StringTokenizer st = new StringTokenizer( strings.get( 0 ), delim );
+
+		ArrayList< String > featureNames = new ArrayList<>();
+
+		while ( st.hasMoreTokens() )
+		{
+			featureNames.add( st.nextToken() );
+		}
+		return featureNames;
+	}
+
+	public static String autoFixDelim( String delim, ArrayList< String > strings )
+	{
 		if ( delim == null )
 		{
 			if ( strings.get( 0 ).contains( "\t" ) )
@@ -122,6 +177,13 @@ public class TableUtils
 				delim = ",";
 			}
 		}
+		return delim;
+	}
+
+	public static JTable createJTableFromStringList( ArrayList< String > strings, String delim )
+	{
+
+		delim = autoFixDelim( delim, strings );
 
 		StringTokenizer st = new StringTokenizer( strings.get( 0 ), delim );
 

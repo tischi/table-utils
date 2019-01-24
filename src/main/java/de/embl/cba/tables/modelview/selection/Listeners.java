@@ -1,4 +1,4 @@
-package de.embl.cba.tables.tablebdvobject;
+package de.embl.cba.tables.modelview.selection;
 
 import java.util.ArrayList;
 import java.util.Collection;

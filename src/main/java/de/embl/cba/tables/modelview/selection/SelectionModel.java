@@ -1,7 +1,9 @@
-package de.embl.cba.tables.tablebdvobject;
+package de.embl.cba.tables.modelview.selection;
+
+import de.embl.cba.tables.modelview.selection.Listeners;
+import de.embl.cba.tables.modelview.selection.SelectionListener;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 public interface SelectionModel< T >

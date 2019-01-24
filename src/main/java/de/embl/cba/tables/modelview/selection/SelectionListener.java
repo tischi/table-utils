@@ -1,4 +1,4 @@
-package de.embl.cba.tables.tablebdvobject;
+package de.embl.cba.tables.modelview.selection;
 
 /**
  * Interface for listeners of a {@link SelectionModel}.
@@ -11,8 +11,6 @@ public interface SelectionListener< T >
 	 */
 	public void selectionChanged();
 
-	public void selectionAdded( T selection );
-
-	public void selectionRemoved( T selection );
+	public void selectionChanged( T selection, boolean selected );
 
 }

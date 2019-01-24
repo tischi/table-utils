@@ -3,7 +3,7 @@ package de.embl.cba.tables.objects;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.TableUIs;
-import de.embl.cba.tables.tablebdvobject.TableView;
+import de.embl.cba.tables.modelview.datamodels.SegmentUtils;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
@@ -28,7 +28,7 @@ public class ObjectTablePanel extends JPanel
 	final private JTable table;
 
 	final String name;
-	public static final String NO_COLUMN_SELECTED = "No valueInTableColumn selected";
+	public static final String NO_COLUMN_SELECTED = "No featureValue selected";
 
 	private final TableModel model;
 	private JFrame frame;
@@ -152,7 +152,7 @@ public class ObjectTablePanel extends JPanel
 
 	private JMenuItem addColumnMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "Add valueInTableColumn..." );
+		final JMenuItem menuItem = new JMenuItem( "Add featureValue..." );
 
 		final ObjectTablePanel objectTablePanel = this;
 		menuItem.addActionListener( new ActionListener()
@@ -277,7 +277,7 @@ public class ObjectTablePanel extends JPanel
 		else
 		{
 			final Double timePoint = ( Double ) table.getValueAt( rowInModel, timeColumnIndex );
-			key = getObjectKey( label, timePoint.intValue() );
+			key = SegmentUtils.getSegmentKey( label, timePoint.intValue() );
 		}
 
 		return key;
@@ -325,7 +325,7 @@ public class ObjectTablePanel extends JPanel
 	{
 		if ( objectRowMap == null ) createObjectRowMap();
 
-		final String objectKey = getObjectKey( label, timepoint );
+		final String objectKey = SegmentUtils.getSegmentKey( label, timepoint );
 
 		final Integer rowIndex = objectRowMap.get( objectKey );
 
@@ -335,13 +335,7 @@ public class ObjectTablePanel extends JPanel
 
 	private String getObjectKey( Double label )
 	{
-		return getObjectKey( label, null );
-	}
-
-	private String getObjectKey( Double label, Integer time )
-	{
-		if ( time == null ) return label.toString();
-		else return label.toString() + "_" + time.toString();
+		return SegmentUtils.getSegmentKey( label, null );
 	}
 
 	public double[] getMinMaxValues( String selectedColumn )

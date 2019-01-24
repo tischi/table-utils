@@ -192,7 +192,7 @@ public class TableBdvConnector
 					}
 					else
 					{
-						Logger.error( "Please specify the Object Label valueInTableColumn!" );
+						Logger.error( "Please specify the Object Label featureValue!" );
 					}
 				}
 			}
@@ -257,7 +257,7 @@ public class TableBdvConnector
 			{
 				if ( ! objectTablePanel.hasCoordinate( ObjectCoordinate.Label ) )
 				{
-					Logger.warn( "Please specify the object label valueInTableColumn:\n" +
+					Logger.warn( "Please specify the object label featureValue:\n" +
 							"[ Objects > Select coordinates... ]" );
 					return;
 				}

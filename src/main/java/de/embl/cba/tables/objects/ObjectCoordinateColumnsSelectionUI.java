@@ -1,9 +1,6 @@
 package de.embl.cba.tables.objects;
 
-import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.objects.ObjectCoordinate;
-import de.embl.cba.tables.objects.ObjectTablePanel;
-import de.embl.cba.tables.tablebdvobject.TableView;
+import de.embl.cba.tables.modelview.views.SegmentModelTableView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +13,7 @@ import static de.embl.cba.tables.SwingUtils.horizontalLayoutPanel;
 
 public class ObjectCoordinateColumnsSelectionUI extends JPanel
 {
-	private final TableView objectTablePanel;
+	private final SegmentModelTableView objectTablePanel;
 
 	private ArrayList< String > choices;
 	private JFrame frame;
@@ -40,7 +37,7 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 		showUI();
 	}
 
-	public ObjectCoordinateColumnsSelectionUI( TableView objectTablePanel )
+	public ObjectCoordinateColumnsSelectionUI( SegmentModelTableView objectTablePanel )
 	{
 		this.objectTablePanel = objectTablePanel;
 
@@ -95,7 +92,7 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 			jComboBox.addItem( choice );
 		}
 
-		// +1 is due to the option to select no valueInTableColumn
+		// +1 is due to the option to select no featureValue
 		jComboBox.setSelectedItem( objectTablePanel.getCoordinateColumn( coordinate ) );
 
 		jComboBox.addActionListener( new ActionListener()

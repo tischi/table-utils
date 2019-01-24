@@ -1,10 +1,14 @@
-package de.embl.cba.tables.tablebdvobject;
+package de.embl.cba.tables.modelview.views;
 
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.modelview.datamodels.SegmentModel;
+import de.embl.cba.tables.modelview.objects.Segment;
+import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.objects.ObjectCoordinate;
 import de.embl.cba.tables.objects.ObjectCoordinateColumnsSelectionUI;
+import de.embl.cba.tables.modelview.selection.SelectionModel;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
@@ -16,7 +20,6 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -27,18 +30,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * - https://coderanch.com/t/345383/java/JTable-Paging
  */
 
-public class TableView < T extends TableRow > extends JPanel implements SelectionListener< T >
+public class SegmentModelTableView< T extends Segment > extends JPanel
 {
+	public static final String NO_COLUMN_SELECTED = "No column selected";
+
 	private final SelectionModel< T > selectionModel;
-	private final SegmentationInstancesModel model;
-	private final Listeners.List< SelectionListener > listeners;
-
+	private final SegmentModel< T > segmentModel;
 	final private JTable table;
-
 	final String name;
-	public static final String NO_COLUMN_SELECTED = "No valueInTableColumn selected";
-
 	private final TableModel tableModel;
+
 	private JFrame frame;
     private JScrollPane scrollPane;
     private JMenuBar menuBar;
@@ -47,21 +48,51 @@ public class TableView < T extends TableRow > extends JPanel implements Selectio
 	private HashMap< String, double[] > columnsMinMaxMap;
 	private int highlightedRow;
 
-	public TableView( SegmentationInstancesModel model, SelectionModel< T > selectionModel )
+	public SegmentModelTableView(
+			SegmentModel< T > segmentModel,
+			SelectionModel< T > selectionModel )
 	{
 		super( new GridLayout(1, 0 ) );
 
-		this.model = model;
+		this.segmentModel = segmentModel;
 		this.selectionModel = selectionModel;
 
-		this.table = model.getTable();
-		this.tableModel = model.getTable().getModel();
+
+		addSelectionModelListener( selectionModel );
+
+
+		this.table = instancesModel.getObjectTableModel().getTable();
+		this.tableModel = instancesModel.getObjectTableModel().getTable().getModel();
 		this.name = "Table";
 
-		listeners = new Listeners.SynchronizedList< SelectionListener >(  );
+		initObjectCoordinateColumnMap();
+
+		objectCoordinateColumnMap.put(
+				ObjectCoordinate.Label,
+				instancesModel.getObjectTableModel().getLabelColumn() );
+
 
 		prepareTableView();
 		showTable();
+		installRowSelectionListener();
+	}
+
+	public void addSelectionModelListener( SelectionModel< T > selectionModel )
+	{
+		selectionModel.listeners().add( new SelectionListener()
+		{
+			@Override
+			public void selectionChanged()
+			{
+
+			}
+
+			@Override
+			public void selectionChanged( Object selection, boolean selected )
+			{
+
+			}
+		} );
 	}
 
 	private void prepareTableView()
@@ -76,8 +107,6 @@ public class TableView < T extends TableRow > extends JPanel implements Selectio
         table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 
 		columnsMinMaxMap = new HashMap<>();
-
-        initCoordinateColumns();
 
         initMenuBar();
     }
@@ -108,7 +137,7 @@ public class TableView < T extends TableRow > extends JPanel implements Selectio
 		return objectCoordinateColumnMap.get( objectCoordinate );
 	}
 
-    private void initCoordinateColumns()
+    private void initObjectCoordinateColumnMap()
     {
         this.objectCoordinateColumnMap = new HashMap<>( );
 
@@ -160,9 +189,9 @@ public class TableView < T extends TableRow > extends JPanel implements Selectio
 
 	private JMenuItem addColumnMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "Add valueInTableColumn..." );
+		final JMenuItem menuItem = new JMenuItem( "Add featureValue..." );
 
-		final TableView objectTablePanel = this;
+		final SegmentModelTableView objectTablePanel = this;
 		menuItem.addActionListener( new ActionListener()
 		{
 			@Override
@@ -180,7 +209,7 @@ public class TableView < T extends TableRow > extends JPanel implements Selectio
 	{
 		JMenu menu = new JMenu( "Objects" );
 
-		final TableView objectTablePanel = this;
+		final SegmentModelTableView objectTablePanel = this;
 
 		final JMenuItem coordinatesMenuItem = new JMenuItem( "Select coordinates..." );
 		coordinatesMenuItem.addActionListener( new ActionListener()
@@ -223,7 +252,12 @@ public class TableView < T extends TableRow > extends JPanel implements Selectio
 
     public boolean hasCoordinate( ObjectCoordinate objectCoordinate )
     {
-        if( objectCoordinateColumnMap.get( objectCoordinate ) == NO_COLUMN_SELECTED ) return false;
+    	if ( ! objectCoordinateColumnMap.containsKey( objectCoordinate ) )
+			return false;
+
+    	if( objectCoordinateColumnMap.get( objectCoordinate ) == NO_COLUMN_SELECTED )
+			return false;
+
         return true;
     }
 
@@ -369,31 +403,19 @@ public class TableView < T extends TableRow > extends JPanel implements Selectio
 	{
 		if ( row != highlightedRow  )
 		{
-			final int rowInView = table.convertRowIndexToView( row );
-			table.setRowSelectionInterval( rowInView, rowInView );
-			table.scrollRectToVisible( table.getCellRect( rowInView, 0, true ) );
-
-			selectionModel.setSelected( (T) model.getSegmentationInstance( row ) , true );
-
 			highlightedRow = row;
+
+			highlightRowInView( row );
+
+			selectionModel.setSelected( seg.get( row ) , true );
 		}
 	}
 
-	public int getHighlightedRow()
+	public void highlightRowInView( int row )
 	{
-		return highlightedRow;
-	}
-
-	public void highlightRowOfMostRecentSelection( SelectionModel< T > selection )
-	{
-		final Set< T > selected = selection.getSelected();
-		final T lastSelection = ( T ) selected.toArray()[ selected.size() - 1 ];
-		this.highlightRow( lastSelection.tableRowIndex() );
-	}
-
-	public Listeners< SelectionListener > listeners()
-	{
-		return listeners;
+		final int rowInView = table.convertRowIndexToView( row );
+		table.setRowSelectionInterval( rowInView, rowInView );
+		table.scrollRectToVisible( table.getCellRect( rowInView, 0, true ) );
 	}
 
 	public void installRowSelectionListener()
@@ -406,14 +428,10 @@ public class TableView < T extends TableRow > extends JPanel implements Selectio
 				{
 					if ( hasCoordinate( ObjectCoordinate.Label ) )
 					{
-						final int selectedRow = table.getSelectedRow();
-
-						final Double label = getObjectCoordinate( ObjectCoordinate.Label, selectedRow );
-
-						Integer timePoint = getTimePoint( selectedRow );
+						final int row = table.getSelectedRow();
 
 						selectionModel.setSelected(
-								( T ) model.getSegmentationInstance( label, timePoint  ),
+								segmentModel.getSegment( row ),
 								true );
 					}
 					else
