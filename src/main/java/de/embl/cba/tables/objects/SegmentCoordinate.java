@@ -1,6 +1,6 @@
 package de.embl.cba.tables.objects;
 
-public enum ObjectCoordinate
+public enum SegmentCoordinate
 {
 	Label,
 	X,

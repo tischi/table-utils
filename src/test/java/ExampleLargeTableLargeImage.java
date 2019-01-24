@@ -10,7 +10,7 @@ import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
 import de.embl.cba.tables.TableBdvConnector;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.objects.ObjectCoordinate;
+import de.embl.cba.tables.objects.SegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import mpicbg.spim.data.SpimData;
 import mpicbg.spim.data.SpimDataException;
@@ -51,10 +51,10 @@ public class ExampleLargeTableLargeImage
 				"\t" );
 
 		final ObjectTablePanel objectTablePanel = new ObjectTablePanel( jTable );
-		objectTablePanel.setCoordinateColumn( ObjectCoordinate.Label, "label_id" );
-		objectTablePanel.setCoordinateColumn( ObjectCoordinate.X, "com_x_microns" );
-		objectTablePanel.setCoordinateColumn( ObjectCoordinate.Y, "com_y_microns" );
-		objectTablePanel.setCoordinateColumn( ObjectCoordinate.Z, "com_z_microns" );
+		objectTablePanel.setCoordinateColumn( SegmentCoordinate.Label, "label_id" );
+		objectTablePanel.setCoordinateColumn( SegmentCoordinate.X, "com_x_microns" );
+		objectTablePanel.setCoordinateColumn( SegmentCoordinate.Y, "com_y_microns" );
+		objectTablePanel.setCoordinateColumn( SegmentCoordinate.Z, "com_z_microns" );
 
 		// objectTablePanel.showTable();
 

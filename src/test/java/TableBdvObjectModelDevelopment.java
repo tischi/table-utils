@@ -19,7 +19,6 @@ public class TableBdvObjectModelDevelopment
 		final JTable table = Examples.loadObjectTableFor2D16BitLabelMask();
 		final SelectableARGBConvertedRealSource source = Examples.loadSelectableSource();
 
-		final SegmentsFeaturesModel segmentsFeaturesModel = new SegmentsFeaturesModel( table, "Label", null );
 		final LabelImageSource labelImageSource = new LabelImageSource( source, true );
 
 		final SegmentModel model = new SegmentModel(

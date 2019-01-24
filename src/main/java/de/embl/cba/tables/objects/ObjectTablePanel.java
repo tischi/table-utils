@@ -34,7 +34,7 @@ public class ObjectTablePanel extends JPanel
 	private JFrame frame;
     private JScrollPane scrollPane;
     private JMenuBar menuBar;
-    private HashMap< ObjectCoordinate, String > objectCoordinateColumnMap;
+    private HashMap< SegmentCoordinate, String > objectCoordinateColumnMap;
 	private ConcurrentHashMap< String, Integer > objectRowMap;
 	private HashMap< String, double[] > columnsMinMaxMap;
 
@@ -84,7 +84,7 @@ public class ObjectTablePanel extends JPanel
 	}
 
 
-	public synchronized void setCoordinateColumn( ObjectCoordinate objectCoordinate, String column )
+	public synchronized void setCoordinateColumn( SegmentCoordinate segmentCoordinate, String column )
 	{
 		if ( ! getColumnNames().contains( column ) )
 		{
@@ -92,21 +92,21 @@ public class ObjectTablePanel extends JPanel
 			return;
 		}
 
-		objectCoordinateColumnMap.put( objectCoordinate, column );
+		objectCoordinateColumnMap.put( segmentCoordinate, column );
 	}
 
-	public String getCoordinateColumn( ObjectCoordinate objectCoordinate )
+	public String getCoordinateColumn( SegmentCoordinate segmentCoordinate )
 	{
-		return objectCoordinateColumnMap.get( objectCoordinate );
+		return objectCoordinateColumnMap.get( segmentCoordinate );
 	}
 
     private void initCoordinateColumns()
     {
         this.objectCoordinateColumnMap = new HashMap<>( );
 
-        for ( ObjectCoordinate objectCoordinate : ObjectCoordinate.values() )
+        for ( SegmentCoordinate segmentCoordinate : SegmentCoordinate.values() )
         {
-            objectCoordinateColumnMap.put( objectCoordinate, NO_COLUMN_SELECTED );
+            objectCoordinateColumnMap.put( segmentCoordinate, NO_COLUMN_SELECTED );
         }
     }
 
@@ -213,17 +213,17 @@ public class ObjectTablePanel extends JPanel
         return table.convertRowIndexToModel( table.getSelectedRow() );
     }
 
-    public boolean hasCoordinate( ObjectCoordinate objectCoordinate )
+    public boolean hasCoordinate( SegmentCoordinate segmentCoordinate )
     {
-        if( objectCoordinateColumnMap.get( objectCoordinate ) == NO_COLUMN_SELECTED ) return false;
+        if( objectCoordinateColumnMap.get( segmentCoordinate ) == NO_COLUMN_SELECTED ) return false;
         return true;
     }
 
-    public Double getObjectCoordinate( ObjectCoordinate objectCoordinate, int row )
+    public Double getObjectCoordinate( SegmentCoordinate segmentCoordinate, int row )
     {
-        if ( objectCoordinateColumnMap.get( objectCoordinate ) != NO_COLUMN_SELECTED )
+        if ( objectCoordinateColumnMap.get( segmentCoordinate ) != NO_COLUMN_SELECTED )
         {
-            final int columnIndex = table.getColumnModel().getColumnIndex( objectCoordinateColumnMap.get( objectCoordinate ) );
+            final int columnIndex = table.getColumnModel().getColumnIndex( objectCoordinateColumnMap.get( segmentCoordinate ) );
             return ( Double ) table.getValueAt( row, columnIndex );
         }
         else
@@ -252,7 +252,7 @@ public class ObjectTablePanel extends JPanel
 		objectRowMap = new ConcurrentHashMap();
 
 		final int labelColumnIndex =
-				table.getColumnModel().getColumnIndex( getCoordinateColumn( ObjectCoordinate.Label ) );
+				table.getColumnModel().getColumnIndex( getCoordinateColumn( SegmentCoordinate.Label ) );
 
 		int timeColumnIndex = getTimeColumnIndex();
 
@@ -286,10 +286,10 @@ public class ObjectTablePanel extends JPanel
 	private int getTimeColumnIndex()
 	{
 		int timeColumnIndex = -1;
-		if ( hasCoordinate( ObjectCoordinate.T ) )
+		if ( hasCoordinate( SegmentCoordinate.T ) )
 		{
 			timeColumnIndex = table.getColumnModel().getColumnIndex(
-					getCoordinateColumn( ObjectCoordinate.T ) );
+					getCoordinateColumn( SegmentCoordinate.T ) );
 		}
 		return timeColumnIndex;
 	}
@@ -298,7 +298,7 @@ public class ObjectTablePanel extends JPanel
 	{
 		final ConcurrentHashMap map = new ConcurrentHashMap();
 
-		final int labelColumnIndex0 = table.getColumnModel().getColumnIndex( getCoordinateColumn( ObjectCoordinate.Label ) );
+		final int labelColumnIndex0 = table.getColumnModel().getColumnIndex( getCoordinateColumn( SegmentCoordinate.Label ) );
 		final int labelColumnIndex1 = table.getColumnModel().getColumnIndex( column1 );
 
 		final int rowCount = table.getRowCount();

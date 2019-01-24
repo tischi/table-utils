@@ -10,11 +10,10 @@ import de.embl.cba.bdv.utils.converters.RandomARGBConverter;
 import de.embl.cba.bdv.utils.lut.Luts;
 import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
 import de.embl.cba.bdv.utils.selection.SelectionEventListener;
-import de.embl.cba.tables.objects.ObjectCoordinate;
+import de.embl.cba.tables.objects.SegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import de.embl.cba.tables.objects.attributes.AssignObjectAttributesUI;
 import net.imglib2.converter.Converter;
-import net.imglib2.ops.parse.token.Int;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.volatiles.VolatileARGBType;
 import org.scijava.ui.behaviour.ClickBehaviour;
@@ -101,7 +100,7 @@ public class TableBdvConnector
 			@Override
 			public void valueSelected( double label, int timepoint )
 			{
-				if ( ! objectTablePanel.hasCoordinate( ObjectCoordinate.Label ) ) return;
+				if ( ! objectTablePanel.hasCoordinate( SegmentCoordinate.Label ) ) return;
 
 				int row = getRow( label, timepoint );
 				selectedRows.add( row );
@@ -121,7 +120,7 @@ public class TableBdvConnector
 			@Override
 			public void valueUnselected( double objectLabel, int timepoint )
 			{
-				if ( ! objectTablePanel.hasCoordinate( ObjectCoordinate.Label ) ) return;
+				if ( ! objectTablePanel.hasCoordinate( SegmentCoordinate.Label ) ) return;
 
 				int row = getRow( objectLabel, timepoint );
 				selectedRows.remove( row );
@@ -131,7 +130,7 @@ public class TableBdvConnector
 			{
 				int row;
 
-				if ( objectTablePanel.hasCoordinate( ObjectCoordinate.T ) )
+				if ( objectTablePanel.hasCoordinate( SegmentCoordinate.T ) )
 				{
 					row = objectTablePanel.getRowIndex( objectLabel, timepoint );
 				}
@@ -178,11 +177,11 @@ public class TableBdvConnector
 			{
 				if( me.isControlDown() )
 				{
-					if ( objectTablePanel.hasCoordinate( ObjectCoordinate.Label ) )
+					if ( objectTablePanel.hasCoordinate( SegmentCoordinate.Label ) )
 					{
 						final int selectedRow = table.getSelectedRow();
 
-						final Double objectLabel = objectTablePanel.getObjectCoordinate( ObjectCoordinate.Label, selectedRow );
+						final Double objectLabel = objectTablePanel.getObjectCoordinate( SegmentCoordinate.Label, selectedRow );
 
 						Integer timepoint = getTimepoint( selectedRow );
 
@@ -203,9 +202,9 @@ public class TableBdvConnector
 	public Integer getTimepoint( int selectedRow )
 	{
 		Integer timepoint = 0;
-		if ( objectTablePanel.hasCoordinate( ObjectCoordinate.Label.T ) )
+		if ( objectTablePanel.hasCoordinate( SegmentCoordinate.Label.T ) )
 		{
-			final Double timepointDouble = (Double) objectTablePanel.getObjectCoordinate( ObjectCoordinate.Label.T, selectedRow );
+			final Double timepointDouble = (Double) objectTablePanel.getObjectCoordinate( SegmentCoordinate.Label.T, selectedRow );
 			timepoint = timepointDouble.intValue();
 		}
 		return timepoint;
@@ -213,15 +212,15 @@ public class TableBdvConnector
 
 	private void moveBdvToObjectPosition( int row )
 	{
-		final Double x = objectTablePanel.getObjectCoordinate( ObjectCoordinate.X, row );
-		final Double y = objectTablePanel.getObjectCoordinate( ObjectCoordinate.Y, row );
+		final Double x = objectTablePanel.getObjectCoordinate( SegmentCoordinate.X, row );
+		final Double y = objectTablePanel.getObjectCoordinate( SegmentCoordinate.Y, row );
 
 		if ( x != null && y != null )
 		{
-			Double z = objectTablePanel.getObjectCoordinate( ObjectCoordinate.Z, row );
+			Double z = objectTablePanel.getObjectCoordinate( SegmentCoordinate.Z, row );
 			if ( z == null ) z = 0.0;
 
-			Double t = objectTablePanel.getObjectCoordinate( ObjectCoordinate.T, row );
+			Double t = objectTablePanel.getObjectCoordinate( SegmentCoordinate.T, row );
 			if ( t == null ) t = 0.0;
 
 			BdvUtils.moveToPosition(
@@ -255,7 +254,7 @@ public class TableBdvConnector
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
-				if ( ! objectTablePanel.hasCoordinate( ObjectCoordinate.Label ) )
+				if ( ! objectTablePanel.hasCoordinate( SegmentCoordinate.Label ) )
 				{
 					Logger.warn( "Please specify the object label featureValue:\n" +
 							"[ Objects > Select coordinates... ]" );

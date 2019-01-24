@@ -6,7 +6,7 @@ import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.datamodels.SegmentModel;
 import de.embl.cba.tables.modelview.objects.Segment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
-import de.embl.cba.tables.objects.ObjectCoordinate;
+import de.embl.cba.tables.objects.SegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectCoordinateColumnsSelectionUI;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 
@@ -36,17 +36,15 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 
 	private final SelectionModel< T > selectionModel;
 	private final SegmentModel< T > segmentModel;
-	final private JTable table;
-	final String name;
-	private final TableModel tableModel;
 
 	private JFrame frame;
     private JScrollPane scrollPane;
     private JMenuBar menuBar;
-    private HashMap< ObjectCoordinate, String > objectCoordinateColumnMap;
+    private HashMap< SegmentCoordinate, String > segmentFeatureColumnMap;
 	private ConcurrentHashMap< String, Integer > objectRowMap;
 	private HashMap< String, double[] > columnsMinMaxMap;
 	private int highlightedRow;
+	private JTable table;
 
 	public SegmentModelTableView(
 			SegmentModel< T > segmentModel,
@@ -57,22 +55,16 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 		this.segmentModel = segmentModel;
 		this.selectionModel = selectionModel;
 
-
 		addSelectionModelListener( selectionModel );
-
-
-		this.table = instancesModel.getObjectTableModel().getTable();
-		this.tableModel = instancesModel.getObjectTableModel().getTable().getModel();
-		this.name = "Table";
 
 		initObjectCoordinateColumnMap();
 
-		objectCoordinateColumnMap.put(
-				ObjectCoordinate.Label,
-				instancesModel.getObjectTableModel().getLabelColumn() );
+		segmentFeatureColumnMap.put(
+				SegmentCoordinate.Label,
+				segmentModel.getLabelFeatureName() );
 
-
-		prepareTableView();
+		createTable();
+		createMenuBar();
 		showTable();
 		installRowSelectionListener();
 	}
@@ -95,9 +87,11 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 		} );
 	}
 
-	private void prepareTableView()
+	private void createTable()
     {
-        table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
+		table = TableUtils.jTableFromSegmentList( segmentModel.getSegments() );
+
+		table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
         table.setFillsViewportHeight( true );
         table.setAutoCreateRowSorter( true );
         table.setRowSelectionAllowed( true );
@@ -107,11 +101,9 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
         table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 
 		columnsMinMaxMap = new HashMap<>();
-
-        initMenuBar();
     }
 
-	private void initMenuBar()
+	private void createMenuBar()
 	{
 		menuBar = new JMenuBar();
 
@@ -121,7 +113,7 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 	}
 
 
-	public synchronized void setCoordinateColumn( ObjectCoordinate objectCoordinate, String column )
+	public synchronized void setCoordinateColumn( SegmentCoordinate segmentCoordinate, String column )
 	{
 		if ( ! getColumnNames().contains( column ) )
 		{
@@ -129,21 +121,21 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 			return;
 		}
 
-		objectCoordinateColumnMap.put( objectCoordinate, column );
+		segmentFeatureColumnMap.put( segmentCoordinate, column );
 	}
 
-	public String getCoordinateColumn( ObjectCoordinate objectCoordinate )
+	public String getCoordinateColumn( SegmentCoordinate segmentCoordinate )
 	{
-		return objectCoordinateColumnMap.get( objectCoordinate );
+		return segmentFeatureColumnMap.get( segmentCoordinate );
 	}
 
     private void initObjectCoordinateColumnMap()
     {
-        this.objectCoordinateColumnMap = new HashMap<>( );
+        this.segmentFeatureColumnMap = new HashMap<>( );
 
-        for ( ObjectCoordinate objectCoordinate : ObjectCoordinate.values() )
+        for ( SegmentCoordinate segmentCoordinate : SegmentCoordinate.values() )
         {
-            objectCoordinateColumnMap.put( objectCoordinate, NO_COLUMN_SELECTED );
+            segmentFeatureColumnMap.put( segmentCoordinate, NO_COLUMN_SELECTED );
         }
     }
 
@@ -229,7 +221,7 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
     public void showTable() {
 
         //Create and set up the window.
-        frame = new JFrame( name );
+        frame = new JFrame( segmentModel.getName() );
 
         frame.setJMenuBar( menuBar );
 
@@ -250,22 +242,22 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
         return table.convertRowIndexToModel( table.getSelectedRow() );
     }
 
-    public boolean hasCoordinate( ObjectCoordinate objectCoordinate )
+    public boolean hasCoordinate( SegmentCoordinate segmentCoordinate )
     {
-    	if ( ! objectCoordinateColumnMap.containsKey( objectCoordinate ) )
+    	if ( ! segmentFeatureColumnMap.containsKey( segmentCoordinate ) )
 			return false;
 
-    	if( objectCoordinateColumnMap.get( objectCoordinate ) == NO_COLUMN_SELECTED )
+    	if( segmentFeatureColumnMap.get( segmentCoordinate ) == NO_COLUMN_SELECTED )
 			return false;
 
         return true;
     }
 
-    public Double getObjectCoordinate( ObjectCoordinate objectCoordinate, int row )
+    public Double getObjectCoordinate( SegmentCoordinate segmentCoordinate, int row )
     {
-        if ( objectCoordinateColumnMap.get( objectCoordinate ) != NO_COLUMN_SELECTED )
+        if ( segmentFeatureColumnMap.get( segmentCoordinate ) != NO_COLUMN_SELECTED )
         {
-            final int columnIndex = table.getColumnModel().getColumnIndex( objectCoordinateColumnMap.get( objectCoordinate ) );
+            final int columnIndex = table.getColumnModel().getColumnIndex( segmentFeatureColumnMap.get( segmentCoordinate ) );
             return ( Double ) table.getValueAt( row, columnIndex );
         }
         else
@@ -276,7 +268,8 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 
 	public void addColumn( String column, Object defaultValue )
 	{
-		TableUtils.addColumn( tableModel, column, defaultValue );
+		// TODO: this must be propagated back to the segments...
+		TableUtils.addColumn( table.getModel(), column, defaultValue );
 	}
 
 	public ArrayList< String > getColumnNames()
@@ -294,7 +287,7 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 		objectRowMap = new ConcurrentHashMap();
 
 		final int labelColumnIndex =
-				table.getColumnModel().getColumnIndex( getCoordinateColumn( ObjectCoordinate.Label ) );
+				table.getColumnModel().getColumnIndex( getCoordinateColumn( SegmentCoordinate.Label ) );
 
 		int timeColumnIndex = getTimeColumnIndex();
 
@@ -328,10 +321,10 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 	private int getTimeColumnIndex()
 	{
 		int timeColumnIndex = -1;
-		if ( hasCoordinate( ObjectCoordinate.T ) )
+		if ( hasCoordinate( SegmentCoordinate.T ) )
 		{
 			timeColumnIndex = table.getColumnModel().getColumnIndex(
-					getCoordinateColumn( ObjectCoordinate.T ) );
+					getCoordinateColumn( SegmentCoordinate.T ) );
 		}
 		return timeColumnIndex;
 	}
@@ -407,7 +400,7 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 
 			highlightRowInView( row );
 
-			selectionModel.setSelected( seg.get( row ) , true );
+			selectionModel.setSelected( segmentModel.getSegment( row ) , true );
 		}
 	}
 
@@ -426,7 +419,7 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 			{
 				if ( me.isControlDown() )
 				{
-					if ( hasCoordinate( ObjectCoordinate.Label ) )
+					if ( hasCoordinate( SegmentCoordinate.Label ) )
 					{
 						final int row = table.getSelectedRow();
 
@@ -447,28 +440,12 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 	public Integer getTimePoint( int row )
 	{
 		Integer timepoint = 0;
-		if ( hasCoordinate( ObjectCoordinate.Label.T ) )
+		if ( hasCoordinate( SegmentCoordinate.Label.T ) )
 		{
-			final Double timepointDouble = (Double) getObjectCoordinate( ObjectCoordinate.Label.T, row );
+			final Double timepointDouble = (Double) getObjectCoordinate( SegmentCoordinate.Label.T, row );
 			timepoint = timepointDouble.intValue();
 		}
 		return timepoint;
 	}
 
-	@Override
-	public void selectionChanged()
-	{
-	}
-
-	@Override
-	public void selectionAdded( T selection )
-	{
-		highlightRow( selection.tableRowIndex() );
-	}
-
-	@Override
-	public void selectionRemoved( T selection )
-	{
-
-	}
 }

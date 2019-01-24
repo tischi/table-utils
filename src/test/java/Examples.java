@@ -1,7 +1,7 @@
 import bdv.util.RandomAccessibleIntervalSource;
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.objects.ObjectCoordinate;
+import de.embl.cba.tables.objects.SegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import ij.IJ;
 import ij.ImagePlus;
@@ -52,6 +52,6 @@ public abstract class Examples
 
 		objectTablePanel.showTable();
 
-		objectTablePanel.setCoordinateColumn( ObjectCoordinate.Label, jTable.getColumnName( 0 ) );
+		objectTablePanel.setCoordinateColumn( SegmentCoordinate.Label, jTable.getColumnName( 0 ) );
 	}
 }

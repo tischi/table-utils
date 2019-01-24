@@ -27,7 +27,7 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 
 		initColumnChoices();
 
-		for ( ObjectCoordinate coordinate : ObjectCoordinate.values())
+		for ( SegmentCoordinate coordinate : SegmentCoordinate.values())
 		{
 			addColumnSelectionUI( this, coordinate );
 		}
@@ -45,7 +45,7 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 
 		initColumnChoices();
 
-		for ( ObjectCoordinate coordinate : ObjectCoordinate.values())
+		for ( SegmentCoordinate coordinate : SegmentCoordinate.values())
 		{
 			addColumnSelectionUI( this, coordinate );
 		}
@@ -78,7 +78,7 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 		choices.addAll( objectTablePanel.getColumnNames() );
 	}
 
-	private void addColumnSelectionUI( final JPanel panel, final ObjectCoordinate coordinate )
+	private void addColumnSelectionUI( final JPanel panel, final SegmentCoordinate coordinate )
 	{
 		final JPanel horizontalLayoutPanel = horizontalLayoutPanel();
 

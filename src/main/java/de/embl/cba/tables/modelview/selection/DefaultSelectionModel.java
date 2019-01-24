@@ -40,7 +40,7 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 		}
 	}
 
-	public void remove( T object )
+	private void remove( T object )
 	{
 		if ( selected.contains( object ) )
 		{
@@ -48,13 +48,12 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 
 			for ( SelectionListener listener : listeners.list )
 			{
-				listener.selectionChanged();
-				listener.selectionRemoved( object );
+				listener.selectionChanged( object, false );
 			}
 		}
 	}
 
-	public void add( T object )
+	private void add( T object )
 	{
 		if ( ! selected.contains( object ) )
 		{
@@ -62,8 +61,7 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 
 			for ( SelectionListener listener : listeners.list )
 			{
-				listener.selectionChanged();
-				listener.selectionAdded( object );
+				listener.selectionChanged( object, true );
 			}
 		}
 	}

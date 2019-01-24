@@ -109,47 +109,6 @@ public class TableUtils
 		return rows;
 	}
 
-	// String[] columnNames = ObjectTableModel.getColumnNames();
-	// ArrayList< TableRowX > list = ObjectTableModel.getTableData();
-
-	// 1) Filename --> ArrayList< TableRowX >
-	// 2) ArrayList< TableRowX > --> JTable
-
-	public static ArrayList< Segment > segmentsFromTableFile( 
-			File file, 
-			String delim,
-			String labelIndexColumn )
-	{
-
-		final ArrayList< String > tableRows = readRows( file );
-
-		delim = autoFixDelim( delim, tableRows );
-
-		ArrayList< String > columnNames = getColumnNames( tableRows, delim );
-
-		final ArrayList< Segment > segments = new ArrayList<>();
-
-		StringTokenizer st;
-		
-		int numColumns = columnNames.size();
-		
-		for ( int row = 1; row < tableRows.size(); ++row )
-		{
-			final String[] rowEntries = new String[ numColumns ];
-
-			st = new StringTokenizer( tableRows.get( row ), delim );
-
-			for ( int iCol = 0; iCol < numColumns; iCol++ )
-			{
-				rowEntries[ iCol ] = st.nextToken();
-			}
-
-			new Segment( segments, row, label, timePoint );
-
-		}
-
-		return new JTable( model );
-	}
 
 	public static ArrayList< String > getColumnNames( ArrayList< String > strings, String delim )
 	{
@@ -229,6 +188,57 @@ public class TableUtils
 				catch ( Exception e )
 				{
 					model.setValueAt( stringValue, iString - 1, iCol );
+				}
+			}
+
+		}
+
+		model.refreshColumnClasses();
+
+		return new JTable( model );
+	}
+
+	public static JTable jTableFromSegmentList(
+			ArrayList< ? extends Segment > segments )
+	{
+
+		/**
+		 * Init model and columns
+		 */
+
+		ColumnClassAwareTableModel model = new ColumnClassAwareTableModel();
+
+		final ArrayList< String > columns = segments.get( 0 ).featureNames();
+
+		for ( String column : columns )
+		{
+			model.addColumn( column );
+		}
+
+		int numCols = columns.size();
+
+		/**
+		 * Add rows entries
+		 */
+
+		for ( int row = 0; row < segments.size(); ++row )
+		{
+			model.addRow( new Object[ numCols ] );
+
+			final ArrayList< String > featureValues = segments.get( row ).getFeatureValues();
+
+			for ( int col = 0; col < numCols; col++ )
+			{
+				final String stringValue = featureValues.get( col );
+
+				try
+				{
+					final Double numericValue = Double.parseDouble( stringValue );
+					model.setValueAt( numericValue, row, col );
+				}
+				catch ( Exception e )
+				{
+					model.setValueAt( stringValue, row, col );
 				}
 			}
 

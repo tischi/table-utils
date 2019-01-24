@@ -28,10 +28,6 @@ public class SegmentModelBdvView< T extends Segment >
 
 		addSelectionListener( selectionModel );
 
-		segmentModel.getSegment( label, timePoint );
-		selectionModel.setSelected(  );
-
-		// TODO: below cast to SelectableARGBConvertedRealSource could be removed?!
 		bdvSelectionEventHandler = new BdvSelectionEventHandler(
 				bdv,
 				( SelectableARGBConvertedRealSource ) segmentModel.getLabelImageSource().getSource() );
@@ -80,20 +76,6 @@ public class SegmentModelBdvView< T extends Segment >
 		}
 
 		return BdvFunctions.show( labelImageSource.getSource(), options ).getBdvHandle();
-	}
-
-
-	@Override
-	public void selectionChanged()
-	{
-
-	}
-
-	@Override
-	public void selectionChanged( T selection, boolean selected )
-	{
-		bdvSelectionEventHandler.addSelection(  );
-		selection.labelAndTimepoint()
 	}
 
 
