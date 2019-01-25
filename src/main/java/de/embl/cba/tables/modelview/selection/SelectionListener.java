@@ -11,6 +11,11 @@ public interface SelectionListener< T >
 	 */
 	public void selectionChanged();
 
-	public void selectionChanged( T selection, boolean selected );
+	/**
+	 * Notifies when a selection event happened,
+	 * also when this did not change the list
+	 * of currently selected items.
+	 */
+	public void selectionEvent( T selection, boolean selected );
 
 }

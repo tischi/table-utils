@@ -56,8 +56,15 @@ public class TableBdvObjectModelDevelopment
 				new DefaultAnnotatedSegmentsColoringModel( "Label" );
 		final SelectionModel< AnnotatedSegment > selectionModel = new DefaultSelectionModel<>();
 
-		final SegmentsBdvView segmentsBdvView = new SegmentsBdvView( dataModel, selectionModel, coloringModel );
-		//final SegmentsTableView tableView = new SegmentsTableView( dataModel, selectionModel, coloringModel );
+		final SegmentsBdvView segmentsBdvView = new SegmentsBdvView(
+				dataModel,
+				selectionModel,
+				coloringModel );
+
+		final SegmentsTableView tableView = new SegmentsTableView(
+				dataModel,
+				selectionModel,
+				coloringModel );
 
 	}
 }

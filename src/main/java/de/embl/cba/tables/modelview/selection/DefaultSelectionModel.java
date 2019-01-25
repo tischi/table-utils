@@ -1,9 +1,5 @@
 package de.embl.cba.tables.modelview.selection;
 
-import de.embl.cba.tables.modelview.selection.Listeners;
-import de.embl.cba.tables.modelview.selection.SelectionListener;
-import de.embl.cba.tables.modelview.selection.SelectionModel;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -49,7 +45,7 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 			for ( SelectionListener listener : listeners.list )
 			{
 				listener.selectionChanged();
-				listener.selectionChanged( object, false );
+				listener.selectionEvent( object, false );
 			}
 		}
 	}
@@ -63,9 +59,14 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 			for ( SelectionListener listener : listeners.list )
 			{
 				listener.selectionChanged();
-				listener.selectionChanged( object, true );
 			}
 		}
+
+		for ( SelectionListener listener : listeners.list )
+		{
+			listener.selectionEvent( object, true );
+		}
+
 	}
 
 	@Override

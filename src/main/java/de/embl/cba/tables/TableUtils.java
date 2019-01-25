@@ -198,7 +198,7 @@ public class TableUtils
 
 		}
 
-		model.refreshColumnClasses();
+		model.refreshColumnClassesFromStringColumns();
 
 		return new JTable( model );
 	}
@@ -225,16 +225,14 @@ public class TableUtils
 			setColumnIndex( coordinateColumnMap, columnIndex, columnName );
 		}
 
-		StringTokenizer st;
-
 		for ( int row = 1; row < tableRows.size(); ++row )
 		{
 			final LinkedHashMap< String, Object > columnValueMap = new LinkedHashMap<>();
 
+			StringTokenizer st = new StringTokenizer( tableRows.get( row ), delim );
+
 			for ( String feature : columns )
 			{
-				st = new StringTokenizer( tableRows.get( row ), delim );
-
 				final String string = st.nextToken();
 
 				addFeature( columnValueMap, feature, string );
@@ -333,6 +331,8 @@ public class TableUtils
 
 		for ( int row = 0; row < segments.size(); ++row )
 		{
+			model.addRow( new Object[ columns.size() ] );
+
 			final Collection< Object > values = segments.get( row ).features().values();
 
 			int col = 0;
@@ -342,7 +342,7 @@ public class TableUtils
 			}
 		}
 
-		model.refreshColumnClasses();
+		model.refreshColumnClassesFromObjectColumns();
 
 		return new JTable( model );
 	}

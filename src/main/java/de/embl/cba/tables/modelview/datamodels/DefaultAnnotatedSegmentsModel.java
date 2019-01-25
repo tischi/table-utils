@@ -12,7 +12,7 @@ import java.util.Map;
 public class DefaultAnnotatedSegmentsModel
 {
 	private final String name;
-	private final ArrayList< ? extends AnnotatedSegment > segmentWithFeatures;
+	private final ArrayList< ? extends AnnotatedSegment > annotatedSegments;
 	private final LabelImageSourceModel labelImageSourceModel;
 	private final String labelFeatureName;
 	private final String timePointFeatureName;
@@ -21,13 +21,13 @@ public class DefaultAnnotatedSegmentsModel
 
 	public DefaultAnnotatedSegmentsModel(
 			String name,
-			ArrayList< ? extends AnnotatedSegment > segmentWithFeatures,
+			ArrayList< ? extends AnnotatedSegment > annotatedSegments,
 			String labelFeatureName,
 			String timePointFeatureName,
 			LabelImageSourceModel labelImageSourceModel )
 	{
 		this.name = name;
-		this.segmentWithFeatures = segmentWithFeatures;
+		this.annotatedSegments = annotatedSegments;
 		this.labelImageSourceModel = labelImageSourceModel;
 		this.timePointFeatureName = timePointFeatureName;
 		this.labelFeatureName = labelFeatureName;
@@ -39,7 +39,7 @@ public class DefaultAnnotatedSegmentsModel
 	{
 		labelTimePointKeyToSegmentMap = new HashMap<>();
 
-		for ( AnnotatedSegment annotatedSegment : this.segmentWithFeatures )
+		for ( AnnotatedSegment annotatedSegment : this.annotatedSegments )
 		{
 			final Object key = SegmentUtils.getKey(
 					annotatedSegment.getLabel(),
@@ -52,7 +52,7 @@ public class DefaultAnnotatedSegmentsModel
 
 	public AnnotatedSegment getSegment( int listIndex )
 	{
-		return segmentWithFeatures.get( listIndex );
+		return annotatedSegments.get( listIndex );
 	}
 
 	public AnnotatedSegment getSegment( Double label, int timePoint  )
@@ -91,9 +91,9 @@ public class DefaultAnnotatedSegmentsModel
 //		return featureNames;
 //	}
 
-	public ArrayList< ? extends AnnotatedSegment > getSegmentWithFeatures()
+	public ArrayList< ? extends AnnotatedSegment > getAnnotatedSegments()
 	{
-		return segmentWithFeatures;
+		return annotatedSegments;
 	}
 
 	public String getName()

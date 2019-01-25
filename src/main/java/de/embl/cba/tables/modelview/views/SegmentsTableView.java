@@ -3,7 +3,7 @@ package de.embl.cba.tables.modelview.views;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.coloring.AnnotatedSegmentsColoringModel;
+import de.embl.cba.tables.modelview.coloring.FeatureColoringModel;
 import de.embl.cba.tables.modelview.datamodels.DefaultAnnotatedSegmentsModel;
 import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
@@ -20,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -34,34 +35,36 @@ public class SegmentsTableView extends JPanel
 {
 	public static final String NO_COLUMN_SELECTED = "No column selected";
 
-	private final DefaultAnnotatedSegmentsModel defaultAnnotatedSegmentsModel;
 	private final SelectionModel< AnnotatedSegment > selectionModel;
+	private final DefaultAnnotatedSegmentsModel segmentsModel;
+	private final FeatureColoringModel< AnnotatedSegment > coloringModel;
 
 	private JFrame frame;
     private JScrollPane scrollPane;
     private JMenuBar menuBar;
-    private HashMap< SegmentCoordinate, String > segmentFeatureColumnMap;
+    private Map< SegmentCoordinate, String > segmentCoordinateToColumnMap;
 	private ConcurrentHashMap< String, Integer > objectRowMap;
-	private HashMap< String, double[] > columnsMinMaxMap;
+	private Map< String, double[] > columnsMinMaxMap;
 	private int highlightedRow;
 	private JTable table;
 
 	public SegmentsTableView(
-			DefaultAnnotatedSegmentsModel defaultAnnotatedSegmentsModel,
-			SelectionModel< AnnotatedSegment > selectionModel, AnnotatedSegmentsColoringModel coloringModel )
+			final DefaultAnnotatedSegmentsModel segmentsModel,
+			final SelectionModel< AnnotatedSegment > selectionModel,
+			final FeatureColoringModel< AnnotatedSegment > coloringModel )
 	{
 		super( new GridLayout(1, 0 ) );
-
-		this.defaultAnnotatedSegmentsModel = defaultAnnotatedSegmentsModel;
+		this.segmentsModel = segmentsModel;
+		this.coloringModel = coloringModel;
 		this.selectionModel = selectionModel;
 
-		addListener( selectionModel );
+		registerAsListener( selectionModel );
 
-		initObjectCoordinateColumnMap();
+		segmentCoordinateToColumnMap = emptyObjectCoordinateColumnMap();
 
-		segmentFeatureColumnMap.put(
+		segmentCoordinateToColumnMap.put(
 				SegmentCoordinate.Label,
-				defaultAnnotatedSegmentsModel.getLabelFeatureName() );
+				segmentsModel.getLabelFeatureName() );
 
 		createTable();
 		createMenuBar();
@@ -69,7 +72,7 @@ public class SegmentsTableView extends JPanel
 		installRowSelectionListener();
 	}
 
-	public void addListener( SelectionModel< AnnotatedSegment > selectionModel )
+	public void registerAsListener( SelectionModel< AnnotatedSegment > selectionModel )
 	{
 		selectionModel.listeners().add( new SelectionListener()
 		{
@@ -80,7 +83,7 @@ public class SegmentsTableView extends JPanel
 			}
 
 			@Override
-			public void selectionChanged( Object selection, boolean selected )
+			public void selectionEvent( Object selection, boolean selected )
 			{
 
 			}
@@ -89,7 +92,7 @@ public class SegmentsTableView extends JPanel
 
 	private void createTable()
     {
-		table = TableUtils.jTableFromSegmentList( defaultAnnotatedSegmentsModel.getSegmentWithFeatures() );
+		table = TableUtils.jTableFromSegmentList( segmentsModel.getAnnotatedSegments() );
 
 		table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
         table.setFillsViewportHeight( true );
@@ -121,22 +124,24 @@ public class SegmentsTableView extends JPanel
 			return;
 		}
 
-		segmentFeatureColumnMap.put( segmentCoordinate, column );
+		segmentCoordinateToColumnMap.put( segmentCoordinate, column );
 	}
 
 	public String getCoordinateColumn( SegmentCoordinate segmentCoordinate )
 	{
-		return segmentFeatureColumnMap.get( segmentCoordinate );
+		return segmentCoordinateToColumnMap.get( segmentCoordinate );
 	}
 
-    private void initObjectCoordinateColumnMap()
+    private Map< SegmentCoordinate, String > emptyObjectCoordinateColumnMap()
     {
-        this.segmentFeatureColumnMap = new HashMap<>( );
+		Map< SegmentCoordinate, String > segmentCoordinateToColumnMap = new HashMap<>( );
 
         for ( SegmentCoordinate segmentCoordinate : SegmentCoordinate.values() )
         {
-            segmentFeatureColumnMap.put( segmentCoordinate, NO_COLUMN_SELECTED );
+            segmentCoordinateToColumnMap.put( segmentCoordinate, NO_COLUMN_SELECTED );
         }
+
+        return segmentCoordinateToColumnMap;
     }
 
 
@@ -221,7 +226,7 @@ public class SegmentsTableView extends JPanel
     public void showTable() {
 
         //Create and set up the window.
-        frame = new JFrame( defaultAnnotatedSegmentsModel.getName() );
+        frame = new JFrame( segmentsModel.getName() );
 
         frame.setJMenuBar( menuBar );
 
@@ -244,10 +249,10 @@ public class SegmentsTableView extends JPanel
 
     public boolean hasCoordinate( SegmentCoordinate segmentCoordinate )
     {
-    	if ( ! segmentFeatureColumnMap.containsKey( segmentCoordinate ) )
+    	if ( ! segmentCoordinateToColumnMap.containsKey( segmentCoordinate ) )
 			return false;
 
-    	if( segmentFeatureColumnMap.get( segmentCoordinate ) == NO_COLUMN_SELECTED )
+    	if( segmentCoordinateToColumnMap.get( segmentCoordinate ) == NO_COLUMN_SELECTED )
 			return false;
 
         return true;
@@ -255,9 +260,9 @@ public class SegmentsTableView extends JPanel
 
     public Double getObjectCoordinate( SegmentCoordinate segmentCoordinate, int row )
     {
-        if ( segmentFeatureColumnMap.get( segmentCoordinate ) != NO_COLUMN_SELECTED )
+        if ( segmentCoordinateToColumnMap.get( segmentCoordinate ) != NO_COLUMN_SELECTED )
         {
-            final int columnIndex = table.getColumnModel().getColumnIndex( segmentFeatureColumnMap.get( segmentCoordinate ) );
+            final int columnIndex = table.getColumnModel().getColumnIndex( segmentCoordinateToColumnMap.get( segmentCoordinate ) );
             return ( Double ) table.getValueAt( row, columnIndex );
         }
         else
@@ -400,7 +405,7 @@ public class SegmentsTableView extends JPanel
 
 			highlightRowInView( row );
 
-			selectionModel.setSelected( defaultAnnotatedSegmentsModel.getSegment( row ) , true );
+			selectionModel.setSelected( segmentsModel.getSegment( row ) , true );
 		}
 	}
 
@@ -421,10 +426,10 @@ public class SegmentsTableView extends JPanel
 				{
 					if ( hasCoordinate( SegmentCoordinate.Label ) )
 					{
-						final int row = table.getSelectedRow();
+						final int row = table.convertRowIndexToModel(  table.getSelectedRow() );
 
 						selectionModel.setSelected(
-								defaultAnnotatedSegmentsModel.getSegment( row ),
+								segmentsModel.getSegment( row ),
 								true );
 					}
 					else

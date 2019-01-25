@@ -32,7 +32,7 @@ public class ColumnClassAwareTableModel extends DefaultTableModel
 	/**
 	 * Determines getFeature classes from entries in 1st row.
 	 */
-	public void refreshColumnClasses()
+	public void refreshColumnClassesFromStringColumns()
 	{
 		columnClasses = new ArrayList<>(  );
 
@@ -49,6 +49,20 @@ public class ColumnClassAwareTableModel extends DefaultTableModel
 			{
 				columnClasses.add( String.class );
 			}
+		}
+	}
+
+	/**
+	 * Determines getFeature classes from entries in 1st row.
+	 */
+	public void refreshColumnClassesFromObjectColumns()
+	{
+		columnClasses = new ArrayList<>(  );
+
+		for ( int column = 0; column < getColumnCount(); column++ )
+		{
+			final Object value = this.getValueAt( 1, column );
+			columnClasses.add( value.getClass() );
 		}
 	}
 

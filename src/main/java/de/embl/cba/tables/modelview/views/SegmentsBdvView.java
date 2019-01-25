@@ -66,7 +66,7 @@ public class SegmentsBdvView < T extends Segment >
 			}
 
 			@Override
-			public void selectionChanged( Segment selection, boolean selected )
+			public void selectionEvent( Segment selection, boolean selected )
 			{
 				BdvUtils.moveToPosition(
 							bdv,
