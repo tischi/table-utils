@@ -1,5 +1,6 @@
 package de.embl.cba.tables.modelview.views;
 
+import bdv.util.Bdv;
 import bdv.util.BdvFunctions;
 import bdv.util.BdvHandle;
 import bdv.util.BdvOptions;
@@ -7,6 +8,7 @@ import bdv.viewer.Source;
 import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.selection.Segment;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
+import de.embl.cba.tables.modelview.coloring.ColoringListener;
 import de.embl.cba.tables.modelview.coloring.FeatureColoringModel;
 import de.embl.cba.tables.modelview.datamodels.LabelImageSourceModel;
 import de.embl.cba.tables.modelview.datamodels.DefaultAnnotatedSegmentsModel;
@@ -34,7 +36,6 @@ public class SegmentsBdvView < T extends Segment >
 	private final BdvHandle bdv;
 	private final Source source;
 
-
 	// TODO: extract interface from DefaultAnnotatedSegmentsModel
 	public SegmentsBdvView( final DefaultAnnotatedSegmentsModel segmentsModel,
 							final SelectionModel< AnnotatedSegment > selectionModel,
@@ -49,6 +50,15 @@ public class SegmentsBdvView < T extends Segment >
 		bdv = showLabelSourceInBdv( segmentsModel.getLabelImageSourceModel() );
 
 		addSelectionListener( selectionModel );
+
+		coloringModel.listeners().add( new ColoringListener()
+		{
+			@Override
+			public void coloringChanged()
+			{
+				BdvUtils.repaint( bdv );
+			}
+		} );
 
 		installBdvBehaviours();
 	}

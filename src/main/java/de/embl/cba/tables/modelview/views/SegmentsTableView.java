@@ -1,5 +1,7 @@
 package de.embl.cba.tables.modelview.views;
 
+import de.embl.cba.bdv.utils.BdvUtils;
+import de.embl.cba.bdv.utils.lut.BlueWhiteRedARGBLut;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUIs;
@@ -487,14 +489,13 @@ public class SegmentsTableView extends JPanel
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
-				if ( table.getColumnClass( columnIndex ).equals( Number.class ) )
+				if ( Number.class.isAssignableFrom( table.getColumnClass( columnIndex ) ) )
 				{
-
 					final double[] minMaxValues = getMinMaxValues( column );
 
 					coloringModel.setLinearColoring(
 							column,
-							new GlasbeyARGBLut(),
+							new BlueWhiteRedARGBLut( 256 ),
 							minMaxValues[ 0 ],
 							minMaxValues[ 1 ]
 					);

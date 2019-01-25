@@ -94,10 +94,15 @@ public class DefaultAnnotatedSegmentsColoringModel
 	{
 		double value = TableUtils.asDouble( featureValue );
 
-		final double normalisedValue = Math.max( Math.min( ( value - featureRangeMin )
-				/ ( featureRangeMax - featureRangeMin ), 1.0 ), 0.0 );
+		final double normalisedValue =
+				Math.max(
+						Math.min(
+							( value - featureRangeMin )
+								/ ( featureRangeMax - featureRangeMin ), 1.0 ), 0.0 );
 
-		output.set( lut.getARGBIndex( normalisedValue ) );
+		final int argb = lut.getARGB( normalisedValue );
+
+		output.set( argb );
 	}
 
 	public void setColorCategorically( ARGBType output, Object featureValue )
@@ -106,7 +111,7 @@ public class DefaultAnnotatedSegmentsColoringModel
 
 		final double random = createRandom( featureValues.indexOf( featureValue ) + 1 );
 
-		output.set( lut.getARGBIndex( random ) );
+		output.set( lut.getARGB( random ) );
 	}
 
 	public double createRandom( double x )
