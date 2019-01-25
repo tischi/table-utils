@@ -1,6 +1,6 @@
 package de.embl.cba.tables.modelview.datamodels;
 
-public class SegmentUtils
+public class SegmentUtilsDELETE
 {
 
 	public static String getKey( Double label )

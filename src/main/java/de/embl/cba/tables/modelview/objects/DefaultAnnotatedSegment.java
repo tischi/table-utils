@@ -2,18 +2,18 @@ package de.embl.cba.tables.modelview.objects;
 
 import de.embl.cba.bdv.utils.selection.Segment;
 import net.imglib2.FinalInterval;
-import net.imglib2.RealInterval;
+
 import java.util.ArrayList;
 
-public class DefaultSegmentWithFeatures implements SegmentWithFeatures
+public class DefaultAnnotatedSegment implements AnnotatedSegment
 {
 	private final ArrayList< String > featureNames;
 	private final Object[] featureValues;
 	private final Segment segment;
 
-	public DefaultSegmentWithFeatures( Segment segment,
-									   ArrayList< String > featureNames,
-									   Object[] featureValues )
+	public DefaultAnnotatedSegment( Segment segment,
+									ArrayList< String > featureNames,
+									Object[] featureValues )
 	{
 		this.segment = segment;
 		this.featureNames = featureNames;

@@ -2,8 +2,8 @@ package de.embl.cba.tables;
 
 import de.embl.cba.tables.models.ColumnClassAwareTableModel;
 import de.embl.cba.tables.modelview.objects.DefaultSegment;
-import de.embl.cba.tables.modelview.objects.SegmentWithFeatures;
-import de.embl.cba.tables.modelview.objects.DefaultSegmentWithFeatures;
+import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
+import de.embl.cba.tables.modelview.objects.DefaultAnnotatedSegment;
 import org.scijava.table.GenericTable;
 
 import javax.swing.*;
@@ -200,7 +200,7 @@ public class TableUtils
 		return new JTable( model );
 	}
 
-	public static ArrayList< DefaultSegmentWithFeatures > segmentsFromTableFile (
+	public static ArrayList< DefaultAnnotatedSegment > segmentsFromTableFile (
 			File file,
 			String delim,
 			String imageIdColumn,
@@ -212,7 +212,7 @@ public class TableUtils
 	)
 	{
 
-		final ArrayList< DefaultSegmentWithFeatures > segments = new ArrayList<>();
+		final ArrayList< DefaultAnnotatedSegment > segments = new ArrayList<>();
 
 		final ArrayList< String > tableRows = readRows( file );
 
@@ -268,7 +268,7 @@ public class TableUtils
 
 
 			segments.add(
-					new DefaultSegmentWithFeatures(
+					new DefaultAnnotatedSegment(
 							segment,
 							columns, 
 							rowEntries ) );
@@ -314,7 +314,7 @@ public class TableUtils
 		}
 	}
 
-	public static JTable jTableFromSegmentList( ArrayList< ? extends SegmentWithFeatures > segments )
+	public static JTable jTableFromSegmentList( ArrayList< ? extends AnnotatedSegment > segments )
 	{
 
 		/**

@@ -1,6 +1,6 @@
 package de.embl.cba.tables.modelview.datamodels;
 
-import de.embl.cba.tables.modelview.objects.SegmentWithFeatures;
+import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,19 +9,19 @@ import java.util.Map;
 /**
  * Holds all the data
  */
-public class DefaultSegmentWithFeaturesModel
+public class DefaultAnnotatedSegmentsModel
 {
 	private final String name;
-	private final ArrayList< ? extends SegmentWithFeatures > segmentWithFeatures;
+	private final ArrayList< ? extends AnnotatedSegment > segmentWithFeatures;
 	private final LabelImageSourceModel labelImageSourceModel;
 	private final String labelFeatureName;
 	private final String timePointFeatureName;
 
-	private Map< Object, SegmentWithFeatures > labelTimePointKeyToSegmentMap;
+	private Map< Object, AnnotatedSegment > labelTimePointKeyToSegmentMap;
 
-	public DefaultSegmentWithFeaturesModel(
+	public DefaultAnnotatedSegmentsModel(
 			String name,
-			ArrayList< ? extends SegmentWithFeatures > segmentWithFeatures,
+			ArrayList< ? extends AnnotatedSegment > segmentWithFeatures,
 			String labelFeatureName,
 			String timePointFeatureName,
 			LabelImageSourceModel labelImageSourceModel )
@@ -39,23 +39,23 @@ public class DefaultSegmentWithFeaturesModel
 	{
 		labelTimePointKeyToSegmentMap = new HashMap<>();
 
-		for ( SegmentWithFeatures segmentWithFeatures : this.segmentWithFeatures )
+		for ( AnnotatedSegment annotatedSegment : this.segmentWithFeatures )
 		{
-			final Object key = SegmentUtils.getKey(
-					segmentWithFeatures.getLabel(),
-					segmentWithFeatures.getTimePoint()
+			final Object key = SegmentUtilsDELETE.getKey(
+					annotatedSegment.getLabel(),
+					annotatedSegment.getTimePoint()
 			);
 
-			labelTimePointKeyToSegmentMap.put( key, segmentWithFeatures );
+			labelTimePointKeyToSegmentMap.put( key, annotatedSegment );
 		}
 	}
 
-	public SegmentWithFeatures getSegment( int listIndex )
+	public AnnotatedSegment getSegment( int listIndex )
 	{
 		return segmentWithFeatures.get( listIndex );
 	}
 
-	public SegmentWithFeatures getSegment( Double label, int timePoint  )
+	public AnnotatedSegment getSegment( Double label, int timePoint  )
 	{
 		final Object segmentKey = getSegmentKey( label, timePoint );
 		return labelTimePointKeyToSegmentMap.get( segmentKey );
@@ -91,7 +91,7 @@ public class DefaultSegmentWithFeaturesModel
 //		return featureNames;
 //	}
 
-	public ArrayList< ? extends SegmentWithFeatures > getSegmentWithFeatures()
+	public ArrayList< ? extends AnnotatedSegment > getSegmentWithFeatures()
 	{
 		return segmentWithFeatures;
 	}

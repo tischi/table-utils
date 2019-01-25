@@ -5,12 +5,12 @@ import bdv.util.BdvHandle;
 import bdv.util.BdvOptions;
 import bdv.viewer.Source;
 import de.embl.cba.bdv.utils.BdvUtils;
-import de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter;
 import de.embl.cba.bdv.utils.selection.Segment;
-import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
+import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
+import de.embl.cba.tables.modelview.coloring.FeatureColoringModel;
 import de.embl.cba.tables.modelview.datamodels.LabelImageSourceModel;
-import de.embl.cba.tables.modelview.datamodels.DefaultSegmentWithFeaturesModel;
-import de.embl.cba.tables.modelview.objects.SegmentWithFeatures;
+import de.embl.cba.tables.modelview.datamodels.DefaultAnnotatedSegmentsModel;
+import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import org.scijava.ui.behaviour.ClickBehaviour;
@@ -26,29 +26,31 @@ public class SegmentsBdvView < T extends Segment >
 	private String iterateSelectionModeTrigger = "ctrl S";
 	private String viewIn3DTrigger = "ctrl shift button1";
 
-	private final DefaultSegmentWithFeaturesModel defaultSegmentWithFeaturesModel;
-	private final SelectionModel< SegmentWithFeatures > selectionModel;
+	private final DefaultAnnotatedSegmentsModel segmentsModel;
+	private final SelectionModel< AnnotatedSegment > selectionModel;
+	private final FeatureColoringModel< AnnotatedSegment > coloringModel;
 	private Behaviours behaviours;
 
 	private final BdvHandle bdv;
 	private final Source source;
-	private final SelectableVolatileARGBConverter selectableConverter;
 
-	public SegmentsBdvView( final DefaultSegmentWithFeaturesModel defaultSegmentWithFeaturesModel,
-							final SelectionModel< SegmentWithFeatures > selectionModel )
+
+	// TODO: extract interface from DefaultAnnotatedSegmentsModel
+	public SegmentsBdvView( final DefaultAnnotatedSegmentsModel segmentsModel,
+							final SelectionModel< AnnotatedSegment > selectionModel,
+							final FeatureColoringModel< AnnotatedSegment > coloringModel )
 	{
-		this.defaultSegmentWithFeaturesModel = defaultSegmentWithFeaturesModel;
+		this.segmentsModel = segmentsModel;
 		this.selectionModel = selectionModel;
-		this.source = defaultSegmentWithFeaturesModel.getLabelImageSourceModel().getSource();
+		this.coloringModel = coloringModel;
 
-		selectableConverter =  ( ( SelectableARGBConvertedRealSource ) source ).getSelectableConverter();
+		this.source = segmentsModel.getLabelImageSourceModel().getSource();
 
-		bdv = show( defaultSegmentWithFeaturesModel.getLabelImageSourceModel() );
+		bdv = showLabelSourceInBdv( segmentsModel.getLabelImageSourceModel() );
 
 		addSelectionListener( selectionModel );
 
 		installBdvBehaviours();
-
 	}
 
 	public void addSelectionListener( SelectionModel< ? extends Segment > selectionModel )
@@ -59,7 +61,7 @@ public class SegmentsBdvView < T extends Segment >
 			@Override
 			public void selectionChanged()
 			{
-				selectableConverter.setSelected( selectionModel.getSelected() );
+				//selectableConverter.setSelected( selectionModel.getSelected() );
 				BdvUtils.repaint( bdv );
 			}
 
@@ -75,8 +77,17 @@ public class SegmentsBdvView < T extends Segment >
 		} );
 	}
 
-	public BdvHandle show( LabelImageSourceModel labelImageSourceModel )
+	public BdvHandle showLabelSourceInBdv( LabelImageSourceModel labelImageSourceModel )
 	{
+		final AnnotatedSegmentsColoringConverter coloringConverter =
+				new AnnotatedSegmentsColoringConverter(
+						segmentsModel,
+						coloringModel );
+
+		final ARGBConvertedRealSource argbConvertedLabelSource = new ARGBConvertedRealSource(
+				segmentsModel.getLabelImageSourceModel().getSource(),
+				coloringConverter );
+
 		BdvOptions options = BdvOptions.options();
 
 		if ( labelImageSourceModel.is2D() )
@@ -84,7 +95,11 @@ public class SegmentsBdvView < T extends Segment >
 			options = options.is2D();
 		}
 
-		return BdvFunctions.show( labelImageSourceModel.getSource(), options ).getBdvHandle();
+		final BdvHandle bdvHandle = BdvFunctions.show( argbConvertedLabelSource, options ).getBdvHandle();
+
+		bdvHandle.getViewerPanel().addTimePointListener( coloringConverter );
+
+		return bdvHandle;
 	}
 
 	private void installBdvBehaviours()
@@ -92,7 +107,7 @@ public class SegmentsBdvView < T extends Segment >
 		behaviours = new Behaviours( new InputTriggerConfig() );
 		behaviours.install(
 				bdv.getBdvHandle().getTriggerbindings(),
-				defaultSegmentWithFeaturesModel.getLabelImageSourceModel().getSource().getName() + "-bdv-selection-handler" );
+				segmentsModel.getLabelImageSourceModel().getSource().getName() + "-bdv-selection-handler" );
 
 		installSelectionBehaviour( );
 		installSelectNoneBehaviour( );
@@ -118,7 +133,7 @@ public class SegmentsBdvView < T extends Segment >
 	{
 		selectionModel.clearSelection( );
 
-		selectableConverter.setSelected( selectionModel.getSelected() );
+		//selectableConverter.setSelected( selectionModel.getSelected() );
 
 		BdvUtils.repaint( bdv );
 	}
@@ -145,9 +160,9 @@ public class SegmentsBdvView < T extends Segment >
 
 		final int timePoint = getCurrentTimePoint();
 
-		selectionModel.toggle( defaultSegmentWithFeaturesModel.getSegment( label, timePoint ) );
+		selectionModel.toggle( segmentsModel.getSegment( label, timePoint ) );
 
-		selectableConverter.setSelected( selectionModel.getSelected() );
+		//selectableConverter.setSelected( selectionModel.getSelected() );
 
 		BdvUtils.repaint( bdv );
 	}

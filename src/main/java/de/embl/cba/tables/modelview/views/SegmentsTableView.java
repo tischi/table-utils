@@ -3,8 +3,9 @@ package de.embl.cba.tables.modelview.views;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.datamodels.DefaultSegmentWithFeaturesModel;
-import de.embl.cba.tables.modelview.objects.SegmentWithFeatures;
+import de.embl.cba.tables.modelview.coloring.AnnotatedSegmentsColoringModel;
+import de.embl.cba.tables.modelview.datamodels.DefaultAnnotatedSegmentsModel;
+import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.objects.SegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectCoordinateColumnsSelectionUI;
@@ -33,8 +34,8 @@ public class SegmentsTableView extends JPanel
 {
 	public static final String NO_COLUMN_SELECTED = "No column selected";
 
-	private final DefaultSegmentWithFeaturesModel defaultSegmentWithFeaturesModel;
-	private final SelectionModel< SegmentWithFeatures > selectionModel;
+	private final DefaultAnnotatedSegmentsModel defaultAnnotatedSegmentsModel;
+	private final SelectionModel< AnnotatedSegment > selectionModel;
 
 	private JFrame frame;
     private JScrollPane scrollPane;
@@ -46,12 +47,12 @@ public class SegmentsTableView extends JPanel
 	private JTable table;
 
 	public SegmentsTableView(
-			DefaultSegmentWithFeaturesModel defaultSegmentWithFeaturesModel,
-			SelectionModel< SegmentWithFeatures > selectionModel )
+			DefaultAnnotatedSegmentsModel defaultAnnotatedSegmentsModel,
+			SelectionModel< AnnotatedSegment > selectionModel, AnnotatedSegmentsColoringModel coloringModel )
 	{
 		super( new GridLayout(1, 0 ) );
 
-		this.defaultSegmentWithFeaturesModel = defaultSegmentWithFeaturesModel;
+		this.defaultAnnotatedSegmentsModel = defaultAnnotatedSegmentsModel;
 		this.selectionModel = selectionModel;
 
 		addListener( selectionModel );
@@ -60,7 +61,7 @@ public class SegmentsTableView extends JPanel
 
 		segmentFeatureColumnMap.put(
 				SegmentCoordinate.Label,
-				defaultSegmentWithFeaturesModel.getLabelFeatureName() );
+				defaultAnnotatedSegmentsModel.getLabelFeatureName() );
 
 		createTable();
 		createMenuBar();
@@ -68,7 +69,7 @@ public class SegmentsTableView extends JPanel
 		installRowSelectionListener();
 	}
 
-	public void addListener( SelectionModel< SegmentWithFeatures > selectionModel )
+	public void addListener( SelectionModel< AnnotatedSegment > selectionModel )
 	{
 		selectionModel.listeners().add( new SelectionListener()
 		{
@@ -88,7 +89,7 @@ public class SegmentsTableView extends JPanel
 
 	private void createTable()
     {
-		table = TableUtils.jTableFromSegmentList( defaultSegmentWithFeaturesModel.getSegmentWithFeatures() );
+		table = TableUtils.jTableFromSegmentList( defaultAnnotatedSegmentsModel.getSegmentWithFeatures() );
 
 		table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
         table.setFillsViewportHeight( true );
@@ -220,7 +221,7 @@ public class SegmentsTableView extends JPanel
     public void showTable() {
 
         //Create and set up the window.
-        frame = new JFrame( defaultSegmentWithFeaturesModel.getName() );
+        frame = new JFrame( defaultAnnotatedSegmentsModel.getName() );
 
         frame.setJMenuBar( menuBar );
 
@@ -399,7 +400,7 @@ public class SegmentsTableView extends JPanel
 
 			highlightRowInView( row );
 
-			selectionModel.setSelected( defaultSegmentWithFeaturesModel.getSegment( row ) , true );
+			selectionModel.setSelected( defaultAnnotatedSegmentsModel.getSegment( row ) , true );
 		}
 	}
 
@@ -423,7 +424,7 @@ public class SegmentsTableView extends JPanel
 						final int row = table.getSelectedRow();
 
 						selectionModel.setSelected(
-								defaultSegmentWithFeaturesModel.getSegment( row ),
+								defaultAnnotatedSegmentsModel.getSegment( row ),
 								true );
 					}
 					else

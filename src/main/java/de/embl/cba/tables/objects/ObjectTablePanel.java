@@ -3,7 +3,7 @@ package de.embl.cba.tables.objects;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.TableUIs;
-import de.embl.cba.tables.modelview.datamodels.SegmentUtils;
+import de.embl.cba.tables.modelview.datamodels.SegmentUtilsDELETE;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
@@ -277,7 +277,7 @@ public class ObjectTablePanel extends JPanel
 		else
 		{
 			final Double timePoint = ( Double ) table.getValueAt( rowInModel, timeColumnIndex );
-			key = SegmentUtils.getKey( label, timePoint.intValue() );
+			key = SegmentUtilsDELETE.getKey( label, timePoint.intValue() );
 		}
 
 		return key;
@@ -325,7 +325,7 @@ public class ObjectTablePanel extends JPanel
 	{
 		if ( objectRowMap == null ) createObjectRowMap();
 
-		final String objectKey = SegmentUtils.getKey( label, timepoint );
+		final String objectKey = SegmentUtilsDELETE.getKey( label, timepoint );
 
 		final Integer rowIndex = objectRowMap.get( objectKey );
 
@@ -335,7 +335,7 @@ public class ObjectTablePanel extends JPanel
 
 	private String getObjectKey( Double label )
 	{
-		return SegmentUtils.getKey( label, null );
+		return SegmentUtilsDELETE.getKey( label, null );
 	}
 
 	public double[] getMinMaxValues( String selectedColumn )
