@@ -3,12 +3,12 @@ package de.embl.cba.tables.modelview.datamodels;
 import bdv.viewer.Source;
 import net.imglib2.type.numeric.RealType;
 
-public class LabelImageSource
+public class LabelImageSourceModel // implements imageSource??
 {
 	private final Source< ? extends RealType< ? > > labelSource;
 	private final boolean is2D;
 
-	public LabelImageSource( Source< ? extends RealType< ? > > labelSource, boolean is2D )
+	public LabelImageSourceModel( Source< ? extends RealType< ? > > labelSource, boolean is2D )
 	{
 		this.labelSource = labelSource;
 		this.is2D = is2D;

@@ -8,5 +8,6 @@ public interface FeatureList
 
 	Object featureValue( String featureName );
 
-//	int tableRowIndex();
+	Object[] getFeatureValues();
+
 }

@@ -48,6 +48,7 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 
 			for ( SelectionListener listener : listeners.list )
 			{
+				listener.selectionChanged();
 				listener.selectionChanged( object, false );
 			}
 		}
@@ -61,6 +62,7 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 
 			for ( SelectionListener listener : listeners.list )
 			{
+				listener.selectionChanged();
 				listener.selectionChanged( object, true );
 			}
 		}

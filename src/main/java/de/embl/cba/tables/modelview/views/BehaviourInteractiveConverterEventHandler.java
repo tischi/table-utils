@@ -12,10 +12,8 @@ import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
 import org.scijava.ui.behaviour.util.Behaviours;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.net.CookieHandler;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BehaviourInteractiveConverterEventHandler
@@ -42,7 +40,7 @@ public class BehaviourInteractiveConverterEventHandler
 	 * @param bdv Bdv window in which the source is shown.
 	 */
 	public BehaviourInteractiveConverterEventHandler( Bdv bdv,
-														 SelectableARGBConvertedRealSource selectableSource )
+													  SelectableARGBConvertedRealSource selectableSource )
 	{
 		this.bdv = bdv;
 		this.source = selectableSource;
@@ -157,20 +155,8 @@ public class BehaviourInteractiveConverterEventHandler
 
 	public void selectNone()
 	{
-		final Map< Integer, Set< Double > > selections = selectableConverter.getSelections();
 
-		for ( final BdvLabelSourceSelectionListener s : bdvLabelSourceSelectionListeners )
-		{
-			for ( int timepoint : selections.keySet() )
-			{
-				for ( Double selection : selections.get( timepoint ) )
-				{
-					s.selectionChanged( selection, timepoint, false );
-				}
-			}
-		}
-
-		selectableConverter.clearSelections( );
+		selectableConverter.setSelected( null );
 
 		BdvUtils.repaint( bdv );
 	}
@@ -211,7 +197,7 @@ public class BehaviourInteractiveConverterEventHandler
 
 	private void removeSelectionAndNotifyListeners( double selected, int currentTimepoint )
 	{
-		selectableConverter.selectionChanged( selected, currentTimepoint, false );
+		//selectableConverter.selectionChanged( selected, currentTimepoint, false );
 
 		for ( final BdvLabelSourceSelectionListener s : bdvLabelSourceSelectionListeners )
 			s.selectionChanged( selected, currentTimepoint, false );
@@ -232,12 +218,12 @@ public class BehaviourInteractiveConverterEventHandler
 
 	private boolean isNewSelection( double selected, int timepoint )
 	{
-		if ( selectableConverter.getSelections() == null ) return true;
-
-		if ( selectableConverter.getSelections().get( timepoint ) == null ) return true;
-
-		if ( selectableConverter.getSelections().get( timepoint ).contains( selected ) ) return false;
-
+//		if ( selectableConverter.getSelections() == null ) return true;
+//
+//		if ( selectableConverter.getSelections().get( timepoint ) == null ) return true;
+//
+//		if ( selectableConverter.getSelections().get( timepoint ).contains( selected ) ) return false;
+//
 		return true;
 	}
 
@@ -245,7 +231,7 @@ public class BehaviourInteractiveConverterEventHandler
 	{
 		if ( isNewSelection( label, timepoint  ) )
 		{
-			selectableConverter.selectionChanged( label, timepoint, true );
+			//selectableConverter.selectionChanged( label, timepoint, true );
 		}
 	}
 

@@ -1,42 +1,54 @@
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.datamodels.LabelImageSource;
-import de.embl.cba.tables.modelview.datamodels.SegmentModel;
-import de.embl.cba.tables.modelview.objects.Segment;
+import de.embl.cba.tables.modelview.datamodels.LabelImageSourceModel;
+import de.embl.cba.tables.modelview.datamodels.DefaultSegmentWithFeaturesModel;
+import de.embl.cba.tables.modelview.objects.DefaultSegmentWithFeatures;
+import de.embl.cba.tables.modelview.objects.SegmentWithFeatures;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
-import de.embl.cba.tables.modelview.views.SegmentModelBdvView;
-import de.embl.cba.tables.modelview.views.SegmentModelTableView;
+import de.embl.cba.tables.modelview.views.SegmentsBdvView;
+import de.embl.cba.tables.modelview.views.SegmentsTableView;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class TableBdvObjectModelDevelopment
 {
 	public static void main( String[] args ) throws IOException
 	{
 
-		final SelectableARGBConvertedRealSource source = Examples.loadSelectableSource();
-		final LabelImageSource labelImageSource = new LabelImageSource( source, true );
+		final SelectableARGBConvertedRealSource source = new SelectableARGBConvertedRealSource( Examples.load2D16BitLabelMask() );
+
+		final LabelImageSourceModel labelImageSourceModel = new LabelImageSourceModel( source, true );
 
 		final File tableFile = new File( Examples.class.getResource( "2d-16bit-labelMask-Morphometry.csv" ).getFile() );
 
-		final SegmentModel model = new SegmentModel(
-				"MyModel",
+
+		final ArrayList< DefaultSegmentWithFeatures > segments = new ArrayList<>();
+
+		final ArrayList< DefaultSegmentWithFeatures > segmentsWithFeatures = TableUtils.segmentsFromTableFile(
 				tableFile,
+				",",
 				"Label",
 				null,
-				labelImageSource );
+				"X",
+				"Y",
+				null );
+
+		final DefaultSegmentWithFeaturesModel model =
+				new DefaultSegmentWithFeaturesModel(
+				"MyModel",
+				segmentsWithFeatures,
+						"Label",
+				null,
+				labelImageSourceModel );
 
 
-		final SelectionModel< Segment > selectionModel = new DefaultSelectionModel<>();
+		final SelectionModel< SegmentWithFeatures > selectionModel = new DefaultSelectionModel<>();
 
-		final SegmentModelBdvView< Segment > segmentModelBdvView = new SegmentModelBdvView( model, selectionModel );
-		final SegmentModelTableView< Segment > segmentModelTableView = new SegmentModelTableView<>( model, selectionModel );
-
-		selectionModel.listeners().add( segmentModelBdvView );
-		selectionModel.listeners().add( segmentModelTableView );
+		final SegmentsBdvView segmentsBdvView = new SegmentsBdvView( model, selectionModel );
+		final SegmentsTableView tableView = new SegmentsTableView( model, selectionModel );
 
 	}
 }

@@ -1,10 +1,10 @@
 package de.embl.cba.tables;
 
 import de.embl.cba.tables.models.ColumnClassAwareTableModel;
-import de.embl.cba.tables.modelview.datamodels.SegmentModel;
-import de.embl.cba.tables.modelview.datamodels.SegmentUtils;
-import de.embl.cba.tables.modelview.objects.Segment;
-import mdbtools.libmdb.file;
+import de.embl.cba.tables.modelview.datamodels.DefaultSegmentWithFeaturesModel;
+import de.embl.cba.tables.modelview.objects.DefaultSegment;
+import de.embl.cba.tables.modelview.objects.SegmentWithFeatures;
+import de.embl.cba.tables.modelview.objects.DefaultSegmentWithFeatures;
 import org.scijava.table.GenericTable;
 
 import javax.swing.*;
@@ -201,14 +201,18 @@ public class TableUtils
 		return new JTable( model );
 	}
 
-	public static void segmentsFromTableFile (
-			SegmentModel< Segment > segmentModel,
+	public static ArrayList< DefaultSegmentWithFeatures > segmentsFromTableFile (
 			File file,
 			String delim,
-			ArrayList< Segment > segments, // output
-			ArrayList< String > featureNames // output
+			String labelColumnName,
+			String tCoordinateColumnName,
+			String xCoordinateColumnName,
+			String yCoordinateColumnName,
+			String zCoordinateColumnName
 	)
 	{
+
+		final ArrayList< DefaultSegmentWithFeatures > segments = new ArrayList<>();
 
 		final ArrayList< String > tableRows = readRows( file );
 
@@ -216,10 +220,22 @@ public class TableUtils
 
 		ArrayList< String > columns = getColumnNames( tableRows, delim );
 
-		for ( String column : columns )
+		int labelColumnIndex = -1;
+		int tColumnIndex = -1;
+		int xColumnIndex = -1;
+		int yColumnIndex = -1;
+		int zColumnIndex = -1;
+
+		for ( int i = 0; i < columns.size(); i++ )
 		{
-			featureNames.add( column );
+			final String column = columns.get( i );
+			if ( column.equals( labelColumnName ) ) labelColumnIndex = i;
+			if ( column.equals( tCoordinateColumnName ) ) tColumnIndex = i;
+			if ( column.equals( xCoordinateColumnName ) ) xColumnIndex = i;
+			if ( column.equals( yCoordinateColumnName ) ) yColumnIndex = i;
+			if ( column.equals( zCoordinateColumnName ) ) zColumnIndex = i;
 		}
+
 
 		StringTokenizer st;
 
@@ -236,19 +252,37 @@ public class TableUtils
 				rowEntries[ iCol ] = st.nextToken();
 			}
 
-			segments.add( new Segment( segmentModel, columns, rowEntries ) );
+
+			final DefaultSegment segment = new DefaultSegment(
+					Double.parseDouble( rowEntries[ labelColumnIndex ] ),
+					Integer.parseInt( rowEntries[ tColumnIndex ] ),
+					new double[]{
+							Double.parseDouble( rowEntries[ xColumnIndex ] ),
+							Double.parseDouble( rowEntries[ yColumnIndex ] ),
+							Double.parseDouble( rowEntries[ zColumnIndex ] ),
+					},
+					null );
+
+
+			segments.add(
+					new DefaultSegmentWithFeatures(
+							segment,
+							columns, 
+							rowEntries ) );
 		}
+
+		return segments;
 
 	}
 
-	public static JTable jTableFromSegmentList( ArrayList< ? extends Segment > segments )
+	public static JTable jTableFromSegmentList( ArrayList< ? extends SegmentWithFeatures > segments )
 	{
 
 		/**
 		 * Init model and columns
 		 */
 
-		ColumnClassAwareTableModel model = new ColumnClassAwareTableModel();
+		DefaultTableModel model = new DefaultTableModel();
 
 		final ArrayList< String > columns = segments.get( 0 ).featureNames();
 
@@ -259,7 +293,7 @@ public class TableUtils
 
 		/**
 		 * Add rows, which are just references to the segments feature values.
-		 * Thus not data duplication happens here.
+		 * Thus no data duplication happens here.
 		 */
 
 		for ( int row = 0; row < segments.size(); ++row )
@@ -267,7 +301,7 @@ public class TableUtils
 			model.addRow( segments.get( row ).getFeatureValues() );
 		}
 
-		model.refreshColumnClasses();
+		//model.refreshColumnClasses();
 
 		return new JTable( model );
 	}

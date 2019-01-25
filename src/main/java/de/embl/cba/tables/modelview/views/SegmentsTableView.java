@@ -3,8 +3,8 @@ package de.embl.cba.tables.modelview.views;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.datamodels.SegmentModel;
-import de.embl.cba.tables.modelview.objects.Segment;
+import de.embl.cba.tables.modelview.datamodels.DefaultSegmentWithFeaturesModel;
+import de.embl.cba.tables.modelview.objects.SegmentWithFeatures;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.objects.SegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectCoordinateColumnsSelectionUI;
@@ -12,7 +12,6 @@ import de.embl.cba.tables.modelview.selection.SelectionModel;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,12 +29,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * - https://coderanch.com/t/345383/java/JTable-Paging
  */
 
-public class SegmentModelTableView< T extends Segment > extends JPanel
+public class SegmentsTableView extends JPanel
 {
 	public static final String NO_COLUMN_SELECTED = "No column selected";
 
-	private final SelectionModel< T > selectionModel;
-	private final SegmentModel< T > segmentModel;
+	private final DefaultSegmentWithFeaturesModel defaultSegmentWithFeaturesModel;
+	private final SelectionModel< SegmentWithFeatures > selectionModel;
 
 	private JFrame frame;
     private JScrollPane scrollPane;
@@ -46,22 +45,22 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 	private int highlightedRow;
 	private JTable table;
 
-	public SegmentModelTableView(
-			SegmentModel< T > segmentModel,
-			SelectionModel< T > selectionModel )
+	public SegmentsTableView(
+			DefaultSegmentWithFeaturesModel defaultSegmentWithFeaturesModel,
+			SelectionModel< SegmentWithFeatures > selectionModel )
 	{
 		super( new GridLayout(1, 0 ) );
 
-		this.segmentModel = segmentModel;
+		this.defaultSegmentWithFeaturesModel = defaultSegmentWithFeaturesModel;
 		this.selectionModel = selectionModel;
 
-		addSelectionModelListener( selectionModel );
+		addListener( selectionModel );
 
 		initObjectCoordinateColumnMap();
 
 		segmentFeatureColumnMap.put(
 				SegmentCoordinate.Label,
-				segmentModel.getLabelFeatureName() );
+				defaultSegmentWithFeaturesModel.getLabelFeatureName() );
 
 		createTable();
 		createMenuBar();
@@ -69,7 +68,7 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 		installRowSelectionListener();
 	}
 
-	public void addSelectionModelListener( SelectionModel< T > selectionModel )
+	public void addListener( SelectionModel< SegmentWithFeatures > selectionModel )
 	{
 		selectionModel.listeners().add( new SelectionListener()
 		{
@@ -89,7 +88,7 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 
 	private void createTable()
     {
-		table = TableUtils.jTableFromSegmentList( segmentModel.getSegments() );
+		table = TableUtils.jTableFromSegmentList( defaultSegmentWithFeaturesModel.getSegmentWithFeatures() );
 
 		table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
         table.setFillsViewportHeight( true );
@@ -183,7 +182,7 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 	{
 		final JMenuItem menuItem = new JMenuItem( "Add featureValue..." );
 
-		final SegmentModelTableView objectTablePanel = this;
+		final SegmentsTableView objectTablePanel = this;
 		menuItem.addActionListener( new ActionListener()
 		{
 			@Override
@@ -201,7 +200,7 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 	{
 		JMenu menu = new JMenu( "Objects" );
 
-		final SegmentModelTableView objectTablePanel = this;
+		final SegmentsTableView objectTablePanel = this;
 
 		final JMenuItem coordinatesMenuItem = new JMenuItem( "Select coordinates..." );
 		coordinatesMenuItem.addActionListener( new ActionListener()
@@ -221,7 +220,7 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
     public void showTable() {
 
         //Create and set up the window.
-        frame = new JFrame( segmentModel.getName() );
+        frame = new JFrame( defaultSegmentWithFeaturesModel.getName() );
 
         frame.setJMenuBar( menuBar );
 
@@ -400,7 +399,7 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 
 			highlightRowInView( row );
 
-			selectionModel.setSelected( segmentModel.getSegment( row ) , true );
+			selectionModel.setSelected( defaultSegmentWithFeaturesModel.getSegment( row ) , true );
 		}
 	}
 
@@ -424,7 +423,7 @@ public class SegmentModelTableView< T extends Segment > extends JPanel
 						final int row = table.getSelectedRow();
 
 						selectionModel.setSelected(
-								segmentModel.getSegment( row ),
+								defaultSegmentWithFeaturesModel.getSegment( row ),
 								true );
 					}
 					else
