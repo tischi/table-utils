@@ -4,38 +4,20 @@ import de.embl.cba.bdv.utils.selection.Segment;
 import net.imglib2.FinalInterval;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DefaultAnnotatedSegment implements AnnotatedSegment
 {
-	private final ArrayList< String > featureNames;
-	private final Object[] featureValues;
+	private final LinkedHashMap< String, Object > featureMap;
 	private final Segment segment;
 
 	public DefaultAnnotatedSegment( Segment segment,
-									ArrayList< String > featureNames,
-									Object[] featureValues )
+									LinkedHashMap< String, Object > featureMap )
 	{
 		this.segment = segment;
-		this.featureNames = featureNames;
-		this.featureValues = featureValues;
-	}
-
-	@Override
-	public ArrayList< String > featureNames()
-	{
-		return featureNames;
-	}
-
-	@Override
-	public Object featureValue( String featureName )
-	{
-		return featureValues[ featureNames.indexOf( featureName ) ];
-	}
-
-	@Override
-	public Object[] getFeatureValues()
-	{
-		return featureValues;
+		this.featureMap = featureMap;
 	}
 
 	@Override
@@ -68,6 +50,9 @@ public class DefaultAnnotatedSegment implements AnnotatedSegment
 		return segment.getBoundingBox();
 	}
 
-
-
+	@Override
+	public LinkedHashMap< String, Object > features()
+	{
+		return featureMap;
+	}
 }

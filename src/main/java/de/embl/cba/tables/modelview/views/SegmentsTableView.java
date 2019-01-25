@@ -181,7 +181,7 @@ public class SegmentsTableView extends JPanel
 
 	private JMenuItem addColumnMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "Add featureValue..." );
+		final JMenuItem menuItem = new JMenuItem( "Add getFeature..." );
 
 		final SegmentsTableView objectTablePanel = this;
 		menuItem.addActionListener( new ActionListener()
@@ -269,7 +269,7 @@ public class SegmentsTableView extends JPanel
 	public void addColumn( String column, Object defaultValue )
 	{
 		// TODO: this must be propagated back to the segments...
-		TableUtils.addColumn( table.getModel(), column, defaultValue );
+		TableUtils.addFeature( table.getModel(), column, defaultValue );
 	}
 
 	public ArrayList< String > getColumnNames()

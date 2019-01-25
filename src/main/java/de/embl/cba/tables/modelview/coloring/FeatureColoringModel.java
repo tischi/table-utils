@@ -16,9 +16,19 @@ public interface FeatureColoringModel< T > extends ColoringModel< T >
 	 */
 	Listeners< ColoringListener > listeners();
 
-	void setColoringFeature( String coloringFeature,
-							 ARGBLut lut,
-							 double rangeMin,
-							 double rangeMax );
+	enum ColoringMode
+	{
+		Categorical,
+		Linear
+	}
+
+	/**
+	 * TODO
+	 */
+	void setColoringFeatureAndLut( String coloringFeature,
+								   ARGBLut lut,
+								   ColoringMode coloringMode,
+								   double featureRangeMin,
+								   double featureRangeMax );
 
 }

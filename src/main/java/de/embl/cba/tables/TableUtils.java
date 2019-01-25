@@ -227,30 +227,49 @@ public class TableUtils
 
 		StringTokenizer st;
 
-		int numColumns = columns.size();
-
-
 		for ( int row = 1; row < tableRows.size(); ++row )
 		{
-			final String[] features = new String[ numColumns ];
+			final LinkedHashMap< String, Object > columnValueMap = new LinkedHashMap<>();
 
-			st = new StringTokenizer( tableRows.get( row ), delim );
-
-			for ( int col = 0; col < numColumns; col++ )
+			for ( String feature : columns )
 			{
-				features[ col ] = st.nextToken();
+				st = new StringTokenizer( tableRows.get( row ), delim );
+
+				final String string = st.nextToken();
+
+				addFeature( columnValueMap, feature, string );
 			}
 
-			final DefaultSegment segment = SegmentUtils.segmentFromFeatures( coordinateColumnMap, features );
+			final DefaultSegment segment = SegmentUtils.segmentFromFeatures(
+					coordinateColumnMap,
+					columnValueMap );
 
-			segments.add( new DefaultAnnotatedSegment(
-							segment,
-							columns, 
-							features ) );
+			segments.add( new DefaultAnnotatedSegment( segment, columnValueMap ) );
 		}
 
 		return segments;
 
+	}
+
+	public static void addFeature( HashMap< String, Object > columnValueMap, String column, String string )
+	{
+		try
+		{
+			final double number = Integer.parseInt( string );
+			columnValueMap.put( column, number );
+		}
+		catch ( Exception e )
+		{
+			try
+			{
+				final double number = Double.parseDouble( string );
+				columnValueMap.put( column, number );
+			}
+			catch ( Exception e2 )
+			{
+				columnValueMap.put( column, string );
+			}
+		}
 	}
 
 	public static void setColumnIndex( Map< SegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap, int columnIndex, String columnName )
@@ -303,26 +322,27 @@ public class TableUtils
 		 * Init model and columns
 		 */
 
-		DefaultTableModel model = new DefaultTableModel();
+		ColumnClassAwareTableModel model = new ColumnClassAwareTableModel();
 
-		final ArrayList< String > columns = segments.get( 0 ).featureNames();
+		final Set< String > columns = segments.get( 0 ).features().keySet();
 
 		for ( String column : columns )
 		{
 			model.addColumn( column );
 		}
 
-		/**
-		 * Add rows, which are just references to the segments feature values.
-		 * Thus no data duplication happens here.
-		 */
-
 		for ( int row = 0; row < segments.size(); ++row )
 		{
-			model.addRow( segments.get( row ).getFeatureValues() );
+			final Collection< Object > values = segments.get( row ).features().values();
+
+			int col = 0;
+			for ( Object value : values )
+			{
+				model.setValueAt( value, row, col++ );
+			}
 		}
 
-		//model.refreshColumnClasses();
+		model.refreshColumnClasses();
 
 		return new JTable( model );
 	}
@@ -398,12 +418,12 @@ public class TableUtils
 		return max;
 	}
 
-	public static void addColumn( JTable table, String column, Object defaultValue )
+	public static void addFeature( JTable table, String column, Object defaultValue )
 	{
-		addColumn( table.getModel(), column, defaultValue );
+		addFeature( table.getModel(), column, defaultValue );
 	}
 
-	public static void addColumn( TableModel model, String column, Object defaultValue )
+	public static void addFeature( TableModel model, String column, Object defaultValue )
 	{
 		if ( model instanceof ColumnClassAwareTableModel )
 		{
@@ -426,7 +446,7 @@ public class TableUtils
 	{
 		if ( imageFile == null ) return;
 		final Path relativeImagePath = getRelativeImagePath( tableFile, imageFile );
-		TableUtils.addColumn( table, "RelativeImagePath_" + imageName, relativeImagePath );
+		TableUtils.addFeature( table, "RelativeImagePath_" + imageName, relativeImagePath );
 	}
 
 	public static Path getRelativeImagePath( File tableFile, File imageFile )
@@ -438,5 +458,17 @@ public class TableUtils
 	}
 
 
-
+	public static double asDouble( Object featureValue )
+	{
+		double value;
+		if ( featureValue instanceof Number )
+		{
+			value = (( Number ) featureValue).doubleValue();
+		}
+		else
+		{
+			value = Double.parseDouble( ( String ) featureValue );
+		}
+		return value;
+	}
 }

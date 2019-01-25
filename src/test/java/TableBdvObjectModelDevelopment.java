@@ -52,7 +52,6 @@ public class TableBdvObjectModelDevelopment
 				null,
 				labelImageSourceModel );
 
-
 		final FeatureColoringModel< AnnotatedSegment > coloringModel =
 				new DefaultAnnotatedSegmentsColoringModel( "Label" );
 		final SelectionModel< AnnotatedSegment > selectionModel = new DefaultSelectionModel<>();

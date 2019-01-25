@@ -5,6 +5,7 @@ import de.embl.cba.tables.modelview.objects.DefaultSegmentBuilder;
 import de.embl.cba.tables.objects.SegmentCoordinate;
 import net.imglib2.util.ValuePair;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class SegmentUtils
@@ -20,7 +21,47 @@ public class SegmentUtils
 		return "L"+label.toString() + "_T" + timePoint.toString();
 	}
 
-	public static DefaultSegment segmentFromFeatures( Map< SegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap, String[] rowEntries )
+	public static DefaultSegment segmentFromFeatures(
+			Map< SegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
+			HashMap< String, Object > columnValueMap )
+	{
+		final DefaultSegmentBuilder segmentBuilder = new DefaultSegmentBuilder();
+
+		for( SegmentCoordinate coordinate : coordinateColumnMap.keySet() )
+		{
+			final String colName = coordinateColumnMap.get( coordinate ).getA();
+
+			columnValueMap.get( colName );
+			switch ( coordinate )
+			{
+				case X:
+					segmentBuilder.setX( ( double ) columnValueMap.get( colName ) );
+					break;
+				case Y:
+					segmentBuilder.setY( ( double ) columnValueMap.get( colName ) );
+					break;
+				case Z:
+					segmentBuilder.setZ( ( double ) columnValueMap.get( colName ) );
+					break;
+				case T:
+					segmentBuilder.setTimePoint( ( int ) columnValueMap.get( colName ) );
+					break;
+				case Label:
+					segmentBuilder.setLabel( ( double ) columnValueMap.get( colName ) );
+					break;
+				case ImageId:
+					segmentBuilder.setImageId( ( String ) columnValueMap.get( colName )  );
+					break;
+
+			}
+		}
+
+		return segmentBuilder.build();
+	}
+
+	public static DefaultSegment segmentFromFeaturesIndexBased(
+			Map< SegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
+			String[] rowEntries )
 	{
 		final DefaultSegmentBuilder segmentBuilder = new DefaultSegmentBuilder();
 

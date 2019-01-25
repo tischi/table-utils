@@ -191,7 +191,7 @@ public class TableBdvConnector
 					}
 					else
 					{
-						Logger.error( "Please specify the Object Label featureValue!" );
+						Logger.error( "Please specify the Object Label getFeature!" );
 					}
 				}
 			}
@@ -256,7 +256,7 @@ public class TableBdvConnector
 			{
 				if ( ! objectTablePanel.hasCoordinate( SegmentCoordinate.Label ) )
 				{
-					Logger.warn( "Please specify the object label featureValue:\n" +
+					Logger.warn( "Please specify the object label getFeature:\n" +
 							"[ Objects > Select coordinates... ]" );
 					return;
 				}

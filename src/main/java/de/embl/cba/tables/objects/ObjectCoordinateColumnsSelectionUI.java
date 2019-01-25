@@ -92,7 +92,7 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 			jComboBox.addItem( choice );
 		}
 
-		// +1 is due to the option to select no featureValue
+		// +1 is due to the option to select no getFeature
 		jComboBox.setSelectedItem( objectTablePanel.getCoordinateColumn( coordinate ) );
 
 		jComboBox.addActionListener( new ActionListener()

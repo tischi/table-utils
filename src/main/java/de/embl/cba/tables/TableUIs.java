@@ -12,7 +12,7 @@ public class TableUIs
 {
 	public static void addColumnUI( SegmentsTableView objectTablePanel )
 	{
-		final GenericDialog gd = new GenericDialog( "New featureValue" );
+		final GenericDialog gd = new GenericDialog( "New getFeature" );
 		gd.addStringField( "Column name", "MyNewColumn", 30 );
 		gd.addStringField( "Default value [String or Number]", "None", 30 );
 
@@ -38,7 +38,7 @@ public class TableUIs
 
 	public static void addColumnUI( ObjectTablePanel objectTablePanel )
 	{
-		final GenericDialog gd = new GenericDialog( "New featureValue" );
+		final GenericDialog gd = new GenericDialog( "New getFeature" );
 		gd.addStringField( "Column name", "MyNewColumn", 30 );
 		gd.addStringField( "Default value [String or Number]", "None", 30 );
 

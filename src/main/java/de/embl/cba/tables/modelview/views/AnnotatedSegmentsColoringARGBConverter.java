@@ -46,18 +46,17 @@ public class AnnotatedSegmentsColoringARGBConverter
 			return;
 		}
 
+		coloringModel.convert(
+				getAnnotatedSegment( label ),
+				color.get() );
 
-		final AnnotatedSegment segment =
-				segmentsModel.getSegment(
-						label.getRealDouble(),
-						timePointIndex );
+	}
 
-//		final ARGBType argbType = new ARGBType();
-		coloringModel.convert( segment, color.get() );
-
-		//color.set( argbType.get() );
-
-		int a = 1;
+	public AnnotatedSegment getAnnotatedSegment( RealType label )
+	{
+		return segmentsModel.getSegment(
+				label.getRealDouble(),
+				timePointIndex );
 	}
 
 	@Override
