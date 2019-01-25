@@ -1,24 +1,35 @@
 package de.embl.cba.tables.modelview.objects;
 
 import de.embl.cba.bdv.utils.selection.Segment;
-import net.imglib2.RealInterval;
+import net.imglib2.FinalInterval;
 import net.imglib2.roi.labeling.LabelRegion;
 
 public class DefaultSegment implements Segment
 {
+	private final String imageId;
 	private final double label;
 	private final int timePoint;
 	private final double[] position;
-	private final RealInterval boundingBox;
+	private final FinalInterval boundingBox;
 
-	public DefaultSegment( double label, int timePoint, double[] position, RealInterval boundingBox )
+	public DefaultSegment(
+			String imageId,
+			double label,
+			int timePoint,
+			double[] position,
+			FinalInterval boundingBox )
 	{
+		this.imageId = imageId;
 		this.label = label;
 		this.timePoint = timePoint;
 		this.position = position;
 		this.boundingBox = boundingBox;
+	}
 
-		final LabelRegion labelRegion = new LabelRegion();
+	@Override
+	public String getImageId()
+	{
+		return imageId;
 	}
 
 	@Override
@@ -40,7 +51,7 @@ public class DefaultSegment implements Segment
 	}
 
 	@Override
-	public RealInterval getBoundingBox()
+	public FinalInterval getBoundingBox()
 	{
 		return boundingBox;
 	}

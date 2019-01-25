@@ -1,7 +1,6 @@
 package de.embl.cba.tables;
 
 import de.embl.cba.tables.models.ColumnClassAwareTableModel;
-import de.embl.cba.tables.modelview.datamodels.DefaultSegmentWithFeaturesModel;
 import de.embl.cba.tables.modelview.objects.DefaultSegment;
 import de.embl.cba.tables.modelview.objects.SegmentWithFeatures;
 import de.embl.cba.tables.modelview.objects.DefaultSegmentWithFeatures;
@@ -204,11 +203,12 @@ public class TableUtils
 	public static ArrayList< DefaultSegmentWithFeatures > segmentsFromTableFile (
 			File file,
 			String delim,
-			String labelColumnName,
-			String tCoordinateColumnName,
-			String xCoordinateColumnName,
-			String yCoordinateColumnName,
-			String zCoordinateColumnName
+			String imageIdColumn,
+			String labelColumn,
+			String tCoordinateColumn,
+			String xCoordinateColumn,
+			String yCoordinateColumn,
+			String zCoordinateColumn
 	)
 	{
 
@@ -220,6 +220,7 @@ public class TableUtils
 
 		ArrayList< String > columns = getColumnNames( tableRows, delim );
 
+		int imageIdColumnIndex = -1;
 		int labelColumnIndex = -1;
 		int tColumnIndex = -1;
 		int xColumnIndex = -1;
@@ -229,11 +230,12 @@ public class TableUtils
 		for ( int i = 0; i < columns.size(); i++ )
 		{
 			final String column = columns.get( i );
-			if ( column.equals( labelColumnName ) ) labelColumnIndex = i;
-			if ( column.equals( tCoordinateColumnName ) ) tColumnIndex = i;
-			if ( column.equals( xCoordinateColumnName ) ) xColumnIndex = i;
-			if ( column.equals( yCoordinateColumnName ) ) yColumnIndex = i;
-			if ( column.equals( zCoordinateColumnName ) ) zColumnIndex = i;
+			if ( column.equals( imageIdColumn ) ) imageIdColumnIndex = i;
+			if ( column.equals( labelColumn ) ) labelColumnIndex = i;
+			if ( column.equals( tCoordinateColumn ) ) tColumnIndex = i;
+			if ( column.equals( xCoordinateColumn ) ) xColumnIndex = i;
+			if ( column.equals( yCoordinateColumn ) ) yColumnIndex = i;
+			if ( column.equals( zCoordinateColumn ) ) zColumnIndex = i;
 		}
 
 
@@ -254,12 +256,13 @@ public class TableUtils
 
 
 			final DefaultSegment segment = new DefaultSegment(
-					Double.parseDouble( rowEntries[ labelColumnIndex ] ),
-					Integer.parseInt( rowEntries[ tColumnIndex ] ),
+					getString( imageIdColumnIndex, rowEntries ),
+					getDouble( labelColumnIndex, rowEntries ),
+					getInteger( tColumnIndex, rowEntries),
 					new double[]{
-							Double.parseDouble( rowEntries[ xColumnIndex ] ),
-							Double.parseDouble( rowEntries[ yColumnIndex ] ),
-							Double.parseDouble( rowEntries[ zColumnIndex ] ),
+							getDouble( xColumnIndex, rowEntries ),
+							getDouble( yColumnIndex, rowEntries ),
+							getDouble( zColumnIndex, rowEntries ),
 					},
 					null );
 
@@ -273,6 +276,42 @@ public class TableUtils
 
 		return segments;
 
+	}
+
+	public static int getInteger( int columnIndex, String[] rowEntries  )
+	{
+		if ( columnIndex == -1 )
+		{
+			return 0;
+		}
+		else
+		{
+			return Integer.parseInt( rowEntries[ columnIndex ] );
+		}
+	}
+
+	public static String getString( int columnIndex, String[] rowEntries )
+	{
+		if ( columnIndex == -1 )
+		{
+			return "";
+		}
+		else
+		{
+			return rowEntries[ columnIndex ];
+		}
+	}
+
+	public static double getDouble( int columnIndex, String[] rowEntries )
+	{
+		if ( columnIndex == -1 )
+		{
+			return 0.0D;
+		}
+		else
+		{
+			return Double.parseDouble( rowEntries[ columnIndex ] );
+		}
 	}
 
 	public static JTable jTableFromSegmentList( ArrayList< ? extends SegmentWithFeatures > segments )

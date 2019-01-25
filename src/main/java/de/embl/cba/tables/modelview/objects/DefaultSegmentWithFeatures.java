@@ -1,6 +1,7 @@
 package de.embl.cba.tables.modelview.objects;
 
 import de.embl.cba.bdv.utils.selection.Segment;
+import net.imglib2.FinalInterval;
 import net.imglib2.RealInterval;
 import java.util.ArrayList;
 
@@ -38,6 +39,12 @@ public class DefaultSegmentWithFeatures implements SegmentWithFeatures
 	}
 
 	@Override
+	public String getImageId()
+	{
+		return segment.getImageId();
+	}
+
+	@Override
 	public double getLabel()
 	{
 		return segment.getLabel();
@@ -56,7 +63,7 @@ public class DefaultSegmentWithFeatures implements SegmentWithFeatures
 	}
 
 	@Override
-	public RealInterval getBoundingBox()
+	public FinalInterval getBoundingBox()
 	{
 		return segment.getBoundingBox();
 	}

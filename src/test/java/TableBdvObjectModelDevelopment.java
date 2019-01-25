@@ -30,6 +30,7 @@ public class TableBdvObjectModelDevelopment
 		final ArrayList< DefaultSegmentWithFeatures > segmentsWithFeatures = TableUtils.segmentsFromTableFile(
 				tableFile,
 				",",
+				null,
 				"Label",
 				null,
 				"X",
