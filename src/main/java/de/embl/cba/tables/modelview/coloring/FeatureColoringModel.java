@@ -29,5 +29,16 @@ public interface FeatureColoringModel< T > extends ColoringModel< T >
 
 	void setLinearColoring( String coloringFeature, ARGBLut lut, double min, double max );
 
+	double getMin();
+
+	double getMax();
+
+	void setMin( double min );
+
+	void setMax( double max );
+
+	String getColoringFeature();
+
+
 
 }

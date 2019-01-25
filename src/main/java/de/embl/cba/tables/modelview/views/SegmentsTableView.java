@@ -1,11 +1,11 @@
 package de.embl.cba.tables.modelview.views;
 
-import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.lut.BlueWhiteRedARGBLut;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.modelview.coloring.ColoringModelDialogs;
 import de.embl.cba.tables.modelview.coloring.FeatureColoringModel;
 import de.embl.cba.tables.modelview.datamodels.DefaultAnnotatedSegmentsModel;
 import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
@@ -500,7 +500,7 @@ public class SegmentsTableView extends JPanel
 							minMaxValues[ 1 ]
 					);
 
-					//BdvUserInterfaceUtils.showBrightnessDialog( bdv, selectedColumn, converter )
+					ColoringModelDialogs.showMinMaxDialog( column, coloringModel );
 				}
 				else
 				{

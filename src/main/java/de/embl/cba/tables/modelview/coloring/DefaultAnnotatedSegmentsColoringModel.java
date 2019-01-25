@@ -19,9 +19,11 @@ public class DefaultAnnotatedSegmentsColoringModel
 	private String coloringFeature;
 	private ARGBLut lut;
 	private ColoringMode coloringMode;
-	private double featureRangeMin;
-	private double featureRangeMax;
+	private double min;
+	private double max;
 	private ArrayList< Object > featureValues;
+	private double initialMin;
+	private double initialMax;
 
 	public DefaultAnnotatedSegmentsColoringModel( String coloringFeature )
 	{
@@ -29,8 +31,8 @@ public class DefaultAnnotatedSegmentsColoringModel
 		this.coloringFeature = coloringFeature;
 		this.lut = new GlasbeyARGBLut();
 		this.coloringMode = ColoringMode.Categorical;
-		this.featureRangeMin = 0.0;
-		this.featureRangeMax = 1.0;
+		this.min = 0.0;
+		this.max = 1.0;
 		this.featureValues = new ArrayList<>(  );
 	}
 
@@ -67,12 +69,45 @@ public class DefaultAnnotatedSegmentsColoringModel
 		this.coloringFeature = coloringFeature;
 		this.lut = lut;
 
-		this.featureRangeMin = min;
-		this.featureRangeMax = max;
+		this.min = min;
+		this.max = max;
+		this.initialMin = min;
+		this.initialMax = max;
 
 		notifyColoringListeners();
 	}
 
+	@Override
+	public double getMin()
+	{
+		return min;
+	}
+
+	@Override
+	public double getMax()
+	{
+		return max;
+	}
+
+	@Override
+	public void setMin( double min )
+	{
+		this.min = min;
+		notifyColoringListeners();
+	}
+
+	@Override
+	public void setMax( double max )
+	{
+		this.max = max;
+		notifyColoringListeners();
+	}
+
+	@Override
+	public String getColoringFeature()
+	{
+		return coloringFeature;
+	}
 
 	@Override
 	public void convert( AnnotatedSegment annotatedSegment,
@@ -92,17 +127,35 @@ public class DefaultAnnotatedSegmentsColoringModel
 
 	public void setColorLinearly( ARGBType output, Object featureValue )
 	{
-		double value = TableUtils.asDouble( featureValue );
-
-		final double normalisedValue =
-				Math.max(
-						Math.min(
-							( value - featureRangeMin )
-								/ ( featureRangeMax - featureRangeMin ), 1.0 ), 0.0 );
-
+		final double value = TableUtils.asDouble( featureValue );
+		double normalisedValue = computeLinearNormalisedValue( value );
 		final int argb = lut.getARGB( normalisedValue );
-
 		output.set( argb );
+	}
+
+	public double computeLinearNormalisedValue( double value )
+	{
+		double normalisedValue = 0;
+		if ( max == min )
+		{
+			if ( max == initialMin )
+			{
+				normalisedValue = 1.0;
+			}
+			else if ( max == initialMax )
+			{
+				normalisedValue = 0.0;
+			}
+		}
+		else
+		{
+			normalisedValue =
+					Math.max(
+							Math.min(
+									( value - min )
+											/ ( max - min ), 1.0 ), 0.0 );
+		}
+		return normalisedValue;
 	}
 
 	public void setColorCategorically( ARGBType output, Object featureValue )
