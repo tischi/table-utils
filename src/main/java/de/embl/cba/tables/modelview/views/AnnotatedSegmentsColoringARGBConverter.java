@@ -10,7 +10,7 @@ import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.volatiles.VolatileARGBType;
 
-public class AnnotatedSegmentsColoringConverter
+public class AnnotatedSegmentsColoringARGBConverter
 		implements Converter< RealType, VolatileARGBType >, TimePointListener
 {
 	private final DefaultAnnotatedSegmentsModel segmentsModel;
@@ -18,7 +18,7 @@ public class AnnotatedSegmentsColoringConverter
 
 	private int timePointIndex;
 
-	public AnnotatedSegmentsColoringConverter(
+	public AnnotatedSegmentsColoringARGBConverter(
 			DefaultAnnotatedSegmentsModel segmentsModel,
 			FeatureColoringModel< AnnotatedSegment > coloringModel )
 	{
@@ -52,10 +52,10 @@ public class AnnotatedSegmentsColoringConverter
 						label.getRealDouble(),
 						timePointIndex );
 
-		final ARGBType argbType = new ARGBType();
-		coloringModel.convert( segment, argbType );
+//		final ARGBType argbType = new ARGBType();
+		coloringModel.convert( segment, color.get() );
 
-		color.set( argbType.get() );
+		//color.set( argbType.get() );
 
 		int a = 1;
 	}

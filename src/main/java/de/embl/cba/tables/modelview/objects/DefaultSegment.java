@@ -9,21 +9,24 @@ public class DefaultSegment implements Segment
 	private final String imageId;
 	private final double label;
 	private final int timePoint;
-	private final double[] position;
 	private final FinalInterval boundingBox;
+	private final double[] position;
+
 
 	public DefaultSegment(
 			String imageId,
 			double label,
 			int timePoint,
-			double[] position,
+			double x,
+			double y,
+			double z,
 			FinalInterval boundingBox )
 	{
 		this.imageId = imageId;
 		this.label = label;
 		this.timePoint = timePoint;
-		this.position = position;
 		this.boundingBox = boundingBox;
+		this.position = new double[]{x,y,z};
 	}
 
 	@Override

@@ -79,8 +79,8 @@ public class SegmentsBdvView < T extends Segment >
 
 	public BdvHandle showLabelSourceInBdv( LabelImageSourceModel labelImageSourceModel )
 	{
-		final AnnotatedSegmentsColoringConverter coloringConverter =
-				new AnnotatedSegmentsColoringConverter(
+		final AnnotatedSegmentsColoringARGBConverter coloringConverter =
+				new AnnotatedSegmentsColoringARGBConverter(
 						segmentsModel,
 						coloringModel );
 

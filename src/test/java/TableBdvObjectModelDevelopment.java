@@ -11,10 +11,13 @@ import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.modelview.views.SegmentsBdvView;
 import de.embl.cba.tables.modelview.views.SegmentsTableView;
+import de.embl.cba.tables.objects.SegmentCoordinate;
+import net.imglib2.util.ValuePair;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TableBdvObjectModelDevelopment
 {
@@ -30,15 +33,16 @@ public class TableBdvObjectModelDevelopment
 
 		final ArrayList< DefaultAnnotatedSegment > segments = new ArrayList<>();
 
-		final ArrayList< DefaultAnnotatedSegment > segmentsWithFeatures = TableUtils.segmentsFromTableFile(
-				tableFile,
-				",",
-				null,
-				"Label",
-				null,
-				"X",
-				"Y",
-				null );
+		final HashMap< SegmentCoordinate, ValuePair< String, Integer > > coordinateToColumnNameMap = new HashMap<>();
+		coordinateToColumnNameMap.put( SegmentCoordinate.Label, new ValuePair( "Label",  null ) );
+		coordinateToColumnNameMap.put( SegmentCoordinate.X, new ValuePair("X", null ) );
+		coordinateToColumnNameMap.put( SegmentCoordinate.Y, new ValuePair("Y", null ) );
+
+		final ArrayList< DefaultAnnotatedSegment > segmentsWithFeatures =
+				TableUtils.segmentsFromTableFile(
+						tableFile,
+						",",
+						coordinateToColumnNameMap );
 
 		final DefaultAnnotatedSegmentsModel dataModel =
 				new DefaultAnnotatedSegmentsModel(

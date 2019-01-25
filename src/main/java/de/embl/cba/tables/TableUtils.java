@@ -1,9 +1,12 @@
 package de.embl.cba.tables;
 
 import de.embl.cba.tables.models.ColumnClassAwareTableModel;
+import de.embl.cba.tables.modelview.datamodels.SegmentUtils;
 import de.embl.cba.tables.modelview.objects.DefaultSegment;
 import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
 import de.embl.cba.tables.modelview.objects.DefaultAnnotatedSegment;
+import de.embl.cba.tables.objects.SegmentCoordinate;
+import net.imglib2.util.ValuePair;
 import org.scijava.table.GenericTable;
 
 import javax.swing.*;
@@ -203,12 +206,7 @@ public class TableUtils
 	public static ArrayList< DefaultAnnotatedSegment > segmentsFromTableFile (
 			File file,
 			String delim,
-			String imageIdColumn,
-			String labelColumn,
-			String tCoordinateColumn,
-			String xCoordinateColumn,
-			String yCoordinateColumn,
-			String zCoordinateColumn
+			Map< SegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap
 	)
 	{
 
@@ -220,62 +218,53 @@ public class TableUtils
 
 		ArrayList< String > columns = getColumnNames( tableRows, delim );
 
-		int imageIdColumnIndex = -1;
-		int labelColumnIndex = -1;
-		int tColumnIndex = -1;
-		int xColumnIndex = -1;
-		int yColumnIndex = -1;
-		int zColumnIndex = -1;
-
-		for ( int i = 0; i < columns.size(); i++ )
+		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
 		{
-			final String column = columns.get( i );
-			if ( column.equals( imageIdColumn ) ) imageIdColumnIndex = i;
-			if ( column.equals( labelColumn ) ) labelColumnIndex = i;
-			if ( column.equals( tCoordinateColumn ) ) tColumnIndex = i;
-			if ( column.equals( xCoordinateColumn ) ) xColumnIndex = i;
-			if ( column.equals( yCoordinateColumn ) ) yColumnIndex = i;
-			if ( column.equals( zCoordinateColumn ) ) zColumnIndex = i;
-		}
+			final String columnName = columns.get( columnIndex );
 
+			setColumnIndex( coordinateColumnMap, columnIndex, columnName );
+		}
 
 		StringTokenizer st;
 
 		int numColumns = columns.size();
 
+
 		for ( int row = 1; row < tableRows.size(); ++row )
 		{
-			final String[] rowEntries = new String[ numColumns ];
+			final String[] features = new String[ numColumns ];
 
 			st = new StringTokenizer( tableRows.get( row ), delim );
 
-			for ( int iCol = 0; iCol < numColumns; iCol++ )
+			for ( int col = 0; col < numColumns; col++ )
 			{
-				rowEntries[ iCol ] = st.nextToken();
+				features[ col ] = st.nextToken();
 			}
 
+			final DefaultSegment segment = SegmentUtils.segmentFromFeatures( coordinateColumnMap, features );
 
-			final DefaultSegment segment = new DefaultSegment(
-					getString( imageIdColumnIndex, rowEntries ),
-					getDouble( labelColumnIndex, rowEntries ),
-					getInteger( tColumnIndex, rowEntries),
-					new double[]{
-							getDouble( xColumnIndex, rowEntries ),
-							getDouble( yColumnIndex, rowEntries ),
-							getDouble( zColumnIndex, rowEntries ),
-					},
-					null );
-
-
-			segments.add(
-					new DefaultAnnotatedSegment(
+			segments.add( new DefaultAnnotatedSegment(
 							segment,
 							columns, 
-							rowEntries ) );
+							features ) );
 		}
 
 		return segments;
 
+	}
+
+	public static void setColumnIndex( Map< SegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap, int columnIndex, String columnName )
+	{
+		for ( SegmentCoordinate coordinate : coordinateColumnMap.keySet() )
+		{
+			if ( coordinateColumnMap.get( coordinate ).getA().equals( columnName ) )
+			{
+				coordinateColumnMap.put(
+						coordinate,
+						new ValuePair< String, Integer>( columnName, columnIndex ) );
+				break;
+			}
+		}
 	}
 
 	public static int getInteger( int columnIndex, String[] rowEntries  )
@@ -304,14 +293,7 @@ public class TableUtils
 
 	public static double getDouble( int columnIndex, String[] rowEntries )
 	{
-		if ( columnIndex == -1 )
-		{
-			return 0.0D;
-		}
-		else
-		{
-			return Double.parseDouble( rowEntries[ columnIndex ] );
-		}
+		return Double.parseDouble( rowEntries[ columnIndex ] );
 	}
 
 	public static JTable jTableFromSegmentList( ArrayList< ? extends AnnotatedSegment > segments )

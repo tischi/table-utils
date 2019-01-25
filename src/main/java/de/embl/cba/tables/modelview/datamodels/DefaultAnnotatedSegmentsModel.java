@@ -41,7 +41,7 @@ public class DefaultAnnotatedSegmentsModel
 
 		for ( AnnotatedSegment annotatedSegment : this.segmentWithFeatures )
 		{
-			final Object key = SegmentUtilsDELETE.getKey(
+			final Object key = SegmentUtils.getKey(
 					annotatedSegment.getLabel(),
 					annotatedSegment.getTimePoint()
 			);
