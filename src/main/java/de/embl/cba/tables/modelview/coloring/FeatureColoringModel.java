@@ -25,10 +25,9 @@ public interface FeatureColoringModel< T > extends ColoringModel< T >
 	/**
 	 * TODO
 	 */
-	void setColoringFeatureAndLut( String coloringFeature,
-								   ARGBLut lut,
-								   ColoringMode coloringMode,
-								   double featureRangeMin,
-								   double featureRangeMax );
+	void setCategoricalColoring( String coloringFeature, ARGBLut lut );
+
+	void setLinearColoring( String coloringFeature, ARGBLut lut, double min, double max );
+
 
 }

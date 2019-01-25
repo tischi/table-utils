@@ -49,22 +49,30 @@ public class DefaultAnnotatedSegmentsColoringModel
 	}
 
 	@Override
-	public void setColoringFeatureAndLut(
-			String coloringFeature,
-			ARGBLut lut,
-			ColoringMode coloringMode,
-			double featureRangeMin,
-			double featureRangeMax )
+	public void setCategoricalColoring( String coloringFeature, ARGBLut lut )
 	{
+		this.coloringMode = ColoringMode.Categorical;
 		this.coloringFeature = coloringFeature;
 		this.lut = lut;
-		this.coloringMode = coloringMode;
-		this.featureRangeMin = featureRangeMin;
-		this.featureRangeMax = featureRangeMax;
+
 		this.featureValues = new ArrayList<>(  );
 
 		notifyColoringListeners();
 	}
+
+	@Override
+	public void setLinearColoring( String coloringFeature, ARGBLut lut, double min, double max )
+	{
+		this.coloringMode = ColoringMode.Linear;
+		this.coloringFeature = coloringFeature;
+		this.lut = lut;
+
+		this.featureRangeMin = min;
+		this.featureRangeMax = max;
+
+		notifyColoringListeners();
+	}
+
 
 	@Override
 	public void convert( AnnotatedSegment annotatedSegment,

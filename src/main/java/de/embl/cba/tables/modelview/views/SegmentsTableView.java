@@ -1,5 +1,6 @@
 package de.embl.cba.tables.modelview.views;
 
+import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
@@ -110,9 +111,11 @@ public class SegmentsTableView extends JPanel
 	{
 		menuBar = new JMenuBar();
 
-		menuBar.add( createTableMenuItem() );
+		menuBar.add( createTableMenu() );
 
-		menuBar.add( createObjectCoordinateMenuItem() );
+		menuBar.add( createObjectCoordinateMenu() );
+
+		menuBar.add( createColoringMenu() );
 	}
 
 
@@ -152,7 +155,7 @@ public class SegmentsTableView extends JPanel
 		if ( frame != null ) SwingUtilities.updateComponentTreeUI( frame );
 	}
 
-	private JMenu createTableMenuItem()
+	private JMenu createTableMenu()
     {
         JMenu menu = new JMenu( "Table" );
 
@@ -202,7 +205,7 @@ public class SegmentsTableView extends JPanel
 	}
 
 
-	private JMenu createObjectCoordinateMenuItem()
+	private JMenu createObjectCoordinateMenu()
 	{
 		JMenu menu = new JMenu( "Objects" );
 
@@ -439,6 +442,76 @@ public class SegmentsTableView extends JPanel
 				}
 			}
 		} );
+	}
+
+
+	private JMenu createColoringMenu()
+	{
+		JMenu coloringMenu = new JMenu( "Coloring" );
+
+		coloringMenu.add( createRestoreOriginalColorMenuItem() );
+
+		for ( int col = 0; col < table.getColumnCount(); col++ )
+		{
+			coloringMenu.add( createColorByColumnMenuItem( table.getColumnName( col ) ) );
+		}
+
+		return coloringMenu;
+	}
+
+	private JMenuItem createRestoreOriginalColorMenuItem()
+	{
+		final JMenuItem restoreOriginalColorMenuItem =
+				new JMenuItem( "Restore original coloring");
+
+		restoreOriginalColorMenuItem.addActionListener( new ActionListener()
+		{
+			@Override
+			public void actionPerformed( ActionEvent e )
+			{
+				//bdvSelectionEventHandler.getSelectableConverter().setWrappedConverter( originalConverter );
+				//BdvUtils.repaint( bdvSelectionEventHandler.getBdv() );
+			}
+		} );
+		return restoreOriginalColorMenuItem;
+	}
+
+
+	private JMenuItem createColorByColumnMenuItem( final String column )
+	{
+		final JMenuItem colorByColumnMenuItem = new JMenuItem( "Color by " + column );
+		final int columnIndex = table.getColumnModel().getColumnIndex( column );
+
+		colorByColumnMenuItem.addActionListener( new ActionListener()
+		{
+			@Override
+			public void actionPerformed( ActionEvent e )
+			{
+				if ( table.getColumnClass( columnIndex ).equals( Number.class ) )
+				{
+
+					final double[] minMaxValues = getMinMaxValues( column );
+
+					coloringModel.setLinearColoring(
+							column,
+							new GlasbeyARGBLut(),
+							minMaxValues[ 0 ],
+							minMaxValues[ 1 ]
+					);
+
+					//BdvUserInterfaceUtils.showBrightnessDialog( bdv, selectedColumn, converter )
+				}
+				else
+				{
+					coloringModel.setCategoricalColoring(
+							column,
+							new GlasbeyARGBLut() );
+				}
+			}
+
+		} );
+
+		return colorByColumnMenuItem;
 	}
 
 
