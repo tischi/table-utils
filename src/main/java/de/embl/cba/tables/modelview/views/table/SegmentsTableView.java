@@ -118,7 +118,7 @@ public class SegmentsTableView extends JPanel
 
 	private void createTable()
     {
-		table = TableUtils.jTableFromSegmentList( segmentsModel.getAnnotatedSegments() );
+		table = TableUtils.jTableFromSegmentList( segmentsModel.getSegments() );
 
 		table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
         table.setFillsViewportHeight( true );

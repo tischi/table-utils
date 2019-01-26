@@ -8,6 +8,8 @@ import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringListener;
 import de.embl.cba.tables.modelview.coloring.ColoringModel;
+import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
+import de.embl.cba.tables.modelview.datamodels.ImageSegmentsModel;
 import de.embl.cba.tables.modelview.datamodels.LabelImageSourceModel;
 import de.embl.cba.tables.modelview.datamodels.AnnotatedSegmentsModel;
 import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
@@ -21,24 +23,24 @@ import org.scijava.ui.behaviour.util.Behaviours;
 
 import static de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter.BACKGROUND;
 
-public class SegmentsBdvView < T extends ImageSegment >
+public class ImageSegmentsBdvView< T extends ImageSegment >
 {
 	private String selectTrigger = "ctrl button1";
 	private String selectNoneTrigger = "ctrl Q";
 	private String iterateSelectionModeTrigger = "ctrl S";
 	private String viewIn3DTrigger = "ctrl shift button1";
 
-	private final AnnotatedSegmentsModel segmentsModel;
-	private final SelectionModel< AnnotatedImageSegment > selectionModel;
-	private final ColoringModel< T > coloringModel;
+	private final ImageSegmentsModel< T > segmentsModel;
+	private final SelectionModel< T > selectionModel;
+	private final SelectionColoringModel< T > coloringModel;
 	private Behaviours behaviours;
 
 	private final BdvHandle bdv;
 	private Source source;
 
-	public SegmentsBdvView( final AnnotatedSegmentsModel segmentsModel,
-							final SelectionModel< AnnotatedImageSegment > selectionModel,
-							final ColoringModel< T > coloringModel )
+	public ImageSegmentsBdvView( final ImageSegmentsModel< T > segmentsModel,
+								 final SelectionModel< T > selectionModel,
+								 final SelectionColoringModel< T > coloringModel )
 	{
 		this.segmentsModel = segmentsModel;
 		this.selectionModel = selectionModel;

@@ -10,7 +10,7 @@ import java.util.Map;
  * Holds all the data
  */
 
-public class AnnotatedSegmentsModel
+public class AnnotatedSegmentsModel implements ImageSegmentsModel
 {
 	private final String name;
 	private final ArrayList< ? extends AnnotatedImageSegment > annotatedSegments;
@@ -56,12 +56,14 @@ public class AnnotatedSegmentsModel
 		return annotatedSegments.get( listIndex );
 	}
 
-	public AnnotatedImageSegment getSegment( Double label, int timePoint  )
+	@Override
+	public AnnotatedImageSegment getSegment( Double label, int timePoint )
 	{
 		final Object segmentKey = getSegmentKey( label, timePoint );
 		return labelTimePointKeyToSegmentMap.get( segmentKey );
 	}
 
+	@Override
 	public LabelImageSourceModel getLabelImageSourceModel()
 	{
 		return labelImageSourceModel;
@@ -92,7 +94,8 @@ public class AnnotatedSegmentsModel
 //		return featureNames;
 //	}
 
-	public ArrayList< ? extends AnnotatedImageSegment > getAnnotatedSegments()
+	@Override
+	public ArrayList< ? extends AnnotatedImageSegment > getSegments()
 	{
 		return annotatedSegments;
 	}
