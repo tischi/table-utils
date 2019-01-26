@@ -1,80 +1,47 @@
 package de.embl.cba.tables.modelview.coloring;
 
 import de.embl.cba.bdv.utils.lut.ARGBLut;
-import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.TableRow;
-import de.embl.cba.tables.modelview.selection.Listeners;
 import net.imglib2.type.numeric.ARGBType;
-
-import java.util.ArrayList;
 
 import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 
-public class TableRowColumnColoringModel implements ColumnColoringModel< TableRow >
-{
 
-	private final Listeners.SynchronizedList< ColoringListener > listeners;
-	private String coloringFeature;
+// TODO: extract abstract class NumericFeatureColoringModel
+public class TableRowColumnColoringModel< T extends TableRow >
+		extends AbstractColoringModel< T > implements NumericColoringModel< T >
+{
+	private String feature;
 	private ARGBLut lut;
-	private ColoringMode coloringMode;
 	private double min;
 	private double max;
-	private ArrayList< Object > featureValues;
-	private double initialMin;
-	private double initialMax;
+	private double rangeMin;
+	private double rangeMax;
 
-	public TableRowColumnColoringModel( String coloringFeature )
+	public TableRowColumnColoringModel(
+			String column,
+			ARGBLut lut,
+			double rangeMin,
+			double rangeMax )
 	{
-		this.listeners = new Listeners.SynchronizedList< ColoringListener >(  );
-		this.coloringFeature = coloringFeature;
-		this.lut = new GlasbeyARGBLut();
-		this.coloringMode = ColoringMode.Categorical;
-		this.min = 0.0;
-		this.max = 1.0;
-		this.featureValues = new ArrayList<>(  );
-	}
 
-	public void notifyColoringListeners()
-	{
-		for ( ColoringListener listener : listeners.list )
-		{
-			listener.coloringChanged();
-		}
-	}
-
-	@Override
-	public Listeners< ColoringListener > listeners()
-	{
-		return listeners;
-	}
-
-	@Override
-	public void setCategoricalColoring( String column, ARGBLut lut )
-	{
-		this.coloringMode = ColoringMode.Categorical;
-		this.coloringFeature = column;
+		this.feature = column;
 		this.lut = lut;
-
-		this.featureValues = new ArrayList<>(  );
-
-		notifyColoringListeners();
+		this.min = rangeMin;
+		this.max = rangeMax;
+		this.rangeMin = rangeMin;
+		this.rangeMax = rangeMax;
 	}
 
 	@Override
-	public void setLinearColoring( String column, ARGBLut lut, double min, double max )
+	public void convert( T input, ARGBType output )
 	{
-		this.coloringMode = ColoringMode.Linear;
-		this.coloringFeature = column;
-		this.lut = lut;
-
-		this.min = min;
-		this.max = max;
-		this.initialMin = min;
-		this.initialMax = max;
-
-		notifyColoringListeners();
+		final Object featureValue = input.cells().get( feature );
+		setColorLinearly( output, featureValue );
 	}
+
 
 	@Override
 	public double getMin()
@@ -82,46 +49,34 @@ public class TableRowColumnColoringModel implements ColumnColoringModel< TableRo
 		return min;
 	}
 
+
 	@Override
 	public double getMax()
 	{
 		return max;
 	}
 
+
 	@Override
 	public void setMin( double min )
 	{
 		this.min = min;
-		notifyColoringListeners();
+		//notifyColoringListeners();
 	}
 
 	@Override
 	public void setMax( double max )
 	{
 		this.max = max;
-		notifyColoringListeners();
+		//notifyColoringListeners();
 	}
 
-	@Override
-	public String getColumn()
+
+	public String getFeature()
 	{
-		return coloringFeature;
+		return feature;
 	}
 
-	@Override
-	public void convert( TableRow tableRow, ARGBType output )
-	{
-		final Object featureValue = tableRow.cells().get( coloringFeature );
-
-		if ( coloringMode.equals( ColoringMode.Categorical ) )
-		{
-			setColorCategorically( output, featureValue );
-		}
-		else if ( coloringMode.equals( ColoringMode.Linear ) )
-		{
-			setColorLinearly( output, featureValue );
-		}
-	}
 
 	public void setColorLinearly( ARGBType output, Object featureValue )
 	{
@@ -136,11 +91,11 @@ public class TableRowColumnColoringModel implements ColumnColoringModel< TableRo
 		double normalisedValue = 0;
 		if ( max == min )
 		{
-			if ( max == initialMin )
+			if ( max == rangeMin )
 			{
 				normalisedValue = 1.0;
 			}
-			else if ( max == initialMax )
+			else if ( max == rangeMax )
 			{
 				normalisedValue = 0.0;
 			}
@@ -156,21 +111,10 @@ public class TableRowColumnColoringModel implements ColumnColoringModel< TableRo
 		return normalisedValue;
 	}
 
-	public void setColorCategorically( ARGBType output, Object featureValue )
-	{
-		if( ! featureValues.contains( featureValue ) ) featureValues.add( featureValue );
-
-		final double random = createRandom( featureValues.indexOf( featureValue ) + 1 );
-
-		output.set( lut.getARGB( random ) );
-	}
-
 	public double createRandom( double x )
 	{
 		double random = ( x * 50 ) * goldenRatio;
 		random = random - ( long ) Math.floor( random );
 		return random;
 	}
-
-
 }

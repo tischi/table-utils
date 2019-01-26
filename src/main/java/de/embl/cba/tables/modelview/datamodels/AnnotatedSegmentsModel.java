@@ -9,6 +9,7 @@ import java.util.Map;
 /**
  * Holds all the data
  */
+
 public class AnnotatedSegmentsModel
 {
 	private final String name;

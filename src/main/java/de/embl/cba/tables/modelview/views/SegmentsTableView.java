@@ -1,13 +1,12 @@
 package de.embl.cba.tables.modelview.views;
 
 import de.embl.cba.bdv.utils.lut.BlueWhiteRedARGBLut;
-import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.coloring.ColoringModelDialogs;
-import de.embl.cba.tables.modelview.coloring.ColumnColoringModel;
+import de.embl.cba.tables.modelview.coloring.NumericColoringModelDialog;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
+import de.embl.cba.tables.modelview.coloring.TableRowColumnColoringModel;
 import de.embl.cba.tables.modelview.datamodels.AnnotatedSegmentsModel;
 import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.TableRow;
@@ -43,7 +42,7 @@ public class SegmentsTableView extends JPanel
 
 	private final SelectionModel< AnnotatedImageSegment > selectionModel;
 	private final AnnotatedSegmentsModel segmentsModel;
-	private final SelectionColoringModel< AnnotatedImageSegment > coloringModel;
+	private final SelectionColoringModel< AnnotatedImageSegment > selectionColoringModel;
 
 	private JFrame frame;
     private JScrollPane scrollPane;
@@ -53,15 +52,16 @@ public class SegmentsTableView extends JPanel
 	private Map< String, double[] > columnsMinMaxMap;
 	private int highlightedRow;
 	private JTable table;
+	private NumericColoringModelDialog coloringModelDialog;
 
 	public SegmentsTableView(
 			final AnnotatedSegmentsModel segmentsModel,
 			final SelectionModel< AnnotatedImageSegment > selectionModel,
-			final SelectionColoringModel< AnnotatedImageSegment > coloringModel )
+			final SelectionColoringModel< AnnotatedImageSegment > selectionColoringModel )
 	{
 		super( new GridLayout(1, 0 ) );
 		this.segmentsModel = segmentsModel;
-		this.coloringModel = coloringModel;
+		this.selectionColoringModel = selectionColoringModel;
 		this.selectionModel = selectionModel;
 
 		registerAsSelectionListener( selectionModel );
@@ -94,6 +94,7 @@ public class SegmentsTableView extends JPanel
 					final int row = tableRow.rowIndex();
 					final int rowInView = table.convertRowIndexToView( row );
 					table.getSelectionModel().addSelectionInterval( rowInView, rowInView );
+					// TODO: order table such that all of them are visible
 				}
 			}
 
@@ -104,12 +105,6 @@ public class SegmentsTableView extends JPanel
 				{
 					moveToRow( selection.rowIndex() );
 				}
-//				final int rowInView = table.convertRowIndexToView( selection.rowIndex() );
-//				final boolean isAlreadySelected = table.getSelectionModel().isSelectedIndex( rowInView );
-//				if ( ! isAlreadySelected )
-//				{
-//					selectRow( selection.rowIndex(), selected );
-//				}
 			}
 		} );
 	}
@@ -516,18 +511,22 @@ public class SegmentsTableView extends JPanel
 				{
 					final double[] minMaxValues = getMinMaxValues( column );
 
-//					coloringModel.setLinearColoring(
-//							column,
-//							new BlueWhiteRedARGBLut( 256 ),
-//							minMaxValues[ 0 ],
-//							minMaxValues[ 1 ]
-//					);
-//
-//					ColoringModelDialogs.showMinMaxDialog( column, coloringModel );
+					final TableRowColumnColoringModel< AnnotatedImageSegment > coloringModel
+							= new TableRowColumnColoringModel<>(
+									column,
+									new BlueWhiteRedARGBLut( 1000 ),
+									minMaxValues[ 0 ],
+									minMaxValues[ 1 ]
+					);
+
+					selectionColoringModel.setWrappedColoringModel( coloringModel );
+
+					coloringModelDialog = new NumericColoringModelDialog( column, coloringModel );
+
 				}
 				else
 				{
-//					coloringModel.setCategoricalColoring(
+//					selectionColoringModel.setCategoricalColoring(
 //							column,
 //							new GlasbeyARGBLut() );
 				}

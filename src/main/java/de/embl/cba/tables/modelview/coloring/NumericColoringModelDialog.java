@@ -7,17 +7,16 @@ import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import javax.swing.*;
 import java.awt.*;
 
-public class ColoringModelDialogs
+public class NumericColoringModelDialog extends JFrame
 {
 	private static Point minMaxDialogLocation;
 
-	public static void showMinMaxDialog(
+	public NumericColoringModelDialog(
 			final String coloringFeature,
-			final ColumnColoringModel< AnnotatedImageSegment > coloringModel  )
+			final NumericColoringModel< ? > coloringModel  )
 	{
 
 		final JFrame frame = new JFrame( coloringFeature );
-
 
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 
@@ -63,19 +62,12 @@ public class ColoringModelDialogs
 		if ( minMaxDialogLocation != null )
 			frame.setLocation( minMaxDialogLocation );
 
-		coloringModel.listeners().add( new ColoringListener()
-		{
-			@Override
-			public void coloringChanged()
-			{
-				if ( coloringModel.getColumn() != coloringFeature )
-				{
-					minMaxDialogLocation = frame.getLocation();
-					frame.dispose();
-				}
-			}
-		} );
+	}
 
+	public void close()
+	{
+		minMaxDialogLocation = getLocation();
+		dispose();
 	}
 
 
