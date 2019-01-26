@@ -5,7 +5,7 @@ import net.imglib2.type.numeric.ARGBType;
 
 import java.util.Map;
 
-public class CategoryColoringModel< T > implements ColoringModel< T >
+public class CategoryColoringModel< T > extends AbstractColoringModel< T >
 {
 	Map< T, ARGBType > objectColorMap;
 
@@ -33,11 +33,4 @@ public class CategoryColoringModel< T > implements ColoringModel< T >
 			output.set( 0 );
 		}
 	}
-
-	@Override
-	public Listeners< ColoringListener > listeners()
-	{
-		return null;
-	}
-
 }

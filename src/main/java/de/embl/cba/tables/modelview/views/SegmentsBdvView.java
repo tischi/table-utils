@@ -8,9 +8,9 @@ import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.selection.Segment;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringListener;
-import de.embl.cba.tables.modelview.coloring.ColumnColoringModel;
+import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.datamodels.LabelImageSourceModel;
-import de.embl.cba.tables.modelview.datamodels.DefaultAnnotatedSegmentsModel;
+import de.embl.cba.tables.modelview.datamodels.AnnotatedSegmentsModel;
 import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.ImageSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
@@ -28,24 +28,21 @@ public class SegmentsBdvView < T extends Segment >
 	private String iterateSelectionModeTrigger = "ctrl S";
 	private String viewIn3DTrigger = "ctrl shift button1";
 
-	private final DefaultAnnotatedSegmentsModel segmentsModel;
+	private final AnnotatedSegmentsModel segmentsModel;
 	private final SelectionModel< AnnotatedImageSegment > selectionModel;
-	private final ColumnColoringModel< AnnotatedImageSegment > coloringModel;
+	private final SelectionColoringModel< AnnotatedImageSegment > coloringModel;
 	private Behaviours behaviours;
 
 	private final BdvHandle bdv;
-	private final Source source;
+	private Source source;
 
-	// TODO: extract interface from DefaultAnnotatedSegmentsModel
-	public SegmentsBdvView( final DefaultAnnotatedSegmentsModel segmentsModel,
+	public SegmentsBdvView( final AnnotatedSegmentsModel segmentsModel,
 							final SelectionModel< AnnotatedImageSegment > selectionModel,
-							final ColumnColoringModel< AnnotatedImageSegment > coloringModel )
+							final SelectionColoringModel< AnnotatedImageSegment > coloringModel )
 	{
 		this.segmentsModel = segmentsModel;
 		this.selectionModel = selectionModel;
 		this.coloringModel = coloringModel;
-
-		this.source = segmentsModel.getLabelImageSourceModel().getSource();
 
 		bdv = showLabelSourceInBdv( segmentsModel.getLabelImageSourceModel() );
 
@@ -89,12 +86,12 @@ public class SegmentsBdvView < T extends Segment >
 
 	public BdvHandle showLabelSourceInBdv( LabelImageSourceModel labelImageSourceModel )
 	{
-		final AnnotatedSegmentsColoringARGBConverter coloringConverter =
-				new AnnotatedSegmentsColoringARGBConverter(
+		final AnnotatedSegmentLabelsARGBConverter coloringConverter =
+				new AnnotatedSegmentLabelsARGBConverter(
 						segmentsModel,
 						coloringModel );
 
-		final ARGBConvertedRealSource argbConvertedLabelSource = new ARGBConvertedRealSource(
+		source = new ARGBConvertedRealSource(
 				segmentsModel.getLabelImageSourceModel().getSource(),
 				coloringConverter );
 
@@ -105,7 +102,7 @@ public class SegmentsBdvView < T extends Segment >
 			options = options.is2D();
 		}
 
-		final BdvHandle bdvHandle = BdvFunctions.show( argbConvertedLabelSource, options ).getBdvHandle();
+		final BdvHandle bdvHandle = BdvFunctions.show( source, options ).getBdvHandle();
 
 		bdvHandle.getViewerPanel().addTimePointListener( coloringConverter );
 

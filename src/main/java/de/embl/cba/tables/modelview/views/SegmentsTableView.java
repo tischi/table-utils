@@ -7,7 +7,7 @@ import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.coloring.ColoringModelDialogs;
 import de.embl.cba.tables.modelview.coloring.ColumnColoringModel;
-import de.embl.cba.tables.modelview.datamodels.DefaultAnnotatedSegmentsModel;
+import de.embl.cba.tables.modelview.datamodels.AnnotatedSegmentsModel;
 import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.TableRow;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
@@ -40,7 +40,7 @@ public class SegmentsTableView extends JPanel
 	public static final String NO_COLUMN_SELECTED = "No column selected";
 
 	private final SelectionModel< AnnotatedImageSegment > selectionModel;
-	private final DefaultAnnotatedSegmentsModel segmentsModel;
+	private final AnnotatedSegmentsModel segmentsModel;
 	private final ColumnColoringModel< AnnotatedImageSegment > coloringModel;
 
 	private JFrame frame;
@@ -53,7 +53,7 @@ public class SegmentsTableView extends JPanel
 	private JTable table;
 
 	public SegmentsTableView(
-			final DefaultAnnotatedSegmentsModel segmentsModel,
+			final AnnotatedSegmentsModel segmentsModel,
 			final SelectionModel< AnnotatedImageSegment > selectionModel,
 			final ColumnColoringModel< AnnotatedImageSegment > coloringModel )
 	{

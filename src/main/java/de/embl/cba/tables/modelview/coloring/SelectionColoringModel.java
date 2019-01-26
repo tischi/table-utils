@@ -4,7 +4,9 @@ import de.embl.cba.tables.modelview.selection.Listeners;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import net.imglib2.type.numeric.ARGBType;
 
-public class SelectionColoringModel < T > implements ColoringModel< T >
+import static de.embl.cba.tables.modelview.coloring.SelectionColoringModel.SelectionMode.DimNotSelected;
+
+public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 {
 	ColoringModel< T > coloringModel;
 	SelectionModel< T > selectionModel;
@@ -32,18 +34,16 @@ public class SelectionColoringModel < T > implements ColoringModel< T >
 
 		this.selectionColor = YELLOW;
 		this.brightnessNotSelected = 0.1;
+		this.selectionMode = DimNotSelected;
 	}
 
-	@Override
-	public Listeners< ColoringListener > listeners()
-	{
-		return null;
-	}
 
 	@Override
 	public void convert( T input, ARGBType output )
 	{
 		coloringModel.convert( input, output );
+
+		if ( selectionModel.isEmpty() ) return;
 
 		final boolean isSelected = selectionModel.isSelected( input );
 

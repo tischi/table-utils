@@ -1,8 +1,6 @@
 package de.embl.cba.tables.modelview.coloring;
 
 import de.embl.cba.bdv.utils.lut.ARGBLut;
-import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
-import de.embl.cba.tables.modelview.selection.Listeners;
 import net.imglib2.type.numeric.ARGBType;
 
 import java.util.HashMap;
@@ -10,10 +8,11 @@ import java.util.Map;
 
 import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 
-public class DynamicCategoryColoringModel< T > implements ColoringModel< T >
+public class DynamicCategoryColoringModel< T > extends AbstractColoringModel< T >
 {
 	Map< T, ARGBType > inputToColorMap;
 	ARGBLut argbLut;
+	private final int randomSeed;
 
 	/**
 	 * Objects are converted to colors.
@@ -24,10 +23,11 @@ public class DynamicCategoryColoringModel< T > implements ColoringModel< T >
 	 *
 	 * @param argbLut
 	 */
-	public DynamicCategoryColoringModel( ARGBLut argbLut )
+	public DynamicCategoryColoringModel( ARGBLut argbLut, int randomSeed )
 	{
 		this.argbLut = argbLut;
-		inputToColorMap = new HashMap<>(  );
+		this.randomSeed = randomSeed;
+		this.inputToColorMap = new HashMap<>(  );
 	}
 
 	@Override
@@ -35,22 +35,16 @@ public class DynamicCategoryColoringModel< T > implements ColoringModel< T >
 	{
 		if( ! inputToColorMap.keySet().contains( input ) )
 		{
-			final double random = createRandom( inputToColorMap.size() );
+			final double random = createRandom( inputToColorMap.size() + 1 );
 			inputToColorMap.put( input, new ARGBType( argbLut.getARGB( random ) ) );
 		}
 
 		output.set( inputToColorMap.get( input ).get() );
 	}
 
-	@Override
-	public Listeners< ColoringListener > listeners()
-	{
-		return null;
-	}
-
 	public double createRandom( double x )
 	{
-		double random = ( x * 50 ) * goldenRatio;
+		double random = ( x * randomSeed ) * goldenRatio;
 		random = random - ( long ) Math.floor( random );
 		return random;
 	}

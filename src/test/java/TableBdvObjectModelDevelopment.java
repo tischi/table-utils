@@ -1,9 +1,9 @@
+import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
-import de.embl.cba.tables.modelview.coloring.TableRowColumnColoringModel;
-import de.embl.cba.tables.modelview.coloring.ColumnColoringModel;
 import de.embl.cba.tables.modelview.datamodels.LabelImageSourceModel;
-import de.embl.cba.tables.modelview.datamodels.DefaultAnnotatedSegmentsModel;
+import de.embl.cba.tables.modelview.datamodels.AnnotatedSegmentsModel;
 import de.embl.cba.tables.modelview.objects.DefaultAnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
@@ -42,8 +42,8 @@ public class TableBdvObjectModelDevelopment
 						",",
 						coordinateToColumnNameMap );
 
-		final DefaultAnnotatedSegmentsModel dataModel =
-				new DefaultAnnotatedSegmentsModel(
+		final AnnotatedSegmentsModel dataModel =
+				new AnnotatedSegmentsModel(
 				"MyModel",
 				segmentsWithFeatures,
 						"Label",
@@ -51,14 +51,22 @@ public class TableBdvObjectModelDevelopment
 				labelImageSourceModel );
 
 
-		new SelectionColoringModel< AnnotatedImageSegment >();
 
-		final SelectionModel< AnnotatedImageSegment > selectionModel = new DefaultSelectionModel<>();
+		final SelectionModel< AnnotatedImageSegment > selectionModel
+				= new DefaultSelectionModel<>();
+
+		final DynamicCategoryColoringModel< AnnotatedImageSegment > coloringModel
+				= new DynamicCategoryColoringModel<>( new GlasbeyARGBLut(), 50 );
+
+		final SelectionColoringModel< AnnotatedImageSegment > selectionColoringModel
+				= new SelectionColoringModel<>(
+					coloringModel,
+					selectionModel );
 
 		final SegmentsBdvView segmentsBdvView = new SegmentsBdvView(
 				dataModel,
 				selectionModel,
-				coloringModel );
+				selectionColoringModel );
 
 //		final SegmentsTableView tableView = new SegmentsTableView(
 //				dataModel,

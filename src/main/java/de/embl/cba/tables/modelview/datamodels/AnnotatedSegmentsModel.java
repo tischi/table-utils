@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Holds all the data
  */
-public class DefaultAnnotatedSegmentsModel
+public class AnnotatedSegmentsModel
 {
 	private final String name;
 	private final ArrayList< ? extends AnnotatedImageSegment > annotatedSegments;
@@ -19,7 +19,7 @@ public class DefaultAnnotatedSegmentsModel
 
 	private Map< Object, AnnotatedImageSegment > labelTimePointKeyToSegmentMap;
 
-	public DefaultAnnotatedSegmentsModel(
+	public AnnotatedSegmentsModel(
 			String name,
 			ArrayList< ? extends AnnotatedImageSegment > annotatedSegments,
 			String labelFeatureName,

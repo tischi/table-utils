@@ -114,7 +114,7 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 	@Override
 	public boolean isEmpty()
 	{
-		return false;
+		return selected.isEmpty();
 	}
 
 	@Override
