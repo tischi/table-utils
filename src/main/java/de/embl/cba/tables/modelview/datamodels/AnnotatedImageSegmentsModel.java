@@ -10,25 +10,26 @@ import java.util.Map;
  * Holds all the data
  */
 
-public class AnnotatedSegmentsModel implements ImageSegmentsModel
+public class AnnotatedImageSegmentsModel < T extends AnnotatedImageSegment >
+		implements ImageSegmentsModel, TableRowsModel
 {
 	private final String name;
-	private final ArrayList< ? extends AnnotatedImageSegment > annotatedSegments;
+	private final ArrayList< T > annotatedImageSegments;
 	private final LabelImageSourceModel labelImageSourceModel;
 	private final String labelFeatureName;
 	private final String timePointFeatureName;
 
-	private Map< Object, AnnotatedImageSegment > labelTimePointKeyToSegmentMap;
+	private Map< Object, T > labelTimePointKeyToSegmentMap;
 
-	public AnnotatedSegmentsModel(
+	public AnnotatedImageSegmentsModel(
 			String name,
-			ArrayList< ? extends AnnotatedImageSegment > annotatedSegments,
+			ArrayList< T > annotatedImageSegments,
 			String labelFeatureName,
 			String timePointFeatureName,
 			LabelImageSourceModel labelImageSourceModel )
 	{
 		this.name = name;
-		this.annotatedSegments = annotatedSegments;
+		this.annotatedImageSegments = annotatedImageSegments;
 		this.labelImageSourceModel = labelImageSourceModel;
 		this.timePointFeatureName = timePointFeatureName;
 		this.labelFeatureName = labelFeatureName;
@@ -40,20 +41,20 @@ public class AnnotatedSegmentsModel implements ImageSegmentsModel
 	{
 		labelTimePointKeyToSegmentMap = new HashMap<>();
 
-		for ( AnnotatedImageSegment annotatedSegment : this.annotatedSegments )
+		for ( T annotatedImageSegment : this.annotatedImageSegments )
 		{
 			final Object key = SegmentUtils.getKey(
-					annotatedSegment.label(),
-					annotatedSegment.timePoint()
+					annotatedImageSegment.label(),
+					annotatedImageSegment.timePoint()
 			);
 
-			labelTimePointKeyToSegmentMap.put( key, annotatedSegment );
+			labelTimePointKeyToSegmentMap.put( key, annotatedImageSegment );
 		}
 	}
 
 	public AnnotatedImageSegment getSegment( int listIndex )
 	{
-		return annotatedSegments.get( listIndex );
+		return annotatedImageSegments.get( listIndex );
 	}
 
 	@Override
@@ -69,16 +70,24 @@ public class AnnotatedSegmentsModel implements ImageSegmentsModel
 		return labelImageSourceModel;
 	}
 
+	@Override
+	public ArrayList< ? extends AnnotatedImageSegment > getImageSegments()
+	{
+		return annotatedImageSegments;
+	}
+
 	public static Object getSegmentKey( Double label, Integer timePoint )
 	{
 		return "L"+label.toString() + "_T" + timePoint.toString();
 	}
 
-	public String getTimePointFeatureName()
+	@Override
+	public String getTimePointColumnName()
 	{
 		return timePointFeatureName;
 	}
 
+	@Override
 	public String getLabelFeatureName()
 	{
 		return labelFeatureName;
@@ -95,9 +104,9 @@ public class AnnotatedSegmentsModel implements ImageSegmentsModel
 //	}
 
 	@Override
-	public ArrayList< ? extends AnnotatedImageSegment > getSegments()
+	public ArrayList< ? extends AnnotatedImageSegment > getTableRows()
 	{
-		return annotatedSegments;
+		return annotatedImageSegments;
 	}
 
 	public String getName()

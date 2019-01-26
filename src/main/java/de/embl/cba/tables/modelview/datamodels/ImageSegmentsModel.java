@@ -11,5 +11,5 @@ public interface ImageSegmentsModel < T extends ImageSegment >
 
 	LabelImageSourceModel getLabelImageSourceModel();
 
-	ArrayList< T > getSegments();
+	ArrayList< T > getImageSegments();
 }

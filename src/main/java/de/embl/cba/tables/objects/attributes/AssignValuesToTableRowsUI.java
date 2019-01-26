@@ -2,11 +2,10 @@ package de.embl.cba.tables.objects.attributes;
 
 import de.embl.cba.tables.SwingUtils;
 import de.embl.cba.tables.modelview.objects.TableRow;
-import de.embl.cba.tables.modelview.views.table.SegmentsTableView;
+import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
 import org.fife.rsta.ac.js.Logger;
 
 import javax.swing.*;
-import javax.swing.text.TableView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,7 +15,7 @@ import java.util.Set;
 public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 {
 	public static final String NEW_ATTRIBUTE = "None";
-	final SegmentsTableView tableView;
+	final TableRowsTableView< T > tableView;
 	Set< T > selectedRows;
 	private JComboBox attributeComboBox;
 	private JComboBox columnComboBox;
@@ -30,7 +29,7 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 
 	// TODO: make this only work on TableRows (get rid of TableView dependency)
 
-	public AssignValuesToTableRowsUI( SegmentsTableView tableView )
+	public AssignValuesToTableRowsUI( TableRowsTableView tableView )
 	{
 		this.tableView = tableView;
 		selectedAttributes = new HashSet<>();
@@ -147,6 +146,7 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 	private void updateColumnComboBox()
 	{
 		columnComboBox.removeAllItems();
+
 		for ( String name : tableView.getColumnNames() )
 		{
 			columnComboBox.addItem( name );

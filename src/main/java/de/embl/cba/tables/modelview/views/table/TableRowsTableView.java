@@ -6,7 +6,7 @@ import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.coloring.*;
-import de.embl.cba.tables.modelview.datamodels.AnnotatedSegmentsModel;
+import de.embl.cba.tables.modelview.datamodels.TableRowsModel;
 import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.TableRow;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
@@ -28,13 +28,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SegmentsTableView extends JPanel
+public class TableRowsTableView < T extends TableRow > extends JPanel
 {
 	public static final String NO_COLUMN_SELECTED = "No column selected";
 
-	private final SelectionModel< AnnotatedImageSegment > selectionModel;
-	private final AnnotatedSegmentsModel segmentsModel;
-	private final SelectionColoringModel< AnnotatedImageSegment > selectionColoringModel;
+	private final SelectionModel< T > selectionModel;
+	private final TableRowsModel< T > tableRowsModel;
+	private final SelectionColoringModel< T > selectionColoringModel;
 
 	private JFrame frame;
     private JScrollPane scrollPane;
@@ -45,13 +45,13 @@ public class SegmentsTableView extends JPanel
 	private JTable table;
 	private int labelColoringRandomSeed;
 
-	public SegmentsTableView(
-			final AnnotatedSegmentsModel segmentsModel,
-			final SelectionModel< AnnotatedImageSegment > selectionModel,
-			final SelectionColoringModel< AnnotatedImageSegment > selectionColoringModel )
+	public TableRowsTableView(
+			final TableRowsModel< T > tableRowsModel,
+			final SelectionModel< T > selectionModel,
+			final SelectionColoringModel< T > selectionColoringModel )
 	{
 		super( new GridLayout(1, 0 ) );
-		this.segmentsModel = segmentsModel;
+		this.tableRowsModel = tableRowsModel;
 		this.selectionColoringModel = selectionColoringModel;
 		this.selectionModel = selectionModel;
 
@@ -63,7 +63,7 @@ public class SegmentsTableView extends JPanel
 
 		segmentCoordinateToColumnMap.put(
 				SegmentCoordinate.Label,
-				segmentsModel.getLabelFeatureName() );
+				tableRowsModel.getLabelFeatureName() );
 
 		labelColoringRandomSeed = 50;
 
@@ -73,7 +73,7 @@ public class SegmentsTableView extends JPanel
 		installRowSelectionListener();
 	}
 
-	public void registerAsColoringListener( SelectionColoringModel< AnnotatedImageSegment > selectionColoringModel )
+	public void registerAsColoringListener( SelectionColoringModel< T > selectionColoringModel )
 	{
 		selectionColoringModel.listeners().add( new ColoringListener()
 		{
@@ -118,7 +118,7 @@ public class SegmentsTableView extends JPanel
 
 	private void createTable()
     {
-		table = TableUtils.jTableFromSegmentList( segmentsModel.getSegments() );
+		table = TableUtils.jTableFromSegmentList( tableRowsModel.getTableRows() );
 
 		table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
         table.setFillsViewportHeight( true );
@@ -196,14 +196,14 @@ public class SegmentsTableView extends JPanel
 	private JMenuItem valueAssignmentMenuItem()
 	{
 		final JMenuItem menuItem = new JMenuItem( "Assign Values..." );
-		final SegmentsTableView segmentsTableView = this;
+		final TableRowsTableView tableRowsTableView = this;
 		menuItem.addActionListener( new ActionListener()
 		{
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
 				final AssignValuesToTableRowsUI assignObjectAttributesUI =
-						new AssignValuesToTableRowsUI( segmentsTableView );
+						new AssignValuesToTableRowsUI( tableRowsTableView );
 				assignObjectAttributesUI.showUI( selectionModel.getSelected() );
 			}
 		} );
@@ -235,7 +235,7 @@ public class SegmentsTableView extends JPanel
 	{
 		final JMenuItem menuItem = new JMenuItem( "Add Column..." );
 
-		final SegmentsTableView tableView = this;
+		final TableRowsTableView tableView = this;
 
 		menuItem.addActionListener( new ActionListener()
 		{
@@ -254,7 +254,7 @@ public class SegmentsTableView extends JPanel
 	{
 		JMenu menu = new JMenu( "Objects" );
 
-		final SegmentsTableView objectTablePanel = this;
+		final TableRowsTableView objectTablePanel = this;
 
 		final JMenuItem coordinatesMenuItem = new JMenuItem( "Select coordinates..." );
 		coordinatesMenuItem.addActionListener( new ActionListener()
@@ -274,7 +274,7 @@ public class SegmentsTableView extends JPanel
     public void showTable() {
 
         //Create and set up the window.
-        frame = new JFrame( segmentsModel.getName() );
+        frame = new JFrame( "Table" );
 
         frame.setJMenuBar( menuBar );
 
@@ -457,7 +457,7 @@ public class SegmentsTableView extends JPanel
 			{
 				table.addRowSelectionInterval( rowInView, rowInView );
 				table.scrollRectToVisible( table.getCellRect( rowInView, 0, true ) );
-				selectionModel.setSelected( segmentsModel.getSegment( row ), true );
+				selectionModel.setSelected( tableRowsModel.getTableRows().get( row ), true );
 			}
 		}
 		else
@@ -480,7 +480,7 @@ public class SegmentsTableView extends JPanel
 			{
 				final int selectedRowInView = table.getSelectedRow();
 				final int row = table.convertRowIndexToModel( selectedRowInView );
-				selectionModel.toggle( segmentsModel.getSegment( row ) );
+				selectionModel.toggle( tableRowsModel.getTableRows().get( row ) );
 			}
 		} );
 	}
@@ -531,12 +531,12 @@ public class SegmentsTableView extends JPanel
 			public void actionPerformed( ActionEvent e )
 			{
 				if ( Number.class.isAssignableFrom( table.getColumnClass( columnIndex ) )
-						&& ! column.equals( segmentsModel.getLabelFeatureName() ))
+						&& ! column.equals( tableRowsModel.getLabelFeatureName() ))
 				{
 					final double[] minMaxValues = getMinMaxValues( column );
 
-					final TableRowColumnColoringModel< AnnotatedImageSegment > coloringModel
-							= new TableRowColumnColoringModel<>(
+					final TableRowColumnColoringModel< T > coloringModel
+							= new TableRowColumnColoringModel< T >(
 									column,
 									new BlueWhiteRedARGBLut( 1000 ),
 									minMaxValues[ 0 ],
@@ -554,8 +554,8 @@ public class SegmentsTableView extends JPanel
 				}
 				else
 				{
-					final DynamicCategoryColoringModel< AnnotatedImageSegment > coloringModel
-							= new DynamicCategoryColoringModel<>(
+					final DynamicCategoryColoringModel< T > coloringModel
+							= new DynamicCategoryColoringModel< T >(
 							new GlasbeyARGBLut(),
 							labelColoringRandomSeed++
 					);

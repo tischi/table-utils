@@ -1,7 +1,7 @@
 package de.embl.cba.tables;
 
 import de.embl.cba.tables.objects.ObjectTablePanel;
-import de.embl.cba.tables.modelview.views.table.SegmentsTableView;
+import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
 import ij.gui.GenericDialog;
 
 import javax.swing.*;
@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class TableUIs
 {
-	public static void addColumnUI( SegmentsTableView tableView )
+	public static void addColumnUI( TableRowsTableView tableView )
 	{
 		final GenericDialog gd = new GenericDialog( "New Column" );
 		gd.addStringField( "Column name", "MyNewColumn", 30 );

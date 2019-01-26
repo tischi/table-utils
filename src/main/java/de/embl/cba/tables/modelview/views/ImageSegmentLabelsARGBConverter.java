@@ -2,9 +2,7 @@ package de.embl.cba.tables.modelview.views;
 
 import bdv.viewer.TimePointListener;
 import de.embl.cba.tables.modelview.coloring.ColoringModel;
-import de.embl.cba.tables.modelview.datamodels.AnnotatedSegmentsModel;
 import de.embl.cba.tables.modelview.datamodels.ImageSegmentsModel;
-import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.ImageSegment;
 import net.imglib2.Volatile;
 import net.imglib2.converter.Converter;

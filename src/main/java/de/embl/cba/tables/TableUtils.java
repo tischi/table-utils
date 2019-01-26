@@ -2,6 +2,7 @@ package de.embl.cba.tables;
 
 import de.embl.cba.tables.models.ColumnClassAwareTableModel;
 import de.embl.cba.tables.modelview.datamodels.SegmentUtils;
+import de.embl.cba.tables.modelview.datamodels.TableRowsModel;
 import de.embl.cba.tables.modelview.objects.*;
 import de.embl.cba.tables.objects.SegmentCoordinate;
 import net.imglib2.util.ValuePair;
@@ -313,7 +314,7 @@ public class TableUtils
 		return Double.parseDouble( rowEntries[ columnIndex ] );
 	}
 
-	public static JTable jTableFromSegmentList( ArrayList< ? extends AnnotatedImageSegment > segments )
+	public static JTable jTableFromSegmentList( ArrayList< ? extends TableRow > tableRows )
 	{
 
 		/**
@@ -322,18 +323,18 @@ public class TableUtils
 
 		ColumnClassAwareTableModel model = new ColumnClassAwareTableModel();
 
-		final Set< String > columns = segments.get( 0 ).cells().keySet();
+		final Set< String > columns = tableRows.get( 0 ).cells().keySet();
 
 		for ( String column : columns )
 		{
 			model.addColumn( column );
 		}
 
-		for ( int row = 0; row < segments.size(); ++row )
+		for ( int row = 0; row < tableRows.size(); ++row )
 		{
 			model.addRow( new Object[ columns.size() ] );
 
-			final Collection< Object > values = segments.get( row ).cells().values();
+			final Collection< Object > values = tableRows.get( row ).cells().values();
 
 			int col = 0;
 			for ( Object value : values )

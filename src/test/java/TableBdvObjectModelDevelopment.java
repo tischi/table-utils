@@ -3,13 +3,13 @@ import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.datamodels.LabelImageSourceModel;
-import de.embl.cba.tables.modelview.datamodels.AnnotatedSegmentsModel;
+import de.embl.cba.tables.modelview.datamodels.AnnotatedImageSegmentsModel;
 import de.embl.cba.tables.modelview.objects.DefaultAnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.modelview.views.bdv.ImageSegmentsBdvView;
-import de.embl.cba.tables.modelview.views.table.SegmentsTableView;
+import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
 import de.embl.cba.tables.objects.SegmentCoordinate;
 import net.imglib2.util.ValuePair;
 
@@ -43,8 +43,8 @@ public class TableBdvObjectModelDevelopment
 						",",
 						coordinateToColumnNameMap );
 
-		final AnnotatedSegmentsModel dataModel =
-				new AnnotatedSegmentsModel(
+		final AnnotatedImageSegmentsModel dataModel =
+				new AnnotatedImageSegmentsModel(
 				"MyModel",
 				segmentsWithFeatures,
 						"Label",
@@ -67,7 +67,7 @@ public class TableBdvObjectModelDevelopment
 				selectionModel,
 				selectionColoringModel );
 
-		final SegmentsTableView tableView = new SegmentsTableView(
+		final TableRowsTableView tableView = new TableRowsTableView(
 				dataModel,
 				selectionModel,
 				selectionColoringModel );

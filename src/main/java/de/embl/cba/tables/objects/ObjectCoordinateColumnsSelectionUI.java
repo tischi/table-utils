@@ -1,6 +1,6 @@
 package de.embl.cba.tables.objects;
 
-import de.embl.cba.tables.modelview.views.table.SegmentsTableView;
+import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +13,7 @@ import static de.embl.cba.tables.SwingUtils.horizontalLayoutPanel;
 
 public class ObjectCoordinateColumnsSelectionUI extends JPanel
 {
-	private final SegmentsTableView objectTablePanel;
+	private final TableRowsTableView objectTablePanel;
 
 	private ArrayList< String > choices;
 	private JFrame frame;
@@ -37,7 +37,7 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 		showUI();
 	}
 
-	public ObjectCoordinateColumnsSelectionUI( SegmentsTableView objectTablePanel )
+	public ObjectCoordinateColumnsSelectionUI( TableRowsTableView objectTablePanel )
 	{
 		this.objectTablePanel = objectTablePanel;
 
