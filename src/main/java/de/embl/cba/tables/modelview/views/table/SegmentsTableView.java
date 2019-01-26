@@ -13,11 +13,10 @@ import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.objects.SegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectCoordinateColumnsSelectionUI;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
+import de.embl.cba.tables.objects.attributes.AssignValuesToTableRowsUI;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -44,6 +43,7 @@ public class SegmentsTableView extends JPanel
 	private ConcurrentHashMap< String, Integer > objectRowMap;
 	private Map< String, double[] > columnsMinMaxMap;
 	private JTable table;
+	private int labelColoringRandomSeed;
 
 	public SegmentsTableView(
 			final AnnotatedSegmentsModel segmentsModel,
@@ -64,6 +64,8 @@ public class SegmentsTableView extends JPanel
 		segmentCoordinateToColumnMap.put(
 				SegmentCoordinate.Label,
 				segmentsModel.getLabelFeatureName() );
+
+		labelColoringRandomSeed = 50;
 
 		createTable();
 		createMenuBar();
@@ -136,7 +138,7 @@ public class SegmentsTableView extends JPanel
 
 		menuBar.add( createTableMenu() );
 
-		menuBar.add( createObjectCoordinateMenu() );
+		// menuBar.add( createObjectCoordinateMenu() );
 
 		menuBar.add( createColoringMenu() );
 	}
@@ -186,8 +188,27 @@ public class SegmentsTableView extends JPanel
 
 		menu.add( addColumnMenuItem() );
 
+		menu.add( valueAssignmentMenuItem() );
+
 		return menu;
     }
+
+	private JMenuItem valueAssignmentMenuItem()
+	{
+		final JMenuItem menuItem = new JMenuItem( "Assign Values..." );
+		final SegmentsTableView segmentsTableView = this;
+		menuItem.addActionListener( new ActionListener()
+		{
+			@Override
+			public void actionPerformed( ActionEvent e )
+			{
+				final AssignValuesToTableRowsUI assignObjectAttributesUI =
+						new AssignValuesToTableRowsUI( segmentsTableView );
+				assignObjectAttributesUI.showUI( selectionModel.getSelected() );
+			}
+		} );
+		return menuItem;
+	}
 
 	private JMenuItem createSaveAsMenuItem()
 	{
@@ -212,15 +233,16 @@ public class SegmentsTableView extends JPanel
 
 	private JMenuItem addColumnMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "Add getColumn..." );
+		final JMenuItem menuItem = new JMenuItem( "Add Column..." );
 
-		final SegmentsTableView objectTablePanel = this;
+		final SegmentsTableView tableView = this;
+
 		menuItem.addActionListener( new ActionListener()
 		{
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
-				TableUIs.addColumnUI( objectTablePanel );
+				TableUIs.addColumnUI( tableView );
 			}
 		} );
 
@@ -299,7 +321,7 @@ public class SegmentsTableView extends JPanel
 
 	public void addColumn( String column, Object defaultValue )
 	{
-		// TODO: this must be propagated back to the segments...
+		// TODO: this should be propagated back to the segments...
 		TableUtils.addFeature( table.getModel(), column, defaultValue );
 	}
 
@@ -498,7 +520,7 @@ public class SegmentsTableView extends JPanel
 
 	private JMenuItem createColorByColumnMenuItem( final String column )
 	{
-		// TODO: also table cells can be colored
+		// TODO: also table cells could be colored
 
 		final JMenuItem colorByColumnMenuItem = new JMenuItem( "Color " + column );
 		final int columnIndex = table.getColumnModel().getColumnIndex( column );
@@ -508,7 +530,8 @@ public class SegmentsTableView extends JPanel
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
-				if ( Number.class.isAssignableFrom( table.getColumnClass( columnIndex ) ) )
+				if ( Number.class.isAssignableFrom( table.getColumnClass( columnIndex ) )
+						&& ! column.equals( segmentsModel.getLabelFeatureName() ))
 				{
 					final double[] minMaxValues = getMinMaxValues( column );
 
@@ -531,11 +554,10 @@ public class SegmentsTableView extends JPanel
 				}
 				else
 				{
-
 					final DynamicCategoryColoringModel< AnnotatedImageSegment > coloringModel
 							= new DynamicCategoryColoringModel<>(
 							new GlasbeyARGBLut(),
-							50
+							labelColoringRandomSeed++
 					);
 
 					selectionColoringModel.setWrappedColoringModel( coloringModel );

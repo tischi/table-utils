@@ -10,11 +10,11 @@ import java.io.IOException;
 
 public class TableUIs
 {
-	public static void addColumnUI( SegmentsTableView objectTablePanel )
+	public static void addColumnUI( SegmentsTableView tableView )
 	{
-		final GenericDialog gd = new GenericDialog( "New getColumn" );
+		final GenericDialog gd = new GenericDialog( "New Column" );
 		gd.addStringField( "Column name", "MyNewColumn", 30 );
-		gd.addStringField( "Default value [String or Number]", "None", 30 );
+		gd.addStringField( "Default value [Text or Numeric]", "None", 30 );
 
 		gd.showDialog();
 		if( gd.wasCanceled() ) return;
@@ -33,7 +33,7 @@ public class TableUIs
 			defaultValue = defaultValueString;
 		}
 
-		objectTablePanel.addColumn( columnName, defaultValue );
+		tableView.addColumn( columnName, defaultValue );
 	}
 
 	public static void addColumnUI( ObjectTablePanel objectTablePanel )

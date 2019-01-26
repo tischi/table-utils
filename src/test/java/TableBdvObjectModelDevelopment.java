@@ -51,8 +51,6 @@ public class TableBdvObjectModelDevelopment
 				null,
 				labelImageSourceModel );
 
-
-
 		final SelectionModel< AnnotatedImageSegment > selectionModel
 				= new DefaultSelectionModel<>();
 
