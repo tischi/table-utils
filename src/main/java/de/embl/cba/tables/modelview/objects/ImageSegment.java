@@ -4,7 +4,7 @@ import net.imglib2.FinalInterval;
 
 public interface ImageSegment
 {
-	String imageId();
+	String imageSetId();
 
 	double label();
 

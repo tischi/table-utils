@@ -2,6 +2,7 @@ package de.embl.cba.tables.cellprofiler;
 
 import java.util.ArrayList;
 
+@Deprecated
 public class CellProfilerDataset
 {
 	// TODO: make enum

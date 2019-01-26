@@ -102,7 +102,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 						selectionColoringModel );
 
 		source = new ARGBConvertedRealSource(
-				imagesAndSegmentsModel.getImageSourcesModel().getLabelImageSources("").get( 0 ),
+				imagesAndSegmentsModel.getImageSourcesModel().getLabelImageSource(""),
 				coloringConverter );
 
 		BdvOptions options = BdvOptions.options();

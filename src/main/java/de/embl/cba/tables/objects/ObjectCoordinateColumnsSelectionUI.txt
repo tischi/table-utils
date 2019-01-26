@@ -12,9 +12,10 @@ import java.util.ArrayList;
 
 import static de.embl.cba.tables.SwingUtils.horizontalLayoutPanel;
 
+
 public class ObjectCoordinateColumnsSelectionUI extends JPanel
 {
-	private final TableRowsTableView objectTablePanel;
+	private final TableRowsTableView §1objectTablePanel;
 
 	private ArrayList< String > choices;
 	private JFrame frame;

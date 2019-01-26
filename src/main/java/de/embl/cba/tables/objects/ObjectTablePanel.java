@@ -182,7 +182,7 @@ public class ObjectTablePanel extends JPanel
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
-				new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
+				//new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
 			}
 		} );
 

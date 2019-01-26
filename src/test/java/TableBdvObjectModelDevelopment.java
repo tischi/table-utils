@@ -5,7 +5,7 @@ import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.datamodels.DefaultImageSourcesModelOld;
 import de.embl.cba.tables.modelview.datamodels.AnnotatedImageSegmentsAndImagesModel;
-import de.embl.cba.tables.modelview.datamodels.ImageSourcesModel;
+import de.embl.cba.tables.modelview.datamodels.DefaultImageSourcesModel;
 import de.embl.cba.tables.modelview.objects.DefaultAnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.DefaultImageSegmentBuilder;
@@ -31,7 +31,7 @@ public class TableBdvObjectModelDevelopment
 
 		final RandomAccessibleIntervalSource labelSource = Examples.load2D16BitLabelSource();
 
-		final ImageSourcesModel imageSourcesModel = new ImageSourcesModel( true );
+		final DefaultImageSourcesModel imageSourcesModel = new DefaultImageSourcesModel( true );
 
 		imageSourcesModel.addLabelImageSource( DefaultImageSegmentBuilder.getDefaultImageId(), labelSource );
 

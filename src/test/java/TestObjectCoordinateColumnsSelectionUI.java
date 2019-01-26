@@ -1,4 +1,3 @@
-import de.embl.cba.tables.objects.ObjectCoordinateColumnsSelectionUI;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import net.imagej.ImageJ;
 
@@ -18,7 +17,6 @@ public class TestObjectCoordinateColumnsSelectionUI
 
 		objectTablePanel.showTable();
 
-		new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
-
+		//new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
 	}
 }

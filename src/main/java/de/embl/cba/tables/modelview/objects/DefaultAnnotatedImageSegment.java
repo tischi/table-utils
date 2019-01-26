@@ -17,9 +17,9 @@ public class DefaultAnnotatedImageSegment implements AnnotatedImageSegment
 	}
 
 	@Override
-	public String imageId()
+	public String imageSetId()
 	{
-		return imageSegment.imageId();
+		return imageSegment.imageSetId();
 	}
 
 	@Override

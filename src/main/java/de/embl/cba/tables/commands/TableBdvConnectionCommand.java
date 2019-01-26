@@ -12,7 +12,6 @@ import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableBdvConnector;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.objects.ObjectTablePanel;
-import de.embl.cba.tables.objects.ObjectCoordinateColumnsSelectionUI;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imglib2.RandomAccessibleInterval;
@@ -62,7 +61,7 @@ public class TableBdvConnectionCommand < R extends RealType< R > & NativeType< R
 
 		tableBdvConnector.setSelectionByAttribute( true );
 
-		new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
+//		new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
 	}
 
 	public ObjectTablePanel createAndShowTablePanel( JTable table )

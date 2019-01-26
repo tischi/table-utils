@@ -5,12 +5,10 @@ import bdv.viewer.Source;
 import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
 import de.embl.cba.tables.TableBdvConnector;
-import de.embl.cba.tables.objects.ObjectCoordinateColumnsSelectionUI;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
@@ -20,6 +18,7 @@ import net.imglib2.view.Views;
 import javax.swing.*;
 import java.util.HashMap;
 
+@Deprecated
 public class CellProfilerOutputExplorer < T extends RealType< T > & NativeType< T > >
 {
 	BdvHandle bdv;
@@ -61,7 +60,7 @@ public class CellProfilerOutputExplorer < T extends RealType< T > & NativeType< 
 						new BdvSelectionEventHandler( bdv, ( SelectableARGBConvertedRealSource ) source )
 				);
 
-				new ObjectCoordinateColumnsSelectionUI( tablePanel );
+//				new ObjectCoordinateColumnsSelectionUI( tablePanel );
 			}
 		}
 	}
