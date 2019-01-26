@@ -4,7 +4,7 @@ import de.embl.cba.bdv.utils.selection.Segment;
 import net.imglib2.FinalInterval;
 import net.imglib2.roi.labeling.LabelRegion;
 
-public class DefaultSegment implements Segment
+public class DefaultImageSegment implements ImageSegment
 {
 	private final String imageId;
 	private final double label;
@@ -13,7 +13,7 @@ public class DefaultSegment implements Segment
 	private final double[] position;
 
 
-	public DefaultSegment(
+	public DefaultImageSegment(
 			String imageId,
 			double label,
 			int timePoint,
@@ -30,31 +30,31 @@ public class DefaultSegment implements Segment
 	}
 
 	@Override
-	public String getImageId()
+	public String imageId()
 	{
 		return imageId;
 	}
 
 	@Override
-	public double getLabel()
+	public double label()
 	{
 		return label;
 	}
 
 	@Override
-	public int getTimePoint()
+	public int timePoint()
 	{
 		return timePoint;
 	}
 
 	@Override
-	public double[] getPosition()
+	public double[] position()
 	{
 		return position;
 	}
 
 	@Override
-	public FinalInterval getBoundingBox()
+	public FinalInterval boundingBox()
 	{
 		return boundingBox;
 	}

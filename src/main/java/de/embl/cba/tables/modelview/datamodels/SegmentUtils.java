@@ -1,6 +1,6 @@
 package de.embl.cba.tables.modelview.datamodels;
 
-import de.embl.cba.tables.modelview.objects.DefaultSegment;
+import de.embl.cba.tables.modelview.objects.DefaultImageSegment;
 import de.embl.cba.tables.modelview.objects.DefaultSegmentBuilder;
 import de.embl.cba.tables.objects.SegmentCoordinate;
 import net.imglib2.util.ValuePair;
@@ -21,7 +21,7 @@ public class SegmentUtils
 		return "L"+label.toString() + "_T" + timePoint.toString();
 	}
 
-	public static DefaultSegment segmentFromFeatures(
+	public static DefaultImageSegment segmentFromFeatures(
 			Map< SegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
 			HashMap< String, Object > columnValueMap )
 	{
@@ -59,7 +59,7 @@ public class SegmentUtils
 		return segmentBuilder.build();
 	}
 
-	public static DefaultSegment segmentFromFeaturesIndexBased(
+	public static DefaultImageSegment segmentFromFeaturesIndexBased(
 			Map< SegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
 			String[] rowEntries )
 	{

@@ -6,9 +6,10 @@ import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.coloring.ColoringModelDialogs;
-import de.embl.cba.tables.modelview.coloring.FeatureColoringModel;
+import de.embl.cba.tables.modelview.coloring.ColumnColoringModel;
 import de.embl.cba.tables.modelview.datamodels.DefaultAnnotatedSegmentsModel;
-import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
+import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
+import de.embl.cba.tables.modelview.objects.TableRow;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.objects.SegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectCoordinateColumnsSelectionUI;
@@ -38,9 +39,9 @@ public class SegmentsTableView extends JPanel
 {
 	public static final String NO_COLUMN_SELECTED = "No column selected";
 
-	private final SelectionModel< AnnotatedSegment > selectionModel;
+	private final SelectionModel< AnnotatedImageSegment > selectionModel;
 	private final DefaultAnnotatedSegmentsModel segmentsModel;
-	private final FeatureColoringModel< AnnotatedSegment > coloringModel;
+	private final ColumnColoringModel< AnnotatedImageSegment > coloringModel;
 
 	private JFrame frame;
     private JScrollPane scrollPane;
@@ -53,15 +54,15 @@ public class SegmentsTableView extends JPanel
 
 	public SegmentsTableView(
 			final DefaultAnnotatedSegmentsModel segmentsModel,
-			final SelectionModel< AnnotatedSegment > selectionModel,
-			final FeatureColoringModel< AnnotatedSegment > coloringModel )
+			final SelectionModel< AnnotatedImageSegment > selectionModel,
+			final ColumnColoringModel< AnnotatedImageSegment > coloringModel )
 	{
 		super( new GridLayout(1, 0 ) );
 		this.segmentsModel = segmentsModel;
 		this.coloringModel = coloringModel;
 		this.selectionModel = selectionModel;
 
-		registerAsListener( selectionModel );
+		registerAsSelectionListener( selectionModel );
 
 		segmentCoordinateToColumnMap = emptyObjectCoordinateColumnMap();
 
@@ -75,9 +76,9 @@ public class SegmentsTableView extends JPanel
 		installRowSelectionListener();
 	}
 
-	public void registerAsListener( SelectionModel< AnnotatedSegment > selectionModel )
+	public void registerAsSelectionListener( SelectionModel< ? extends TableRow > selectionModel )
 	{
-		selectionModel.listeners().add( new SelectionListener()
+		selectionModel.listeners().add( new SelectionListener< TableRow >()
 		{
 			@Override
 			public void selectionChanged()
@@ -86,9 +87,9 @@ public class SegmentsTableView extends JPanel
 			}
 
 			@Override
-			public void selectionEvent( Object selection, boolean selected )
+			public void selectionEvent( TableRow selection, boolean selected )
 			{
-
+				selectRow( selection.rowIndex(), selected );
 			}
 		} );
 	}
@@ -402,24 +403,28 @@ public class SegmentsTableView extends JPanel
 		columnsMinMaxMap.put( selectedColumn, new double[]{ min, max } );
 	}
 
-	public void highlightRow( int row )
+	public void selectRow( int row, boolean select )
 	{
-		if ( row != highlightedRow  )
+		final int rowInView = table.convertRowIndexToView( row );
+
+		if ( select )
 		{
-			highlightedRow = row;
+			final boolean isSelected = table.getSelectionModel().isSelectedIndex( rowInView );
 
-			highlightRowInView( row );
-
-			selectionModel.setSelected( segmentsModel.getSegment( row ) , true );
+			if ( !isSelected )
+			{
+				table.addRowSelectionInterval( rowInView, rowInView );
+				table.scrollRectToVisible( table.getCellRect( rowInView, 0, true ) );
+				selectionModel.setSelected( segmentsModel.getSegment( row ), true );
+			}
+		}
+		else
+		{
+			// TODO: remove from selection
 		}
 	}
 
-	public void highlightRowInView( int row )
-	{
-		final int rowInView = table.convertRowIndexToView( row );
-		table.setRowSelectionInterval( rowInView, rowInView );
-		table.scrollRectToVisible( table.getCellRect( rowInView, 0, true ) );
-	}
+
 
 	public void installRowSelectionListener()
 	{

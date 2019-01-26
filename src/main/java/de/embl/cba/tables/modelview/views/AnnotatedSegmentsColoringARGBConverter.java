@@ -1,12 +1,11 @@
 package de.embl.cba.tables.modelview.views;
 
 import bdv.viewer.TimePointListener;
-import de.embl.cba.tables.modelview.coloring.FeatureColoringModel;
+import de.embl.cba.tables.modelview.coloring.ColumnColoringModel;
 import de.embl.cba.tables.modelview.datamodels.DefaultAnnotatedSegmentsModel;
-import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
+import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import net.imglib2.Volatile;
 import net.imglib2.converter.Converter;
-import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.volatiles.VolatileARGBType;
 
@@ -14,13 +13,13 @@ public class AnnotatedSegmentsColoringARGBConverter
 		implements Converter< RealType, VolatileARGBType >, TimePointListener
 {
 	private final DefaultAnnotatedSegmentsModel segmentsModel;
-	private final FeatureColoringModel< AnnotatedSegment > coloringModel;
+	private final ColumnColoringModel< AnnotatedImageSegment > coloringModel;
 
 	private int timePointIndex;
 
 	public AnnotatedSegmentsColoringARGBConverter(
 			DefaultAnnotatedSegmentsModel segmentsModel,
-			FeatureColoringModel< AnnotatedSegment > coloringModel )
+			ColumnColoringModel< AnnotatedImageSegment > coloringModel )
 	{
 		this.segmentsModel = segmentsModel;
 		this.coloringModel = coloringModel;
@@ -52,7 +51,7 @@ public class AnnotatedSegmentsColoringARGBConverter
 
 	}
 
-	public AnnotatedSegment getAnnotatedSegment( RealType label )
+	public AnnotatedImageSegment getAnnotatedSegment( RealType label )
 	{
 		return segmentsModel.getSegment(
 				label.getRealDouble(),

@@ -2,9 +2,7 @@ package de.embl.cba.tables;
 
 import de.embl.cba.tables.models.ColumnClassAwareTableModel;
 import de.embl.cba.tables.modelview.datamodels.SegmentUtils;
-import de.embl.cba.tables.modelview.objects.DefaultSegment;
-import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
-import de.embl.cba.tables.modelview.objects.DefaultAnnotatedSegment;
+import de.embl.cba.tables.modelview.objects.*;
 import de.embl.cba.tables.objects.SegmentCoordinate;
 import net.imglib2.util.ValuePair;
 import org.scijava.table.GenericTable;
@@ -203,14 +201,14 @@ public class TableUtils
 		return new JTable( model );
 	}
 
-	public static ArrayList< DefaultAnnotatedSegment > segmentsFromTableFile (
+	public static ArrayList< DefaultAnnotatedImageSegment > segmentsFromTableFile (
 			File file,
 			String delim,
 			Map< SegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap
 	)
 	{
 
-		final ArrayList< DefaultAnnotatedSegment > segments = new ArrayList<>();
+		final ArrayList< DefaultAnnotatedImageSegment > segments = new ArrayList<>();
 
 		final ArrayList< String > tableRows = readRows( file );
 
@@ -238,11 +236,13 @@ public class TableUtils
 				addFeature( columnValueMap, feature, string );
 			}
 
-			final DefaultSegment segment = SegmentUtils.segmentFromFeatures(
+			final DefaultImageSegment segment = SegmentUtils.segmentFromFeatures(
 					coordinateColumnMap,
 					columnValueMap );
 
-			segments.add( new DefaultAnnotatedSegment( segment, columnValueMap ) );
+			final TableRow tableRow = new DefaultTableRow( columnValueMap, row );
+
+			segments.add( new DefaultAnnotatedImageSegment( segment, tableRow ) );
 		}
 
 		return segments;
@@ -313,7 +313,7 @@ public class TableUtils
 		return Double.parseDouble( rowEntries[ columnIndex ] );
 	}
 
-	public static JTable jTableFromSegmentList( ArrayList< ? extends AnnotatedSegment > segments )
+	public static JTable jTableFromSegmentList( ArrayList< ? extends AnnotatedImageSegment > segments )
 	{
 
 		/**
@@ -322,7 +322,7 @@ public class TableUtils
 
 		ColumnClassAwareTableModel model = new ColumnClassAwareTableModel();
 
-		final Set< String > columns = segments.get( 0 ).features().keySet();
+		final Set< String > columns = segments.get( 0 ).cells().keySet();
 
 		for ( String column : columns )
 		{
@@ -333,7 +333,7 @@ public class TableUtils
 		{
 			model.addRow( new Object[ columns.size() ] );
 
-			final Collection< Object > values = segments.get( row ).features().values();
+			final Collection< Object > values = segments.get( row ).cells().values();
 
 			int col = 0;
 			for ( Object value : values )

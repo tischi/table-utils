@@ -3,7 +3,7 @@ package de.embl.cba.tables.modelview.coloring;
 import de.embl.cba.bdv.utils.lut.ARGBLut;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
+import de.embl.cba.tables.modelview.objects.TableRow;
 import de.embl.cba.tables.modelview.selection.Listeners;
 import net.imglib2.type.numeric.ARGBType;
 
@@ -11,8 +11,7 @@ import java.util.ArrayList;
 
 import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 
-public class DefaultAnnotatedSegmentsColoringModel
-		implements FeatureColoringModel< AnnotatedSegment >
+public class TableRowColumnColoringModel implements ColumnColoringModel< TableRow >
 {
 
 	private final Listeners.SynchronizedList< ColoringListener > listeners;
@@ -25,7 +24,7 @@ public class DefaultAnnotatedSegmentsColoringModel
 	private double initialMin;
 	private double initialMax;
 
-	public DefaultAnnotatedSegmentsColoringModel( String coloringFeature )
+	public TableRowColumnColoringModel( String coloringFeature )
 	{
 		this.listeners = new Listeners.SynchronizedList< ColoringListener >(  );
 		this.coloringFeature = coloringFeature;
@@ -51,10 +50,10 @@ public class DefaultAnnotatedSegmentsColoringModel
 	}
 
 	@Override
-	public void setCategoricalColoring( String coloringFeature, ARGBLut lut )
+	public void setCategoricalColoring( String column, ARGBLut lut )
 	{
 		this.coloringMode = ColoringMode.Categorical;
-		this.coloringFeature = coloringFeature;
+		this.coloringFeature = column;
 		this.lut = lut;
 
 		this.featureValues = new ArrayList<>(  );
@@ -63,10 +62,10 @@ public class DefaultAnnotatedSegmentsColoringModel
 	}
 
 	@Override
-	public void setLinearColoring( String coloringFeature, ARGBLut lut, double min, double max )
+	public void setLinearColoring( String column, ARGBLut lut, double min, double max )
 	{
 		this.coloringMode = ColoringMode.Linear;
-		this.coloringFeature = coloringFeature;
+		this.coloringFeature = column;
 		this.lut = lut;
 
 		this.min = min;
@@ -104,16 +103,15 @@ public class DefaultAnnotatedSegmentsColoringModel
 	}
 
 	@Override
-	public String getColoringFeature()
+	public String getColumn()
 	{
 		return coloringFeature;
 	}
 
 	@Override
-	public void convert( AnnotatedSegment annotatedSegment,
-						 ARGBType output )
+	public void convert( TableRow tableRow, ARGBType output )
 	{
-		final Object featureValue = annotatedSegment.features().get( coloringFeature );
+		final Object featureValue = tableRow.cells().get( coloringFeature );
 
 		if ( coloringMode.equals( ColoringMode.Categorical ) )
 		{

@@ -12,9 +12,9 @@ public class DefaultSegmentBuilder
 	private double z = 0.0;
 	private FinalInterval boundingBox = null;
 
-	public DefaultSegment build()
+	public DefaultImageSegment build()
 	{
-		final DefaultSegment defaultSegment = new DefaultSegment(
+		final DefaultImageSegment defaultImageSegment = new DefaultImageSegment(
 				imageId,
 				label,
 				timePoint,
@@ -22,7 +22,7 @@ public class DefaultSegmentBuilder
 				y,
 				z,
 				boundingBox );
-		return defaultSegment;
+		return defaultImageSegment;
 	}
 
 	public DefaultSegmentBuilder setImageId( String imageId )

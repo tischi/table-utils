@@ -1,6 +1,5 @@
 package de.embl.cba.tables.modelview.views;
 
-import bdv.util.Bdv;
 import bdv.util.BdvFunctions;
 import bdv.util.BdvHandle;
 import bdv.util.BdvOptions;
@@ -9,10 +8,11 @@ import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.selection.Segment;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringListener;
-import de.embl.cba.tables.modelview.coloring.FeatureColoringModel;
+import de.embl.cba.tables.modelview.coloring.ColumnColoringModel;
 import de.embl.cba.tables.modelview.datamodels.LabelImageSourceModel;
 import de.embl.cba.tables.modelview.datamodels.DefaultAnnotatedSegmentsModel;
-import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
+import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
+import de.embl.cba.tables.modelview.objects.ImageSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import org.scijava.ui.behaviour.ClickBehaviour;
@@ -29,8 +29,8 @@ public class SegmentsBdvView < T extends Segment >
 	private String viewIn3DTrigger = "ctrl shift button1";
 
 	private final DefaultAnnotatedSegmentsModel segmentsModel;
-	private final SelectionModel< AnnotatedSegment > selectionModel;
-	private final FeatureColoringModel< AnnotatedSegment > coloringModel;
+	private final SelectionModel< AnnotatedImageSegment > selectionModel;
+	private final ColumnColoringModel< AnnotatedImageSegment > coloringModel;
 	private Behaviours behaviours;
 
 	private final BdvHandle bdv;
@@ -38,8 +38,8 @@ public class SegmentsBdvView < T extends Segment >
 
 	// TODO: extract interface from DefaultAnnotatedSegmentsModel
 	public SegmentsBdvView( final DefaultAnnotatedSegmentsModel segmentsModel,
-							final SelectionModel< AnnotatedSegment > selectionModel,
-							final FeatureColoringModel< AnnotatedSegment > coloringModel )
+							final SelectionModel< AnnotatedImageSegment > selectionModel,
+							final ColumnColoringModel< AnnotatedImageSegment > coloringModel )
 	{
 		this.segmentsModel = segmentsModel;
 		this.selectionModel = selectionModel;
@@ -63,10 +63,10 @@ public class SegmentsBdvView < T extends Segment >
 		installBdvBehaviours();
 	}
 
-	public void addSelectionListener( SelectionModel< ? extends Segment > selectionModel )
+	public void addSelectionListener( SelectionModel< ? extends ImageSegment > selectionModel )
 	{
 
-		selectionModel.listeners().add( new SelectionListener< Segment >()
+		selectionModel.listeners().add( new SelectionListener< ImageSegment >()
 		{
 			@Override
 			public void selectionChanged()
@@ -76,12 +76,12 @@ public class SegmentsBdvView < T extends Segment >
 			}
 
 			@Override
-			public void selectionEvent( Segment selection, boolean selected )
+			public void selectionEvent( ImageSegment selection, boolean selected )
 			{
 				BdvUtils.moveToPosition(
 							bdv,
-							selection.getPosition(),
-							selection.getTimePoint(),
+							selection.position(),
+							selection.timePoint(),
 							500 );
 			}
 		} );
@@ -143,8 +143,6 @@ public class SegmentsBdvView < T extends Segment >
 	{
 		selectionModel.clearSelection( );
 
-		//selectableConverter.setSelected( selectionModel.getSelected() );
-
 		BdvUtils.repaint( bdv );
 	}
 
@@ -171,8 +169,6 @@ public class SegmentsBdvView < T extends Segment >
 		final int timePoint = getCurrentTimePoint();
 
 		selectionModel.toggle( segmentsModel.getSegment( label, timePoint ) );
-
-		//selectableConverter.setSelected( selectionModel.getSelected() );
 
 		BdvUtils.repaint( bdv );
 	}

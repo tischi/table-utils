@@ -2,7 +2,7 @@ package de.embl.cba.tables.modelview.coloring;
 
 import bdv.tools.brightness.SliderPanelDouble;
 import bdv.util.BoundedValueDouble;
-import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
+import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +13,7 @@ public class ColoringModelDialogs
 
 	public static void showMinMaxDialog(
 			final String coloringFeature,
-			final FeatureColoringModel< AnnotatedSegment > coloringModel  )
+			final ColumnColoringModel< AnnotatedImageSegment > coloringModel  )
 	{
 
 		final JFrame frame = new JFrame( coloringFeature );
@@ -68,7 +68,7 @@ public class ColoringModelDialogs
 			@Override
 			public void coloringChanged()
 			{
-				if ( coloringModel.getColoringFeature() != coloringFeature )
+				if ( coloringModel.getColumn() != coloringFeature )
 				{
 					minMaxDialogLocation = frame.getLocation();
 					frame.dispose();

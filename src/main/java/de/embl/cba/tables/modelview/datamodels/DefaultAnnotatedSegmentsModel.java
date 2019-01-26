@@ -1,6 +1,6 @@
 package de.embl.cba.tables.modelview.datamodels;
 
-import de.embl.cba.tables.modelview.objects.AnnotatedSegment;
+import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,16 +12,16 @@ import java.util.Map;
 public class DefaultAnnotatedSegmentsModel
 {
 	private final String name;
-	private final ArrayList< ? extends AnnotatedSegment > annotatedSegments;
+	private final ArrayList< ? extends AnnotatedImageSegment > annotatedSegments;
 	private final LabelImageSourceModel labelImageSourceModel;
 	private final String labelFeatureName;
 	private final String timePointFeatureName;
 
-	private Map< Object, AnnotatedSegment > labelTimePointKeyToSegmentMap;
+	private Map< Object, AnnotatedImageSegment > labelTimePointKeyToSegmentMap;
 
 	public DefaultAnnotatedSegmentsModel(
 			String name,
-			ArrayList< ? extends AnnotatedSegment > annotatedSegments,
+			ArrayList< ? extends AnnotatedImageSegment > annotatedSegments,
 			String labelFeatureName,
 			String timePointFeatureName,
 			LabelImageSourceModel labelImageSourceModel )
@@ -39,23 +39,23 @@ public class DefaultAnnotatedSegmentsModel
 	{
 		labelTimePointKeyToSegmentMap = new HashMap<>();
 
-		for ( AnnotatedSegment annotatedSegment : this.annotatedSegments )
+		for ( AnnotatedImageSegment annotatedSegment : this.annotatedSegments )
 		{
 			final Object key = SegmentUtils.getKey(
-					annotatedSegment.getLabel(),
-					annotatedSegment.getTimePoint()
+					annotatedSegment.label(),
+					annotatedSegment.timePoint()
 			);
 
 			labelTimePointKeyToSegmentMap.put( key, annotatedSegment );
 		}
 	}
 
-	public AnnotatedSegment getSegment( int listIndex )
+	public AnnotatedImageSegment getSegment( int listIndex )
 	{
 		return annotatedSegments.get( listIndex );
 	}
 
-	public AnnotatedSegment getSegment( Double label, int timePoint  )
+	public AnnotatedImageSegment getSegment( Double label, int timePoint  )
 	{
 		final Object segmentKey = getSegmentKey( label, timePoint );
 		return labelTimePointKeyToSegmentMap.get( segmentKey );
@@ -91,7 +91,7 @@ public class DefaultAnnotatedSegmentsModel
 //		return featureNames;
 //	}
 
-	public ArrayList< ? extends AnnotatedSegment > getAnnotatedSegments()
+	public ArrayList< ? extends AnnotatedImageSegment > getAnnotatedSegments()
 	{
 		return annotatedSegments;
 	}
