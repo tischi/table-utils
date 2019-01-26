@@ -7,6 +7,7 @@ import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.coloring.ColoringModelDialogs;
 import de.embl.cba.tables.modelview.coloring.ColumnColoringModel;
+import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.datamodels.AnnotatedSegmentsModel;
 import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.TableRow;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -41,7 +43,7 @@ public class SegmentsTableView extends JPanel
 
 	private final SelectionModel< AnnotatedImageSegment > selectionModel;
 	private final AnnotatedSegmentsModel segmentsModel;
-	private final ColumnColoringModel< AnnotatedImageSegment > coloringModel;
+	private final SelectionColoringModel< AnnotatedImageSegment > coloringModel;
 
 	private JFrame frame;
     private JScrollPane scrollPane;
@@ -55,7 +57,7 @@ public class SegmentsTableView extends JPanel
 	public SegmentsTableView(
 			final AnnotatedSegmentsModel segmentsModel,
 			final SelectionModel< AnnotatedImageSegment > selectionModel,
-			final ColumnColoringModel< AnnotatedImageSegment > coloringModel )
+			final SelectionColoringModel< AnnotatedImageSegment > coloringModel )
 	{
 		super( new GridLayout(1, 0 ) );
 		this.segmentsModel = segmentsModel;
@@ -83,13 +85,31 @@ public class SegmentsTableView extends JPanel
 			@Override
 			public void selectionChanged()
 			{
+				table.getSelectionModel().clearSelection();
 
+				final Set< ? extends TableRow > selected = selectionModel.getSelected();
+
+				for ( TableRow tableRow : selected )
+				{
+					final int row = tableRow.rowIndex();
+					final int rowInView = table.convertRowIndexToView( row );
+					table.getSelectionModel().addSelectionInterval( rowInView, rowInView );
+				}
 			}
 
 			@Override
 			public void selectionEvent( TableRow selection, boolean selected )
 			{
-				selectRow( selection.rowIndex(), selected );
+				if ( selected )
+				{
+					moveToRow( selection.rowIndex() );
+				}
+//				final int rowInView = table.convertRowIndexToView( selection.rowIndex() );
+//				final boolean isAlreadySelected = table.getSelectionModel().isSelectedIndex( rowInView );
+//				if ( ! isAlreadySelected )
+//				{
+//					selectRow( selection.rowIndex(), selected );
+//				}
 			}
 		} );
 	}
@@ -409,9 +429,9 @@ public class SegmentsTableView extends JPanel
 
 		if ( select )
 		{
-			final boolean isSelected = table.getSelectionModel().isSelectedIndex( rowInView );
+			final boolean isAlreadySelected = table.getSelectionModel().isSelectedIndex( rowInView );
 
-			if ( !isSelected )
+			if ( ! isAlreadySelected )
 			{
 				table.addRowSelectionInterval( rowInView, rowInView );
 				table.scrollRectToVisible( table.getCellRect( rowInView, 0, true ) );
@@ -424,7 +444,11 @@ public class SegmentsTableView extends JPanel
 		}
 	}
 
-
+	public void moveToRow( int row )
+	{
+		final int rowInView = table.convertRowIndexToView( row );
+		table.scrollRectToVisible( table.getCellRect( rowInView, 0, true ) );
+	}
 
 	public void installRowSelectionListener()
 	{
@@ -432,21 +456,15 @@ public class SegmentsTableView extends JPanel
 		{
 			public void mousePressed( MouseEvent me )
 			{
-				if ( me.isControlDown() )
-				{
-					if ( hasCoordinate( SegmentCoordinate.Label ) )
-					{
-						final int row = table.convertRowIndexToModel(  table.getSelectedRow() );
+				final int selectedRowInView = table.getSelectedRow();
 
-						selectionModel.setSelected(
-								segmentsModel.getSegment( row ),
-								true );
-					}
-					else
-					{
-						Logger.error( "Please specify the Object Label Column!" );
-					}
-				}
+				final boolean isAlreadySelected = table.getSelectionModel().isSelectedIndex( selectedRowInView );
+
+				final int row = table.convertRowIndexToModel( selectedRowInView );
+
+				selectionModel.setSelected(
+						segmentsModel.getSegment( row ),
+						true );
 			}
 		} );
 	}
@@ -498,20 +516,20 @@ public class SegmentsTableView extends JPanel
 				{
 					final double[] minMaxValues = getMinMaxValues( column );
 
-					coloringModel.setLinearColoring(
-							column,
-							new BlueWhiteRedARGBLut( 256 ),
-							minMaxValues[ 0 ],
-							minMaxValues[ 1 ]
-					);
-
-					ColoringModelDialogs.showMinMaxDialog( column, coloringModel );
+//					coloringModel.setLinearColoring(
+//							column,
+//							new BlueWhiteRedARGBLut( 256 ),
+//							minMaxValues[ 0 ],
+//							minMaxValues[ 1 ]
+//					);
+//
+//					ColoringModelDialogs.showMinMaxDialog( column, coloringModel );
 				}
 				else
 				{
-					coloringModel.setCategoricalColoring(
-							column,
-							new GlasbeyARGBLut() );
+//					coloringModel.setCategoricalColoring(
+//							column,
+//							new GlasbeyARGBLut() );
 				}
 			}
 

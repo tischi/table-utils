@@ -9,6 +9,7 @@ import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.modelview.views.SegmentsBdvView;
+import de.embl.cba.tables.modelview.views.SegmentsTableView;
 import de.embl.cba.tables.objects.SegmentCoordinate;
 import net.imglib2.util.ValuePair;
 
@@ -68,10 +69,10 @@ public class TableBdvObjectModelDevelopment
 				selectionModel,
 				selectionColoringModel );
 
-//		final SegmentsTableView tableView = new SegmentsTableView(
-//				dataModel,
-//				selectionModel,
-//				coloringModel );
+		final SegmentsTableView tableView = new SegmentsTableView(
+				dataModel,
+				selectionModel,
+				selectionColoringModel );
 
 	}
 }

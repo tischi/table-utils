@@ -240,7 +240,7 @@ public class TableUtils
 					coordinateColumnMap,
 					columnValueMap );
 
-			final TableRow tableRow = new DefaultTableRow( columnValueMap, row );
+			final TableRow tableRow = new DefaultTableRow( columnValueMap, row - 1  );
 
 			segments.add( new DefaultAnnotatedImageSegment( segment, tableRow ) );
 		}

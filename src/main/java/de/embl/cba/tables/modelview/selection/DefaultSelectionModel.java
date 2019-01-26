@@ -74,14 +74,12 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 	{
 		if ( selected.contains( object ) )
 		{
-			selected.remove( object );
+			remove( object );
 		}
 		else
 		{
-			selected.add( object );
+			add( object );
 		}
-
-		listeners.list.forEach( SelectionListener::selectionChanged );
 	}
 
 	@Override
