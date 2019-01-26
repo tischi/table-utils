@@ -1,7 +1,7 @@
 package de.embl.cba.tables;
 
 import de.embl.cba.tables.objects.ObjectTablePanel;
-import de.embl.cba.tables.modelview.views.SegmentsTableView;
+import de.embl.cba.tables.modelview.views.table.SegmentsTableView;
 import ij.gui.GenericDialog;
 
 import javax.swing.*;
@@ -12,7 +12,7 @@ public class TableUIs
 {
 	public static void addColumnUI( SegmentsTableView objectTablePanel )
 	{
-		final GenericDialog gd = new GenericDialog( "New getFeature" );
+		final GenericDialog gd = new GenericDialog( "New getColumn" );
 		gd.addStringField( "Column name", "MyNewColumn", 30 );
 		gd.addStringField( "Default value [String or Number]", "None", 30 );
 
@@ -38,7 +38,7 @@ public class TableUIs
 
 	public static void addColumnUI( ObjectTablePanel objectTablePanel )
 	{
-		final GenericDialog gd = new GenericDialog( "New getFeature" );
+		final GenericDialog gd = new GenericDialog( "New getColumn" );
 		gd.addStringField( "Column name", "MyNewColumn", 30 );
 		gd.addStringField( "Default value [String or Number]", "None", 30 );
 

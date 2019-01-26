@@ -28,7 +28,7 @@ public class ObjectTablePanel extends JPanel
 	final private JTable table;
 
 	final String name;
-	public static final String NO_COLUMN_SELECTED = "No getFeature selected";
+	public static final String NO_COLUMN_SELECTED = "No getColumn selected";
 
 	private final TableModel model;
 	private JFrame frame;
@@ -152,7 +152,7 @@ public class ObjectTablePanel extends JPanel
 
 	private JMenuItem addColumnMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "Add getFeature..." );
+		final JMenuItem menuItem = new JMenuItem( "Add getColumn..." );
 
 		final ObjectTablePanel objectTablePanel = this;
 		menuItem.addActionListener( new ActionListener()

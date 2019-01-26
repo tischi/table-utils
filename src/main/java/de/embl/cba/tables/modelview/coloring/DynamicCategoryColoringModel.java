@@ -12,7 +12,7 @@ public class DynamicCategoryColoringModel< T > extends AbstractColoringModel< T 
 {
 	Map< T, ARGBType > inputToColorMap;
 	ARGBLut argbLut;
-	private final int randomSeed;
+	private int randomSeed;
 
 	/**
 	 * Objects are converted to colors.

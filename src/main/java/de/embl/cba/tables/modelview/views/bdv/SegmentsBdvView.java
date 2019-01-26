@@ -1,21 +1,20 @@
-package de.embl.cba.tables.modelview.views;
+package de.embl.cba.tables.modelview.views.bdv;
 
 import bdv.util.BdvFunctions;
 import bdv.util.BdvHandle;
 import bdv.util.BdvOptions;
 import bdv.viewer.Source;
 import de.embl.cba.bdv.utils.BdvUtils;
-import de.embl.cba.bdv.utils.selection.Segment;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringListener;
 import de.embl.cba.tables.modelview.coloring.ColoringModel;
-import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.datamodels.LabelImageSourceModel;
 import de.embl.cba.tables.modelview.datamodels.AnnotatedSegmentsModel;
 import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.ImageSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
+import de.embl.cba.tables.modelview.views.ImageSegmentLabelsARGBConverter;
 import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
 import org.scijava.ui.behaviour.util.Behaviours;
@@ -47,8 +46,15 @@ public class SegmentsBdvView < T extends ImageSegment >
 
 		bdv = showLabelSourceInBdv( segmentsModel.getLabelImageSourceModel() );
 
-		addSelectionListener( selectionModel );
+		registerAsSelectionListener( selectionModel );
 
+		registerAsColoringListener( coloringModel );
+
+		installBdvBehaviours();
+	}
+
+	public void registerAsColoringListener( ColoringModel< T > coloringModel )
+	{
 		coloringModel.listeners().add( new ColoringListener()
 		{
 			@Override
@@ -57,30 +63,29 @@ public class SegmentsBdvView < T extends ImageSegment >
 				BdvUtils.repaint( bdv );
 			}
 		} );
-
-		installBdvBehaviours();
 	}
 
-	public void addSelectionListener( SelectionModel< ? extends ImageSegment > selectionModel )
+	public void registerAsSelectionListener( SelectionModel< ? extends ImageSegment > selectionModel )
 	{
-
 		selectionModel.listeners().add( new SelectionListener< ImageSegment >()
 		{
 			@Override
 			public void selectionChanged()
 			{
-				//selectableConverter.setSelected( selectionModel.getSelected() );
 				BdvUtils.repaint( bdv );
 			}
 
 			@Override
 			public void selectionEvent( ImageSegment selection, boolean selected )
 			{
-				BdvUtils.moveToPosition(
+				if ( selected )
+				{
+					BdvUtils.moveToPosition(
 							bdv,
 							selection.position(),
 							selection.timePoint(),
 							500 );
+				}
 			}
 		} );
 	}

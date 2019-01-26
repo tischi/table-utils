@@ -1,6 +1,6 @@
 package de.embl.cba.tables.objects;
 
-import de.embl.cba.tables.modelview.views.SegmentsTableView;
+import de.embl.cba.tables.modelview.views.table.SegmentsTableView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -92,7 +92,7 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 			jComboBox.addItem( choice );
 		}
 
-		// +1 is due to the option to select no getFeature
+		// +1 is due to the option to select no getColumn
 		jComboBox.setSelectedItem( objectTablePanel.getCoordinateColumn( coordinate ) );
 
 		jComboBox.addActionListener( new ActionListener()

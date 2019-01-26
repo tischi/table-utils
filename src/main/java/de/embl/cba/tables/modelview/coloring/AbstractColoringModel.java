@@ -5,8 +5,8 @@ import net.imglib2.type.numeric.ARGBType;
 
 public abstract class AbstractColoringModel< T > implements ColoringModel< T >
 {
-	private final Listeners.SynchronizedList< ColoringListener > listeners
-			= new Listeners.SynchronizedList< ColoringListener >(  );;
+	protected final Listeners.SynchronizedList< ColoringListener > listeners
+			= new Listeners.SynchronizedList< ColoringListener >(  );
 
 	@Override
 	public Listeners< ColoringListener > listeners()

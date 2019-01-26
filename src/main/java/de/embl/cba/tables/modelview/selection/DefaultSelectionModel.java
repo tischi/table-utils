@@ -59,14 +59,9 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 			for ( SelectionListener listener : listeners.list )
 			{
 				listener.selectionChanged();
+				listener.selectionEvent( object, true );
 			}
 		}
-
-		for ( SelectionListener listener : listeners.list )
-		{
-			listener.selectionEvent( object, true );
-		}
-
 	}
 
 	@Override

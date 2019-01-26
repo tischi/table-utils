@@ -113,16 +113,39 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 				break;
 		}
 
+		notifyColoringListeners();
+
 	}
 
 	public void setSelectionColor( ARGBType selectionColor )
 	{
 		this.selectionColor = selectionColor;
+		notifyColoringListeners();
 	}
 
 	public void setWrappedColoringModel( ColoringModel< T > coloringModel )
 	{
 		this.coloringModel = coloringModel;
+		notifyColoringListeners();
+
+		// and pass through...
+		coloringModel.listeners().add( new ColoringListener()
+		{
+			@Override
+			public void coloringChanged()
+			{
+				notifyColoringListeners();
+			}
+		} );
+
+	}
+
+	private void notifyColoringListeners()
+	{
+		for ( ColoringListener listener : listeners.list )
+		{
+			listener.coloringChanged();
+		}
 	}
 
 	public ColoringModel< T > getWrappedColoringModel()

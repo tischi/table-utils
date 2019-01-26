@@ -30,7 +30,7 @@ public class ColumnClassAwareTableModel extends DefaultTableModel
 	}
 
 	/**
-	 * Determines getFeature classes from entries in 1st row.
+	 * Determines getColumn classes from entries in 1st row.
 	 */
 	public void refreshColumnClassesFromStringColumns()
 	{
@@ -53,7 +53,7 @@ public class ColumnClassAwareTableModel extends DefaultTableModel
 	}
 
 	/**
-	 * Determines getFeature classes from entries in 1st row.
+	 * Determines getColumn classes from entries in 1st row.
 	 */
 	public void refreshColumnClassesFromObjectColumns()
 	{

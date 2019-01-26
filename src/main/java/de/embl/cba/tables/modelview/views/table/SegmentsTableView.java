@@ -1,12 +1,11 @@
-package de.embl.cba.tables.modelview.views;
+package de.embl.cba.tables.modelview.views.table;
 
 import de.embl.cba.bdv.utils.lut.BlueWhiteRedARGBLut;
+import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.coloring.NumericColoringModelDialog;
-import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
-import de.embl.cba.tables.modelview.coloring.TableRowColumnColoringModel;
+import de.embl.cba.tables.modelview.coloring.*;
 import de.embl.cba.tables.modelview.datamodels.AnnotatedSegmentsModel;
 import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.TableRow;
@@ -17,6 +16,8 @@ import de.embl.cba.tables.modelview.selection.SelectionModel;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,14 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-/**
- *
- *
- *
- * Notes:
- * - https://coderanch.com/t/345383/java/JTable-Paging
- */
 
 public class SegmentsTableView extends JPanel
 {
@@ -50,9 +43,7 @@ public class SegmentsTableView extends JPanel
     private Map< SegmentCoordinate, String > segmentCoordinateToColumnMap;
 	private ConcurrentHashMap< String, Integer > objectRowMap;
 	private Map< String, double[] > columnsMinMaxMap;
-	private int highlightedRow;
 	private JTable table;
-	private NumericColoringModelDialog coloringModelDialog;
 
 	public SegmentsTableView(
 			final AnnotatedSegmentsModel segmentsModel,
@@ -66,6 +57,8 @@ public class SegmentsTableView extends JPanel
 
 		registerAsSelectionListener( selectionModel );
 
+		registerAsColoringListener( selectionColoringModel );
+
 		segmentCoordinateToColumnMap = emptyObjectCoordinateColumnMap();
 
 		segmentCoordinateToColumnMap.put(
@@ -76,6 +69,18 @@ public class SegmentsTableView extends JPanel
 		createMenuBar();
 		showTable();
 		installRowSelectionListener();
+	}
+
+	public void registerAsColoringListener( SelectionColoringModel< AnnotatedImageSegment > selectionColoringModel )
+	{
+		selectionColoringModel.listeners().add( new ColoringListener()
+		{
+			@Override
+			public void coloringChanged()
+			{
+				// ...
+			}
+		} );
 	}
 
 	public void registerAsSelectionListener( SelectionModel< ? extends TableRow > selectionModel )
@@ -207,7 +212,7 @@ public class SegmentsTableView extends JPanel
 
 	private JMenuItem addColumnMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "Add getFeature..." );
+		final JMenuItem menuItem = new JMenuItem( "Add getColumn..." );
 
 		final SegmentsTableView objectTablePanel = this;
 		menuItem.addActionListener( new ActionListener()
@@ -452,14 +457,8 @@ public class SegmentsTableView extends JPanel
 			public void mousePressed( MouseEvent me )
 			{
 				final int selectedRowInView = table.getSelectedRow();
-
-				final boolean isAlreadySelected = table.getSelectionModel().isSelectedIndex( selectedRowInView );
-
 				final int row = table.convertRowIndexToModel( selectedRowInView );
-
-				selectionModel.setSelected(
-						segmentsModel.getSegment( row ),
-						true );
+				selectionModel.toggle( segmentsModel.getSegment( row ) );
 			}
 		} );
 	}
@@ -499,7 +498,9 @@ public class SegmentsTableView extends JPanel
 
 	private JMenuItem createColorByColumnMenuItem( final String column )
 	{
-		final JMenuItem colorByColumnMenuItem = new JMenuItem( "Color by " + column );
+		// TODO: also table cells can be colored
+
+		final JMenuItem colorByColumnMenuItem = new JMenuItem( "Color " + column );
 		final int columnIndex = table.getColumnModel().getColumnIndex( column );
 
 		colorByColumnMenuItem.addActionListener( new ActionListener()
@@ -521,15 +522,25 @@ public class SegmentsTableView extends JPanel
 
 					selectionColoringModel.setWrappedColoringModel( coloringModel );
 
-					coloringModelDialog = new NumericColoringModelDialog( column, coloringModel );
+					final NumericColoringModelDialog dialog =
+							new NumericColoringModelDialog(
+									column,
+									coloringModel );
 
+					// TODO: whether and how to automatically close this dialog?
 				}
 				else
 				{
-//					selectionColoringModel.setCategoricalColoring(
-//							column,
-//							new GlasbeyARGBLut() );
+
+					final DynamicCategoryColoringModel< AnnotatedImageSegment > coloringModel
+							= new DynamicCategoryColoringModel<>(
+							new GlasbeyARGBLut(),
+							50
+					);
+
+					selectionColoringModel.setWrappedColoringModel( coloringModel );
 				}
+
 			}
 
 		} );

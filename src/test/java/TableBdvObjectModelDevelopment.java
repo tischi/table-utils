@@ -8,8 +8,8 @@ import de.embl.cba.tables.modelview.objects.DefaultAnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
-import de.embl.cba.tables.modelview.views.SegmentsBdvView;
-import de.embl.cba.tables.modelview.views.SegmentsTableView;
+import de.embl.cba.tables.modelview.views.bdv.SegmentsBdvView;
+import de.embl.cba.tables.modelview.views.table.SegmentsTableView;
 import de.embl.cba.tables.objects.SegmentCoordinate;
 import net.imglib2.util.ValuePair;
 

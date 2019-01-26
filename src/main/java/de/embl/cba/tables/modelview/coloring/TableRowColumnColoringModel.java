@@ -2,7 +2,6 @@ package de.embl.cba.tables.modelview.coloring;
 
 import de.embl.cba.bdv.utils.lut.ARGBLut;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.TableRow;
 import net.imglib2.type.numeric.ARGBType;
 
@@ -13,7 +12,7 @@ import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 public class TableRowColumnColoringModel< T extends TableRow >
 		extends AbstractColoringModel< T > implements NumericColoringModel< T >
 {
-	private String feature;
+	private String column;
 	private ARGBLut lut;
 	private double min;
 	private double max;
@@ -27,7 +26,7 @@ public class TableRowColumnColoringModel< T extends TableRow >
 			double rangeMax )
 	{
 
-		this.feature = column;
+		this.column = column;
 		this.lut = lut;
 		this.min = rangeMin;
 		this.max = rangeMax;
@@ -38,7 +37,7 @@ public class TableRowColumnColoringModel< T extends TableRow >
 	@Override
 	public void convert( T input, ARGBType output )
 	{
-		final Object featureValue = input.cells().get( feature );
+		final Object featureValue = input.cells().get( column );
 		setColorLinearly( output, featureValue );
 	}
 
@@ -61,20 +60,24 @@ public class TableRowColumnColoringModel< T extends TableRow >
 	public void setMin( double min )
 	{
 		this.min = min;
-		//notifyColoringListeners();
+		notifyColoringListeners();
 	}
 
 	@Override
 	public void setMax( double max )
 	{
 		this.max = max;
-		//notifyColoringListeners();
+		notifyColoringListeners();
 	}
 
-
-	public String getFeature()
+	public void setColumn( String column )
 	{
-		return feature;
+		this.column = column;
+	}
+
+	public String getColumn()
+	{
+		return column;
 	}
 
 
@@ -116,5 +119,13 @@ public class TableRowColumnColoringModel< T extends TableRow >
 		double random = ( x * 50 ) * goldenRatio;
 		random = random - ( long ) Math.floor( random );
 		return random;
+	}
+
+	private void notifyColoringListeners()
+	{
+		for ( ColoringListener listener : listeners.list )
+		{
+			listener.coloringChanged();
+		}
 	}
 }

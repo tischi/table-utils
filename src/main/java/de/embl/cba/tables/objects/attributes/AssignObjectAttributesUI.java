@@ -110,7 +110,7 @@ public class AssignObjectAttributesUI extends JPanel
 
 		horizontalLayoutPanel.add( attributeComboBox );
 
-		// TODO: maybe add more items, depending on getFeature
+		// TODO: maybe add more items, depending on getColumn
 
 		return horizontalLayoutPanel;
 	}
@@ -181,7 +181,7 @@ public class AssignObjectAttributesUI extends JPanel
 						columnIndex );
 			} catch ( Exception e )
 			{
-				Logger.logError( "Entered value must be numeric for getFeature: " + column );
+				Logger.logError( "Entered value must be numeric for getColumn: " + column );
 			}
 		}
 		else

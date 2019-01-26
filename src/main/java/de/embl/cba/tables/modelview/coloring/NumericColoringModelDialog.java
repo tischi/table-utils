@@ -7,7 +7,7 @@ import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import javax.swing.*;
 import java.awt.*;
 
-public class NumericColoringModelDialog extends JFrame
+public class NumericColoringModelDialog extends JFrame implements ColoringListener
 {
 	private static Point minMaxDialogLocation;
 
@@ -71,4 +71,9 @@ public class NumericColoringModelDialog extends JFrame
 	}
 
 
+	@Override
+	public void coloringChanged()
+	{
+
+	}
 }
