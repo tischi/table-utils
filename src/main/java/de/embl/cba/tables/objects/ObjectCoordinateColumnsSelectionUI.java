@@ -1,5 +1,6 @@
 package de.embl.cba.tables.objects;
 
+import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
 import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
 
 import javax.swing.*;
@@ -27,7 +28,7 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 
 		initColumnChoices();
 
-		for ( SegmentCoordinate coordinate : SegmentCoordinate.values())
+		for ( ImageSegmentCoordinate coordinate : ImageSegmentCoordinate.values())
 		{
 			addColumnSelectionUI( this, coordinate );
 		}
@@ -45,7 +46,7 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 
 		initColumnChoices();
 
-		for ( SegmentCoordinate coordinate : SegmentCoordinate.values())
+		for ( ImageSegmentCoordinate coordinate : ImageSegmentCoordinate.values())
 		{
 			addColumnSelectionUI( this, coordinate );
 		}
@@ -78,7 +79,7 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 		choices.addAll( objectTablePanel.getColumnNames() );
 	}
 
-	private void addColumnSelectionUI( final JPanel panel, final SegmentCoordinate coordinate )
+	private void addColumnSelectionUI( final JPanel panel, final ImageSegmentCoordinate coordinate )
 	{
 		final JPanel horizontalLayoutPanel = horizontalLayoutPanel();
 

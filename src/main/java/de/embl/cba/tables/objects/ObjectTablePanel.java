@@ -4,6 +4,7 @@ import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.modelview.datamodels.SegmentUtils;
+import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
@@ -23,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * - https://coderanch.com/t/345383/java/JTable-Paging
  */
 
+@Deprecated
 public class ObjectTablePanel extends JPanel
 {
 	final private JTable table;
@@ -34,7 +36,7 @@ public class ObjectTablePanel extends JPanel
 	private JFrame frame;
     private JScrollPane scrollPane;
     private JMenuBar menuBar;
-    private HashMap< SegmentCoordinate, String > objectCoordinateColumnMap;
+    private HashMap< ImageSegmentCoordinate, String > objectCoordinateColumnMap;
 	private ConcurrentHashMap< String, Integer > objectRowMap;
 	private HashMap< String, double[] > columnsMinMaxMap;
 
@@ -84,7 +86,7 @@ public class ObjectTablePanel extends JPanel
 	}
 
 
-	public synchronized void setCoordinateColumn( SegmentCoordinate segmentCoordinate, String column )
+	public synchronized void setCoordinateColumn( ImageSegmentCoordinate imageSegmentCoordinate, String column )
 	{
 		if ( ! getColumnNames().contains( column ) )
 		{
@@ -92,21 +94,21 @@ public class ObjectTablePanel extends JPanel
 			return;
 		}
 
-		objectCoordinateColumnMap.put( segmentCoordinate, column );
+		objectCoordinateColumnMap.put( imageSegmentCoordinate, column );
 	}
 
-	public String getCoordinateColumn( SegmentCoordinate segmentCoordinate )
+	public String getCoordinateColumn( ImageSegmentCoordinate imageSegmentCoordinate )
 	{
-		return objectCoordinateColumnMap.get( segmentCoordinate );
+		return objectCoordinateColumnMap.get( imageSegmentCoordinate );
 	}
 
     private void initCoordinateColumns()
     {
         this.objectCoordinateColumnMap = new HashMap<>( );
 
-        for ( SegmentCoordinate segmentCoordinate : SegmentCoordinate.values() )
+        for ( ImageSegmentCoordinate imageSegmentCoordinate : ImageSegmentCoordinate.values() )
         {
-            objectCoordinateColumnMap.put( segmentCoordinate, NO_COLUMN_SELECTED );
+            objectCoordinateColumnMap.put( imageSegmentCoordinate, NO_COLUMN_SELECTED );
         }
     }
 
@@ -213,17 +215,17 @@ public class ObjectTablePanel extends JPanel
         return table.convertRowIndexToModel( table.getSelectedRow() );
     }
 
-    public boolean hasCoordinate( SegmentCoordinate segmentCoordinate )
+    public boolean hasCoordinate( ImageSegmentCoordinate imageSegmentCoordinate )
     {
-        if( objectCoordinateColumnMap.get( segmentCoordinate ) == NO_COLUMN_SELECTED ) return false;
+        if( objectCoordinateColumnMap.get( imageSegmentCoordinate ) == NO_COLUMN_SELECTED ) return false;
         return true;
     }
 
-    public Double getObjectCoordinate( SegmentCoordinate segmentCoordinate, int row )
+    public Double getObjectCoordinate( ImageSegmentCoordinate imageSegmentCoordinate, int row )
     {
-        if ( objectCoordinateColumnMap.get( segmentCoordinate ) != NO_COLUMN_SELECTED )
+        if ( objectCoordinateColumnMap.get( imageSegmentCoordinate ) != NO_COLUMN_SELECTED )
         {
-            final int columnIndex = table.getColumnModel().getColumnIndex( objectCoordinateColumnMap.get( segmentCoordinate ) );
+            final int columnIndex = table.getColumnModel().getColumnIndex( objectCoordinateColumnMap.get( imageSegmentCoordinate ) );
             return ( Double ) table.getValueAt( row, columnIndex );
         }
         else
@@ -234,7 +236,7 @@ public class ObjectTablePanel extends JPanel
 
 	public void addColumn( String column, Object defaultValue )
 	{
-		TableUtils.addFeature( model, column, defaultValue );
+		TableUtils.addColumn( model, column, defaultValue );
 	}
 
 	public ArrayList< String > getColumnNames()
@@ -252,7 +254,7 @@ public class ObjectTablePanel extends JPanel
 		objectRowMap = new ConcurrentHashMap();
 
 		final int labelColumnIndex =
-				table.getColumnModel().getColumnIndex( getCoordinateColumn( SegmentCoordinate.Label ) );
+				table.getColumnModel().getColumnIndex( getCoordinateColumn( ImageSegmentCoordinate.Label ) );
 
 		int timeColumnIndex = getTimeColumnIndex();
 
@@ -286,10 +288,10 @@ public class ObjectTablePanel extends JPanel
 	private int getTimeColumnIndex()
 	{
 		int timeColumnIndex = -1;
-		if ( hasCoordinate( SegmentCoordinate.T ) )
+		if ( hasCoordinate( ImageSegmentCoordinate.T ) )
 		{
 			timeColumnIndex = table.getColumnModel().getColumnIndex(
-					getCoordinateColumn( SegmentCoordinate.T ) );
+					getCoordinateColumn( ImageSegmentCoordinate.T ) );
 		}
 		return timeColumnIndex;
 	}
@@ -298,7 +300,7 @@ public class ObjectTablePanel extends JPanel
 	{
 		final ConcurrentHashMap map = new ConcurrentHashMap();
 
-		final int labelColumnIndex0 = table.getColumnModel().getColumnIndex( getCoordinateColumn( SegmentCoordinate.Label ) );
+		final int labelColumnIndex0 = table.getColumnModel().getColumnIndex( getCoordinateColumn( ImageSegmentCoordinate.Label ) );
 		final int labelColumnIndex1 = table.getColumnModel().getColumnIndex( column1 );
 
 		final int rowCount = table.getRowCount();

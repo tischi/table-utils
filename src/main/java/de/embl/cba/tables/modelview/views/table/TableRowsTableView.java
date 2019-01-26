@@ -2,16 +2,12 @@ package de.embl.cba.tables.modelview.views.table;
 
 import de.embl.cba.bdv.utils.lut.BlueWhiteRedARGBLut;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
-import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.coloring.*;
 import de.embl.cba.tables.modelview.datamodels.TableRowsModel;
-import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.TableRow;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
-import de.embl.cba.tables.objects.SegmentCoordinate;
-import de.embl.cba.tables.objects.ObjectCoordinateColumnsSelectionUI;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.objects.attributes.AssignValuesToTableRowsUI;
 
@@ -26,46 +22,49 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 public class TableRowsTableView < T extends TableRow > extends JPanel
 {
-	public static final String NO_COLUMN_SELECTED = "No column selected";
+//	public static final String NO_COLUMN_SELECTED = "No column selected";
 
 	private final SelectionModel< T > selectionModel;
+	private final ArrayList< String > categoricalColumns;
 	private final TableRowsModel< T > tableRowsModel;
 	private final SelectionColoringModel< T > selectionColoringModel;
 
 	private JFrame frame;
     private JScrollPane scrollPane;
     private JMenuBar menuBar;
-    private Map< SegmentCoordinate, String > segmentCoordinateToColumnMap;
-	private ConcurrentHashMap< String, Integer > objectRowMap;
+//    private Map< ImageSegmentCoordinate, String > segmentCoordinateToColumnMap;
+//	private ConcurrentHashMap< String, Integer > objectRowMap;
 	private Map< String, double[] > columnsMinMaxMap;
 	private JTable table;
-	private int labelColoringRandomSeed;
+	private int categoricalLabelColoringRandomSeed;
 
 	public TableRowsTableView(
 			final TableRowsModel< T > tableRowsModel,
 			final SelectionModel< T > selectionModel,
-			final SelectionColoringModel< T > selectionColoringModel )
+			final SelectionColoringModel< T > selectionColoringModel,
+			ArrayList< String > categoricalColumns )
 	{
 		super( new GridLayout(1, 0 ) );
 		this.tableRowsModel = tableRowsModel;
 		this.selectionColoringModel = selectionColoringModel;
 		this.selectionModel = selectionModel;
+		this.categoricalColumns = categoricalColumns;
 
 		registerAsSelectionListener( selectionModel );
 
-		registerAsColoringListener( selectionColoringModel );
+//		registerAsColoringListener( selectionColoringModel );
 
-		segmentCoordinateToColumnMap = emptyObjectCoordinateColumnMap();
+//		segmentCoordinateToColumnMap = emptyObjectCoordinateColumnMap();
+//
+//		segmentCoordinateToColumnMap.put(
+//				ImageSegmentCoordinate.Label,
+//				tableRowsModel.getLabelFeatureName() );
 
-		segmentCoordinateToColumnMap.put(
-				SegmentCoordinate.Label,
-				tableRowsModel.getLabelFeatureName() );
-
-		labelColoringRandomSeed = 50;
+		categoricalLabelColoringRandomSeed = 50;
 
 		createTable();
 		createMenuBar();
@@ -144,33 +143,33 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	}
 
 
-	public synchronized void setCoordinateColumn( SegmentCoordinate segmentCoordinate, String column )
-	{
-		if ( ! getColumnNames().contains( column ) )
-		{
-			Logger.error( column + " does not exist." );
-			return;
-		}
+//	public synchronized void setCoordinateColumn( ImageSegmentCoordinate imageSegmentCoordinate, String column )
+//	{
+//		if ( ! getColumnNames().contains( column ) )
+//		{
+//			Logger.error( column + " does not exist." );
+//			return;
+//		}
+//
+//		segmentCoordinateToColumnMap.put( imageSegmentCoordinate, column );
+//	}
 
-		segmentCoordinateToColumnMap.put( segmentCoordinate, column );
-	}
-
-	public String getCoordinateColumn( SegmentCoordinate segmentCoordinate )
-	{
-		return segmentCoordinateToColumnMap.get( segmentCoordinate );
-	}
-
-    private Map< SegmentCoordinate, String > emptyObjectCoordinateColumnMap()
-    {
-		Map< SegmentCoordinate, String > segmentCoordinateToColumnMap = new HashMap<>( );
-
-        for ( SegmentCoordinate segmentCoordinate : SegmentCoordinate.values() )
-        {
-            segmentCoordinateToColumnMap.put( segmentCoordinate, NO_COLUMN_SELECTED );
-        }
-
-        return segmentCoordinateToColumnMap;
-    }
+//	public String getCoordinateColumn( ImageSegmentCoordinate imageSegmentCoordinate )
+//	{
+//		return segmentCoordinateToColumnMap.get( imageSegmentCoordinate );
+//	}
+//
+//    private Map< ImageSegmentCoordinate, String > emptyObjectCoordinateColumnMap()
+//    {
+//		Map< ImageSegmentCoordinate, String > segmentCoordinateToColumnMap = new HashMap<>( );
+//
+//        for ( ImageSegmentCoordinate imageSegmentCoordinate : ImageSegmentCoordinate.values() )
+//        {
+//            segmentCoordinateToColumnMap.put( imageSegmentCoordinate, NO_COLUMN_SELECTED );
+//        }
+//
+//        return segmentCoordinateToColumnMap;
+//    }
 
 
 	public void addMenu( JMenuItem menuItem )
@@ -249,27 +248,26 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
-
-	private JMenu createObjectCoordinateMenu()
-	{
-		JMenu menu = new JMenu( "Objects" );
-
-		final TableRowsTableView objectTablePanel = this;
-
-		final JMenuItem coordinatesMenuItem = new JMenuItem( "Select coordinates..." );
-		coordinatesMenuItem.addActionListener( new ActionListener()
-		{
-			@Override
-			public void actionPerformed( ActionEvent e )
-			{
-				new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
-			}
-		} );
-
-
-		menu.add( coordinatesMenuItem );
-		return menu;
-	}
+//	private JMenu createObjectCoordinateMenu()
+//	{
+//		JMenu menu = new JMenu( "Objects" );
+//
+//		final TableRowsTableView objectTablePanel = this;
+//
+//		final JMenuItem coordinatesMenuItem = new JMenuItem( "Select coordinates..." );
+//		coordinatesMenuItem.addActionListener( new ActionListener()
+//		{
+//			@Override
+//			public void actionPerformed( ActionEvent e )
+//			{
+//				new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
+//			}
+//		} );
+//
+//
+//		menu.add( coordinatesMenuItem );
+//		return menu;
+//	}
 
     public void showTable() {
 
@@ -290,39 +288,33 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
         frame.setVisible(true);
     }
 
-    public int getSelectedRowIndex()
-    {
-        return table.convertRowIndexToModel( table.getSelectedRow() );
-    }
-
-    public boolean hasCoordinate( SegmentCoordinate segmentCoordinate )
-    {
-    	if ( ! segmentCoordinateToColumnMap.containsKey( segmentCoordinate ) )
-			return false;
-
-    	if( segmentCoordinateToColumnMap.get( segmentCoordinate ) == NO_COLUMN_SELECTED )
-			return false;
-
-        return true;
-    }
-
-    public Double getObjectCoordinate( SegmentCoordinate segmentCoordinate, int row )
-    {
-        if ( segmentCoordinateToColumnMap.get( segmentCoordinate ) != NO_COLUMN_SELECTED )
-        {
-            final int columnIndex = table.getColumnModel().getColumnIndex( segmentCoordinateToColumnMap.get( segmentCoordinate ) );
-            return ( Double ) table.getValueAt( row, columnIndex );
-        }
-        else
-        {
-            return null;
-        }
-    }
+//    public boolean hasCoordinate( ImageSegmentCoordinate imageSegmentCoordinate )
+//    {
+//    	if ( ! segmentCoordinateToColumnMap.containsKey( imageSegmentCoordinate ) )
+//			return false;
+//
+//    	if( segmentCoordinateToColumnMap.get( imageSegmentCoordinate ) == NO_COLUMN_SELECTED )
+//			return false;
+//
+//        return true;
+//    }
+//
+//    public Double getObjectCoordinate( ImageSegmentCoordinate imageSegmentCoordinate, int row )
+//    {
+//        if ( segmentCoordinateToColumnMap.get( imageSegmentCoordinate ) != NO_COLUMN_SELECTED )
+//        {
+//            final int columnIndex = table.getColumnModel().getColumnIndex( segmentCoordinateToColumnMap.get( imageSegmentCoordinate ) );
+//            return ( Double ) table.getValueAt( row, columnIndex );
+//        }
+//        else
+//        {
+//            return null;
+//        }
+//    }
 
 	public void addColumn( String column, Object defaultValue )
 	{
-		// TODO: this should be propagated back to the segments...
-		TableUtils.addFeature( table.getModel(), column, defaultValue );
+		TableUtils.addColumn( table.getModel(), column, defaultValue );
 	}
 
 	public ArrayList< String > getColumnNames()
@@ -335,135 +327,87 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return table;
 	}
 
-	private void createObjectRowMap()
+//	private void createObjectRowMap()
+//	{
+//		objectRowMap = new ConcurrentHashMap();
+//
+//		final int labelColumnIndex =
+//				table.getColumnModel().getColumnIndex( getCoordinateColumn( ImageSegmentCoordinate.Label ) );
+//
+//		int timeColumnIndex = getTimeColumnIndex();
+//
+//		final int rowCount = table.getRowCount();
+//		for ( int row = 0; row < rowCount; row++ )
+//		{
+//			String key = createObjectKey( labelColumnIndex, timeColumnIndex, row );
+//			objectRowMap.put( key, row );
+//		}
+//	}
+
+//	private String createObjectKey(
+//			final int labelColumnIndex,
+//			final int timeColumnIndex,
+//			final int rowInView )
+//	{
+//		final int rowInModel = table.convertRowIndexToModel( rowInView );
+//		final Double label = ( Double ) table.getValueAt( rowInModel, labelColumnIndex );
+//
+//		String key;
+//		if ( timeColumnIndex == -1 )
+//		{
+//			key = getObjectKey( label );
+//		}
+//		else
+//		{
+//			final Double timePoint = ( Double ) table.getValueAt( rowInModel, timeColumnIndex );
+//			key = getObjectKey( label, timePoint.intValue() );
+//		}
+//
+//		return key;
+//	}
+
+//	private int getTimeColumnIndex()
+//	{
+//		int timeColumnIndex = -1;
+//		if ( hasCoordinate( ImageSegmentCoordinate.T ) )
+//		{
+//			timeColumnIndex = table.getColumnModel().getColumnIndex(
+//					getCoordinateColumn( ImageSegmentCoordinate.T ) );
+//		}
+//		return timeColumnIndex;
+//	}
+
+//	public int getRowIndex( Double label, Integer timePoint )
+//	{
+//		if ( objectRowMap == null ) createObjectRowMap();
+//
+//		final String objectKey = getObjectKey( label, timePoint );
+//
+//		final Integer rowIndex = objectRowMap.get( objectKey );
+//
+//		return rowIndex;
+//	}
+
+//	private String getObjectKey( Double label )
+//	{
+//		return getObjectKey( label, null );
+//	}
+
+//	private String getObjectKey( Double label, Integer time )
+//	{
+//		if ( time == null ) return label.toString();
+//		else return label.toString() + "_" + time.toString();
+//	}
+
+	public double[] getMinMaxValues( String column )
 	{
-		objectRowMap = new ConcurrentHashMap();
-
-		final int labelColumnIndex =
-				table.getColumnModel().getColumnIndex( getCoordinateColumn( SegmentCoordinate.Label ) );
-
-		int timeColumnIndex = getTimeColumnIndex();
-
-		final int rowCount = table.getRowCount();
-		for ( int row = 0; row < rowCount; row++ )
+		if ( ! columnsMinMaxMap.containsKey( column ) )
 		{
-			String key = createObjectKey( labelColumnIndex, timeColumnIndex, row );
-			objectRowMap.put( key, row );
-		}
-	}
-
-	private String createObjectKey( final int labelColumnIndex, final int timeColumnIndex, final int rowInView )
-	{
-		final int rowInModel = table.convertRowIndexToModel( rowInView );
-		final Double label = ( Double ) table.getValueAt( rowInModel, labelColumnIndex );
-
-		String key;
-		if ( timeColumnIndex == -1 )
-		{
-			key = getObjectKey( label );
-		}
-		else
-		{
-			final Double timePoint = ( Double ) table.getValueAt( rowInModel, timeColumnIndex );
-			key = getObjectKey( label, timePoint.intValue() );
-		}
-
-		return key;
-	}
-
-	private int getTimeColumnIndex()
-	{
-		int timeColumnIndex = -1;
-		if ( hasCoordinate( SegmentCoordinate.T ) )
-		{
-			timeColumnIndex = table.getColumnModel().getColumnIndex(
-					getCoordinateColumn( SegmentCoordinate.T ) );
-		}
-		return timeColumnIndex;
-	}
-
-
-	private synchronized Object getValueAt( int row, int col )
-	{
-		return table.getValueAt( row, col );
-	}
-
-	public int getRowIndex( double label )
-	{
-		return getRowIndex( label, null );
-	}
-
-	public int getRowIndex( Double label, Integer timepoint )
-	{
-		if ( objectRowMap == null ) createObjectRowMap();
-
-		final String objectKey = getObjectKey( label, timepoint );
-
-		final Integer rowIndex = objectRowMap.get( objectKey );
-
-		return rowIndex;
-	}
-
-
-	private String getObjectKey( Double label )
-	{
-		return getObjectKey( label, null );
-	}
-
-	private String getObjectKey( Double label, Integer time )
-	{
-		if ( time == null ) return label.toString();
-		else return label.toString() + "_" + time.toString();
-	}
-
-	public double[] getMinMaxValues( String selectedColumn )
-	{
-		if ( ! columnsMinMaxMap.containsKey( selectedColumn ) )
-		{
-			determineMinMaxValues( selectedColumn );
+			final double[] minMaxValues = TableUtils.determineMinMaxValues( column, table );
+			columnsMinMaxMap.put( column, minMaxValues );
 		}
 
-		return columnsMinMaxMap.get( selectedColumn );
-	}
-
-	public void determineMinMaxValues( String selectedColumn )
-	{
-		final int columnIndex =
-				table.getColumnModel().getColumnIndex( selectedColumn );
-
-		double min = Double.MAX_VALUE;
-		double max = -Double.MAX_VALUE;
-
-		final int rowCount = table.getRowCount();
-		for ( int row = 0; row < rowCount; row++ )
-		{
-			final double value = ( Double ) table.getValueAt( row, columnIndex );
-			if ( value < min ) min = value;
-			if ( value > max ) max = value;
-		}
-
-		columnsMinMaxMap.put( selectedColumn, new double[]{ min, max } );
-	}
-
-	public void selectRow( int row, boolean select )
-	{
-		final int rowInView = table.convertRowIndexToView( row );
-
-		if ( select )
-		{
-			final boolean isAlreadySelected = table.getSelectionModel().isSelectedIndex( rowInView );
-
-			if ( ! isAlreadySelected )
-			{
-				table.addRowSelectionInterval( rowInView, rowInView );
-				table.scrollRectToVisible( table.getCellRect( rowInView, 0, true ) );
-				selectionModel.setSelected( tableRowsModel.getTableRows().get( row ), true );
-			}
-		}
-		else
-		{
-			// TODO: remove from selection
-		}
+		return columnsMinMaxMap.get( column );
 	}
 
 	public void moveToRow( int row )
@@ -490,7 +434,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		JMenu coloringMenu = new JMenu( "Coloring" );
 
-		coloringMenu.add( createRestoreOriginalColorMenuItem() );
+		// coloringMenu.add( createRestoreOriginalColorMenuItem() );
 
 		for ( int col = 0; col < table.getColumnCount(); col++ )
 		{
@@ -500,22 +444,22 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return coloringMenu;
 	}
 
-	private JMenuItem createRestoreOriginalColorMenuItem()
-	{
-		final JMenuItem restoreOriginalColorMenuItem =
-				new JMenuItem( "Restore original coloring");
-
-		restoreOriginalColorMenuItem.addActionListener( new ActionListener()
-		{
-			@Override
-			public void actionPerformed( ActionEvent e )
-			{
-				//bdvSelectionEventHandler.getSelectableConverter().setWrappedConverter( originalConverter );
-				//BdvUtils.repaint( bdvSelectionEventHandler.getBdv() );
-			}
-		} );
-		return restoreOriginalColorMenuItem;
-	}
+//	private JMenuItem createRestoreOriginalColorMenuItem()
+//	{
+//		final JMenuItem restoreOriginalColorMenuItem =
+//				new JMenuItem( "Restore original coloring");
+//
+//		restoreOriginalColorMenuItem.addActionListener( new ActionListener()
+//		{
+//			@Override
+//			public void actionPerformed( ActionEvent e )
+//			{
+//				//bdvSelectionEventHandler.getSelectableConverter().setWrappedConverter( originalConverter );
+//				//BdvUtils.repaint( bdvSelectionEventHandler.getBdv() );
+//			}
+//		} );
+//		return restoreOriginalColorMenuItem;
+//	}
 
 
 	private JMenuItem createColorByColumnMenuItem( final String column )
@@ -523,46 +467,13 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		// TODO: also table cells could be colored
 
 		final JMenuItem colorByColumnMenuItem = new JMenuItem( "Color " + column );
-		final int columnIndex = table.getColumnModel().getColumnIndex( column );
 
 		colorByColumnMenuItem.addActionListener( new ActionListener()
 		{
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
-				if ( Number.class.isAssignableFrom( table.getColumnClass( columnIndex ) )
-						&& ! column.equals( tableRowsModel.getLabelFeatureName() ))
-				{
-					final double[] minMaxValues = getMinMaxValues( column );
-
-					final TableRowColumnColoringModel< T > coloringModel
-							= new TableRowColumnColoringModel< T >(
-									column,
-									new BlueWhiteRedARGBLut( 1000 ),
-									minMaxValues[ 0 ],
-									minMaxValues[ 1 ]
-					);
-
-					selectionColoringModel.setWrappedColoringModel( coloringModel );
-
-					final NumericColoringModelDialog dialog =
-							new NumericColoringModelDialog(
-									column,
-									coloringModel );
-
-					// TODO: whether and how to automatically close this dialog?
-				}
-				else
-				{
-					final DynamicCategoryColoringModel< T > coloringModel
-							= new DynamicCategoryColoringModel< T >(
-							new GlasbeyARGBLut(),
-							labelColoringRandomSeed++
-					);
-
-					selectionColoringModel.setWrappedColoringModel( coloringModel );
-				}
-
+				colorBy( column );
 			}
 
 		} );
@@ -570,16 +481,48 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return colorByColumnMenuItem;
 	}
 
-
-	public Integer getTimePoint( int row )
+	public void colorBy( String column )
 	{
-		Integer timepoint = 0;
-		if ( hasCoordinate( SegmentCoordinate.Label.T ) )
+		// TODO: clean this up this suffers from the fact that I do not know
+		// the column classes....(and even if, some are numeric but should be treated
+		// categorical
+
+		final int columnIndex = table.getColumnModel().getColumnIndex( column );
+
+		if ( ! categoricalColumns.contains( column )
+				&&
+				Number.class.isAssignableFrom( table.getColumnClass( columnIndex ) ) )
 		{
-			final Double timepointDouble = (Double) getObjectCoordinate( SegmentCoordinate.Label.T, row );
-			timepoint = timepointDouble.intValue();
+			final double[] minMaxValues = getMinMaxValues( column );
+
+			final NumericTableRowColumnColoringModel< T > coloringModel
+					= new NumericTableRowColumnColoringModel< T >(
+							column,
+							new BlueWhiteRedARGBLut( 1000 ),
+							minMaxValues[ 0 ],
+							minMaxValues[ 1 ]
+			);
+
+			selectionColoringModel.setWrappedColoringModel( coloringModel );
+
+			final NumericColoringModelDialog dialog =
+					new NumericColoringModelDialog(
+							column,
+							coloringModel );
+
+			// TODO: whether and how to automatically close this dialog?
 		}
-		return timepoint;
+		else
+		{
+			final DynamicCategoryColoringModel< T > coloringModel
+					= new DynamicCategoryColoringModel< T >(
+					new GlasbeyARGBLut(),
+					categoricalLabelColoringRandomSeed++
+			);
+
+			selectionColoringModel.setWrappedColoringModel( coloringModel );
+		}
 	}
+
 
 }

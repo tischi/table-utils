@@ -2,9 +2,8 @@ package de.embl.cba.tables;
 
 import de.embl.cba.tables.models.ColumnClassAwareTableModel;
 import de.embl.cba.tables.modelview.datamodels.SegmentUtils;
-import de.embl.cba.tables.modelview.datamodels.TableRowsModel;
 import de.embl.cba.tables.modelview.objects.*;
-import de.embl.cba.tables.objects.SegmentCoordinate;
+import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
 import net.imglib2.util.ValuePair;
 import org.scijava.table.GenericTable;
 
@@ -205,7 +204,7 @@ public class TableUtils
 	public static ArrayList< DefaultAnnotatedImageSegment > segmentsFromTableFile (
 			File file,
 			String delim,
-			Map< SegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap
+			Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap
 	)
 	{
 
@@ -234,7 +233,7 @@ public class TableUtils
 			{
 				final String string = st.nextToken();
 
-				addFeature( columnValueMap, feature, string );
+				addColumn( columnValueMap, feature, string );
 			}
 
 			final DefaultImageSegment segment = SegmentUtils.segmentFromFeatures(
@@ -250,7 +249,7 @@ public class TableUtils
 
 	}
 
-	public static void addFeature( HashMap< String, Object > columnValueMap, String column, String string )
+	public static void addColumn( HashMap< String, Object > columnValueMap, String column, String string )
 	{
 		try
 		{
@@ -271,9 +270,9 @@ public class TableUtils
 		}
 	}
 
-	public static void setColumnIndex( Map< SegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap, int columnIndex, String columnName )
+	public static void setColumnIndex( Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap, int columnIndex, String columnName )
 	{
-		for ( SegmentCoordinate coordinate : coordinateColumnMap.keySet() )
+		for ( ImageSegmentCoordinate coordinate : coordinateColumnMap.keySet() )
 		{
 			if ( coordinateColumnMap.get( coordinate ).getA().equals( columnName ) )
 			{
@@ -419,12 +418,12 @@ public class TableUtils
 		return max;
 	}
 
-	public static void addFeature( JTable table, String column, Object defaultValue )
+	public static void addColumn( JTable table, String column, Object defaultValue )
 	{
-		addFeature( table.getModel(), column, defaultValue );
+		addColumn( table.getModel(), column, defaultValue );
 	}
 
-	public static void addFeature( TableModel model, String column, Object defaultValue )
+	public static void addColumn( TableModel model, String column, Object defaultValue )
 	{
 		if ( model instanceof ColumnClassAwareTableModel )
 		{
@@ -447,7 +446,7 @@ public class TableUtils
 	{
 		if ( imageFile == null ) return;
 		final Path relativeImagePath = getRelativeImagePath( tableFile, imageFile );
-		TableUtils.addFeature( table, "RelativeImagePath_" + imageName, relativeImagePath );
+		TableUtils.addColumn( table, "RelativeImagePath_" + imageName, relativeImagePath );
 	}
 
 	public static Path getRelativeImagePath( File tableFile, File imageFile )
@@ -471,5 +470,23 @@ public class TableUtils
 			value = Double.parseDouble( ( String ) featureValue );
 		}
 		return value;
+	}
+
+	public static double[] determineMinMaxValues( String column, JTable table )
+	{
+		final int columnIndex = table.getColumnModel().getColumnIndex( column );
+
+		double min = Double.MAX_VALUE;
+		double max = -Double.MAX_VALUE;
+
+		final int rowCount = table.getRowCount();
+		for ( int row = 0; row < rowCount; row++ )
+		{
+			final double value = ( Double ) table.getValueAt( row, columnIndex );
+			if ( value < min ) min = value;
+			if ( value > max ) max = value;
+		}
+
+		return new double[]{ min, max };
 	}
 }

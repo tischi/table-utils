@@ -1,8 +1,8 @@
 package de.embl.cba.tables.modelview.datamodels;
 
 import de.embl.cba.tables.modelview.objects.DefaultImageSegment;
-import de.embl.cba.tables.modelview.objects.DefaultSegmentBuilder;
-import de.embl.cba.tables.objects.SegmentCoordinate;
+import de.embl.cba.tables.modelview.objects.DefaultImageSegmentBuilder;
+import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
 import net.imglib2.util.ValuePair;
 
 import java.util.HashMap;
@@ -10,24 +10,25 @@ import java.util.Map;
 
 public class SegmentUtils
 {
-
+	@Deprecated
 	public static String getKey( Double label )
 	{
 		return getKey( label, 0 );
 	}
 
+	@Deprecated
 	public static String getKey( Double label, Integer timePoint )
 	{
 		return "L"+label.toString() + "_T" + timePoint.toString();
 	}
 
 	public static DefaultImageSegment segmentFromFeatures(
-			Map< SegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
+			Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
 			HashMap< String, Object > columnValueMap )
 	{
-		final DefaultSegmentBuilder segmentBuilder = new DefaultSegmentBuilder();
+		final DefaultImageSegmentBuilder segmentBuilder = new DefaultImageSegmentBuilder();
 
-		for( SegmentCoordinate coordinate : coordinateColumnMap.keySet() )
+		for( ImageSegmentCoordinate coordinate : coordinateColumnMap.keySet() )
 		{
 			final String colName = coordinateColumnMap.get( coordinate ).getA();
 
@@ -60,12 +61,12 @@ public class SegmentUtils
 	}
 
 	public static DefaultImageSegment segmentFromFeaturesIndexBased(
-			Map< SegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
+			Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
 			String[] rowEntries )
 	{
-		final DefaultSegmentBuilder segmentBuilder = new DefaultSegmentBuilder();
+		final DefaultImageSegmentBuilder segmentBuilder = new DefaultImageSegmentBuilder();
 
-		for( SegmentCoordinate coordinate : coordinateColumnMap.keySet() )
+		for( ImageSegmentCoordinate coordinate : coordinateColumnMap.keySet() )
 		{
 			final Integer col = coordinateColumnMap.get( coordinate ).getB();
 

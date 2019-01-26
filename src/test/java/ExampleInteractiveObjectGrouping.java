@@ -4,7 +4,7 @@ import bdv.util.BdvOptions;
 import bdv.util.RandomAccessibleIntervalSource;
 import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
-import de.embl.cba.tables.objects.SegmentCoordinate;
+import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import net.imagej.ImageJ;
 
@@ -33,7 +33,7 @@ public class ExampleInteractiveObjectGrouping
 		 * Load and showLabelSourceInBdv image
 		 */
 
-		final RandomAccessibleIntervalSource raiSource = Examples.load2D16BitLabelMask();
+		final RandomAccessibleIntervalSource raiSource = Examples.load2D16BitLabelSource();
 
 		final SelectableARGBConvertedRealSource selectableSource =
 				new SelectableARGBConvertedRealSource( raiSource );
@@ -48,7 +48,7 @@ public class ExampleInteractiveObjectGrouping
 
 		final ObjectTablePanel objectTablePanel = new ObjectTablePanel( jTable, "Table" );
 		objectTablePanel.showTable();
-		objectTablePanel.setCoordinateColumn( SegmentCoordinate.Label, jTable.getColumnName( 0 ) );
+		objectTablePanel.setCoordinateColumn( ImageSegmentCoordinate.Label, jTable.getColumnName( 0 ) );
 		objectTablePanel.addColumn( "MyGrouping", "None" );
 
 		/**

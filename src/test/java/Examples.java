@@ -1,7 +1,7 @@
 import bdv.util.RandomAccessibleIntervalSource;
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.objects.SegmentCoordinate;
+import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import ij.IJ;
 import ij.ImagePlus;
@@ -27,7 +27,7 @@ public abstract class Examples
 		return TableUtils.loadTable( tableFile, "," );
 	}
 
-	public static RandomAccessibleIntervalSource load2D16BitLabelMask()
+	public static RandomAccessibleIntervalSource load2D16BitLabelSource()
 	{
 		final ImagePlus imagePlus = IJ.openImage( Examples.class.getResource( "2d-16bit-labelMask.tif" ).getFile() );
 
@@ -42,7 +42,7 @@ public abstract class Examples
 
 	public static SelectableARGBConvertedRealSource loadSelectableSource()
 	{
-		return ( new SelectableARGBConvertedRealSource( Examples.load2D16BitLabelMask() ) );
+		return ( new SelectableARGBConvertedRealSource( Examples.load2D16BitLabelSource() ) );
 	}
 
 
@@ -52,6 +52,6 @@ public abstract class Examples
 
 		objectTablePanel.showTable();
 
-		objectTablePanel.setCoordinateColumn( SegmentCoordinate.Label, jTable.getColumnName( 0 ) );
+		objectTablePanel.setCoordinateColumn( ImageSegmentCoordinate.Label, jTable.getColumnName( 0 ) );
 	}
 }

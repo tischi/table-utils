@@ -9,7 +9,7 @@ import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 
 
 // TODO: extract abstract class NumericFeatureColoringModel
-public class TableRowColumnColoringModel< T extends TableRow >
+public class NumericTableRowColumnColoringModel< T extends TableRow >
 		extends AbstractColoringModel< T > implements NumericColoringModel< T >
 {
 	private String column;
@@ -19,7 +19,7 @@ public class TableRowColumnColoringModel< T extends TableRow >
 	private double rangeMin;
 	private double rangeMax;
 
-	public TableRowColumnColoringModel(
+	public NumericTableRowColumnColoringModel(
 			String column,
 			ARGBLut lut,
 			double rangeMin,

@@ -9,8 +9,7 @@ import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringListener;
 import de.embl.cba.tables.modelview.coloring.ColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
-import de.embl.cba.tables.modelview.datamodels.ImageSegmentsModel;
-import de.embl.cba.tables.modelview.datamodels.LabelImageSourceModel;
+import de.embl.cba.tables.modelview.datamodels.ImagesAndSegmentsModel;
 import de.embl.cba.tables.modelview.objects.ImageSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
@@ -25,27 +24,29 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 {
 	private String selectTrigger = "ctrl button1";
 	private String selectNoneTrigger = "ctrl N";
+	private String alterCategoricalLutRandomSeedTrigger = "ctrl L";
 	private String iterateSelectionModeTrigger = "ctrl S";
 	private String viewIn3DTrigger = "ctrl shift button1";
 
-	private final ImageSegmentsModel< T > imageSegmentsModel;
+	private final ImagesAndSegmentsModel< T > imagesAndSegmentsModel;
 	private final SelectionModel< T > selectionModel;
 	private final SelectionColoringModel< T > selectionColoringModel;
 	private Behaviours behaviours;
 
 	private final BdvHandle bdv;
 	private Source source;
+	private String name = "TODO";
 
 	public ImageSegmentsBdvView(
-			final ImageSegmentsModel< T > imageSegmentsModel,
+			final ImagesAndSegmentsModel< T > imagesAndSegmentsModel,
 			final SelectionModel< T > selectionModel,
 			final SelectionColoringModel< T > selectionColoringModel )
 	{
-		this.imageSegmentsModel = imageSegmentsModel;
+		this.imagesAndSegmentsModel = imagesAndSegmentsModel;
 		this.selectionModel = selectionModel;
 		this.selectionColoringModel = selectionColoringModel;
 
-		bdv = showLabelSourceInBdv( imageSegmentsModel.getLabelImageSourceModel() );
+		bdv = showLabelSourceInBdv( imagesAndSegmentsModel, selectionColoringModel );
 
 		registerAsSelectionListener( selectionModel );
 
@@ -91,20 +92,22 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		} );
 	}
 
-	public BdvHandle showLabelSourceInBdv( LabelImageSourceModel labelImageSourceModel )
+	public BdvHandle showLabelSourceInBdv(
+			ImagesAndSegmentsModel< T > imagesAndSegmentsModel,
+			SelectionColoringModel< T > selectionColoringModel )
 	{
 		final ImageSegmentLabelsARGBConverter coloringConverter =
 				new ImageSegmentLabelsARGBConverter(
-						imageSegmentsModel,
+						imagesAndSegmentsModel,
 						selectionColoringModel );
 
 		source = new ARGBConvertedRealSource(
-				imageSegmentsModel.getLabelImageSourceModel().getSource(),
+				imagesAndSegmentsModel.getImageSourcesModel().getLabelImageSources("").get( 0 ),
 				coloringConverter );
 
 		BdvOptions options = BdvOptions.options();
 
-		if ( labelImageSourceModel.is2D() )
+		if ( imagesAndSegmentsModel.getImageSourcesModel().is2D() )
 		{
 			options = options.is2D();
 		}
@@ -121,7 +124,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		behaviours = new Behaviours( new InputTriggerConfig() );
 		behaviours.install(
 				bdv.getBdvHandle().getTriggerbindings(),
-				imageSegmentsModel.getLabelImageSourceModel().getSource().getName() + "-bdv-selection-handler" );
+				name + "-bdv-selection-handler" );
 
 		installSelectionBehaviour( );
 		installSelectNoneBehaviour( );
@@ -172,7 +175,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		final int timePoint = getCurrentTimePoint();
 
-		selectionModel.toggle( imageSegmentsModel.getSegment( label, timePoint ) );
+		selectionModel.toggle( imagesAndSegmentsModel.getSegment( label, timePoint ) );
 
 		BdvUtils.repaint( bdv );
 	}

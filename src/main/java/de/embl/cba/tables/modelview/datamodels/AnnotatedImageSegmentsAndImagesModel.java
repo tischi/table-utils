@@ -6,33 +6,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Holds all the data
- */
 
-public class AnnotatedImageSegmentsModel < T extends AnnotatedImageSegment >
-		implements ImageSegmentsModel, TableRowsModel
+public class AnnotatedImageSegmentsAndImagesModel< T extends AnnotatedImageSegment >
+	implements ImagesAndSegmentsModel< T >, TableRowsModel< T >
 {
 	private final String name;
 	private final ArrayList< T > annotatedImageSegments;
-	private final LabelImageSourceModel labelImageSourceModel;
+	private final ImageSourcesModel imageSourcesModel;
 	private final String labelFeatureName;
-	private final String timePointFeatureName;
 
 	private Map< Object, T > labelTimePointKeyToSegmentMap;
 
-	public AnnotatedImageSegmentsModel(
+	public AnnotatedImageSegmentsAndImagesModel(
 			String name,
 			ArrayList< T > annotatedImageSegments,
 			String labelFeatureName,
 			String timePointFeatureName,
-			LabelImageSourceModel labelImageSourceModel )
+			ImageSourcesModel imageSourcesModel )
 	{
 		this.name = name;
-		this.annotatedImageSegments = annotatedImageSegments;
-		this.labelImageSourceModel = labelImageSourceModel;
-		this.timePointFeatureName = timePointFeatureName;
 		this.labelFeatureName = labelFeatureName;
+		this.annotatedImageSegments = annotatedImageSegments;
+		this.imageSourcesModel = imageSourcesModel;
 
 		createKeyMap();
 	}
@@ -52,26 +47,25 @@ public class AnnotatedImageSegmentsModel < T extends AnnotatedImageSegment >
 		}
 	}
 
-	public AnnotatedImageSegment getSegment( int listIndex )
+	public T getSegment( int listIndex )
 	{
 		return annotatedImageSegments.get( listIndex );
 	}
 
 	@Override
-	public AnnotatedImageSegment getSegment( Double label, int timePoint )
+	public T getSegment( Double label, int timePoint )
 	{
 		final Object segmentKey = getSegmentKey( label, timePoint );
 		return labelTimePointKeyToSegmentMap.get( segmentKey );
 	}
 
-	@Override
-	public LabelImageSourceModel getLabelImageSourceModel()
+	public ImageSourcesModel getImageSourcesModel()
 	{
-		return labelImageSourceModel;
+		return imageSourcesModel;
 	}
 
 	@Override
-	public ArrayList< ? extends AnnotatedImageSegment > getImageSegments()
+	public ArrayList< T > getImageSegments()
 	{
 		return annotatedImageSegments;
 	}
@@ -82,35 +76,8 @@ public class AnnotatedImageSegmentsModel < T extends AnnotatedImageSegment >
 	}
 
 	@Override
-	public String getTimePointColumnName()
-	{
-		return timePointFeatureName;
-	}
-
-	@Override
-	public String getLabelFeatureName()
-	{
-		return labelFeatureName;
-	}
-
-//	public Map< Object, SegmentWithFeatures > getLabelTimePointKeyToSegmentMap()
-//	{
-//		return labelTimePointKeyToSegmentMap;
-//	}
-
-//	public ArrayList< String > getFeatureNames()
-//	{
-//		return featureNames;
-//	}
-
-	@Override
-	public ArrayList< ? extends AnnotatedImageSegment > getTableRows()
+	public ArrayList< T > getTableRows()
 	{
 		return annotatedImageSegments;
-	}
-
-	public String getName()
-	{
-		return name;
 	}
 }

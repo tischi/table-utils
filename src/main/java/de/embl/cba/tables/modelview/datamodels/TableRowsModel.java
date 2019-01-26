@@ -7,9 +7,5 @@ import java.util.ArrayList;
 
 public interface TableRowsModel < T extends TableRow >
 {
-	String getTimePointColumnName();
-
-	String getLabelFeatureName();
-
 	ArrayList< T > getTableRows();
 }

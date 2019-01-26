@@ -10,7 +10,7 @@ import de.embl.cba.bdv.utils.converters.RandomARGBConverter;
 import de.embl.cba.bdv.utils.lut.Luts;
 import de.embl.cba.bdv.utils.selection.BdvLabelSourceSelectionListener;
 import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
-import de.embl.cba.tables.objects.SegmentCoordinate;
+import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import de.embl.cba.tables.objects.attributes.AssignObjectAttributesUI;
 import net.imglib2.converter.Converter;
@@ -100,7 +100,7 @@ public class TableBdvConnector
 			@Override
 			public void selectionChanged( double label, int timepoint, boolean selected )
 			{
-				if ( ! objectTablePanel.hasCoordinate( SegmentCoordinate.Label ) ) return;
+				if ( ! objectTablePanel.hasCoordinate( ImageSegmentCoordinate.Label ) ) return;
 
 				int row = getRow( label, timepoint );
 				selectedRows.add( row );
@@ -120,7 +120,7 @@ public class TableBdvConnector
 			//@Override
 			public void valueUnselected( double objectLabel, int timepoint )
 			{
-				if ( ! objectTablePanel.hasCoordinate( SegmentCoordinate.Label ) ) return;
+				if ( ! objectTablePanel.hasCoordinate( ImageSegmentCoordinate.Label ) ) return;
 
 				int row = getRow( objectLabel, timepoint );
 				selectedRows.remove( row );
@@ -130,7 +130,7 @@ public class TableBdvConnector
 			{
 				int row;
 
-				if ( objectTablePanel.hasCoordinate( SegmentCoordinate.T ) )
+				if ( objectTablePanel.hasCoordinate( ImageSegmentCoordinate.T ) )
 				{
 					row = objectTablePanel.getRowIndex( objectLabel, timepoint );
 				}
@@ -177,11 +177,11 @@ public class TableBdvConnector
 			{
 				if( me.isControlDown() )
 				{
-					if ( objectTablePanel.hasCoordinate( SegmentCoordinate.Label ) )
+					if ( objectTablePanel.hasCoordinate( ImageSegmentCoordinate.Label ) )
 					{
 						final int selectedRow = table.getSelectedRow();
 
-						final Double objectLabel = objectTablePanel.getObjectCoordinate( SegmentCoordinate.Label, selectedRow );
+						final Double objectLabel = objectTablePanel.getObjectCoordinate( ImageSegmentCoordinate.Label, selectedRow );
 
 						Integer timepoint = getTimepoint( selectedRow );
 
@@ -202,9 +202,9 @@ public class TableBdvConnector
 	public Integer getTimepoint( int selectedRow )
 	{
 		Integer timepoint = 0;
-		if ( objectTablePanel.hasCoordinate( SegmentCoordinate.Label.T ) )
+		if ( objectTablePanel.hasCoordinate( ImageSegmentCoordinate.Label.T ) )
 		{
-			final Double timepointDouble = (Double) objectTablePanel.getObjectCoordinate( SegmentCoordinate.Label.T, selectedRow );
+			final Double timepointDouble = (Double) objectTablePanel.getObjectCoordinate( ImageSegmentCoordinate.Label.T, selectedRow );
 			timepoint = timepointDouble.intValue();
 		}
 		return timepoint;
@@ -212,15 +212,15 @@ public class TableBdvConnector
 
 	private void moveBdvToObjectPosition( int row )
 	{
-		final Double x = objectTablePanel.getObjectCoordinate( SegmentCoordinate.X, row );
-		final Double y = objectTablePanel.getObjectCoordinate( SegmentCoordinate.Y, row );
+		final Double x = objectTablePanel.getObjectCoordinate( ImageSegmentCoordinate.X, row );
+		final Double y = objectTablePanel.getObjectCoordinate( ImageSegmentCoordinate.Y, row );
 
 		if ( x != null && y != null )
 		{
-			Double z = objectTablePanel.getObjectCoordinate( SegmentCoordinate.Z, row );
+			Double z = objectTablePanel.getObjectCoordinate( ImageSegmentCoordinate.Z, row );
 			if ( z == null ) z = 0.0;
 
-			Double t = objectTablePanel.getObjectCoordinate( SegmentCoordinate.T, row );
+			Double t = objectTablePanel.getObjectCoordinate( ImageSegmentCoordinate.T, row );
 			if ( t == null ) t = 0.0;
 
 			BdvUtils.moveToPosition(
@@ -254,7 +254,7 @@ public class TableBdvConnector
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
-				if ( ! objectTablePanel.hasCoordinate( SegmentCoordinate.Label ) )
+				if ( ! objectTablePanel.hasCoordinate( ImageSegmentCoordinate.Label ) )
 				{
 					Logger.warn( "Please specify the object label getColumn:\n" +
 							"[ Objects > Select coordinates... ]" );
