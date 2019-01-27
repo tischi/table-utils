@@ -106,13 +106,32 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		final double[] position = new double[ 3 ];
 		selection.localize( position );
 
-		selection.imageSetName();
+		adaptGroupVisibility( selection );
 
 		BdvUtils.moveToPosition(
 				bdv,
 				position,
 				selection.timePoint(),
 				500 );
+	}
+
+	private void adaptGroupVisibility( ImageSegment selection )
+	{
+		final int currentGroup = getCurrentGroup();
+		final String currentImageSetName = imagesAndSegmentsModel.getImageSourcesModel().getImageSetIds().get( currentGroup );
+
+		if ( ! currentImageSetName.equals( selection.imageSetName() ) )
+		{
+			final int selectedGroup = imagesAndSegmentsModel.getImageSourcesModel().getImageSetIds().indexOf( selection.imageSetName() );
+			//bdv.getViewerPanel().getState().setCurrentGroup( selectedGroup );
+			bdv.getViewerPanel().getVisibilityAndGrouping().setGroupActive( selectedGroup, true );
+		}
+		;
+	}
+
+	private int getCurrentGroup()
+	{
+		return bdv.getViewerPanel().getVisibilityAndGrouping().getCurrentGroup();
 	}
 
 	private void showFirstImageSetAndConfigureBdv(
@@ -221,7 +240,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void toggleSelectionAtMousePosition()
 	{
-		final int currentGroup = bdv.getViewerPanel().getState().getCurrentGroup();
+		final int currentGroup = getCurrentGroup();
 
 		final String currentImageSet = imagesAndSegmentsModel.getImageSourcesModel().getImageSetIds().get( currentGroup );
 
@@ -238,9 +257,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		selectionModel.toggle( imagesAndSegmentsModel.getSegment( currentImageSet, label, timePoint ) );
 
-		BdvUtils.repaint( bdv );
 	}
-	
+
 	private int getCurrentTimePoint()
 	{
 		return bdv.getBdvHandle().getViewerPanel().getState().getCurrentTimepoint();
