@@ -5,14 +5,11 @@ import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public interface ImageSourcesModel
 {
-	ArrayList< Source< ? > > getIntensityImageSources( String imageSetId );
-
-	Source< ? extends RealType< ? > > getLabelImageSource( String imageSetId );
+	Map< String, ArrayList< Source< ? > > > getImageSources( );
 
 	boolean is2D();
-
-	ArrayList< String > getImageSetNames();
 }

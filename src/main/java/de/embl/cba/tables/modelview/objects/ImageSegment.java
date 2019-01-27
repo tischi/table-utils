@@ -6,7 +6,7 @@ import net.imglib2.RealLocalizable;
 
 public interface ImageSegment extends RealLocalizable
 {
-	String imageSetName();
+	String imageId();
 
 	double label();
 

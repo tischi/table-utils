@@ -42,7 +42,10 @@ public class CellProfilerOutputExplorerDevelop
 		final ArrayList< String > categoricalColumns = new ArrayList<>();
 		categoricalColumns.add( "Label" );
 
-		DataModelUtils.buildModelsAndViews( imageSourcesModel, annotatedImageSegments, categoricalColumns );
+		DataModelUtils.buildModelsAndViews(
+				imageSourcesModel,
+				annotatedImageSegments,
+				categoricalColumns );
 
 	}
 

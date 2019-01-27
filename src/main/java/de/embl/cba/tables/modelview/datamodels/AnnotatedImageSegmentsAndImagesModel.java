@@ -35,7 +35,7 @@ public class AnnotatedImageSegmentsAndImagesModel< T extends AnnotatedImageSegme
 		for ( T annotatedImageSegment : this.annotatedImageSegments )
 		{
 			final Object key = getSegmentKey(
-					annotatedImageSegment.imageSetName(),
+					annotatedImageSegment.imageId(),
 					annotatedImageSegment.label(),
 					annotatedImageSegment.timePoint()
 			);

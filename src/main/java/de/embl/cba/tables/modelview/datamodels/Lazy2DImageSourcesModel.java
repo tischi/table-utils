@@ -1,23 +1,26 @@
 package de.embl.cba.tables.modelview.datamodels;
 
 import bdv.util.RandomAccessibleIntervalSource;
+import bdv.viewer.Interpolation;
 import bdv.viewer.Source;
 import ij.IJ;
 import ij.ImagePlus;
+import mpicbg.spim.data.sequence.VoxelDimensions;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.RealRandomAccessible;
 import net.imglib2.img.display.imagej.ImageJFunctions;
+import net.imglib2.realtransform.AffineTransform3D;
+import net.imglib2.type.numeric.NumericType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Lazy2DImageSourcesModel implements ImageSourcesModel
 {
-	private Map< String, IntensityAndLabelImageSourcePaths > imageSourcesMap;
+	private Map< String, ArrayList< Source < ? > > > imageSourcesMap;
 
 	private final boolean is2D;
 
@@ -31,32 +34,92 @@ public class Lazy2DImageSourcesModel implements ImageSourcesModel
 		this.is2D = true;
 	}
 
-	@Override
-	public ArrayList< Source< ? > > getIntensityImageSources( String imageSetId )
+
+	class Lazy2DLabelFileSource< T extends RealType< T > > extends Lazy2DFileSource< T > implements LabelSource< T >
 	{
-		final ArrayList< File > files = imageSourcesMap.get( imageSetId ).intensityImageSources;
-
-		final ArrayList< Source< ? > > sources = new ArrayList<>();
-
-		for ( File file : files )
+		public Lazy2DLabelFileSource( File file )
 		{
-			final ImagePlus imagePlus = IJ.openImage( file.toString() );
-			final RandomAccessibleIntervalSource source = imagePlus2DAsSource3D( imagePlus );
-			sources.add( source );
+			super( file );
+		}
+	}
+
+	class Lazy2DFileSource < T extends NumericType< T > > implements Source< T >
+	{
+		private final File file;
+		private RandomAccessibleIntervalSource< T > source;
+
+		public Lazy2DFileSource( File file )
+		{
+			this.file = file;
 		}
 
-		return sources;
+		@Override
+		public boolean isPresent( int t )
+		{
+			return false;
+		}
+
+		@Override
+		public RandomAccessibleInterval< T > getSource( int t, int level )
+		{
+			return wrappedSource().getSource( t, level );
+		}
+
+		private RandomAccessibleIntervalSource< T > wrappedSource()
+		{
+			if ( source == null )
+			{
+				final ImagePlus imagePlus = IJ.openImage( file.toString() );
+				source =  imagePlus2DAsSource3D( imagePlus );
+			}
+
+			return source;
+		}
+
+		@Override
+		public RealRandomAccessible< T > getInterpolatedSource( int t, int level, Interpolation method )
+		{
+			return wrappedSource().getInterpolatedSource( t, level, method );
+		}
+
+		@Override
+		public void getSourceTransform( int t, int level, AffineTransform3D transform )
+		{
+			wrappedSource().getSourceTransform( t, level, transform  );
+		}
+
+		@Override
+		public T getType()
+		{
+			return wrappedSource().getType();
+		}
+
+		@Override
+		public String getName()
+		{
+			return wrappedSource().getName();
+		}
+
+		@Override
+		public VoxelDimensions getVoxelDimensions()
+		{
+			return wrappedSource().getVoxelDimensions();
+		}
+
+		@Override
+		public int getNumMipmapLevels()
+		{
+			return wrappedSource().getNumMipmapLevels();
+		}
 	}
+
 
 	@Override
-	public Source< ? extends RealType< ? > > getLabelImageSource( String imageSetId )
+	public Map< String, ArrayList< Source< ? > > > getImageSources()
 	{
-		final ImagePlus imagePlus = IJ.openImage( imageSourcesMap.get( imageSetId ).labelImageSource.toString() );
-
-		final RandomAccessibleIntervalSource source = imagePlus2DAsSource3D( imagePlus );
-
-		return source;
+		return imageSourcesMap;
 	}
+
 
 	@Override
 	public boolean is2D()
@@ -64,42 +127,30 @@ public class Lazy2DImageSourcesModel implements ImageSourcesModel
 		return is2D;
 	}
 
-	@Override
-	public ArrayList< String > getImageSetNames()
+	public void addLabelSource( String imageId, File labelSource )
 	{
-		return new ArrayList( imageSourcesMap.keySet() );
+		addKeyIfMissing( imageId );
+
+		imageSourcesMap.get( imageId ).add( new Lazy2DLabelFileSource<>( labelSource ) );
 	}
 
-	public void addLabelImageSource( String imageId, File labelImageSource )
+	public void addIntensityImageSource( String imageId, File labelSource )
 	{
-		addIfMissing( imageId );
+		addKeyIfMissing( imageId );
 
-		imageSourcesMap.get( imageId ).labelImageSource = labelImageSource;
+		imageSourcesMap.get( imageId ).add( new Lazy2DFileSource<>( labelSource ) );
 	}
 
-	public void addIntensityImageSource( String imageId, File intensityImageSource )
-	{
-		addIfMissing( imageId );
-
-		imageSourcesMap.get( imageId ).intensityImageSources.add( intensityImageSource );
-	}
-
-	public void addIfMissing( String imageId )
+	public void addKeyIfMissing( String imageId )
 	{
 		if ( ! imageSourcesMap.containsKey( imageId ) )
 		{
-			final IntensityAndLabelImageSourcePaths sources = new IntensityAndLabelImageSourcePaths();
-			imageSourcesMap.put( imageId, sources );
+			imageSourcesMap.put( imageId, new ArrayList<>(  ) );
 		}
 	}
 
-	private class IntensityAndLabelImageSourcePaths
-	{
-		ArrayList< File > intensityImageSources = new ArrayList<>(  );
-		File labelImageSource;
-	}
-
-	public static RandomAccessibleIntervalSource imagePlus2DAsSource3D( ImagePlus imagePlus )
+	public static < T extends NumericType< T > >
+	RandomAccessibleIntervalSource< T > imagePlus2DAsSource3D( ImagePlus imagePlus )
 	{
 		RandomAccessibleInterval< RealType > wrap = ImageJFunctions.wrapReal( imagePlus );
 

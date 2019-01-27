@@ -27,7 +27,7 @@ public class DefaultImageSegment implements ImageSegment
 	}
 
 	@Override
-	public String imageSetName()
+	public String imageId()
 	{
 		return imageSetName;
 	}

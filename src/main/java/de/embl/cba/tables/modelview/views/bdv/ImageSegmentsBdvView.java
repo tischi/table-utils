@@ -7,6 +7,7 @@ import bdv.viewer.DisplayMode;
 import bdv.viewer.Source;
 import bdv.viewer.VisibilityAndGrouping;
 import bdv.viewer.state.SourceGroup;
+import bdv.viewer.state.SourceState;
 import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringListener;
@@ -14,17 +15,19 @@ import de.embl.cba.tables.modelview.coloring.ColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.datamodels.ImageSourcesModel;
 import de.embl.cba.tables.modelview.datamodels.ImagesAndSegmentsModel;
+import de.embl.cba.tables.modelview.datamodels.LabelSource;
 import de.embl.cba.tables.modelview.objects.ImageSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.modelview.views.ImageSegmentLabelsARGBConverter;
-import net.imglib2.type.numeric.RealType;
 import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
 import org.scijava.ui.behaviour.util.Behaviours;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import static de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter.BACKGROUND;
 
@@ -46,6 +49,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private int bdvGroupId;
 	private HashMap< String, Integer > imageSetIdToBdvGroupIdxMap;
 	private BdvOptions bdvOptions;
+	private HashMap< Integer, String > groupIdxToName;
+	private HashMap< String, String > imageIdToGroupName;
+	private ImageSourcesModel imageSourcesModel;
+	private boolean isGroupingConfigured;
 
 	public ImageSegmentsBdvView(
 			final ImagesAndSegmentsModel< T > imagesAndSegmentsModel,
@@ -56,12 +63,15 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		this.selectionModel = selectionModel;
 		this.selectionColoringModel = selectionColoringModel;
 
-		showFirstImageSetAndConfigureBdv(
-				imagesAndSegmentsModel.getImageSourcesModel(),
-				selectionColoringModel );
+		this.imageSourcesModel = imagesAndSegmentsModel.getImageSourcesModel();
 
-		bdvOptions = bdvOptions.addTo( bdv );
+		groupIdxToName = new HashMap<>(  );
+		imageIdToGroupName = new HashMap<>(  );
+		isGroupingConfigured = false;
 
+		initBdvOptions( imageSourcesModel );
+		showGroup( 0 );
+		
 		registerAsSelectionListener( selectionModel );
 
 		registerAsColoringListener( selectionColoringModel );
@@ -107,7 +117,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		final double[] position = new double[ 3 ];
 		selection.localize( position );
 
-		adaptGroupVisibility( selection );
+		showSegmentGroup( selection );
 
 		BdvUtils.moveToPosition(
 				bdv,
@@ -116,126 +126,137 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 				500 );
 	}
 
-	private void adaptGroupVisibility( ImageSegment selection )
+	private void showSegmentGroup( ImageSegment imageSegment )
 	{
-		final int currentGroup = getCurrentGroup();
-		final String currentImageSetName = imagesAndSegmentsModel.getImageSourcesModel().getImageSetNames().get( currentGroup );
-
-		if ( ! currentImageSetName.equals( selection.imageSetName() ) )
+		if ( ! getCurrentGroupName().equals( getImageSegmentGroupName( imageSegment ) ) )
 		{
-			final int selectedGroup = imagesAndSegmentsModel.getImageSourcesModel().getImageSetNames().indexOf( selection.imageSetName() );
-			//bdv.getViewerPanel().getState().setCurrentGroup( selectedGroup );
-			bdv.getViewerPanel().getVisibilityAndGrouping().setGroupActive( selectedGroup, true );
+			final int selectedGroup = getImageSegmentGroupIdx( imageSegment );
+
+			showGroup( selectedGroup );
 		}
-		;
 	}
 
-	private int getCurrentGroup()
+	private void showGroup( int selectedGroup )
+	{
+		if ( isEmpty( selectedGroup ) )
+		{
+			populateGroup( selectedGroup );
+		}
+
+		bdv.getViewerPanel().getVisibilityAndGrouping().setGroupActive( selectedGroup, true );
+		bdv.getViewerPanel().getVisibilityAndGrouping().setCurrentGroup( selectedGroup );
+	}
+
+	private void populateGroup( int groupIdx )
+	{
+		final String groupName = groupIdxToName.get( groupIdx );
+
+		final ArrayList< Source< ? > > sources = imageSourcesModel.getImageSources().get( groupName );
+
+		for ( Source source : sources )
+		{
+			if ( source instanceof LabelSource )
+			{
+				Source labelSource = asLabelSource( groupName, source );
+
+				bdv = BdvFunctions.show( labelSource, bdvOptions ).getBdvHandle();
+			}
+			else
+			{
+				bdv = BdvFunctions.show( source, bdvOptions ).getBdvHandle();
+			}
+
+			final VisibilityAndGrouping visibilityAndGrouping = bdv.getViewerPanel().getVisibilityAndGrouping();
+
+			if ( ! isGroupingConfigured ) configureGrouping();
+
+			visibilityAndGrouping.addSourceToGroup( bdv.getViewerPanel().getState().numSources() - 1, groupIdx );
+		}
+	}
+
+	private Source asLabelSource( String groupName, Source source )
+	{
+		ImageSegmentLabelsARGBConverter labelSourcesARGBConverter =
+				new ImageSegmentLabelsARGBConverter(
+						imagesAndSegmentsModel,
+						groupName, // TODO???
+						selectionColoringModel );
+
+		// TODO: this could be a SourceAndConverter
+		return new ARGBConvertedRealSource(
+				source,
+				labelSourcesARGBConverter );
+	}
+
+	private boolean isEmpty( int selectedGroup )
+	{
+		if ( bdv == null ) return true;
+		return bdv.getViewerPanel().getState().getSourceGroups().get( selectedGroup ).getSourceIds().size() == 0;
+	}
+
+	private String getImageSegmentGroupName( ImageSegment selection )
+	{
+		return imageIdToGroupName.get( selection.imageId() );
+	}
+
+	private Integer getImageSegmentGroupIdx( ImageSegment selection )
+	{
+		final HashMap< String, Integer > groupNameToIdx = new HashMap<>();
+		return groupNameToIdx.get( imageIdToGroupName.get( selection.imageId() ) );
+	}
+
+	private String getCurrentGroupName()
+	{
+		return groupIdxToName.get( getCurrentGroupIdx() );
+	}
+
+	private int getCurrentGroupIdx()
 	{
 		return bdv.getViewerPanel().getVisibilityAndGrouping().getCurrentGroup();
 	}
 
-	private void showFirstImageSetAndConfigureBdv(
-			ImageSourcesModel imageSourcesModel,
-			SelectionColoringModel< T > selectionColoringModel )
-	{
-		initBdvOptions( imageSourcesModel );
-
-		showImageSet( imageSourcesModel, 0, selectionColoringModel );
-
-		configureGrouping();
-	}
 
 	private void configureGrouping()
 	{
-		final List<SourceGroup> groups = this.bdv.getViewerPanel().getState().getSourceGroups();
-		for (final SourceGroup g : groups) {
-			this.bdv.getViewerPanel().getState().removeGroup(g);
-		}
+		final Set< String > imageSetNames = imageSourcesModel.getImageSources().keySet();
 
 		final VisibilityAndGrouping visibilityAndGrouping = bdv.getViewerPanel().getVisibilityAndGrouping();
+
+		int i = 0;
+		for ( String imageSetName : imageSetNames )
+		{
+			if ( i == 0 )
+			{
+				// first group exists by default => only change name
+				visibilityAndGrouping.setGroupName( 0, imageSetName );
+			}
+			else
+			{
+				bdv.getViewerPanel().addGroup( new SourceGroup( imageSetName ) );
+				visibilityAndGrouping.setGroupName( i, imageSetName );
+				groupIdxToName.put( i, imageSetName );
+				imageIdToGroupName.put( imageSetName, imageSetName ); // TODO!
+			}
+		}
+
 		visibilityAndGrouping.setGroupingEnabled( true );
 		visibilityAndGrouping.setDisplayMode( DisplayMode.GROUP );
+
+		isGroupingConfigured = true;
 	}
 
-	private void showImageSet(
-			ImageSourcesModel imageSourcesModel,
-			int imageSetIdx,
-			SelectionColoringModel< T > selectionColoringModel )
+	private void addMostRecentSourceToGroup( int groupIdx )
 	{
-		final String imageSetName = imageSourcesModel.getImageSetNames().get( imageSetIdx );
-
-		bdv = showLabelSource( imageSourcesModel, imageSetName, selectionColoringModel );
-
-		SourceGroup sourceGroup = createSourceGroup( imageSetIdx, imageSetName );
-
-		sourceGroup.addSource( bdv.getViewerPanel().getState().numSources() - 1  );
-
-		for ( Source intensitySource : imageSourcesModel.getIntensityImageSources( imageSetName ) )
-		{
-			BdvFunctions.show( intensitySource, bdvOptions );
-			sourceGroup.addSource( bdv.getViewerPanel().getState().numSources() - 1  );
-		}
-
-		//bdv.getViewerPanel().addGroup( sourceGroup );
-	}
-
-	private SourceGroup createSourceGroup( int imageSetIdx, String imageSetName )
-	{
-		SourceGroup sourceGroup;
-		try
-		{
-			sourceGroup = bdv.getViewerPanel().getVisibilityAndGrouping().getSourceGroups().get( imageSetIdx );
-			sourceGroup.setName( imageSetName );
-			bdv.getViewerPanel().getVisibilityAndGrouping().setGroupName( imageSetIdx, imageSetName );
-		}
-		catch ( Exception e )
-		{
-			sourceGroup = new SourceGroup( imageSetName );
-			bdv.getViewerPanel().addGroup( sourceGroup );
-		}
-
-
-		return sourceGroup;
+		bdv.getViewerPanel().getVisibilityAndGrouping().addSourceToGroup( bdv.getViewerPanel().getState().numSources() - 1, groupIdx );
 	}
 
 	private void initBdvOptions( ImageSourcesModel imageSourcesModel )
 	{
 		// TODO: is it correct to already here specify the number of groups?
 
-		bdvOptions = BdvOptions.options()
-				.numSourceGroups( imageSourcesModel.getImageSetNames().size() );
-
-		bdvOptions = bdvOptions.addTo( bdv );
+		bdvOptions = BdvOptions.options();
 
 		if ( imageSourcesModel.is2D() ) bdvOptions = bdvOptions.is2D();
-	}
-
-	private BdvHandle showLabelSource(
-			ImageSourcesModel imageSourcesModel,
-			String imageSetId,
-			SelectionColoringModel< T > selectionColoringModel )
-	{
-		ImageSegmentLabelsARGBConverter labelSourcesARGBConverter =
-			new ImageSegmentLabelsARGBConverter(
-					imagesAndSegmentsModel,
-					imageSetId,
-					selectionColoringModel );
-
-		final Source labelSource = imageSourcesModel.getLabelImageSource( imageSetId );
-
-		// TODO: this could be a SourceAndConverter
-		Source argbConvertedLabelSource = new ARGBConvertedRealSource(
-				labelSource,
-				labelSourcesARGBConverter );
-
-		bdv = BdvFunctions.show(
-				argbConvertedLabelSource,
-				bdvOptions ).getBdvHandle();
-
-		bdv.getViewerPanel().addTimePointListener( labelSourcesARGBConverter );
-
-		return bdv;
 	}
 
 	private void installBdvBehaviours()
@@ -249,7 +270,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		installSelectNoneBehaviour( );
 		//installSelectionModeIterationBehaviour( );
 		//installRandomColorShufflingBehaviour();
-
 		//if( is3D() ) install3DViewBehaviour();
 	}
 
@@ -280,22 +300,29 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void toggleSelectionAtMousePosition()
 	{
-		final int currentGroup = getCurrentGroup();
 
-		final String currentImageSet = imagesAndSegmentsModel.getImageSourcesModel().getImageSetNames().get( currentGroup );
+		final List< Integer > indices = bdv.getViewerPanel().getState().getVisibleSourceIndices();
+		final List< SourceState< ? > > sources = bdv.getViewerPanel().getState().getSources();
 
-		final Source< ? extends RealType< ? > > labelImageSource = imagesAndSegmentsModel.getImageSourcesModel().getLabelImageSource( currentImageSet );
+		for ( int idx : indices )
+		{
+			if ( sources.get( idx ).getSpimSource() instanceof LabelSource )
+			{
+				final int timePoint = getCurrentTimePoint();
 
-		final int timePoint = getCurrentTimePoint();
+				final double label = BdvUtils.getValueAtGlobalCoordinates(
+						sources.get( idx ).getSpimSource(),
+						BdvUtils.getGlobalMouseCoordinates( bdv ),
+						timePoint );
 
-		final double label = BdvUtils.getValueAtGlobalCoordinates(
-				labelImageSource,
-				BdvUtils.getGlobalMouseCoordinates( bdv ),
-				timePoint );
+				if ( label == BACKGROUND ) return;
 
-		if ( label == BACKGROUND ) return;
+				// TODO: getCurrentGroupName() does not seem to make sense. Maybe sources must have good names?
+				selectionModel.toggle( imagesAndSegmentsModel.getSegment( getCurrentGroupName(), label, timePoint ) );
 
-		selectionModel.toggle( imagesAndSegmentsModel.getSegment( currentImageSet, label, timePoint ) );
+				break; // TODO: at the minute there can be only one LabelSource per group
+			}
+		}
 
 	}
 

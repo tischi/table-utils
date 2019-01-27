@@ -6,7 +6,6 @@ import de.embl.cba.tables.modelview.datamodels.Lazy2DImageSourcesModel;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -92,7 +91,7 @@ public class CellProfilerTableToImageSourcesParser
 
 				if ( image.contains( OBJECTS ) )
 				{
-					imageSourcesModel.addLabelImageSource( imageSetId, new File( imagePath ) );
+					imageSourcesModel.addLabelSource( imageSetId, new File( imagePath ) );
 				}
 				else
 				{

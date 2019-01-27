@@ -19,16 +19,17 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 		this.is2D = is2D;
 	}
 
+
 	@Override
-	public ArrayList< Source< ? > > getIntensityImageSources( String imageSetId )
+	public ArrayList< Source< ? > > getImageSources( String imageSetId )
 	{
-		return imageSourcesMap.get( imageSetId ).intensityImageSources;
+		return null;
 	}
 
 	@Override
-	public Source< ? extends RealType< ? > > getLabelImageSource( String imageSetId )
+	public Map< String, ArrayList< Source< ? > > > getImageSources()
 	{
-		return imageSourcesMap.get( imageSetId ).labelImageSource;
+		return null;
 	}
 
 	@Override
