@@ -65,7 +65,7 @@ public class Lazy2DImageSourcesModel implements ImageSourcesModel
 	}
 
 	@Override
-	public ArrayList< String > getImageSetIds()
+	public ArrayList< String > getImageSetNames()
 	{
 		return new ArrayList( imageSourcesMap.keySet() );
 	}

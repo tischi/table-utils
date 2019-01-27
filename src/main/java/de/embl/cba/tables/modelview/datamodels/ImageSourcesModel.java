@@ -14,5 +14,5 @@ public interface ImageSourcesModel
 
 	boolean is2D();
 
-	ArrayList< String > getImageSetIds();
+	ArrayList< String > getImageSetNames();
 }

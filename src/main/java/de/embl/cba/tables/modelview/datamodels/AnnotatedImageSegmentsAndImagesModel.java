@@ -13,19 +13,15 @@ public class AnnotatedImageSegmentsAndImagesModel< T extends AnnotatedImageSegme
 	private final String name;
 	private final ArrayList< T > annotatedImageSegments;
 	private final ImageSourcesModel imageSourcesModel;
-	private final String labelFeatureName;
 
 	private Map< Object, T > keyToSegmentMap;
 
 	public AnnotatedImageSegmentsAndImagesModel(
 			String name,
 			ArrayList< T > annotatedImageSegments,
-			String labelFeatureName,
-			String timePointFeatureName,
 			ImageSourcesModel imageSourcesModel )
 	{
 		this.name = name;
-		this.labelFeatureName = labelFeatureName;
 		this.annotatedImageSegments = annotatedImageSegments;
 		this.imageSourcesModel = imageSourcesModel;
 
@@ -38,7 +34,8 @@ public class AnnotatedImageSegmentsAndImagesModel< T extends AnnotatedImageSegme
 
 		for ( T annotatedImageSegment : this.annotatedImageSegments )
 		{
-			final Object key = SegmentUtils.getKey(
+			final Object key = getSegmentKey(
+					annotatedImageSegment.imageSetName(),
 					annotatedImageSegment.label(),
 					annotatedImageSegment.timePoint()
 			);
@@ -80,5 +77,10 @@ public class AnnotatedImageSegmentsAndImagesModel< T extends AnnotatedImageSegme
 	public ArrayList< T > getTableRows()
 	{
 		return annotatedImageSegments;
+	}
+
+	public String getName()
+	{
+		return name;
 	}
 }

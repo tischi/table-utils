@@ -50,8 +50,8 @@ public class SegmentUtils
 				case Label:
 					segmentBuilder.setLabel( ( double ) columnValueMap.get( colName ) );
 					break;
-				case ImageSetId:
-					segmentBuilder.setImageId( ( String ) columnValueMap.get( colName )  );
+				case ImageSetName:
+					segmentBuilder.setImageSetName( columnValueMap.get( colName ).toString()  );
 					break;
 
 			}
@@ -97,8 +97,8 @@ public class SegmentUtils
 							Double.parseDouble(
 									rowEntries[ col ] ) );
 					break;
-				case ImageSetId:
-					segmentBuilder.setImageId( rowEntries[ col ] );
+				case ImageSetName:
+					segmentBuilder.setImageSetName( rowEntries[ col ] );
 					break;
 
 			}

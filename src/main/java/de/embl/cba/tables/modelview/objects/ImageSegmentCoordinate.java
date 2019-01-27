@@ -2,7 +2,7 @@ package de.embl.cba.tables.modelview.objects;
 
 public enum ImageSegmentCoordinate
 {
-	ImageSetId,
+	ImageSetName,
 	Label,
 	X,
 	Y,

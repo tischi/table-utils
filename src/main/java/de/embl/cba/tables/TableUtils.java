@@ -126,7 +126,7 @@ public class TableUtils
 		return featureNames;
 	}
 
-	public static String autoFixDelim( String delim, ArrayList< String > strings )
+	public static String autoDelim( String delim, ArrayList< String > strings )
 	{
 		if ( delim == null )
 		{
@@ -145,7 +145,7 @@ public class TableUtils
 	public static JTable createJTableFromStringList( ArrayList< String > strings, String delim )
 	{
 
-		delim = autoFixDelim( delim, strings );
+		delim = autoDelim( delim, strings );
 
 		StringTokenizer st = new StringTokenizer( strings.get( 0 ), delim );
 
@@ -212,7 +212,7 @@ public class TableUtils
 
 		final ArrayList< String > tableRows = readRows( file );
 
-		delim = autoFixDelim( delim, tableRows );
+		delim = autoDelim( delim, tableRows );
 
 		ArrayList< String > columns = getColumnNames( tableRows, delim );
 

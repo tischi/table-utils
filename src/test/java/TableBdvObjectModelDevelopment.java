@@ -1,18 +1,9 @@
 import bdv.util.RandomAccessibleIntervalSource;
-import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
-import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
-import de.embl.cba.tables.modelview.datamodels.DefaultImageSourcesModelOld;
-import de.embl.cba.tables.modelview.datamodels.AnnotatedImageSegmentsAndImagesModel;
+import de.embl.cba.tables.modelview.datamodels.DataModelUtils;
 import de.embl.cba.tables.modelview.datamodels.DefaultImageSourcesModel;
 import de.embl.cba.tables.modelview.objects.DefaultAnnotatedImageSegment;
-import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.DefaultImageSegmentBuilder;
-import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
-import de.embl.cba.tables.modelview.selection.SelectionModel;
-import de.embl.cba.tables.modelview.views.bdv.ImageSegmentsBdvView;
-import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
 import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
 import net.imglib2.util.ValuePair;
 
@@ -26,16 +17,21 @@ public class TableBdvObjectModelDevelopment
 	public static void main( String[] args ) throws IOException
 	{
 
-		final DefaultImageSourcesModelOld defaultImageSourcesModelOld = new DefaultImageSourcesModelOld(
-				Examples.load2D16BitLabelSource(), true );
+		final DefaultImageSourcesModel imageSourcesModel = createImageSourcesModel();
 
-		final RandomAccessibleIntervalSource labelSource = Examples.load2D16BitLabelSource();
+		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments = createImageSegments( new File( Examples.class.getResource( "2d-16bit-labelMask-Morphometry.csv" ).getFile() ) );
 
-		final DefaultImageSourcesModel imageSourcesModel = new DefaultImageSourcesModel( true );
+		final ArrayList< String > categoricalColumns = new ArrayList<>();
+		categoricalColumns.add( "Label" );
 
-		imageSourcesModel.addLabelImageSource( DefaultImageSegmentBuilder.getDefaultImageId(), labelSource );
+		DataModelUtils.buildModelsAndViews(
+				imageSourcesModel,
+				annotatedImageSegments,
+				categoricalColumns );
+	}
 
-		final File tableFile = new File( Examples.class.getResource( "2d-16bit-labelMask-Morphometry.csv" ).getFile() );
+	public static ArrayList< DefaultAnnotatedImageSegment > createImageSegments( File tableFile )
+	{
 
 		final ArrayList< DefaultAnnotatedImageSegment > segments = new ArrayList<>();
 
@@ -44,43 +40,19 @@ public class TableBdvObjectModelDevelopment
 		coordinateToColumnNameMap.put( ImageSegmentCoordinate.X, new ValuePair("X", null ) );
 		coordinateToColumnNameMap.put( ImageSegmentCoordinate.Y, new ValuePair("Y", null ) );
 
-		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments =
-				TableUtils.segmentsFromTableFile(
-						tableFile,
-						",",
-						coordinateToColumnNameMap );
+		return TableUtils.segmentsFromTableFile(
+				tableFile,
+				",",
+				coordinateToColumnNameMap );
+	}
 
-		final AnnotatedImageSegmentsAndImagesModel dataModel =
-				new AnnotatedImageSegmentsAndImagesModel(
-						"MyModel",
-						annotatedImageSegments,
-						"Label",
-						null,
-						imageSourcesModel );
+	public static DefaultImageSourcesModel createImageSourcesModel()
+	{
+		final RandomAccessibleIntervalSource labelSource = Examples.load2D16BitLabelSource();
 
-		final SelectionModel< AnnotatedImageSegment > selectionModel
-				= new DefaultSelectionModel<>();
+		final DefaultImageSourcesModel imageSourcesModel = new DefaultImageSourcesModel( true );
 
-		final DynamicCategoryColoringModel< AnnotatedImageSegment > coloringModel
-				= new DynamicCategoryColoringModel<>( new GlasbeyARGBLut(), 50 );
-
-		final SelectionColoringModel< AnnotatedImageSegment > selectionColoringModel
-				= new SelectionColoringModel<>(
-					coloringModel,
-					selectionModel );
-
-		final ImageSegmentsBdvView imageSegmentsBdvView = new ImageSegmentsBdvView(
-				dataModel,
-				selectionModel,
-				selectionColoringModel );
-
-		final ArrayList< String > categoricalColumns = new ArrayList<>();
-		categoricalColumns.add( "Label" );
-		final TableRowsTableView tableView = new TableRowsTableView(
-				dataModel,
-				selectionModel,
-				selectionColoringModel,
-				categoricalColumns );
-
+		imageSourcesModel.addLabelImageSource( DefaultImageSegmentBuilder.getDefaultImageSetName(), labelSource );
+		return imageSourcesModel;
 	}
 }

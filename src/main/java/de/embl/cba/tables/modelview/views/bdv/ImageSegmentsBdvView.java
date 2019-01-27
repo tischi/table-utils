@@ -119,11 +119,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private void adaptGroupVisibility( ImageSegment selection )
 	{
 		final int currentGroup = getCurrentGroup();
-		final String currentImageSetName = imagesAndSegmentsModel.getImageSourcesModel().getImageSetIds().get( currentGroup );
+		final String currentImageSetName = imagesAndSegmentsModel.getImageSourcesModel().getImageSetNames().get( currentGroup );
 
 		if ( ! currentImageSetName.equals( selection.imageSetName() ) )
 		{
-			final int selectedGroup = imagesAndSegmentsModel.getImageSourcesModel().getImageSetIds().indexOf( selection.imageSetName() );
+			final int selectedGroup = imagesAndSegmentsModel.getImageSourcesModel().getImageSetNames().indexOf( selection.imageSetName() );
 			//bdv.getViewerPanel().getState().setCurrentGroup( selectedGroup );
 			bdv.getViewerPanel().getVisibilityAndGrouping().setGroupActive( selectedGroup, true );
 		}
@@ -141,9 +141,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		initBdvOptions( imageSourcesModel );
 
-		final String imageSetId = imageSourcesModel.getImageSetIds().get( 0 );
-
-		showImageSet( imageSourcesModel, imageSetId, selectionColoringModel );
+		showImageSet( imageSourcesModel, 0, selectionColoringModel );
 
 		configureGrouping();
 	}
@@ -160,19 +158,45 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		visibilityAndGrouping.setDisplayMode( DisplayMode.GROUP );
 	}
 
-	private void showImageSet( ImageSourcesModel imageSourcesModel, String imageSetId, SelectionColoringModel< T > selectionColoringModel )
+	private void showImageSet(
+			ImageSourcesModel imageSourcesModel,
+			int imageSetIdx,
+			SelectionColoringModel< T > selectionColoringModel )
 	{
-		final SourceGroup sourceGroup = new SourceGroup( imageSetId );
+		final String imageSetName = imageSourcesModel.getImageSetNames().get( imageSetIdx );
 
-		showLabelSource( imageSourcesModel, imageSetId, selectionColoringModel, sourceGroup );
+		bdv = showLabelSource( imageSourcesModel, imageSetName, selectionColoringModel );
 
-		for ( Source intensitySource : imageSourcesModel.getIntensityImageSources( imageSetId ) )
+		SourceGroup sourceGroup = createSourceGroup( imageSetIdx, imageSetName );
+
+		sourceGroup.addSource( bdv.getViewerPanel().getState().numSources() - 1  );
+
+		for ( Source intensitySource : imageSourcesModel.getIntensityImageSources( imageSetName ) )
 		{
-			sourceGroup.addSource( bdv.getViewerPanel().getState().numSources()  );
 			BdvFunctions.show( intensitySource, bdvOptions );
+			sourceGroup.addSource( bdv.getViewerPanel().getState().numSources() - 1  );
 		}
 
-		bdv.getViewerPanel().addGroup( sourceGroup );
+		//bdv.getViewerPanel().addGroup( sourceGroup );
+	}
+
+	private SourceGroup createSourceGroup( int imageSetIdx, String imageSetName )
+	{
+		SourceGroup sourceGroup;
+		try
+		{
+			sourceGroup = bdv.getViewerPanel().getVisibilityAndGrouping().getSourceGroups().get( imageSetIdx );
+			sourceGroup.setName( imageSetName );
+			bdv.getViewerPanel().getVisibilityAndGrouping().setGroupName( imageSetIdx, imageSetName );
+		}
+		catch ( Exception e )
+		{
+			sourceGroup = new SourceGroup( imageSetName );
+			bdv.getViewerPanel().addGroup( sourceGroup );
+		}
+
+
+		return sourceGroup;
 	}
 
 	private void initBdvOptions( ImageSourcesModel imageSourcesModel )
@@ -180,17 +204,18 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		// TODO: is it correct to already here specify the number of groups?
 
 		bdvOptions = BdvOptions.options()
-				.numSourceGroups( imageSourcesModel.getImageSetIds().size() );
+				.numSourceGroups( imageSourcesModel.getImageSetNames().size() );
 
 		bdvOptions = bdvOptions.addTo( bdv );
 
 		if ( imageSourcesModel.is2D() ) bdvOptions = bdvOptions.is2D();
 	}
 
-	private void showLabelSource( ImageSourcesModel imageSourcesModel, String imageSetId, SelectionColoringModel< T > selectionColoringModel, SourceGroup sourceGroup )
+	private BdvHandle showLabelSource(
+			ImageSourcesModel imageSourcesModel,
+			String imageSetId,
+			SelectionColoringModel< T > selectionColoringModel )
 	{
-		sourceGroup.addSource( bdv.getViewerPanel().getState().numSources() );
-
 		ImageSegmentLabelsARGBConverter labelSourcesARGBConverter =
 			new ImageSegmentLabelsARGBConverter(
 					imagesAndSegmentsModel,
@@ -199,6 +224,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		final Source labelSource = imageSourcesModel.getLabelImageSource( imageSetId );
 
+		// TODO: this could be a SourceAndConverter
 		Source argbConvertedLabelSource = new ARGBConvertedRealSource(
 				labelSource,
 				labelSourcesARGBConverter );
@@ -208,6 +234,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 				bdvOptions ).getBdvHandle();
 
 		bdv.getViewerPanel().addTimePointListener( labelSourcesARGBConverter );
+
+		return bdv;
 	}
 
 	private void installBdvBehaviours()
@@ -254,7 +282,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		final int currentGroup = getCurrentGroup();
 
-		final String currentImageSet = imagesAndSegmentsModel.getImageSourcesModel().getImageSetIds().get( currentGroup );
+		final String currentImageSet = imagesAndSegmentsModel.getImageSourcesModel().getImageSetNames().get( currentGroup );
 
 		final Source< ? extends RealType< ? > > labelImageSource = imagesAndSegmentsModel.getImageSourcesModel().getLabelImageSource( currentImageSet );
 
