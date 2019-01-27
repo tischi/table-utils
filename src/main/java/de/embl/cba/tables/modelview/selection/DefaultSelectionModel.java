@@ -44,8 +44,15 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 
 			for ( SelectionListener listener : listeners.list )
 			{
-				listener.selectionChanged();
-				listener.selectionEvent( object, false );
+				new Thread( new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						listener.selectionChanged();
+						listener.selectionEvent( object, false );
+					}
+				}).start();
 			}
 		}
 	}
@@ -58,8 +65,15 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 
 			for ( SelectionListener listener : listeners.list )
 			{
-				listener.selectionChanged();
-				listener.selectionEvent( object, true );
+				new Thread( new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						listener.selectionChanged();
+						listener.selectionEvent( object, true );
+					}
+				}).start();
 			}
 		}
 	}
@@ -93,7 +107,18 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 		else
 		{
 			selected.clear();
-			listeners.list.forEach( SelectionListener::selectionChanged );
+
+			for ( SelectionListener listener : listeners.list )
+			{
+				new Thread( new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						listener.selectionChanged();
+					}
+				}).start();
+			}
 			return true;
 		}
 	}

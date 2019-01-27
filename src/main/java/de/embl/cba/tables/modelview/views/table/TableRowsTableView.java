@@ -12,16 +12,15 @@ import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.objects.attributes.AssignValuesToTableRowsUI;
 
 import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 
 public class TableRowsTableView < T extends TableRow > extends JPanel
@@ -41,6 +40,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private Map< String, double[] > columnsMinMaxMap;
 	private JTable table;
 	private int categoricalLabelColoringRandomSeed;
+	private ArrayList< Integer > selectedRowsInView;
+	private int recentlySelectedRowInView;
 
 	public TableRowsTableView(
 			final TableRowsModel< T > tableRowsModel,
@@ -53,6 +54,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		this.selectionColoringModel = selectionColoringModel;
 		this.selectionModel = selectionModel;
 		this.categoricalColumns = categoricalColumns;
+
+		selectedRowsInView = new ArrayList<>(  );
 
 		registerAsSelectionListener( selectionModel );
 
@@ -84,36 +87,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		} );
 	}
 
-	public void registerAsSelectionListener( SelectionModel< ? extends TableRow > selectionModel )
-	{
-		selectionModel.listeners().add( new SelectionListener< TableRow >()
-		{
-			@Override
-			public void selectionChanged()
-			{
-				table.getSelectionModel().clearSelection();
 
-				final Set< ? extends TableRow > selected = selectionModel.getSelected();
-
-				for ( TableRow tableRow : selected )
-				{
-					final int row = tableRow.rowIndex();
-					final int rowInView = table.convertRowIndexToView( row );
-					table.getSelectionModel().addSelectionInterval( rowInView, rowInView );
-					// TODO: order table such that all of them are visible
-				}
-			}
-
-			@Override
-			public void selectionEvent( TableRow selection, boolean selected )
-			{
-				if ( selected )
-				{
-					moveToRow( selection.rowIndex() );
-				}
-			}
-		} );
-	}
 
 	private void createTable()
     {
@@ -123,8 +97,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
         table.setFillsViewportHeight( true );
         table.setAutoCreateRowSorter( true );
         table.setRowSelectionAllowed( true );
+		table.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
 
-        scrollPane = new JScrollPane( table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane = new JScrollPane( table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.add( scrollPane );
         table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 
@@ -410,25 +385,101 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return columnsMinMaxMap.get( column );
 	}
 
-	public void moveToRow( int row )
+	public void moveToRowInView( int rowInView )
 	{
-		final int rowInView = table.convertRowIndexToView( row );
-		table.scrollRectToVisible( table.getCellRect( rowInView, 0, true ) );
+		table.getSelectionModel().setSelectionInterval( rowInView, rowInView );
+		final Rectangle visibleRect = table.getVisibleRect();
+		final Rectangle cellRect = table.getCellRect( rowInView, 0, true );
+		visibleRect.y = cellRect.y;
+		table.scrollRectToVisible( visibleRect );
+		table.updateUI();
 	}
 
 	public void installRowSelectionListener()
 	{
-		table.addMouseListener(new MouseInputAdapter()
+//		table.addMouseListener(new MouseInputAdapter()
+//		{
+//			public void mousePressed( MouseEvent me )
+//			{
+////				while ( table.getSelectionModel().getValueIsAdjusting() )
+////				{
+////					int a = 1;
+////				};
+//
+//				final int selectedRowInView = table.getSelectedRow();
+//				if ( selectedRowInView == -1 )
+//				{
+//					int a = 1;
+//				}
+//				final int row = table.convertRowIndexToModel( selectedRowInView );
+//				selectionModel.toggle( tableRowsModel.getTableRows().get( row ) );
+//			}
+//		} );
+
+		table.getSelectionModel().addListSelectionListener( new ListSelectionListener()
 		{
-			public void mousePressed( MouseEvent me )
+			@Override
+			public void valueChanged( ListSelectionEvent e )
 			{
-				final int selectedRowInView = table.getSelectedRow();
-				final int row = table.convertRowIndexToModel( selectedRowInView );
-				selectionModel.toggle( tableRowsModel.getTableRows().get( row ) );
+				if ( e.getValueIsAdjusting() ) return;
+
+				recentlySelectedRowInView = table.getSelectedRow();
+
+				final int row = table.convertRowIndexToModel( recentlySelectedRowInView );
+
+				// TODO: currently one can only select single rows (not even unselect,
+				// because it was to complex with all the listeners)
+				selectionModel.setSelected( tableRowsModel.getTableRows().get( row ), true );
 			}
 		} );
 	}
 
+	public void registerAsSelectionListener( SelectionModel< ? extends TableRow > selectionModel )
+	{
+		selectionModel.listeners().add( new SelectionListener< TableRow >()
+		{
+			@Override
+			public synchronized void selectionChanged()
+			{
+//				table.getSelectionModel().setValueIsAdjusting( true );
+
+//				table.getSelectionModel().clearSelection();
+
+//				final Set< ? extends TableRow > selected = selectionModel.getSelected();
+//
+//				for ( TableRow tableRow : selected )
+//				{
+//					final int row = tableRow.rowIndex();
+//					final int rowInView = table.convertRowIndexToView( row );
+////				    if ( ! selectedRowsInView.contains( rowInView ) )
+////					{
+////					table.getSelectionModel().addSelectionInterval( rowInView, rowInView );
+////					}
+//				}
+//
+////				table.getSelectionModel().setValueIsAdjusting( false );
+//
+//				int a = 1;
+			}
+
+			@Override
+			public void selectionEvent( TableRow selection, boolean selected )
+			{
+				if ( selected )
+				{
+					final int rowInView = table.convertRowIndexToView( selection.rowIndex() );
+
+					if ( rowInView == recentlySelectedRowInView ) return;
+
+					moveToRowInView( rowInView );
+				}
+				else
+				{
+					// TODO: change color of selected rows
+				}
+			}
+		} );
+	}
 
 	private JMenu createColoringMenu()
 	{
