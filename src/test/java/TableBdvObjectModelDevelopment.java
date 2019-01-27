@@ -2,7 +2,6 @@ import bdv.util.RandomAccessibleIntervalSource;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.datamodels.DataModelUtils;
 import de.embl.cba.tables.modelview.datamodels.DefaultImageSourcesModel;
-import de.embl.cba.tables.modelview.datamodels.LabelSource;
 import de.embl.cba.tables.modelview.objects.DefaultAnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.DefaultImageSegmentBuilder;
 import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;

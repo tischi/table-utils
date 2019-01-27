@@ -33,7 +33,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 		this.selectionModel = selectionModel;
 
 		this.selectionColor = YELLOW;
-		this.brightnessNotSelected = 0.1;
+		this.brightnessNotSelected = 0.2;
 		this.selectionMode = DimNotSelected;
 	}
 

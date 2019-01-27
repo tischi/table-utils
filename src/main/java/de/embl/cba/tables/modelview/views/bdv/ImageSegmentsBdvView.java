@@ -52,7 +52,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private HashMap< Integer, String > groupIdxToName;
 	private HashMap< String, String > imageIdToGroupName;
 	private ImageSourcesModel imageSourcesModel;
-	private boolean isGroupingConfigured;
+	private boolean isBdvGroupingConfigured;
+	private HashMap< Integer, String > sourceIndexToMetaData;
 
 	public ImageSegmentsBdvView(
 			final ImagesAndSegmentsModel< T > imagesAndSegmentsModel,
@@ -67,9 +68,13 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		groupIdxToName = new HashMap<>(  );
 		imageIdToGroupName = new HashMap<>(  );
-		isGroupingConfigured = false;
+		sourceIndexToMetaData = new HashMap<>();
+		isBdvGroupingConfigured = false;
 
 		initBdvOptions( imageSourcesModel );
+
+		configureGroupingNames();
+
 		showGroup( 0 );
 
 		registerAsSelectionListener( selectionModel );
@@ -77,6 +82,17 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		registerAsColoringListener( selectionColoringModel );
 
 		installBdvBehaviours();
+	}
+
+	public void configureGroupingNames()
+	{
+		final Set< String > imageSetNames = imageSourcesModel.getImageSources().keySet();
+		int i = 0;
+		for ( String imageSetName : imageSetNames )
+		{
+			groupIdxToName.put( i, imageSetName );
+			imageIdToGroupName.put( imageSetName, imageSetName ); // TODO!
+		}
 	}
 
 	public void registerAsColoringListener( ColoringModel< T > coloringModel )
@@ -147,16 +163,17 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		bdv.getViewerPanel().getVisibilityAndGrouping().setCurrentGroup( selectedGroup );
 	}
 
-	private void populateGroup( int groupIdx )
+	private void populateGroup( int groupIndex )
 	{
-		final String groupName = groupIdxToName.get( groupIdx );
+		final String groupName = groupIdxToName.get( groupIndex );
 
 		final ArrayList< Source< ? > > sources = imageSourcesModel.getImageSources().get( groupName );
 
 		for ( Source source : sources )
 		{
-			if ( imageSourcesModel.getImageSourceMetaData( source )
-					.contains( ImageSourcesMetaData.LABEL_SOURCE ) )
+			final String imageSourceMetaData = imageSourcesModel.getImageSourceMetaData( source );
+
+			if ( imageSourceMetaData.contains( ImageSourcesMetaData.LABEL_SOURCE ) )
 			{
 				Source labelSource = asLabelSource( groupName, source );
 
@@ -167,11 +184,15 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 				bdv = BdvFunctions.show( source, bdvOptions ).getBdvHandle();
 			}
 
+			if ( ! isBdvGroupingConfigured ) configureBdvGrouping();
+
 			final VisibilityAndGrouping visibilityAndGrouping = bdv.getViewerPanel().getVisibilityAndGrouping();
 
-			if ( ! isGroupingConfigured ) configureGrouping();
+			final int sourceIndex = bdv.getViewerPanel().getState().numSources() - 1;
 
-			visibilityAndGrouping.addSourceToGroup( bdv.getViewerPanel().getState().numSources() - 1, groupIdx );
+			sourceIndexToMetaData.put( sourceIndex, imageSourceMetaData );
+
+			visibilityAndGrouping.addSourceToGroup( sourceIndex, groupIndex );
 		}
 	}
 
@@ -217,7 +238,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	}
 
 
-	private void configureGrouping()
+	private void configureBdvGrouping()
 	{
 		final Set< String > imageSetNames = imageSourcesModel.getImageSources().keySet();
 
@@ -235,15 +256,13 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			{
 				bdv.getViewerPanel().addGroup( new SourceGroup( imageSetName ) );
 				visibilityAndGrouping.setGroupName( i, imageSetName );
-				groupIdxToName.put( i, imageSetName );
-				imageIdToGroupName.put( imageSetName, imageSetName ); // TODO!
 			}
 		}
 
 		visibilityAndGrouping.setGroupingEnabled( true );
 		visibilityAndGrouping.setDisplayMode( DisplayMode.GROUP );
 
-		isGroupingConfigured = true;
+		isBdvGroupingConfigured = true;
 	}
 
 	private void addMostRecentSourceToGroup( int groupIdx )
@@ -302,18 +321,16 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private void toggleSelectionAtMousePosition()
 	{
 
-		final List< Integer > indices = bdv.getViewerPanel().getState().getVisibleSourceIndices();
-		final List< SourceState< ? > > sources = bdv.getViewerPanel().getState().getSources();
+		final List< Integer > visibleSourceIndices = bdv.getViewerPanel().getState().getVisibleSourceIndices();
 
-		for ( int idx : indices )
+		for ( int index : visibleSourceIndices )
 		{
-			// TODO: the logic of finding LabelSources might change...
-			if ( sources.get( idx ).getSpimSource() instanceof ARGBConvertedRealSource )
+			if ( sourceIndexToMetaData.get( index ).contains( ImageSourcesMetaData.LABEL_SOURCE ) )
 			{
 				final int timePoint = getCurrentTimePoint();
 
 				final double label = BdvUtils.getValueAtGlobalCoordinates(
-						sources.get( idx ).getSpimSource(),
+						bdv.getViewerPanel().getState().getSources().get( index ).getSpimSource(),
 						BdvUtils.getGlobalMouseCoordinates( bdv ),
 						timePoint );
 
