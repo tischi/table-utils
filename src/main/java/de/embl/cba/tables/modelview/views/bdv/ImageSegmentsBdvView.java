@@ -177,7 +177,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		bdv.getViewerPanel().getVisibilityAndGrouping().setCurrentGroup( selectedGroup );
 	}
 
-	private void populateAndShowGroup( int groupIndex )
+	private synchronized void populateAndShowGroup( int groupIndex )
 	{
 		final String groupName = groupIdxToName.get( groupIndex );
 

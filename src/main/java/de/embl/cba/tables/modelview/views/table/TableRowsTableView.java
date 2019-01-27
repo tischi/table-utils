@@ -14,6 +14,7 @@ import de.embl.cba.tables.objects.attributes.AssignValuesToTableRowsUI;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -73,6 +74,176 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		createMenuBar();
 		showTable();
 		installRowSelectionListener();
+		configureTableRowColoring( tableRowsModel, selectionModel );
+	}
+
+
+	public void configureTableRowColoring( TableRowsModel< T > tableRowsModel, SelectionModel< T > selectionModel )
+	{
+		table.setDefaultRenderer( Double.class, new DefaultTableCellRenderer()
+		{
+			@Override
+			public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+				Component c = super.getTableCellRendererComponent(
+						table,
+						value,
+						isSelected,
+						hasFocus,
+						row,
+						column);
+
+				c.setBackground( this.getRowColour(row, column) );
+
+				return c;
+			}
+
+			private Color getRowColour( int rowInView, int column )
+			{
+				if ( column == 0 )
+				{
+					int a = 1;
+				}
+
+				if ( column == 1 )
+				{
+					int a = 1;
+				}
+
+				final int row = table.convertRowIndexToModel( rowInView );
+				if ( selectionModel.isSelected( tableRowsModel.getTableRows().get( row ) ) )
+				{
+					return Color.YELLOW;
+				}
+				else
+				{
+					return Color.WHITE;
+				}
+			}
+		} );
+		table.setDefaultRenderer( String.class, new DefaultTableCellRenderer()
+		{
+			@Override
+			public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+				Component c = super.getTableCellRendererComponent(
+						table,
+						value,
+						isSelected,
+						hasFocus,
+						row,
+						column);
+
+				c.setBackground( this.getRowColour(row, column) );
+
+				return c;
+			}
+
+			private Color getRowColour( int rowInView, int column )
+			{
+				if ( column == 0 )
+				{
+					int a = 1;
+				}
+
+				if ( column == 1 )
+				{
+					int a = 1;
+				}
+
+				final int row = table.convertRowIndexToModel( rowInView );
+				if ( selectionModel.isSelected( tableRowsModel.getTableRows().get( row ) ) )
+				{
+					return Color.YELLOW;
+				}
+				else
+				{
+					return Color.WHITE;
+				}
+			}
+		} );
+		table.setDefaultRenderer( Integer.class, new DefaultTableCellRenderer()
+		{
+			@Override
+			public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+				Component c = super.getTableCellRendererComponent(
+						table,
+						value,
+						isSelected,
+						hasFocus,
+						row,
+						column);
+
+				c.setBackground( this.getRowColour(row, column) );
+
+				return c;
+			}
+
+			private Color getRowColour( int rowInView, int column )
+			{
+				if ( column == 0 )
+				{
+					int a = 1;
+				}
+
+				if ( column == 1 )
+				{
+					int a = 1;
+				}
+
+				final int row = table.convertRowIndexToModel( rowInView );
+				if ( selectionModel.isSelected( tableRowsModel.getTableRows().get( row ) ) )
+				{
+					return Color.YELLOW;
+				}
+				else
+				{
+					return Color.WHITE;
+				}
+			}
+		} );
+		table.setDefaultRenderer( Object.class, new DefaultTableCellRenderer()
+		{
+			@Override
+			public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+				Component c = super.getTableCellRendererComponent(
+						table,
+						value,
+						isSelected,
+						hasFocus,
+						row,
+						column);
+
+				c.setBackground( this.getRowColour(row, column) );
+
+				return c;
+			}
+
+			private Color getRowColour( int rowInView, int column )
+			{
+				if ( column == 0 )
+				{
+					int a = 1;
+				}
+
+				if ( column == 1 )
+				{
+					int a = 1;
+				}
+
+				final int row = table.convertRowIndexToModel( rowInView );
+				if ( selectionModel.isSelected( tableRowsModel.getTableRows().get( row ) ) )
+				{
+					return Color.YELLOW;
+				}
+				else
+				{
+					return Color.WHITE;
+				}
+			}
+		} );
 	}
 
 	public void registerAsColoringListener( SelectionColoringModel< T > selectionColoringModel )
@@ -392,30 +563,11 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		final Rectangle cellRect = table.getCellRect( rowInView, 0, true );
 		visibleRect.y = cellRect.y;
 		table.scrollRectToVisible( visibleRect );
-		table.updateUI();
+		table.repaint();
 	}
 
 	public void installRowSelectionListener()
 	{
-//		table.addMouseListener(new MouseInputAdapter()
-//		{
-//			public void mousePressed( MouseEvent me )
-//			{
-////				while ( table.getSelectionModel().getValueIsAdjusting() )
-////				{
-////					int a = 1;
-////				};
-//
-//				final int selectedRowInView = table.getSelectedRow();
-//				if ( selectedRowInView == -1 )
-//				{
-//					int a = 1;
-//				}
-//				final int row = table.convertRowIndexToModel( selectedRowInView );
-//				selectionModel.toggle( tableRowsModel.getTableRows().get( row ) );
-//			}
-//		} );
-
 		table.getSelectionModel().addListSelectionListener( new ListSelectionListener()
 		{
 			@Override
@@ -460,6 +612,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 ////				table.getSelectionModel().setValueIsAdjusting( false );
 //
 //				int a = 1;
+				table.repaint();
 			}
 
 			@Override
