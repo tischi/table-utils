@@ -24,6 +24,7 @@ import org.scijava.ui.behaviour.io.InputTriggerConfig;
 import org.scijava.ui.behaviour.util.Behaviours;
 
 import java.util.HashMap;
+import java.util.List;
 
 import static de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter.BACKGROUND;
 
@@ -144,6 +145,16 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		showImageSet( imageSourcesModel, imageSetId, selectionColoringModel );
 
+		configureGrouping();
+	}
+
+	private void configureGrouping()
+	{
+		final List<SourceGroup> groups = this.bdv.getViewerPanel().getState().getSourceGroups();
+		for (final SourceGroup g : groups) {
+			this.bdv.getViewerPanel().getState().removeGroup(g);
+		}
+
 		final VisibilityAndGrouping visibilityAndGrouping = bdv.getViewerPanel().getVisibilityAndGrouping();
 		visibilityAndGrouping.setGroupingEnabled( true );
 		visibilityAndGrouping.setDisplayMode( DisplayMode.GROUP );
@@ -183,6 +194,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		ImageSegmentLabelsARGBConverter labelSourcesARGBConverter =
 			new ImageSegmentLabelsARGBConverter(
 					imagesAndSegmentsModel,
+					imageSetId,
 					selectionColoringModel );
 
 		final Source labelSource = imageSourcesModel.getLabelImageSource( imageSetId );

@@ -5,6 +5,8 @@ import de.embl.cba.tables.modelview.datamodels.Lazy2DImageSourcesModel;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -16,12 +18,27 @@ public class CellProfilerTableToImageSourcesParser
 	public static final String FILE = "FileName_";
 
 	public static final String OBJECTS = "Objects_";
+	private final File tableFile;
+	private final String imageRootPathInTable;
+	private final String imageRootPathOnThisComputer;
+	private final String delim;
 
 	private ArrayList< String > columns;
 	private Lazy2DImageSourcesModel imageSourcesModel;
 
-	public CellProfilerTableToImageSourcesParser( JTable table )
+	public CellProfilerTableToImageSourcesParser(
+			File tableFile,
+			String imageRootPathInTable,
+			String imageRootPathOnThisComputer,
+			String delim ) throws IOException
 	{
+		this.tableFile = tableFile;
+		this.imageRootPathInTable = imageRootPathInTable;
+		this.imageRootPathOnThisComputer = imageRootPathOnThisComputer;
+		this.delim = delim;
+
+		final JTable table = TableUtils.loadTable( this.tableFile, delim );
+
 		columns = TableUtils.getColumnNames( table );
 
 		final HashMap< String, FolderAndFileColumn > images = getImageFileAndFolderColumns( );
@@ -40,7 +57,7 @@ public class CellProfilerTableToImageSourcesParser
 	private Lazy2DImageSourcesModel createImageSourcesModel(
 			JTable table,
 			int imageSetIdColumnIndex,
-			HashMap< String, FolderAndFileColumn > images )
+			HashMap< String, FolderAndFileColumn > images ) throws IOException
 	{
 		final Lazy2DImageSourcesModel imageSourcesModel = new Lazy2DImageSourcesModel();
 
@@ -65,15 +82,21 @@ public class CellProfilerTableToImageSourcesParser
 						row,
 						table.getColumnModel().getColumnIndex( fileColumn ) );
 
-				final String pathName = folderName + File.separator + fileName;
+				String imagePath = folderName + File.separator + fileName;
+
+				// path mapping if needed
+				if ( imageRootPathInTable != null )
+				{
+					imagePath = imagePath.replace( imageRootPathInTable, imageRootPathOnThisComputer );
+				}
 
 				if ( image.contains( OBJECTS ) )
 				{
-					imageSourcesModel.addLabelImageSource( imageSetId, new File( pathName ) );
+					imageSourcesModel.addLabelImageSource( imageSetId, new File( imagePath ) );
 				}
 				else
 				{
-					imageSourcesModel.addIntensityImageSource( imageSetId, new File( pathName ) );
+					imageSourcesModel.addIntensityImageSource( imageSetId, new File( imagePath ) );
 				}
 			}
 		}

@@ -1,6 +1,7 @@
 package de.embl.cba.tables.modelview.datamodels;
 
 import bdv.viewer.Source;
+import net.imglib2.type.numeric.RealType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 	}
 
 	@Override
-	public Source< ? > getLabelImageSource( String imageSetId )
+	public Source< ? extends RealType< ? > > getLabelImageSource( String imageSetId )
 	{
 		return imageSourcesMap.get( imageSetId ).labelImageSource;
 	}
@@ -42,7 +43,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 		return new ArrayList( imageSourcesMap.keySet() );
 	}
 
-	public void addLabelImageSource( String imageId, Source< ? > labelImageSource )
+	public void addLabelImageSource( String imageId, Source< ? extends RealType< ? > > labelImageSource )
 	{
 		addIfMissing( imageId );
 
@@ -70,7 +71,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 	private class IntensityAndLabelImageSources
 	{
 		ArrayList< Source< ? > > intensityImageSources = new ArrayList<>(  );
-		Source< ? > labelImageSource;
+		Source< ? extends RealType< ? > > labelImageSource;
 	}
 
 }

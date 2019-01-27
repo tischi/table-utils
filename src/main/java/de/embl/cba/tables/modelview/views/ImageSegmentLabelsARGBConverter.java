@@ -13,15 +13,18 @@ public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
 		implements Converter< RealType, VolatileARGBType >, TimePointListener
 {
 	private final ImagesAndSegmentsModel< T > segmentsModel;
+	private final String imageSetId;
 	private final ColoringModel< T > coloringModel;
 
 	private int timePointIndex;
 
 	public ImageSegmentLabelsARGBConverter(
 			ImagesAndSegmentsModel< T > segmentsModel,
+			String imageSetId,
 			ColoringModel< T > coloringModel )
 	{
 		this.segmentsModel = segmentsModel;
+		this.imageSetId = imageSetId;
 		this.coloringModel = coloringModel;
 		timePointIndex = 0;
 	}
@@ -46,7 +49,7 @@ public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
 		}
 
 		coloringModel.convert(
-				segmentsModel.getSegment( label.getRealDouble(), timePointIndex ),
+				segmentsModel.getSegment( imageSetId, label.getRealDouble(), timePointIndex ),
 				color.get() );
 
 	}

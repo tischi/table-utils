@@ -196,7 +196,7 @@ public class TableUtils
 
 		}
 
-		model.refreshColumnClassesFromStringColumns();
+		model.refreshColumnClassesFromObjectColumns();
 
 		return new JTable( model );
 	}

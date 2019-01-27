@@ -24,8 +24,6 @@ public class Lazy2DImageSourcesModel implements ImageSourcesModel
 	/**
 	 * Lazily constructs Sources from 2D image files upon request.
 	 * There is no caching.
-	 *
-	 * @param is2D
 	 */
 	public Lazy2DImageSourcesModel( )
 	{
@@ -51,7 +49,7 @@ public class Lazy2DImageSourcesModel implements ImageSourcesModel
 	}
 
 	@Override
-	public Source< ? > getLabelImageSource( String imageSetId )
+	public Source< ? extends RealType< ? > > getLabelImageSource( String imageSetId )
 	{
 		final ImagePlus imagePlus = IJ.openImage( imageSourcesMap.get( imageSetId ).labelImageSource.toString() );
 

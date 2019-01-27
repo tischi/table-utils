@@ -2,6 +2,7 @@ import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.cellprofiler.CellProfilerDataset;
 import de.embl.cba.tables.cellprofiler.CellProfilerOutputExplorer;
 import de.embl.cba.tables.cellprofiler.CellProfilerTableParser;
+import de.embl.cba.tables.cellprofiler.CellProfilerTableToImageSourcesParser;
 
 import javax.swing.*;
 import java.io.File;
@@ -21,16 +22,24 @@ public class ExploreCellProfilerOutputDevelop
 	{
 		//final File file = new File( TestTableLoading.class.getResource( "cellprofiler-table.txt" ).getFileColumn() );
 
-//		final File file = new File("/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt");
+		final File file = new File("/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt");
 
-		final File file = new File("/Volumes/cba/exchange/Daja-Christian/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt" );
-		final JTable table = TableUtils.loadTable( file, "\t" );
+//		final File file = new File("/Volumes/cba/exchange/Daja-Christian/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt" );
+		//final JTable table = TableUtils.loadTable( file, "\t" );
 
-		final CellProfilerTableParser cellProfilerTableParser = new CellProfilerTableParser( table );
+		new CellProfilerTableToImageSourcesParser(
+				file,
+				"/Volumes/cba/exchange/Daja-Christian",
+				"/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data",
+				"\t"
+				);
 
-		final HashMap< Object, CellProfilerDataset > datasets = cellProfilerTableParser.getDatasets();
-
-		new CellProfilerOutputExplorer( table, datasets );
+//
+//		final CellProfilerTableParser cellProfilerTableParser = new CellProfilerTableParser( table );
+//
+//		final HashMap< Object, CellProfilerDataset > datasets = cellProfilerTableParser.getDatasets();
+//
+//		new CellProfilerOutputExplorer( table, datasets );
 
 	}
 
