@@ -20,7 +20,8 @@ import java.util.*;
 
 public class Lazy2DImageSourcesModel implements ImageSourcesModel
 {
-	private Map< String, ArrayList< Source < ? > > > imageSourcesMap;
+	private Map< String, ArrayList< Source < ? > > > imageSetToSources;
+	private Map< Source< ? >, String > sourceToMetaData;
 
 	private final boolean is2D;
 
@@ -30,17 +31,9 @@ public class Lazy2DImageSourcesModel implements ImageSourcesModel
 	 */
 	public Lazy2DImageSourcesModel( )
 	{
-		this.imageSourcesMap = new HashMap<>(  );
+		this.imageSetToSources = new HashMap<>(  );
+		this.sourceToMetaData = new HashMap<>(  );
 		this.is2D = true;
-	}
-
-
-	class Lazy2DLabelFileSource< T extends RealType< T > > extends Lazy2DFileSource< T > implements LabelSource< T >
-	{
-		public Lazy2DLabelFileSource( File file )
-		{
-			super( file );
-		}
 	}
 
 	class Lazy2DFileSource < T extends NumericType< T > > implements Source< T >
@@ -117,7 +110,13 @@ public class Lazy2DImageSourcesModel implements ImageSourcesModel
 	@Override
 	public Map< String, ArrayList< Source< ? > > > getImageSources()
 	{
-		return imageSourcesMap;
+		return imageSetToSources;
+	}
+
+	@Override
+	public String getImageSourceMetaData( Source< ? > source )
+	{
+		return sourceToMetaData.get( source );
 	}
 
 
@@ -131,21 +130,29 @@ public class Lazy2DImageSourcesModel implements ImageSourcesModel
 	{
 		addKeyIfMissing( imageId );
 
-		imageSourcesMap.get( imageId ).add( new Lazy2DLabelFileSource<>( labelSource ) );
+		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( labelSource );
+
+		imageSetToSources.get( imageId ).add( lazy2DFileSource );
+
+		sourceToMetaData.put( lazy2DFileSource, ImageSourcesMetaData.LABEL_SOURCE );
 	}
 
 	public void addIntensityImageSource( String imageId, File labelSource )
 	{
 		addKeyIfMissing( imageId );
 
-		imageSourcesMap.get( imageId ).add( new Lazy2DFileSource<>( labelSource ) );
+		final Lazy2DFileSource source = new Lazy2DFileSource( labelSource );
+
+		imageSetToSources.get( imageId ).add( source );
+
+		sourceToMetaData.put( source, ImageSourcesMetaData.INTENSITY_SOURCE );
 	}
 
 	public void addKeyIfMissing( String imageId )
 	{
-		if ( ! imageSourcesMap.containsKey( imageId ) )
+		if ( ! imageSetToSources.containsKey( imageId ) )
 		{
-			imageSourcesMap.put( imageId, new ArrayList<>(  ) );
+			imageSetToSources.put( imageId, new ArrayList<>(  ) );
 		}
 	}
 

@@ -3,13 +3,14 @@ package de.embl.cba.tables.modelview.datamodels;
 import bdv.viewer.Source;
 import net.imglib2.type.numeric.RealType;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DefaultImageSourcesModel implements ImageSourcesModel
 {
-	private Map< String, IntensityAndLabelImageSources > imageSourcesMap;
+	private Map< String, ArrayList< Source< ? > > > imageSourcesMap;
 
 	private final boolean is2D;
 
@@ -17,13 +18,6 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 	{
 		this.imageSourcesMap = new HashMap<>(  );
 		this.is2D = is2D;
-	}
-
-
-	@Override
-	public ArrayList< Source< ? > > getImageSources( String imageSetId )
-	{
-		return null;
 	}
 
 	@Override
@@ -38,41 +32,27 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 		return is2D;
 	}
 
-	@Override
-	public ArrayList< String > getImageSetNames()
-	{
-		return new ArrayList( imageSourcesMap.keySet() );
-	}
 
-	public void addLabelImageSource( String imageId, Source< ? extends RealType< ? > > labelImageSource )
+	public void addLabelSource( String imageId, Source< ? extends RealType< ? > > labelSource )
 	{
 		addIfMissing( imageId );
 
-		imageSourcesMap.get( imageId ).labelImageSource = labelImageSource;
+		imageSourcesMap.get( imageId ).add( labelSource );
 	}
 
-	public void addIntensityImageSource( String imageId, Source< ? > intensityImageSource )
+	public void addIntensitySource( String imageId, Source< ? > intensitySource )
 	{
 		addIfMissing( imageId );
 
-		imageSourcesMap.get( imageId ).intensityImageSources.add( intensityImageSource );
+		imageSourcesMap.get( imageId ).add( intensitySource );
 	}
 
 	public void addIfMissing( String imageId )
 	{
 		if ( ! imageSourcesMap.containsKey( imageId ) )
 		{
-			final IntensityAndLabelImageSources sources = new IntensityAndLabelImageSources();
-			imageSourcesMap.put( imageId, sources );
+			imageSourcesMap.put( imageId, new ArrayList<>(  ) );
 		}
-	}
-
-
-
-	private class IntensityAndLabelImageSources
-	{
-		ArrayList< Source< ? > > intensityImageSources = new ArrayList<>(  );
-		Source< ? extends RealType< ? > > labelImageSource;
 	}
 
 }

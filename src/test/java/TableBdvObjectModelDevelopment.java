@@ -2,9 +2,11 @@ import bdv.util.RandomAccessibleIntervalSource;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.datamodels.DataModelUtils;
 import de.embl.cba.tables.modelview.datamodels.DefaultImageSourcesModel;
+import de.embl.cba.tables.modelview.datamodels.LabelSource;
 import de.embl.cba.tables.modelview.objects.DefaultAnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.DefaultImageSegmentBuilder;
 import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
+import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.ValuePair;
 
 import java.io.File;
@@ -48,11 +50,14 @@ public class TableBdvObjectModelDevelopment
 
 	public static DefaultImageSourcesModel createImageSourcesModel()
 	{
-		final RandomAccessibleIntervalSource labelSource = Examples.load2D16BitLabelSource();
+		final RandomAccessibleIntervalSource< ? extends RealType< ? > > labelSource = Examples.load2D16BitLabelSource();
 
 		final DefaultImageSourcesModel imageSourcesModel = new DefaultImageSourcesModel( true );
 
-		imageSourcesModel.addLabelImageSource( DefaultImageSegmentBuilder.getDefaultImageSetName(), labelSource );
+		imageSourcesModel.addLabelSource(
+				DefaultImageSegmentBuilder.getDefaultImageSetName(),
+				labelSource );
+
 		return imageSourcesModel;
 	}
 }

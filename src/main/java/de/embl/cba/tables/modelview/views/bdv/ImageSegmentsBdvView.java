@@ -13,9 +13,9 @@ import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringListener;
 import de.embl.cba.tables.modelview.coloring.ColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
+import de.embl.cba.tables.modelview.datamodels.ImageSourcesMetaData;
 import de.embl.cba.tables.modelview.datamodels.ImageSourcesModel;
 import de.embl.cba.tables.modelview.datamodels.ImagesAndSegmentsModel;
-import de.embl.cba.tables.modelview.datamodels.LabelSource;
 import de.embl.cba.tables.modelview.objects.ImageSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
@@ -71,7 +71,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		initBdvOptions( imageSourcesModel );
 		showGroup( 0 );
-		
+
 		registerAsSelectionListener( selectionModel );
 
 		registerAsColoringListener( selectionColoringModel );
@@ -155,7 +155,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		for ( Source source : sources )
 		{
-			if ( source instanceof LabelSource )
+			if ( imageSourcesModel.getImageSourceMetaData( source )
+					.contains( ImageSourcesMetaData.LABEL_SOURCE ) )
 			{
 				Source labelSource = asLabelSource( groupName, source );
 
@@ -306,7 +307,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		for ( int idx : indices )
 		{
-			if ( sources.get( idx ).getSpimSource() instanceof LabelSource )
+			// TODO: the logic of finding LabelSources might change...
+			if ( sources.get( idx ).getSpimSource() instanceof ARGBConvertedRealSource )
 			{
 				final int timePoint = getCurrentTimePoint();
 

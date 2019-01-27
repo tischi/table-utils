@@ -11,5 +11,7 @@ public interface ImageSourcesModel
 {
 	Map< String, ArrayList< Source< ? > > > getImageSources( );
 
+	String getImageSourceMetaData( Source< ? > source );
+
 	boolean is2D();
 }
