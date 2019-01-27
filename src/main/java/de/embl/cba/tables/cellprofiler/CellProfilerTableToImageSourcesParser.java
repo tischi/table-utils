@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 
 public class CellProfilerTableToImageSourcesParser
@@ -58,6 +59,9 @@ public class CellProfilerTableToImageSourcesParser
 			int imageSetIdColumnIndex,
 			HashMap< String, FolderAndFileColumn > images ) throws IOException
 	{
+
+		final HashSet< String > imageFilePaths = new HashSet<>();
+
 		final Lazy2DImageSourcesModel imageSourcesModel = new Lazy2DImageSourcesModel();
 
 		for ( int row = 0; row < table.getModel().getRowCount(); row++ )
@@ -83,24 +87,41 @@ public class CellProfilerTableToImageSourcesParser
 
 				String imagePath = folderName + File.separator + fileName;
 
-				// path mapping if needed
-				if ( imageRootPathInTable != null )
-				{
-					imagePath = imagePath.replace( imageRootPathInTable, imageRootPathOnThisComputer );
-				}
 
-				if ( image.contains( OBJECTS ) )
-				{
-					imageSourcesModel.addLabelSource( imageSetId, new File( imagePath ) );
-				}
-				else
-				{
-					imageSourcesModel.addIntensityImageSource( imageSetId, new File( imagePath ) );
-				}
+				addImagePathToModel( imageFilePaths, imageSourcesModel, imageSetId, image, imagePath );
+
+
 			}
 		}
 
 		return imageSourcesModel;
+	}
+
+	private void addImagePathToModel(
+			HashSet< String > imageFilePaths,
+			Lazy2DImageSourcesModel imageSourcesModel,
+			String imageSetId,
+			String image,
+			String imagePath )
+	{
+		// path mapping if needed
+		if ( imageRootPathInTable != null )
+		{
+			imagePath = imagePath.replace( imageRootPathInTable, imageRootPathOnThisComputer );
+		}
+
+		if ( ! imageFilePaths.contains( imagePath  ) )
+		{
+			if ( image.contains( OBJECTS ) )
+			{
+				imageSourcesModel.addLabelSource( imageSetId, new File( imagePath ) );
+			} else
+			{
+				imageSourcesModel.addIntensityImageSource( imageSetId, new File( imagePath ) );
+			}
+		}
+
+		imageFilePaths.add( imagePath );
 	}
 
 	public HashMap< String, FolderAndFileColumn > getImageFileAndFolderColumns( )

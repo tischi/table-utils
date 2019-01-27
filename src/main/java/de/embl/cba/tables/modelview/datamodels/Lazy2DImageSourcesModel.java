@@ -49,7 +49,7 @@ public class Lazy2DImageSourcesModel implements ImageSourcesModel
 		@Override
 		public boolean isPresent( int t )
 		{
-			return false;
+			return true;
 		}
 
 		@Override

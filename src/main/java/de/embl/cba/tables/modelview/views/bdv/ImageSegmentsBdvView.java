@@ -7,7 +7,6 @@ import bdv.viewer.DisplayMode;
 import bdv.viewer.Source;
 import bdv.viewer.VisibilityAndGrouping;
 import bdv.viewer.state.SourceGroup;
-import bdv.viewer.state.SourceState;
 import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringListener;
@@ -54,6 +53,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private ImageSourcesModel imageSourcesModel;
 	private boolean isBdvGroupingConfigured;
 	private HashMap< Integer, String > sourceIndexToMetaData;
+	private HashMap< String, Integer > groupNameToIndex;
 
 	public ImageSegmentsBdvView(
 			final ImagesAndSegmentsModel< T > imagesAndSegmentsModel,
@@ -67,6 +67,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		this.imageSourcesModel = imagesAndSegmentsModel.getImageSourcesModel();
 
 		groupIdxToName = new HashMap<>(  );
+		groupNameToIndex = new HashMap<>(  );
 		imageIdToGroupName = new HashMap<>(  );
 		sourceIndexToMetaData = new HashMap<>();
 		isBdvGroupingConfigured = false;
@@ -87,11 +88,14 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	public void configureGroupingNames()
 	{
 		final Set< String > imageSetNames = imageSourcesModel.getImageSources().keySet();
+
 		int i = 0;
 		for ( String imageSetName : imageSetNames )
 		{
 			groupIdxToName.put( i, imageSetName );
+			groupNameToIndex.put( imageSetName, i );
 			imageIdToGroupName.put( imageSetName, imageSetName ); // TODO!
+			i++;
 		}
 	}
 
@@ -144,7 +148,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void showSegmentGroup( ImageSegment imageSegment )
 	{
-		if ( ! getCurrentGroupName().equals( getImageSegmentGroupName( imageSegment ) ) )
+		final String imageSegmentGroupName = getImageSegmentGroupName( imageSegment );
+		final String currentGroupName = getCurrentGroupName();
+
+		if ( ! currentGroupName.equals( imageSegmentGroupName ) )
 		{
 			final int selectedGroup = getImageSegmentGroupIdx( imageSegment );
 
@@ -156,14 +163,14 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		if ( isEmpty( selectedGroup ) )
 		{
-			populateGroup( selectedGroup );
+			populateAndShowGroup( selectedGroup );
 		}
 
 		bdv.getViewerPanel().getVisibilityAndGrouping().setGroupActive( selectedGroup, true );
 		bdv.getViewerPanel().getVisibilityAndGrouping().setCurrentGroup( selectedGroup );
 	}
 
-	private void populateGroup( int groupIndex )
+	private void populateAndShowGroup( int groupIndex )
 	{
 		final String groupName = groupIdxToName.get( groupIndex );
 
@@ -184,6 +191,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 				bdv = BdvFunctions.show( source, bdvOptions ).getBdvHandle();
 			}
 
+			bdvOptions = bdvOptions.addTo( bdv );
+
 			if ( ! isBdvGroupingConfigured ) configureBdvGrouping();
 
 			final VisibilityAndGrouping visibilityAndGrouping = bdv.getViewerPanel().getVisibilityAndGrouping();
@@ -193,6 +202,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			sourceIndexToMetaData.put( sourceIndex, imageSourceMetaData );
 
 			visibilityAndGrouping.addSourceToGroup( sourceIndex, groupIndex );
+			visibilityAndGrouping.setSourceActive( sourceIndex, true );
+
 		}
 	}
 
@@ -212,8 +223,14 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private boolean isEmpty( int selectedGroup )
 	{
-		if ( bdv == null ) return true;
-		return bdv.getViewerPanel().getState().getSourceGroups().get( selectedGroup ).getSourceIds().size() == 0;
+		if ( bdv == null )
+		{
+			return true;
+		}
+
+		final int size = bdv.getViewerPanel().getState().getSourceGroups().get( selectedGroup ).getSourceIds().size();
+
+		return size == 0;
 	}
 
 	private String getImageSegmentGroupName( ImageSegment selection )
@@ -223,8 +240,9 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private Integer getImageSegmentGroupIdx( ImageSegment selection )
 	{
-		final HashMap< String, Integer > groupNameToIdx = new HashMap<>();
-		return groupNameToIdx.get( imageIdToGroupName.get( selection.imageId() ) );
+		final String groupName = imageIdToGroupName.get( selection.imageId() );
+		final Integer groupIndex = groupNameToIndex.get( groupName );
+		return groupIndex;
 	}
 
 	private String getCurrentGroupName()
@@ -244,6 +262,12 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		final VisibilityAndGrouping visibilityAndGrouping = bdv.getViewerPanel().getVisibilityAndGrouping();
 
+		while ( visibilityAndGrouping.getSourceGroups().size() > 1 ) {
+			final SourceGroup g = visibilityAndGrouping.getSourceGroups().get(0);
+			this.bdv.getViewerPanel().removeGroup( g );
+		}
+
+
 		int i = 0;
 		for ( String imageSetName : imageSetNames )
 		{
@@ -257,6 +281,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 				bdv.getViewerPanel().addGroup( new SourceGroup( imageSetName ) );
 				visibilityAndGrouping.setGroupName( i, imageSetName );
 			}
+
+			i++;
 		}
 
 		visibilityAndGrouping.setGroupingEnabled( true );
@@ -272,8 +298,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void initBdvOptions( ImageSourcesModel imageSourcesModel )
 	{
-		// TODO: is it correct to already here specify the number of groups?
-
 		bdvOptions = BdvOptions.options();
 
 		if ( imageSourcesModel.is2D() ) bdvOptions = bdvOptions.is2D();
@@ -320,7 +344,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void toggleSelectionAtMousePosition()
 	{
-
 		final List< Integer > visibleSourceIndices = bdv.getViewerPanel().getState().getVisibleSourceIndices();
 
 		for ( int index : visibleSourceIndices )
