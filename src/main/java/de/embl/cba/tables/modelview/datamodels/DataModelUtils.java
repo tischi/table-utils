@@ -20,11 +20,12 @@ public class DataModelUtils
 	 * @param imageSourcesModel
 	 * @param annotatedImageSegments
 	 * @param categoricalColumns
+	 * @param centerOnSegment
 	 */
 	public static void buildModelsAndViews(
 			ImageSourcesModel imageSourcesModel,
 			ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments,
-			ArrayList< String > categoricalColumns )
+			ArrayList< String > categoricalColumns, boolean centerOnSegment )
 	{
 		final AnnotatedImageSegmentsAndImagesModel dataModel =
 				new AnnotatedImageSegmentsAndImagesModel(
@@ -46,7 +47,7 @@ public class DataModelUtils
 		final ImageSegmentsBdvView imageSegmentsBdvView = new ImageSegmentsBdvView(
 				dataModel,
 				selectionModel,
-				selectionColoringModel );
+				selectionColoringModel, centerOnSegment );
 
 
 		final TableRowsTableView tableView = new TableRowsTableView(

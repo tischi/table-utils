@@ -45,7 +45,8 @@ public class CellProfilerOutputExplorerDevelop
 		DataModelUtils.buildModelsAndViews(
 				imageSourcesModel,
 				annotatedImageSegments,
-				categoricalColumns );
+				categoricalColumns,
+				false );
 
 	}
 

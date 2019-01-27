@@ -28,7 +28,8 @@ public class TableBdvObjectModelDevelopment
 		DataModelUtils.buildModelsAndViews(
 				imageSourcesModel,
 				annotatedImageSegments,
-				categoricalColumns );
+				categoricalColumns,
+				true );
 	}
 
 	public static ArrayList< DefaultAnnotatedImageSegment > createImageSegments( File tableFile )

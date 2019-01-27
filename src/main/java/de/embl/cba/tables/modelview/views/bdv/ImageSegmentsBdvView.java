@@ -54,22 +54,26 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private boolean isBdvGroupingConfigured;
 	private HashMap< Integer, String > sourceIndexToMetaData;
 	private HashMap< String, Integer > groupNameToIndex;
+	private boolean centerOnSegment;
 
 	public ImageSegmentsBdvView(
 			final ImagesAndSegmentsModel< T > imagesAndSegmentsModel,
 			final SelectionModel< T > selectionModel,
-			final SelectionColoringModel< T > selectionColoringModel )
+			final SelectionColoringModel< T > selectionColoringModel,
+			boolean centerOnSegment )
 	{
 		this.imagesAndSegmentsModel = imagesAndSegmentsModel;
 		this.selectionModel = selectionModel;
 		this.selectionColoringModel = selectionColoringModel;
 
 		this.imageSourcesModel = imagesAndSegmentsModel.getImageSourcesModel();
+		this.centerOnSegment = centerOnSegment;
 
 		groupIdxToName = new HashMap<>(  );
 		groupNameToIndex = new HashMap<>(  );
 		imageIdToGroupName = new HashMap<>(  );
 		sourceIndexToMetaData = new HashMap<>();
+
 		isBdvGroupingConfigured = false;
 
 		initBdvOptions( imageSourcesModel );
@@ -134,16 +138,19 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	public void centerBdvViewOnSegment( ImageSegment selection )
 	{
-		final double[] position = new double[ 3 ];
-		selection.localize( position );
-
 		showSegmentGroup( selection );
+		bdv.getBdvHandle().getViewerPanel().setTimepoint( selection.timePoint() );
 
-		BdvUtils.moveToPosition(
-				bdv,
-				position,
-				selection.timePoint(),
-				500 );
+		if ( centerOnSegment )
+		{
+			final double[] position = new double[ 3 ];
+			selection.localize( position );
+			BdvUtils.moveToPosition(
+					bdv,
+					position,
+					selection.timePoint(),
+					500 );
+		}
 	}
 
 	private void showSegmentGroup( ImageSegment imageSegment )
