@@ -15,7 +15,7 @@ public class AnnotatedImageSegmentsAndImagesModel< T extends AnnotatedImageSegme
 	private final ImageSourcesModel imageSourcesModel;
 	private final String labelFeatureName;
 
-	private Map< Object, T > labelTimePointKeyToSegmentMap;
+	private Map< Object, T > keyToSegmentMap;
 
 	public AnnotatedImageSegmentsAndImagesModel(
 			String name,
@@ -34,7 +34,7 @@ public class AnnotatedImageSegmentsAndImagesModel< T extends AnnotatedImageSegme
 
 	private void createKeyMap()
 	{
-		labelTimePointKeyToSegmentMap = new HashMap<>();
+		keyToSegmentMap = new HashMap<>();
 
 		for ( T annotatedImageSegment : this.annotatedImageSegments )
 		{
@@ -43,7 +43,7 @@ public class AnnotatedImageSegmentsAndImagesModel< T extends AnnotatedImageSegme
 					annotatedImageSegment.timePoint()
 			);
 
-			labelTimePointKeyToSegmentMap.put( key, annotatedImageSegment );
+			keyToSegmentMap.put( key, annotatedImageSegment );
 		}
 	}
 
@@ -53,11 +53,12 @@ public class AnnotatedImageSegmentsAndImagesModel< T extends AnnotatedImageSegme
 	}
 
 	@Override
-	public T getSegment( Double label, int timePoint )
+	public T getSegment( String imageSetName, Double label, int timePoint )
 	{
-		final Object segmentKey = getSegmentKey( label, timePoint );
-		return labelTimePointKeyToSegmentMap.get( segmentKey );
+		final Object segmentKey = getSegmentKey( imageSetName, label, timePoint );
+		return keyToSegmentMap.get( segmentKey );
 	}
+
 
 	public ImageSourcesModel getImageSourcesModel()
 	{
@@ -70,9 +71,9 @@ public class AnnotatedImageSegmentsAndImagesModel< T extends AnnotatedImageSegme
 		return annotatedImageSegments;
 	}
 
-	public static Object getSegmentKey( Double label, Integer timePoint )
+	public static Object getSegmentKey( String imageSetName, Double label, Integer timePoint )
 	{
-		return "L"+label.toString() + "_T" + timePoint.toString();
+		return imageSetName + "_L"+label.toString() + "_T" + timePoint.toString();
 	}
 
 	@Override

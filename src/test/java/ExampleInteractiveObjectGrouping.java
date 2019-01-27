@@ -30,7 +30,7 @@ public class ExampleInteractiveObjectGrouping
 		new ImageJ().ui().showUI();
 
 		/**
-		 * Load and showLabelSourceInBdv image
+		 * Load and showImageSourcesInBdv image
 		 */
 
 		final RandomAccessibleIntervalSource raiSource = Examples.load2D16BitLabelSource();

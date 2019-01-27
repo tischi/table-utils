@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public interface ImagesAndSegmentsModel< T extends ImageSegment >
 {
-	T getSegment( Double label, int timePoint );
+	T getSegment( String imageSetName, Double label, int timePoint );
 
 	ImageSourcesModel getImageSourcesModel();
 

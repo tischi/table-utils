@@ -46,16 +46,9 @@ public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
 		}
 
 		coloringModel.convert(
-				getAnnotatedSegment( label, timePointIndex ),
+				segmentsModel.getSegment( label.getRealDouble(), timePointIndex ),
 				color.get() );
 
-	}
-
-	public T getAnnotatedSegment( RealType label, int timePointIndex )
-	{
-		return ( T ) segmentsModel.getSegment(
-				label.getRealDouble(),
-				timePointIndex );
 	}
 
 	@Override

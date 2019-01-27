@@ -1,8 +1,7 @@
 package de.embl.cba.tables.cellprofiler;
 
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.datamodels.DefaultImageSourcesModel;
-import de.embl.cba.tables.modelview.datamodels.ImageSourcesModel;
+import de.embl.cba.tables.modelview.datamodels.Lazy2DImageSourcesModel;
 
 import javax.swing.*;
 import java.io.File;
@@ -19,7 +18,7 @@ public class CellProfilerTableToImageSourcesParser
 	public static final String OBJECTS = "Objects_";
 
 	private ArrayList< String > columns;
-	private DefaultImageSourcesModel imageSourcesModel;
+	private Lazy2DImageSourcesModel imageSourcesModel;
 
 	public CellProfilerTableToImageSourcesParser( JTable table )
 	{
@@ -27,19 +26,27 @@ public class CellProfilerTableToImageSourcesParser
 
 		final HashMap< String, FolderAndFileColumn > images = getImageFileAndFolderColumns( );
 
-		imageSourcesModel = getImageSources(
+		imageSourcesModel = createImageSourcesModel(
 				table,
 				table.getColumnModel().getColumnIndex( IMAGE_SET_INDEX_COLUMN ),
 				images );
 	}
 
-	public DefaultImageSourcesModel getImageSources( JTable table, int imageSetIdColumnIndex, HashMap< String, FolderAndFileColumn > images )
+	public Lazy2DImageSourcesModel getImageSourcesModel()
 	{
-		final ImageSourcesModel imageSourcesModel = new DefaultImageSourcesModel( true );
+		return imageSourcesModel;
+	}
+
+	private Lazy2DImageSourcesModel createImageSourcesModel(
+			JTable table,
+			int imageSetIdColumnIndex,
+			HashMap< String, FolderAndFileColumn > images )
+	{
+		final Lazy2DImageSourcesModel imageSourcesModel = new Lazy2DImageSourcesModel();
 
 		for ( int row = 0; row < table.getModel().getRowCount(); row++ )
 		{
-			final String imageId = table.getValueAt( row, imageSetIdColumnIndex ).toString();
+			final String imageSetId = table.getValueAt( row, imageSetIdColumnIndex ).toString();
 
 			//if ( ! datasets.keySet().contains( datasetIndex ) )
 			//{
@@ -62,18 +69,16 @@ public class CellProfilerTableToImageSourcesParser
 
 				if ( image.contains( OBJECTS ) )
 				{
-					type = CellProfilerDataset.OBJECT_LABEL_MASK;
+					imageSourcesModel.addLabelImageSource( imageSetId, new File( pathName ) );
 				}
-
-				dataset.addImagePath( type, pathName );
+				else
+				{
+					imageSourcesModel.addIntensityImageSource( imageSetId, new File( pathName ) );
+				}
 			}
-
-			datasets.put( imageId, dataset );
-			}
-
 		}
 
-		return datasets;
+		return imageSourcesModel;
 	}
 
 	public HashMap< String, FolderAndFileColumn > getImageFileAndFolderColumns( )
@@ -89,11 +94,6 @@ public class CellProfilerTableToImageSourcesParser
 			}
 		}
 		return images;
-	}
-
-	public HashMap< Object, CellProfilerDataset > getImageSources()
-	{
-		return imageSourcesModel;
 	}
 
 	private String getMatchingFileColumn( String image )

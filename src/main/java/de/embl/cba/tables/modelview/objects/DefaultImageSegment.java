@@ -27,7 +27,7 @@ public class DefaultImageSegment implements ImageSegment
 	}
 
 	@Override
-	public String imageSetId()
+	public String imageSetName()
 	{
 		return imageSetId;
 	}
@@ -45,14 +45,44 @@ public class DefaultImageSegment implements ImageSegment
 	}
 
 	@Override
-	public double[] position()
-	{
-		return position;
-	}
-
-	@Override
 	public FinalInterval boundingBox()
 	{
 		return boundingBox;
+	}
+
+	@Override
+	public void localize( float[] position )
+	{
+		for ( int d = 0; d < position.length; d++ )
+		{
+			position[ d ] = (float) this.position[ d ];
+		}
+	}
+
+	@Override
+	public void localize( double[] position )
+	{
+		for ( int d = 0; d < position.length; d++ )
+		{
+			position[ d ] = this.position[ d ];
+		}
+	}
+
+	@Override
+	public float getFloatPosition( int d )
+	{
+		return (float) position[ d ];
+	}
+
+	@Override
+	public double getDoublePosition( int d )
+	{
+		return position[ d ];
+	}
+
+	@Override
+	public int numDimensions()
+	{
+		return position.length;
 	}
 }
