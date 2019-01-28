@@ -44,6 +44,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private int categoricalLabelColoringRandomSeed;
 	private ArrayList< Integer > selectedRowsInView;
 	private int recentlySelectedRowInView;
+	private String currentColoringColumn;
 
 	public TableRowsTableView(
 			final TableRowsModel< T > tableRowsModel,
@@ -94,7 +95,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 						row,
 						column);
 
-				c.setBackground( getRowColour(row, column) );
+				c.setBackground( getColour(row, column) );
 
 				return c;
 			}
@@ -113,7 +114,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 						row,
 						column);
 
-				c.setBackground( getRowColour(row, column) );
+				c.setBackground( getColour(row, column) );
 
 				return c;
 			}
@@ -132,7 +133,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 						row,
 						column);
 
-				c.setBackground( getRowColour(row, column) );
+				c.setBackground( getColour(row, column) );
 
 				return c;
 			}
@@ -151,15 +152,18 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 						row,
 						column );
 
-				c.setBackground( getRowColour( row, column ) );
+				c.setBackground( getColour( row, column ) );
 
 				return c;
 			}
 		});
 	}
 
-	private Color getRowColour( int rowInView, int column )
+	private Color getColour( int rowInView, int columnInView )
 	{
+		final int col = table.convertColumnIndexToModel( columnInView );
+		final String column = getColumnNames().get( col );
+
 		final int row = table.convertRowIndexToModel( rowInView );
 		if ( selectionModel.isSelected( tableRowsModel.getTableRows().get( row ) ) )
 		{
@@ -185,7 +189,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			}
 		} );
 	}
-	
+
 	private void createTable()
     {
 		table = TableUtils.jTableFromSegmentList( tableRowsModel.getTableRows() );
@@ -616,6 +620,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		// TODO: clean this up this suffers from the fact that I do not know
 		// the column classes....(and even if, some are numeric but should be treated
 		// categorical
+
+		currentColoringColumn = column;
 
 		final int columnIndex = table.getColumnModel().getColumnIndex( column );
 
