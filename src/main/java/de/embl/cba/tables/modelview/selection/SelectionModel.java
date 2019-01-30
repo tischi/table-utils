@@ -37,7 +37,7 @@ public interface SelectionModel< T >
 	public void toggle( final T object );
 	
 	/**
-	 * Sets the selected state of a collection of objects.
+	 * Sets the selected state of a collection of segments.
 	 *
 	 * @param objects
 	 *            the object collection.
@@ -56,9 +56,9 @@ public interface SelectionModel< T >
 	public boolean clearSelection();
 
 	/**
-	 * Get the selected objects.
+	 * Get the selected segments.
 	 **
-	 * @return a <b>new</b> {@link Set} containing all the selected objects.
+	 * @return a <b>new</b> {@link Set} containing all the selected segments.
 	 */
 	public Set< T > getSelected();
 

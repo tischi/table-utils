@@ -10,7 +10,7 @@ import de.embl.cba.bdv.utils.converters.RandomARGBConverter;
 import de.embl.cba.bdv.utils.lut.Luts;
 import de.embl.cba.bdv.utils.selection.BdvLabelSourceSelectionListener;
 import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
-import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
+import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import de.embl.cba.tables.objects.attributes.AssignObjectAttributesUI;
 import net.imglib2.converter.Converter;
@@ -85,7 +85,7 @@ public class TableBdvConnector
 				assignObjectAttributesUI.showUI( selectedRows );
 			}
 		}
-		, "fetch-selected-objects-" + objectTablePanel.getName(), OBJECT_ATTRIBUTE_ASSIGNMENT_TRIGGER );
+		, "fetch-selected-segments-" + objectTablePanel.getName(), OBJECT_ATTRIBUTE_ASSIGNMENT_TRIGGER );
 	}
 
 	public void setSelectionByAttribute( boolean selectionByAttribute )

@@ -1,4 +1,4 @@
-package de.embl.cba.tables.modelview.objects;
+package de.embl.cba.tables.modelview.segments;
 
 import java.util.LinkedHashMap;
 

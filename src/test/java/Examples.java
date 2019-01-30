@@ -1,8 +1,8 @@
 import bdv.util.RandomAccessibleIntervalSource;
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.datamodels.CellProfilerImageSourcesModel;
-import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
+import de.embl.cba.tables.modelview.images.CellProfilerImageSourcesModel;
+import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import ij.IJ;
 import ij.ImagePlus;

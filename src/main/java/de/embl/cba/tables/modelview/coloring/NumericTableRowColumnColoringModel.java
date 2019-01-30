@@ -2,7 +2,7 @@ package de.embl.cba.tables.modelview.coloring;
 
 import de.embl.cba.bdv.utils.lut.ARGBLut;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.objects.TableRow;
+import de.embl.cba.tables.modelview.segments.TableRow;
 import net.imglib2.type.numeric.ARGBType;
 
 import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;

@@ -1,10 +1,10 @@
 import bdv.util.RandomAccessibleIntervalSource;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.datamodels.DataModelUtils;
-import de.embl.cba.tables.modelview.datamodels.DefaultImageSourcesModel;
-import de.embl.cba.tables.modelview.objects.DefaultAnnotatedImageSegment;
-import de.embl.cba.tables.modelview.objects.DefaultImageSegmentBuilder;
-import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
+import de.embl.cba.tables.modelview.combined.DataModelUtils;
+import de.embl.cba.tables.modelview.images.DefaultImageSourcesModel;
+import de.embl.cba.tables.modelview.segments.DefaultAnnotatedImageSegment;
+import de.embl.cba.tables.modelview.segments.DefaultImageSegmentBuilder;
+import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.ValuePair;
 

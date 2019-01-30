@@ -18,7 +18,7 @@ public class DynamicCategoryColoringModel< T > extends AbstractColoringModel< T 
 	 * Objects are converted to colors.
 	 * Colors are dynamically assigned at random
 	 * from the given {@code argbLut} and stored in a map,
-	 * such that same objects will always be converted to same
+	 * such that same segments will always be converted to same
 	 * colors.
 	 *
 	 * @param argbLut

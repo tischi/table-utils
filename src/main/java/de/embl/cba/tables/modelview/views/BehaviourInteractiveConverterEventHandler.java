@@ -36,7 +36,7 @@ public class BehaviourInteractiveConverterEventHandler
 	private static final int BACKGROUND = 0;
 
 	/**
-	 * Selection of argbconversion (objects) in a label source.
+	 * Selection of argbconversion (segments) in a label source.
 	 * @param bdv Bdv window in which the source is shown.
 	 */
 	public BehaviourInteractiveConverterEventHandler( Bdv bdv,

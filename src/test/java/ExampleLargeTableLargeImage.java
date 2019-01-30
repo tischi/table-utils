@@ -10,7 +10,7 @@ import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
 import de.embl.cba.tables.TableBdvConnector;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
+import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import mpicbg.spim.data.SpimData;
 import mpicbg.spim.data.SpimDataException;

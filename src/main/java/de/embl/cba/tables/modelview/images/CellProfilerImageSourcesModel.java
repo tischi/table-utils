@@ -1,4 +1,4 @@
-package de.embl.cba.tables.modelview.datamodels;
+package de.embl.cba.tables.modelview.images;
 
 import bdv.util.RandomAccessibleIntervalSource;
 import bdv.viewer.Interpolation;
@@ -18,7 +18,7 @@ import net.imglib2.view.Views;
 import java.io.File;
 import java.util.*;
 
-import static de.embl.cba.tables.modelview.datamodels.Metadata.*;
+import static de.embl.cba.tables.modelview.images.Metadata.*;
 
 public class CellProfilerImageSourcesModel implements ImageSourcesModel
 {
@@ -109,12 +109,12 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 		}
 	}
 
-	public void addLabelSource( String imageId, File labelSource, ArrayList< String > imageSetIDs )
+	public void addSource( String imageId, File file, ArrayList< String > imageSetIDs, String flavor )
 	{
-		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( imageId, labelSource );
+		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( imageId, file );
 
 		final Metadata metadata = new Metadata();
-		metadata.get().put( FLAVOUR, LABEL_SOURCE_FLAVOUR );
+		metadata.get().put( FLAVOUR, flavor );
 		metadata.get().put( DIMENSIONS, 2 );
 		metadata.get().put( EXCLUSIVE_IMAGE_SET, imageSetIDs );
 		metadata.get().put( NAME, imageId );
@@ -122,18 +122,18 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( lazy2DFileSource, metadata ) );
 	}
 
-	public void addIntensityImageSource( String imageId, File labelSource, ArrayList< String > imageSetIDs )
-	{
-		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( imageId, labelSource );
-
-		final Metadata metadata = new Metadata();
-		metadata.get().put( FLAVOUR, INTENSITY_SOURCE_FLAVOUR );
-		metadata.get().put( DIMENSIONS, 2 );
-		metadata.get().put( EXCLUSIVE_IMAGE_SET, imageSetIDs );
-		metadata.get().put( NAME, imageId );
-
-		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( lazy2DFileSource, metadata ) );
-	}
+//	public void addIntensityImageSource( String imageId, File labelSource, ArrayList< String > imageSetIDs )
+//	{
+//		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( imageId, labelSource );
+//
+//		final Metadata metadata = new Metadata();
+//		metadata.get().put( FLAVOUR, INTENSITY_SOURCE_FLAVOUR );
+//		metadata.get().put( DIMENSIONS, 2 );
+//		metadata.get().put( EXCLUSIVE_IMAGE_SET, imageSetIDs );
+//		metadata.get().put( NAME, imageId );
+//
+//		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( lazy2DFileSource, metadata ) );
+//	}
 
 
 	public static < T extends NumericType< T > >

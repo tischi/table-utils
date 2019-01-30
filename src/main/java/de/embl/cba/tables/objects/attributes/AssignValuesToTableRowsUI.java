@@ -1,7 +1,7 @@
 package de.embl.cba.tables.objects.attributes;
 
 import de.embl.cba.tables.SwingUtils;
-import de.embl.cba.tables.modelview.objects.TableRow;
+import de.embl.cba.tables.modelview.segments.TableRow;
 import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
 import org.fife.rsta.ac.js.Logger;
 

@@ -1,10 +1,10 @@
 package de.embl.cba.tables.objects;
 
 import de.embl.cba.tables.Logger;
-import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.TableUIs;
-import de.embl.cba.tables.modelview.datamodels.SegmentUtils;
-import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
+import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.modelview.segments.SegmentUtils;
+import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;

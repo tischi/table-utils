@@ -4,7 +4,7 @@ import bdv.util.BdvOptions;
 import bdv.util.RandomAccessibleIntervalSource;
 import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
-import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
+import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import net.imagej.ImageJ;
 
@@ -74,7 +74,7 @@ public class ExampleInteractiveObjectGrouping
 //		{
 //			assignObjectAttributesUI.showUI( bdvSelectionEventHandler.getSelectedValues()  );
 //		}
-//		, "fetch-curently-selected-objects-" + selectableSource.getName(), Examples.OBJECT_GROUPING_TRIGGER  );
+//		, "fetch-curently-selected-segments-" + selectableSource.getName(), Examples.OBJECT_GROUPING_TRIGGER  );
 
 	}
 }

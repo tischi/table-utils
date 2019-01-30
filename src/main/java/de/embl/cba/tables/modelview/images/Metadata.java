@@ -1,4 +1,4 @@
-package de.embl.cba.tables.modelview.datamodels;
+package de.embl.cba.tables.modelview.images;
 
 import java.util.HashMap;
 import java.util.Map;

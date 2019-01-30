@@ -1,10 +1,5 @@
-package de.embl.cba.tables.modelview.datamodels;
+package de.embl.cba.tables.modelview.images;
 
-import bdv.viewer.Source;
-import net.imglib2.type.NativeType;
-import net.imglib2.type.numeric.RealType;
-
-import java.util.ArrayList;
 import java.util.Map;
 
 

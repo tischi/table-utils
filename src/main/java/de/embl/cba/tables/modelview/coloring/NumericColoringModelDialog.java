@@ -2,7 +2,6 @@ package de.embl.cba.tables.modelview.coloring;
 
 import bdv.tools.brightness.SliderPanelDouble;
 import bdv.util.BoundedValueDouble;
-import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
 
 import javax.swing.*;
 import java.awt.*;

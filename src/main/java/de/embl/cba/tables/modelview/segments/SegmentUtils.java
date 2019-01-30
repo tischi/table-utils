@@ -1,8 +1,5 @@
-package de.embl.cba.tables.modelview.datamodels;
+package de.embl.cba.tables.modelview.segments;
 
-import de.embl.cba.tables.modelview.objects.DefaultImageSegment;
-import de.embl.cba.tables.modelview.objects.DefaultImageSegmentBuilder;
-import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
 import net.imglib2.util.ValuePair;
 
 import java.util.HashMap;

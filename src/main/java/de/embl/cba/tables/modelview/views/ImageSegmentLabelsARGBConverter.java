@@ -2,8 +2,8 @@ package de.embl.cba.tables.modelview.views;
 
 import bdv.viewer.TimePointListener;
 import de.embl.cba.tables.modelview.coloring.ColoringModel;
-import de.embl.cba.tables.modelview.datamodels.ImagesAndSegmentsModel;
-import de.embl.cba.tables.modelview.objects.ImageSegment;
+import de.embl.cba.tables.modelview.combined.ImagesAndSegmentsModel;
+import de.embl.cba.tables.modelview.segments.ImageSegment;
 import net.imglib2.Volatile;
 import net.imglib2.converter.Converter;
 import net.imglib2.type.numeric.RealType;

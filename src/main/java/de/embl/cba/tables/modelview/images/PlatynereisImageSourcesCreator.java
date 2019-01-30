@@ -1,53 +1,86 @@
-package de.embl.cba.tables.cellprofiler;
+package de.embl.cba.tables.modelview.images;
 
+import de.embl.cba.tables.FileUtils;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.datamodels.CellProfilerImageSourcesModel;
+import de.embl.cba.tables.cellprofiler.FolderAndFileColumn;
+import org.fife.rsta.ac.js.Logger;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 
-public class CellProfilerTableToImageSourcesParser
+public class PlatynereisImageSourcesCreator
 {
+
+	public static final String DEFAULT_EM_RAW_FILE_ID = "em-raw-full-res"; //"em-raw-100nm"; //"em-raw-10nm-10nm-25nm"; //"em-raw-100nm"; //
+	public static final String DEFAULT_LABELS_FILE_ID = "em-segmented-cells-labels" ;
+	public static final String LABELS_FILE_ID = "-labels" ;
+
+	public static final String BDV_XML_SUFFIX = ".xml";
+	public static final String IMARIS_SUFFIX = ".ims";
+	public static final double PROSPR_SCALING_IN_MICROMETER = 0.5;
+	public static final String EM_RAW_FILE_ID = "em-raw-"; //"em-raw-100nm"; //"em-raw-10nm-10nm-25nm"; //"em-raw-100nm"; //
+	public static final String EM_SEGMENTED_FILE_ID = "em-segmented";
+	public static final String EM_FILE_ID = "em-";
+	public static final String SELECTION_UI = "Data sources";
+	public static final String POSITION_UI = "Move to position";
+	public static final Color DEFAULT_GENE_COLOR = new Color( 255, 0, 255, 255 );
+	public static final Color DEFAULT_EM_RAW_COLOR = new Color( 255, 255, 255, 255 );
+	public static final Color DEFAULT_EM_SEGMENTATION_COLOR = new Color( 255, 0, 0, 255 );
+	public static final double ZOOM_REGION_SIZE = 50.0;
+	public static final String NEW_PROSPR = "-new";
+	public static final String AVG_PROSPR = "-avg";
+
+	public static final String CELLULAR_MODELS = "cellular-models";
+	public static final CharSequence MEDS = "-MEDs" ;
+	public static final CharSequence SPMS = "-SPMs";
+	public static final String OLD = "-OLD";
+
 	public static final String IMAGE_SET_INDEX_COLUMN = "ImageNumber";
 	public static final String FOLDER = "PathName_";
 	public static final String FILE = "FileName_";
 
 	public static final String OBJECTS = "Objects_";
-	private final File tableFile;
-	private final String imageRootPathInTable;
-	private final String imageRootPathOnThisComputer;
-	private final String delim;
 
 	private ArrayList< String > columns;
 	private CellProfilerImageSourcesModel imageSourcesModel;
 
-	public CellProfilerTableToImageSourcesParser(
-			File tableFile,
-			String imageRootPathInTable,
-			String imageRootPathOnThisComputer,
-			String delim ) throws IOException
+	public PlatynereisImageSourcesCreator( File directory ) throws IOException
 	{
-		this.tableFile = tableFile;
-		this.imageRootPathInTable = imageRootPathInTable;
-		this.imageRootPathOnThisComputer = imageRootPathOnThisComputer;
-		this.delim = delim;
+		ArrayList< File > imageFiles = getImageFiles( directory, BDV_XML_SUFFIX );
 
-		final JTable table = TableUtils.loadTable( this.tableFile, delim );
-
-		columns = TableUtils.getColumnNames( table );
-
-		final HashMap< String, FolderAndFileColumn > images = getImageFileAndFolderColumns( );
-
-		imageSourcesModel = createImageSourcesModel(
-				table,
-				table.getColumnModel().getColumnIndex( IMAGE_SET_INDEX_COLUMN ),
-				images );
+		PlatynereisImageSourcesModel.getSourceName( imageFiles );
+//		final HashMap< String, FolderAndFileColumn > images = getImageFileAndFolderColumns( );
+//
+//		imageSourcesModel = createImageSourcesModel(
+//				table,
+//				table.getColumnModel().getColumnIndex( IMAGE_SET_INDEX_COLUMN ),
+//				images );
 	}
+
+	public ArrayList< File > getImageFiles( File inputDirectory, String filePattern )
+	{
+		Logger.log( "Fetching image files..." );
+		final ArrayList< File > fileList = FileUtils.getFileList( inputDirectory, filePattern );
+		Logger.log( "Number of image files: " +  fileList.size() );
+		Collections.sort( fileList, new SortFilesIgnoreCase());
+		return fileList;
+	}
+
+
+	public class SortFilesIgnoreCase implements Comparator<File>
+	{
+		public int compare( File o1, File o2 )
+		{
+			String s1 = o1.getName();
+			String s2 = o2.getName();
+			return s1.toLowerCase().compareTo(s2.toLowerCase());
+		}
+	}
+
 
 	public CellProfilerImageSourcesModel getImageSourcesModel()
 	{
@@ -136,7 +169,7 @@ public class CellProfilerTableToImageSourcesParser
 		{
 			if ( imageId.contains( OBJECTS ) )
 			{
-				imageSourcesModel.addLabelSource( imageId, new File( imagePath ), imageSetIds );
+				imageSourcesModel.addSource( imageId, new File( imagePath ), imageSetIds );
 			}
 			else
 			{

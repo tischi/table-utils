@@ -1,10 +1,10 @@
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.cellprofiler.CellProfilerTableToImageSourcesParser;
-import de.embl.cba.tables.modelview.datamodels.DataModelUtils;
-import de.embl.cba.tables.modelview.datamodels.CellProfilerImageSourcesModel;
-import de.embl.cba.tables.modelview.datamodels.SegmentUtils;
-import de.embl.cba.tables.modelview.objects.DefaultAnnotatedImageSegment;
-import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
+import de.embl.cba.tables.modelview.images.CellProfilerImageSourcesCreator;
+import de.embl.cba.tables.modelview.combined.DataModelUtils;
+import de.embl.cba.tables.modelview.images.CellProfilerImageSourcesModel;
+import de.embl.cba.tables.modelview.combined.SegmentUtils;
+import de.embl.cba.tables.modelview.segments.DefaultAnnotatedImageSegment;
+import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import net.imglib2.util.ValuePair;
 
 import java.io.File;
@@ -29,7 +29,7 @@ public class CellProfilerOutputExplorerDevelop
 //		final File file = new File("/Volumes/cba/exchange/Daja-Christian/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt" );
 		//final JTable table = TableUtils.loadTable( file, "\t" );
 
-		final CellProfilerTableToImageSourcesParser parser = new CellProfilerTableToImageSourcesParser(
+		final CellProfilerImageSourcesCreator parser = new CellProfilerImageSourcesCreator(
 				tableFile,
 				"/Volumes/cba/exchange/Daja-Christian",
 				"/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data",

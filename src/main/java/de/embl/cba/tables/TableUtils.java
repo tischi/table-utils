@@ -1,9 +1,9 @@
 package de.embl.cba.tables;
 
 import de.embl.cba.tables.models.ColumnClassAwareTableModel;
-import de.embl.cba.tables.modelview.datamodels.SegmentUtils;
-import de.embl.cba.tables.modelview.objects.*;
-import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
+import de.embl.cba.tables.modelview.segments.SegmentUtils;
+import de.embl.cba.tables.modelview.segments.*;
+import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import net.imglib2.util.ValuePair;
 import org.scijava.table.GenericTable;
 

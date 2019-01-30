@@ -13,11 +13,11 @@ import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringListener;
 import de.embl.cba.tables.modelview.coloring.ColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
-import de.embl.cba.tables.modelview.datamodels.ImageSourcesModel;
-import de.embl.cba.tables.modelview.datamodels.ImagesAndSegmentsModel;
-import de.embl.cba.tables.modelview.datamodels.Metadata;
-import de.embl.cba.tables.modelview.datamodels.SourceAndMetadata;
-import de.embl.cba.tables.modelview.objects.ImageSegment;
+import de.embl.cba.tables.modelview.images.ImageSourcesModel;
+import de.embl.cba.tables.modelview.combined.ImagesAndSegmentsModel;
+import de.embl.cba.tables.modelview.images.Metadata;
+import de.embl.cba.tables.modelview.images.SourceAndMetadata;
+import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.modelview.views.ImageSegmentLabelsARGBConverter;
@@ -28,7 +28,7 @@ import org.scijava.ui.behaviour.util.Behaviours;
 import java.util.*;
 
 import static de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter.BACKGROUND;
-import static de.embl.cba.tables.modelview.datamodels.Metadata.*;
+import static de.embl.cba.tables.modelview.images.Metadata.*;
 
 public class ImageSegmentsBdvView < T extends ImageSegment >
 {

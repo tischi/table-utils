@@ -1,10 +1,11 @@
-package de.embl.cba.tables.modelview.datamodels;
+package de.embl.cba.tables.modelview.combined;
 
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
-import de.embl.cba.tables.modelview.objects.AnnotatedImageSegment;
-import de.embl.cba.tables.modelview.objects.DefaultAnnotatedImageSegment;
+import de.embl.cba.tables.modelview.images.ImageSourcesModel;
+import de.embl.cba.tables.modelview.segments.AnnotatedImageSegment;
+import de.embl.cba.tables.modelview.segments.DefaultAnnotatedImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.modelview.views.bdv.ImageSegmentsBdvView;

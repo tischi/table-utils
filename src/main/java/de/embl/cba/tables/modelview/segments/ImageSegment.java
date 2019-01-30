@@ -1,7 +1,6 @@
-package de.embl.cba.tables.modelview.objects;
+package de.embl.cba.tables.modelview.segments;
 
 import net.imglib2.FinalInterval;
-import net.imglib2.Localizable;
 import net.imglib2.RealLocalizable;
 
 public interface ImageSegment extends RealLocalizable

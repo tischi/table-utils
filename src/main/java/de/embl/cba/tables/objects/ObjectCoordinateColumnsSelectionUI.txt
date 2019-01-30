@@ -1,6 +1,6 @@
 package de.embl.cba.tables.objects;
 
-import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
+import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
 
 import javax.swing.*;
