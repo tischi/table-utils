@@ -201,11 +201,13 @@ public class TableUtils
 		return new JTable( model );
 	}
 
+
+	// TODO: replace by more performant version
 	public static ArrayList< DefaultAnnotatedImageSegment > segmentsFromTableFile(
-			File file,
+			final File file,
 			String delim,
-			Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
-			DefaultImageSegmentBuilder segmentBuilder
+			final Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
+			final DefaultImageSegmentBuilder segmentBuilder
 	)
 	{
 
@@ -224,19 +226,19 @@ public class TableUtils
 //			//setColumnIndex( coordinateColumnMap, columnIndex, columnName );
 //		}
 
+
 		for ( int row = 1; row < rowsInTable.size(); ++row )
 		{
 			final LinkedHashMap< String, Object > columnValueMap = new LinkedHashMap<>();
 
 			StringTokenizer st = new StringTokenizer( rowsInTable.get( row ), delim );
 
-			for ( String feature : columns )
+			for ( String column : columns )
 			{
 				final String string = st.nextToken();
 
-				addColumn( columnValueMap, feature, string );
+				addColumn( columnValueMap, column, string );
 			}
-
 
 			final DefaultImageSegment segment =
 					SegmentUtils.segmentFromFeatures(
@@ -254,7 +256,68 @@ public class TableUtils
 
 	}
 
-	public static void addColumn( HashMap< String, Object > columnValueMap, String column, String string )
+	public static ArrayList< DefaultAnnotatedImageSegment > segmentsFromTableFileColumnWise(
+			final File file,
+			String delim,
+			final Map< ImageSegmentCoordinate, String > coordinateColumnMap,
+			final DefaultImageSegmentBuilder segmentBuilder
+	)
+	{
+
+		final ArrayList< DefaultAnnotatedImageSegment > segments = new ArrayList<>();
+
+		final ArrayList< String > rowsInTable = readRows( file );
+
+		delim = autoDelim( delim, rowsInTable );
+
+		ArrayList< String > columns = getColumnNames( rowsInTable, delim );
+
+		final LinkedHashMap< String, ArrayList< Object > > columnToValues = new LinkedHashMap<>();
+
+		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
+		{
+			final String columnName = columns.get( columnIndex );
+			columnToValues.put( columnName, new ArrayList<>(  ) );
+			//setColumnIndex( coordinateColumnMap, columnIndex, columnName );
+		}
+
+
+		final ArrayList< TableRowMap > tableRowMaps = new ArrayList<>();
+		for ( int row = 1; row < rowsInTable.size(); ++row )
+		{
+//			final LinkedHashMap< String, Object > columnValueMap = new LinkedHashMap<>();
+
+			StringTokenizer st = new StringTokenizer( rowsInTable.get( row ), delim );
+
+			for ( String column : columns )
+			{
+				final String string = st.nextToken();
+				columnToValues.get( column ).add( string );
+			}
+
+
+			final TableRowMap tableRowMap = new DefaultTableRowMap( columnToValues, row - 1  );
+
+			final DefaultImageSegment segment =
+					SegmentUtils.segmentFromTableRowMap(
+							coordinateColumnMap,
+							tableRowMap,
+							segmentBuilder );
+
+
+			tableRowMaps.add( tableRowMap );
+//
+//			segments.add( new DefaultAnnotatedImageSegment( null, tableRow ) );
+		}
+
+		return segments;
+
+	}
+
+	public static void addColumn(
+			HashMap< String, Object > columnValueMap,
+			String column,
+			String string )
 	{
 		try
 		{
@@ -273,6 +336,31 @@ public class TableUtils
 				columnValueMap.put( column, string );
 			}
 		}
+	}
+
+	public static void addStringColumn(
+			HashMap< String, Object > columnValueMap,
+			String column,
+			String string )
+	{
+		columnValueMap.put( column, string );
+//		try
+//		{
+//			final double number = Integer.parseInt( string );
+//			columnValueMap.put( column, number );
+//		}
+//		catch ( Exception e )
+//		{
+//			try
+//			{
+//				final double number = Double.parseDouble( string );
+//				columnValueMap.put( column, number );
+//			}
+//			catch ( Exception e2 )
+//			{
+//				columnValueMap.put( column, string );
+//			}
+//		}
 	}
 
 	public static void setColumnIndex( Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap, int columnIndex, String columnName )

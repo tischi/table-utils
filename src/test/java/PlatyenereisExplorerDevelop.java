@@ -37,17 +37,17 @@ public class PlatyenereisExplorerDevelop
 		final File cellTable =
 				new File( "/Volumes/arendt/EM_6dpf_segmentation/EM-Prospr/label_attributes/em-segmented-cells-labels-morphology-v2.csv" );
 
-		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments = createCellSegments( cellTable );
+		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments
+				= createCellSegments( cellTable );
 
 		/**
 		 * Create ImageSourcesModel
 		 */
 		final File directory = new File( "/Volumes/arendt/EM_6dpf_segmentation/EM-Prospr" );
 
-		final PlatynereisImageSourcesModelCreator sourcesModelCreator
-				= new PlatynereisImageSourcesModelCreator( directory );
 
-		final PlatynereisImageSourcesModel imageSourcesModel = sourcesModelCreator.getModel();
+		final PlatynereisImageSourcesModel imageSourcesModel
+				= new PlatynereisImageSourcesModelCreator( directory ).getModel();
 
 		final ArrayList< String > categoricalColumns = new ArrayList<>();
 		categoricalColumns.add( "label_id" );
@@ -68,21 +68,21 @@ public class PlatyenereisExplorerDevelop
 
 	public static ArrayList< DefaultAnnotatedImageSegment > createCellSegments( File tableFile )
 	{
-		final HashMap< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateToColumnNameAndIndexMap = new HashMap<>();
-		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Label, new ValuePair( "label_id",  null ) );
-		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.X, new ValuePair("com_x_microns", null ) );
-		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Y, new ValuePair("com_y_microns", null ) );
-		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Z, new ValuePair("com_z_microns", null ) );
+		final HashMap< ImageSegmentCoordinate, String > coordinateToColumnMap = new HashMap<>();
+		coordinateToColumnMap.put( ImageSegmentCoordinate.Label, "label_id" );
+		coordinateToColumnMap.put( ImageSegmentCoordinate.X, "com_x_microns" );
+		coordinateToColumnMap.put( ImageSegmentCoordinate.Y, "com_y_microns" );
+		coordinateToColumnMap.put( ImageSegmentCoordinate.Z, "com_z_microns" );
 
 		final DefaultImageSegmentBuilder segmentBuilder = new DefaultImageSegmentBuilder();
 
 		segmentBuilder.setImageId( "em-segmented-cells-labels" );
 
 		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments
-				= TableUtils.segmentsFromTableFile(
+				= TableUtils.segmentsFromTableFileColumnWise(
 					tableFile,
 					null,
-					coordinateToColumnNameAndIndexMap,
+					coordinateToColumnMap,
 					segmentBuilder );
 
 		return annotatedImageSegments;

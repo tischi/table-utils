@@ -154,11 +154,7 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 				final ArrayList< SourceAndConverter< ? > > sources = new ArrayList<>();
 				BigDataViewer.initSetups( spimData, converterSetups, sources );
 
-				source = ( Source< T > ) sources.get( 0 ).getSpimSource();
-
-				// TODO: handle the transforms properly (I must have the code somewhere...)
-				// maybe they are ok already????
-				//spimData.getViewRegistrations().getViewRegistrationsOrdered().get( 0 ).getTransformList()/
+				source = ( Source< T > ) sources.get( 0 ).asVolatile().getSpimSource();
 			}
 
 			return source;

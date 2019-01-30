@@ -75,6 +75,61 @@ public class SegmentUtils
 		return segmentBuilder.build();
 	}
 
+
+	public static DefaultImageSegment segmentFromTableRowMap(
+			final Map< ImageSegmentCoordinate, String > coordinateColumnMap,
+			final TableRowMap tableRowMap,
+			final DefaultImageSegmentBuilder segmentBuilder )
+	{
+
+		for( ImageSegmentCoordinate coordinate : coordinateColumnMap.keySet() )
+		{
+			final String colName = coordinateColumnMap.get( coordinate );
+
+			tableRowMap.get( colName );
+
+			switch ( coordinate )
+			{
+				case X:
+					segmentBuilder.setX( Double.parseDouble( (String) tableRowMap.get( colName ) ) );
+					break;
+				case Y:
+					segmentBuilder.setY( Double.parseDouble(  (String) tableRowMap.get( colName ) ));
+					break;
+				case Z:
+					segmentBuilder.setZ( Double.parseDouble( (String) tableRowMap.get( colName ) ) );
+					break;
+				case T:
+					segmentBuilder.setTimePoint( Integer.parseInt( (String) tableRowMap.get( colName ) ));
+					break;
+				case Label:
+					segmentBuilder.setLabel(  Double.parseDouble((String)  tableRowMap.get( colName ) ));
+					break;
+				case ImageId:
+					if ( colName.contains( SEVERAL_COLUMN_SEPARATOR ) )
+					{
+						final String[] columns = colName.split( SEVERAL_COLUMN_SEPARATOR );
+						String imageId = "";
+						for ( String column : columns )
+						{
+							imageId += tableRowMap.get( column ).toString();
+						}
+						segmentBuilder.setImageId( imageId );
+					}
+					else
+					{
+						segmentBuilder.setImageId( tableRowMap.get( colName ).toString() );
+					}
+
+					break;
+
+			}
+		}
+
+		return segmentBuilder.build();
+	}
+
+
 	public static DefaultImageSegment segmentFromFeaturesIndexBased(
 			Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
 			String[] rowEntries )
