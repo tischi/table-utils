@@ -7,11 +7,14 @@ import net.imglib2.type.numeric.RealType;
 import java.util.ArrayList;
 import java.util.Map;
 
+
+// TODO: make it implement map? or just use a map?
+// the point of putting a get() into it was to be able to make it lazy...
 public interface ImageSourcesModel
 {
-	Map< String, ArrayList< Source< ? > > > getImageSources( );
+	/**
+	 *
+	 */
+	Map< String, SourceAndMetadata > get();
 
-	String getImageSourceMetaData( Source< ? > source );
-
-	boolean is2D();
 }

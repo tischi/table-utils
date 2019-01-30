@@ -22,7 +22,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 	}
 
 	@Override
-	public Map< String, ArrayList< Source< ? > > > getImageSources()
+	public Map< String, ArrayList< Source< ? > > > get()
 	{
 		return imageSetToSources;
 	}
@@ -45,7 +45,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 		addIfMissing( imageId );
 
 		imageSetToSources.get( imageId ).add( labelSource );
-		sourceToMetaData.put( labelSource, ImageSourcesMetaData.LABEL_SOURCE );
+		sourceToMetaData.put( labelSource, Metadata.FLAVOUR );
 	}
 
 	public void addIntensitySource( String imageId, Source< ? > intensitySource )
@@ -53,7 +53,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 		addIfMissing( imageId );
 
 		imageSetToSources.get( imageId ).add( intensitySource );
-		sourceToMetaData.put( intensitySource, ImageSourcesMetaData.INTENSITY_SOURCE );
+		sourceToMetaData.put( intensitySource, Metadata.DIMENSIONS );
 
 	}
 

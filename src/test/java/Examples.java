@@ -1,7 +1,7 @@
 import bdv.util.RandomAccessibleIntervalSource;
 import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.datamodels.Lazy2DImageSourcesModel;
+import de.embl.cba.tables.modelview.datamodels.CellProfilerImageSourcesModel;
 import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
 import de.embl.cba.tables.objects.ObjectTablePanel;
 import ij.IJ;
@@ -27,7 +27,7 @@ public abstract class Examples
 	{
 		final ImagePlus imagePlus = IJ.openImage( Examples.class.getResource( "2d-16bit-labelMask.tif" ).getFile() );
 
-		final RandomAccessibleIntervalSource source = Lazy2DImageSourcesModel.imagePlus2DAsSource3D( imagePlus );
+		final RandomAccessibleIntervalSource source = CellProfilerImageSourcesModel.imagePlus2DAsSource3D( imagePlus );
 
 		return source;
 	}

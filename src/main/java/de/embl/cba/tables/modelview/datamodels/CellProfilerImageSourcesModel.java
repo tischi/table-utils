@@ -18,22 +18,23 @@ import net.imglib2.view.Views;
 import java.io.File;
 import java.util.*;
 
-public class Lazy2DImageSourcesModel implements ImageSourcesModel
+import static de.embl.cba.tables.modelview.datamodels.Metadata.*;
+
+public class CellProfilerImageSourcesModel implements ImageSourcesModel
 {
-	private Map< String, ArrayList< Source < ? > > > imageSetToSources;
-	private Map< Source< ? >, String > sourceToMetaData;
 
-	private final boolean is2D;
+	private final Map< String, SourceAndMetadata > nameToSourceAndMetadata;
 
-	/**
-	 * Lazily constructs Sources from 2D image files upon request.
-	 * There is no caching.
-	 */
-	public Lazy2DImageSourcesModel( )
+
+	public CellProfilerImageSourcesModel( )
 	{
-		this.imageSetToSources = new HashMap<>(  );
-		this.sourceToMetaData = new HashMap<>(  );
-		this.is2D = true;
+		nameToSourceAndMetadata = new HashMap<>();
+	}
+
+	@Override
+	public Map< String, SourceAndMetadata > get()
+	{
+		return nameToSourceAndMetadata;
 	}
 
 	class Lazy2DFileSource < T extends NumericType< T > > implements Source< T >
@@ -106,55 +107,30 @@ public class Lazy2DImageSourcesModel implements ImageSourcesModel
 		}
 	}
 
-
-	@Override
-	public Map< String, ArrayList< Source< ? > > > getImageSources()
+	public void addLabelSource( String imageId, File labelSource, ArrayList< String > imageSetIDs )
 	{
-		return imageSetToSources;
-	}
-
-	@Override
-	public String getImageSourceMetaData( Source< ? > source )
-	{
-		return sourceToMetaData.get( source );
-	}
-
-
-	@Override
-	public boolean is2D()
-	{
-		return is2D;
-	}
-
-	public void addLabelSource( String imageId, File labelSource )
-	{
-		addKeyIfMissing( imageId );
-
 		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( labelSource );
 
-		imageSetToSources.get( imageId ).add( lazy2DFileSource );
+		final Metadata metadata = new Metadata();
+		metadata.get().put( FLAVOUR, LABEL_SOURCE_FLAVOUR );
+		metadata.get().put( DIMENSIONS, 2 );
+		metadata.get().put( EXCLUSIVELY_SHOW_WITH, imageSetIDs );
 
-		sourceToMetaData.put( lazy2DFileSource, ImageSourcesMetaData.LABEL_SOURCE );
+		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( lazy2DFileSource, metadata ) );
 	}
 
-	public void addIntensityImageSource( String imageId, File labelSource )
+	public void addIntensityImageSource( String imageId, File labelSource, ArrayList< String > imageSetIDs )
 	{
-		addKeyIfMissing( imageId );
+		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( labelSource );
 
-		final Lazy2DFileSource source = new Lazy2DFileSource( labelSource );
+		final Metadata metadata = new Metadata();
+		metadata.get().put( FLAVOUR, INTENSITY_SOURCE_FLAVOUR );
+		metadata.get().put( DIMENSIONS, 2 );
+		metadata.get().put( EXCLUSIVELY_SHOW_WITH, imageSetIDs );
 
-		imageSetToSources.get( imageId ).add( source );
-
-		sourceToMetaData.put( source, ImageSourcesMetaData.INTENSITY_SOURCE );
+		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( lazy2DFileSource, metadata ) );
 	}
 
-	public void addKeyIfMissing( String imageId )
-	{
-		if ( ! imageSetToSources.containsKey( imageId ) )
-		{
-			imageSetToSources.put( imageId, new ArrayList<>(  ) );
-		}
-	}
 
 	public static < T extends NumericType< T > >
 	RandomAccessibleIntervalSource< T > imagePlus2DAsSource3D( ImagePlus imagePlus )

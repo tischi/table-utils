@@ -1,7 +1,7 @@
 package de.embl.cba.tables.cellprofiler;
 
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.datamodels.Lazy2DImageSourcesModel;
+import de.embl.cba.tables.modelview.datamodels.CellProfilerImageSourcesModel;
 
 import javax.swing.*;
 import java.io.File;
@@ -24,7 +24,7 @@ public class CellProfilerTableToImageSourcesParser
 	private final String delim;
 
 	private ArrayList< String > columns;
-	private Lazy2DImageSourcesModel imageSourcesModel;
+	private CellProfilerImageSourcesModel imageSourcesModel;
 
 	public CellProfilerTableToImageSourcesParser(
 			File tableFile,
@@ -49,12 +49,12 @@ public class CellProfilerTableToImageSourcesParser
 				images );
 	}
 
-	public Lazy2DImageSourcesModel getImageSourcesModel()
+	public CellProfilerImageSourcesModel getImageSourcesModel()
 	{
 		return imageSourcesModel;
 	}
 
-	private Lazy2DImageSourcesModel createImageSourcesModel(
+	private CellProfilerImageSourcesModel createImageSourcesModel(
 			JTable table,
 			int imageSetIdColumnIndex,
 			HashMap< String, FolderAndFileColumn > images ) throws IOException
@@ -62,7 +62,7 @@ public class CellProfilerTableToImageSourcesParser
 
 		final HashSet< String > imageFilePaths = new HashSet<>();
 
-		final Lazy2DImageSourcesModel imageSourcesModel = new Lazy2DImageSourcesModel();
+		final CellProfilerImageSourcesModel imageSourcesModel = new CellProfilerImageSourcesModel();
 
 		for ( int row = 0; row < table.getModel().getRowCount(); row++ )
 		{
@@ -99,7 +99,7 @@ public class CellProfilerTableToImageSourcesParser
 
 	private void addImagePathToModel(
 			HashSet< String > imageFilePaths,
-			Lazy2DImageSourcesModel imageSourcesModel,
+			CellProfilerImageSourcesModel imageSourcesModel,
 			String imageSetId,
 			String image,
 			String imagePath )

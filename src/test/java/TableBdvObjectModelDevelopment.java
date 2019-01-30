@@ -20,7 +20,8 @@ public class TableBdvObjectModelDevelopment
 
 		final DefaultImageSourcesModel imageSourcesModel = createImageSourcesModel();
 
-		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments = createImageSegments( new File( Examples.class.getResource( "2d-16bit-labelMask-Morphometry.csv" ).getFile() ) );
+		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments = createImageSegments(
+				new File( Examples.class.getResource( "2d-16bit-labelMask-Morphometry.csv" ).getFile() ) );
 
 		final ArrayList< String > categoricalColumns = new ArrayList<>();
 		categoricalColumns.add( "Label" );

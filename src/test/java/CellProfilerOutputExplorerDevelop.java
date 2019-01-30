@@ -1,7 +1,7 @@
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.cellprofiler.CellProfilerTableToImageSourcesParser;
 import de.embl.cba.tables.modelview.datamodels.DataModelUtils;
-import de.embl.cba.tables.modelview.datamodels.Lazy2DImageSourcesModel;
+import de.embl.cba.tables.modelview.datamodels.CellProfilerImageSourcesModel;
 import de.embl.cba.tables.modelview.objects.DefaultAnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
 import net.imglib2.util.ValuePair;
@@ -35,7 +35,7 @@ public class CellProfilerOutputExplorerDevelop
 				"\t"
 		);
 
-		final Lazy2DImageSourcesModel imageSourcesModel = parser.getImageSourcesModel();
+		final CellProfilerImageSourcesModel imageSourcesModel = parser.getImageSourcesModel();
 
 		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments = createImageSegments( tableFile );
 
