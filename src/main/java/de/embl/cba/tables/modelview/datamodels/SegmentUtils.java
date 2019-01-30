@@ -10,6 +10,9 @@ import java.util.Map;
 
 public class SegmentUtils
 {
+
+	public static final String SEVERAL_COLUMN_SEPARATOR = "____";
+
 	@Deprecated
 	public static String getKey( Double label )
 	{
@@ -50,8 +53,22 @@ public class SegmentUtils
 				case Label:
 					segmentBuilder.setLabel( ( double ) columnValueMap.get( colName ) );
 					break;
-				case ImageSetName:
-					segmentBuilder.setImageSetName( columnValueMap.get( colName ).toString()  );
+				case ImageId:
+					if ( colName.contains( SEVERAL_COLUMN_SEPARATOR ) )
+					{
+						final String[] columns = colName.split( SEVERAL_COLUMN_SEPARATOR );
+						String imageId = "";
+						for ( String column : columns )
+						{
+							imageId += columnValueMap.get( column ).toString();
+						}
+						segmentBuilder.setImageId( imageId );
+					}
+					else
+					{
+						segmentBuilder.setImageId( columnValueMap.get( colName ).toString() );
+					}
+
 					break;
 
 			}
@@ -97,8 +114,8 @@ public class SegmentUtils
 							Double.parseDouble(
 									rowEntries[ col ] ) );
 					break;
-				case ImageSetName:
-					segmentBuilder.setImageSetName( rowEntries[ col ] );
+				case ImageId:
+					segmentBuilder.setImageId( rowEntries[ col ] );
 					break;
 
 			}

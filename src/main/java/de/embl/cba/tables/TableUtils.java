@@ -210,24 +210,24 @@ public class TableUtils
 
 		final ArrayList< DefaultAnnotatedImageSegment > segments = new ArrayList<>();
 
-		final ArrayList< String > tableRows = readRows( file );
+		final ArrayList< String > rowsInTable = readRows( file );
 
-		delim = autoDelim( delim, tableRows );
+		delim = autoDelim( delim, rowsInTable );
 
-		ArrayList< String > columns = getColumnNames( tableRows, delim );
+		ArrayList< String > columns = getColumnNames( rowsInTable, delim );
 
 		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
 		{
 			final String columnName = columns.get( columnIndex );
 
-			setColumnIndex( coordinateColumnMap, columnIndex, columnName );
+			//setColumnIndex( coordinateColumnMap, columnIndex, columnName );
 		}
 
-		for ( int row = 1; row < tableRows.size(); ++row )
+		for ( int row = 1; row < rowsInTable.size(); ++row )
 		{
 			final LinkedHashMap< String, Object > columnValueMap = new LinkedHashMap<>();
 
-			StringTokenizer st = new StringTokenizer( tableRows.get( row ), delim );
+			StringTokenizer st = new StringTokenizer( rowsInTable.get( row ), delim );
 
 			for ( String feature : columns )
 			{
@@ -236,9 +236,11 @@ public class TableUtils
 				addColumn( columnValueMap, feature, string );
 			}
 
-			final DefaultImageSegment segment = SegmentUtils.segmentFromFeatures(
-					coordinateColumnMap,
-					columnValueMap );
+			final DefaultImageSegment segment =
+					SegmentUtils.segmentFromFeatures(
+						coordinateColumnMap,
+						columnValueMap );
+
 
 			final TableRow tableRow = new DefaultTableRow( columnValueMap, row - 1  );
 

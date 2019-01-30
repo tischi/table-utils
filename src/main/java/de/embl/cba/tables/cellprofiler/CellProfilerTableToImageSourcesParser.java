@@ -72,10 +72,24 @@ public class CellProfilerTableToImageSourcesParser
 			//{
 			//	final CellProfilerDataset dataset = new CellProfilerDataset( datasetIndex );
 
-			for ( String image : images.keySet() )
+			ArrayList< String > imageSetIds = new ArrayList<>(  );
+
+			for ( String imageName : images.keySet() )
 			{
-				final String folderColumn = images.get( image ).getFolderColumn();
-				final String fileColumn = images.get( image ).getFileColumn();
+				final String fileColumn = images.get( imageName ).getFileColumn();
+
+				final String fileName = ( String ) table.getValueAt(
+						row,
+						table.getColumnModel().getColumnIndex( fileColumn ) );
+
+				imageSetIds.add( imageSetId + fileName );
+
+			}
+
+			for ( String imageName : images.keySet() )
+			{
+				final String folderColumn = images.get( imageName ).getFolderColumn();
+				final String fileColumn = images.get( imageName ).getFileColumn();
 
 				final String folderName = ( String ) table.getValueAt(
 						row,
@@ -87,9 +101,12 @@ public class CellProfilerTableToImageSourcesParser
 
 				String imagePath = folderName + File.separator + fileName;
 
-
-				addImagePathToModel( imageFilePaths, imageSourcesModel, imageSetId, image, imagePath );
-
+				addImageToModel(
+						imageFilePaths,
+						imageSourcesModel,
+						imageSetId + fileName,
+						imagePath,
+						imageSetIds );
 
 			}
 		}
@@ -97,14 +114,19 @@ public class CellProfilerTableToImageSourcesParser
 		return imageSourcesModel;
 	}
 
-	private void addImagePathToModel(
+	public static String getImageId( String imageSetId, String imageName )
+	{
+		return imageSetId + imageName;
+	}
+
+	private void addImageToModel(
 			HashSet< String > imageFilePaths,
 			CellProfilerImageSourcesModel imageSourcesModel,
-			String imageSetId,
-			String image,
-			String imagePath )
+			String imageId,
+			String imagePath,
+			ArrayList< String > imageSetIds )
 	{
-		// path mapping if needed
+
 		if ( imageRootPathInTable != null )
 		{
 			imagePath = imagePath.replace( imageRootPathInTable, imageRootPathOnThisComputer );
@@ -112,12 +134,13 @@ public class CellProfilerTableToImageSourcesParser
 
 		if ( ! imageFilePaths.contains( imagePath  ) )
 		{
-			if ( image.contains( OBJECTS ) )
+			if ( imageId.contains( OBJECTS ) )
 			{
-				imageSourcesModel.addLabelSource( imageSetId, new File( imagePath ) );
-			} else
+				imageSourcesModel.addLabelSource( imageId, new File( imagePath ), imageSetIds );
+			}
+			else
 			{
-				imageSourcesModel.addIntensityImageSource( imageSetId, new File( imagePath ) );
+				imageSourcesModel.addIntensityImageSource( imageId, new File( imagePath ), imageSetIds );
 			}
 		}
 

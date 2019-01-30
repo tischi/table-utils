@@ -2,6 +2,7 @@ import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.cellprofiler.CellProfilerTableToImageSourcesParser;
 import de.embl.cba.tables.modelview.datamodels.DataModelUtils;
 import de.embl.cba.tables.modelview.datamodels.CellProfilerImageSourcesModel;
+import de.embl.cba.tables.modelview.datamodels.SegmentUtils;
 import de.embl.cba.tables.modelview.objects.DefaultAnnotatedImageSegment;
 import de.embl.cba.tables.modelview.objects.ImageSegmentCoordinate;
 import net.imglib2.util.ValuePair;
@@ -37,7 +38,7 @@ public class CellProfilerOutputExplorerDevelop
 
 		final CellProfilerImageSourcesModel imageSourcesModel = parser.getImageSourcesModel();
 
-		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments = createImageSegments( tableFile );
+		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments = createCellProfilerImageSegments( tableFile );
 
 		final ArrayList< String > categoricalColumns = new ArrayList<>();
 		categoricalColumns.add( "Label" );
@@ -50,19 +51,21 @@ public class CellProfilerOutputExplorerDevelop
 
 	}
 
-	public static ArrayList< DefaultAnnotatedImageSegment > createImageSegments( File tableFile )
+	public static ArrayList< DefaultAnnotatedImageSegment > createCellProfilerImageSegments( File tableFile )
 	{
 
 		final HashMap< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateToColumnNameAndIndexMap = new HashMap<>();
-		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.ImageSetName, new ValuePair( "ImageNumber",  null ) );
+		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.ImageId,
+				new ValuePair( "ImageNumber" + SegmentUtils.SEVERAL_COLUMN_SEPARATOR + "FileName_Objects_Nuclei_Grayscale",  null ) );
 		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Label, new ValuePair( "Number_Object_Number",  null ) );
 		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.X, new ValuePair("Location_Center_X", null ) );
 		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Y, new ValuePair("Location_Center_Y", null ) );
 
-		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments = TableUtils.segmentsFromTableFile(
-				tableFile,
-				null,
-				coordinateToColumnNameAndIndexMap );
+		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments
+				= TableUtils.segmentsFromTableFile(
+					tableFile,
+					null,
+					coordinateToColumnNameAndIndexMap );
 
 		return annotatedImageSegments;
 	}

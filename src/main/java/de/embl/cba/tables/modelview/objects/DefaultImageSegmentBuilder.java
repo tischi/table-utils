@@ -25,7 +25,7 @@ public class DefaultImageSegmentBuilder
 		return defaultImageSegment;
 	}
 
-	public DefaultImageSegmentBuilder setImageSetName( String imageSetName )
+	public DefaultImageSegmentBuilder setImageId( String imageSetName )
 	{
 		this.imageSetName = imageSetName;
 		return this;

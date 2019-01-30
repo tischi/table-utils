@@ -39,11 +39,13 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 
 	class Lazy2DFileSource < T extends NumericType< T > > implements Source< T >
 	{
+		private final String name;
 		private final File file;
 		private RandomAccessibleIntervalSource< T > source;
 
-		public Lazy2DFileSource( File file )
+		public Lazy2DFileSource( String name, File file )
 		{
+			this.name = name;
 			this.file = file;
 		}
 
@@ -64,7 +66,7 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 			if ( source == null )
 			{
 				final ImagePlus imagePlus = IJ.openImage( file.toString() );
-				source =  imagePlus2DAsSource3D( imagePlus );
+				source =  imagePlus2DAsSource3D( name, imagePlus );
 			}
 
 			return source;
@@ -109,7 +111,7 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 
 	public void addLabelSource( String imageId, File labelSource, ArrayList< String > imageSetIDs )
 	{
-		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( labelSource );
+		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( imageId, labelSource );
 
 		final Metadata metadata = new Metadata();
 		metadata.get().put( FLAVOUR, LABEL_SOURCE_FLAVOUR );
@@ -121,7 +123,7 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 
 	public void addIntensityImageSource( String imageId, File labelSource, ArrayList< String > imageSetIDs )
 	{
-		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( labelSource );
+		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( imageId, labelSource );
 
 		final Metadata metadata = new Metadata();
 		metadata.get().put( FLAVOUR, INTENSITY_SOURCE_FLAVOUR );
@@ -133,13 +135,13 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 
 
 	public static < T extends NumericType< T > >
-	RandomAccessibleIntervalSource< T > imagePlus2DAsSource3D( ImagePlus imagePlus )
+	RandomAccessibleIntervalSource< T > imagePlus2DAsSource3D( String name, ImagePlus imagePlus )
 	{
 		RandomAccessibleInterval< RealType > wrap = ImageJFunctions.wrapReal( imagePlus );
 
 		// needs to be at least 3D
 		wrap = Views.addDimension( wrap, 0, 0);
 
-		return new RandomAccessibleIntervalSource( wrap, Util.getTypeFromInterval( wrap ), imagePlus.getTitle() );
+		return new RandomAccessibleIntervalSource( wrap, Util.getTypeFromInterval( wrap ), name );
 	}
 }

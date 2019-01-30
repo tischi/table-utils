@@ -4,14 +4,14 @@ import net.imglib2.FinalInterval;
 
 public class DefaultImageSegment implements ImageSegment
 {
-	private final String imageSetName;
+	private final String imageId;
 	private final double label;
 	private final int timePoint;
 	private final FinalInterval boundingBox;
 	private final double[] position;
 
 	public DefaultImageSegment(
-			String imageSetName,
+			String imageId,
 			double label,
 			int timePoint,
 			double x,
@@ -19,7 +19,7 @@ public class DefaultImageSegment implements ImageSegment
 			double z,
 			FinalInterval boundingBox )
 	{
-		this.imageSetName = imageSetName;
+		this.imageId = imageId;
 		this.label = label;
 		this.timePoint = timePoint;
 		this.boundingBox = boundingBox;
@@ -29,7 +29,7 @@ public class DefaultImageSegment implements ImageSegment
 	@Override
 	public String imageId()
 	{
-		return imageSetName;
+		return imageId;
 	}
 
 	@Override

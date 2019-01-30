@@ -272,6 +272,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		final RandomAccessibleInterval< BitType > bits = ArrayImgs.bits( new long[]{ 10, 10 } );
 
 		bdv = BdvFunctions.show( bits, "dummy", bdvOptions ).getBdvHandle();
+
+		bdvOptions = bdvOptions.addTo( bdv );
 	}
 
 	private void removeAllSources()

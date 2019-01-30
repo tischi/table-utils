@@ -21,23 +21,23 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 		this.is2D = is2D;
 	}
 
-	@Override
-	public Map< String, ArrayList< Source< ? > > > get()
-	{
-		return imageSetToSources;
-	}
-
-	@Override
-	public String getImageSourceMetaData( Source< ? > source )
-	{
-		return sourceToMetaData.get( source );
-	}
-
-	@Override
-	public boolean is2D()
-	{
-		return is2D;
-	}
+//	@Override
+//	public Map< String, ArrayList< Source< ? > > > get()
+//	{
+//		return imageSetToSources;
+//	}
+//
+//	@Override
+//	public String getImageSourceMetaData( Source< ? > source )
+//	{
+//		return sourceToMetaData.get( source );
+//	}
+//
+//	@Override
+//	public boolean is2D()
+//	{
+//		return is2D;
+//	}
 
 
 	public void addLabelSource( String imageId, Source< ? extends RealType< ? > > labelSource )
@@ -65,4 +65,9 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 		}
 	}
 
+	@Override
+	public Map< String, SourceAndMetadata > get()
+	{
+		return null;
+	}
 }

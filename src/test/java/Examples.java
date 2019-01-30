@@ -27,7 +27,7 @@ public abstract class Examples
 	{
 		final ImagePlus imagePlus = IJ.openImage( Examples.class.getResource( "2d-16bit-labelMask.tif" ).getFile() );
 
-		final RandomAccessibleIntervalSource source = CellProfilerImageSourcesModel.imagePlus2DAsSource3D( imagePlus );
+		final RandomAccessibleIntervalSource source = CellProfilerImageSourcesModel.imagePlus2DAsSource3D( "title", imagePlus );
 
 		return source;
 	}
