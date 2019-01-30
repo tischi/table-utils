@@ -38,15 +38,29 @@ public class DynamicCategoryColoringModel< T > extends AbstractColoringModel< T 
 			final double random = createRandom( inputToColorMap.size() + 1 );
 			inputToColorMap.put( input, new ARGBType( argbLut.getARGB( random ) ) );
 		}
-
 		output.set( inputToColorMap.get( input ).get() );
 	}
 
-	public double createRandom( double x )
+	private double createRandom( double x )
 	{
 		double random = ( x * randomSeed ) * goldenRatio;
 		random = random - ( long ) Math.floor( random );
 		return random;
 	}
 
+	public void incRandomSeed( )
+	{
+		inputToColorMap.clear();
+		this.randomSeed++;
+
+		notifyColoringListeners();
+	}
+
+	private void notifyColoringListeners()
+	{
+		for ( ColoringListener listener : listeners.list )
+		{
+			listener.coloringChanged();
+		}
+	}
 }

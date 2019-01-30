@@ -3,16 +3,13 @@ package de.embl.cba.tables.modelview.views.bdv;
 import bdv.util.BdvFunctions;
 import bdv.util.BdvHandle;
 import bdv.util.BdvOptions;
-import bdv.util.volatiles.VolatileViews;
-import bdv.viewer.DisplayMode;
 import bdv.viewer.Source;
-import bdv.viewer.VisibilityAndGrouping;
-import bdv.viewer.state.SourceGroup;
 import bdv.viewer.state.SourceState;
 import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringListener;
 import de.embl.cba.tables.modelview.coloring.ColoringModel;
+import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
 import de.embl.cba.tables.modelview.combined.ImagesAndSegmentsModel;
@@ -35,7 +32,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 {
 	private String selectTrigger = "ctrl button1";
 	private String selectNoneTrigger = "ctrl N";
-	private String alterCategoricalLutRandomSeedTrigger = "ctrl L";
+	private String incrementCategoricalLutRandomSeedTrigger = "ctrl L";
 	private String iterateSelectionModeTrigger = "ctrl S";
 	private String viewIn3DTrigger = "ctrl shift button1";
 
@@ -451,9 +448,21 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		installSelectionBehaviour( );
 		installSelectNoneBehaviour( );
-		//installSelectionModeIterationBehaviour( );
-		//installRandomColorShufflingBehaviour();
+		installSelectionColoringModeBehaviour( );
+		installRandomColorShufflingBehaviour();
 		//if( is3D() ) install3DViewBehaviour();
+	}
+
+	private void installRandomColorShufflingBehaviour()
+	{
+		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
+		{
+			if ( selectionColoringModel.getWrappedColoringModel() instanceof DynamicCategoryColoringModel )
+			{
+				( ( DynamicCategoryColoringModel ) selectionColoringModel.getWrappedColoringModel() ).incRandomSeed();
+				BdvUtils.repaint( bdv );
+			}
+		}, name + "-change-coloring-random-seed", incrementCategoricalLutRandomSeedTrigger );
 	}
 
 
@@ -500,17 +509,21 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 				final T segment = imagesAndSegmentsModel.getSegment( imageId, label, timePoint );
 				selectionModel.toggle( segment );
 			}
-
 		}
+	}
 
+	private void installSelectionColoringModeBehaviour( )
+	{
+		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
+		{
+			selectionColoringModel.iterateSelectionMode();
+			BdvUtils.repaint( bdv );
+		}, name + "-iterate-selection", iterateSelectionModeTrigger );
 	}
 
 	private int getCurrentTimePoint()
 	{
 		return bdv.getBdvHandle().getViewerPanel().getState().getCurrentTimepoint();
 	}
-
-
-
 
 }
