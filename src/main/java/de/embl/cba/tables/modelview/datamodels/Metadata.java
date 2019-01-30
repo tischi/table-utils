@@ -10,7 +10,7 @@ public class Metadata
 	public static final String LABEL_SOURCE_FLAVOUR = "LabelSource";
 	public static final String INTENSITY_SOURCE_FLAVOUR = "IntensitySource";
 	public static final String DIMENSIONS = "Dimensions";
-	public static final String EXCLUSIVELY_SHOW_WITH = "ExclusivelyShowWith";
+	public static final String EXCLUSIVE_IMAGE_SET = "ExclusivelyShowWith";
 
 	private final Map< String, Object > metadata;
 

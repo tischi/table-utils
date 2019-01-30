@@ -1,6 +1,5 @@
 package de.embl.cba.tables.modelview.views.bdv;
 
-import bdv.util.Bdv;
 import bdv.util.BdvFunctions;
 import bdv.util.BdvHandle;
 import bdv.util.BdvOptions;
@@ -22,11 +21,6 @@ import de.embl.cba.tables.modelview.objects.ImageSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.modelview.views.ImageSegmentLabelsARGBConverter;
-import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.img.array.ArrayImg;
-import net.imglib2.img.array.ArrayImgs;
-import net.imglib2.img.basictypeaccess.array.LongArray;
-import net.imglib2.type.logic.BitType;
 import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
 import org.scijava.ui.behaviour.util.Behaviours;
@@ -218,22 +212,25 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		final Map< String, Object > metadata = sourceAndMetadata.getMetadata().get();
 
-		if ( metadata.containsKey( Metadata.EXCLUSIVELY_SHOW_WITH ) )
+		if ( metadata.containsKey( Metadata.EXCLUSIVE_IMAGE_SET ) )
 		{
 			removeAllSources();
 		}
 
 		showSingleSource( imageId, sourceAndMetadata );
 
-		if ( metadata.containsKey( Metadata.EXCLUSIVELY_SHOW_WITH ) )
+		if ( metadata.containsKey( Metadata.EXCLUSIVE_IMAGE_SET ) )
 		{
-			final ArrayList< String > imageIDs = ( ArrayList< String > ) metadata.get( Metadata.EXCLUSIVELY_SHOW_WITH );
+			final ArrayList< String > imageIDs = ( ArrayList< String > ) metadata.get( Metadata.EXCLUSIVE_IMAGE_SET );
 
-			for ( String imageID : imageIDs )
+			for ( String associatedImageId : imageIDs )
 			{
-				imageSourcesModel.get().get( imageID ).getSource();
+				if ( ! associatedImageId.equals( imageId ) )
+				{
+					final SourceAndMetadata associatedSourceAndMetadata = imageSourcesModel.get().get( associatedImageId );
 
-				showSource( imageID, sourceAndMetadata );
+					showSingleSource( associatedImageId, associatedSourceAndMetadata );
+				}
 			}
 		}
 
@@ -258,36 +255,39 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		if ( metadata.containsKey( FLAVOUR ) && metadata.get( FLAVOUR ).equals( LABEL_SOURCE_FLAVOUR ) )
 		{
-			BdvFunctions.show( asLabelSource( imageId, source ), bdvOptions );
+			bdv = BdvFunctions.show( asLabelSource( imageId, source ), bdvOptions ).getBdvHandle();
 			currentLabelSource = sourceAndMetadata;
 		}
 		else
 		{
-			BdvFunctions.show( source, bdvOptions );
+			bdv = BdvFunctions.show( source, bdvOptions ).getBdvHandle();
 		}
-	}
-
-	private void initBdv()
-	{
-		final RandomAccessibleInterval< BitType > bits = ArrayImgs.bits( new long[]{ 10, 10 } );
-
-		bdv = BdvFunctions.show( bits, "dummy", bdvOptions ).getBdvHandle();
 
 		bdvOptions = bdvOptions.addTo( bdv );
 	}
 
+	private void initBdv()
+	{
+//		final RandomAccessibleInterval< BitType > bits = ArrayImgs.bits( new long[]{ 10, 10 } );
+
+//		bdv = BdvFunctions.show( bits, "dummy", bdvOptions ).getBdvHandle();
+
+//		bdvOptions = bdvOptions.addTo( bdv );
+	}
+
 	private void removeAllSources()
 	{
-		final List< SourceState< ? > > sources = bdv.getViewerPanel().getState().getSources();
-		final int numSources = sources.size();
-
-		// remove all but dummy source
-		for ( int i = numSources - 1; i > 0 ; --i )
+		if ( bdv != null )
 		{
-			final Source< ? > source = sources.get( i ).getSpimSource();
-			bdv.getViewerPanel().removeSource( source );
-		}
+			final List< SourceState< ? > > sources = bdv.getViewerPanel().getState().getSources();
+			final int numSources = sources.size();
 
+			for ( int i = numSources - 1; i >= 0; --i )
+			{
+				final Source< ? > source = sources.get( i ).getSpimSource();
+				bdv.getViewerPanel().removeSource( source );
+			}
+		}
 	}
 
 //	private synchronized void populateAndShowGroup( int groupIndex )

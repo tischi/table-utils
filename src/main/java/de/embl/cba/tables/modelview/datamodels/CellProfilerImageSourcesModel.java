@@ -116,7 +116,8 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 		final Metadata metadata = new Metadata();
 		metadata.get().put( FLAVOUR, LABEL_SOURCE_FLAVOUR );
 		metadata.get().put( DIMENSIONS, 2 );
-		metadata.get().put( EXCLUSIVELY_SHOW_WITH, imageSetIDs );
+		metadata.get().put( EXCLUSIVE_IMAGE_SET, imageSetIDs );
+		metadata.get().put( NAME, imageId );
 
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( lazy2DFileSource, metadata ) );
 	}
@@ -128,7 +129,8 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 		final Metadata metadata = new Metadata();
 		metadata.get().put( FLAVOUR, INTENSITY_SOURCE_FLAVOUR );
 		metadata.get().put( DIMENSIONS, 2 );
-		metadata.get().put( EXCLUSIVELY_SHOW_WITH, imageSetIDs );
+		metadata.get().put( EXCLUSIVE_IMAGE_SET, imageSetIDs );
+		metadata.get().put( NAME, imageId );
 
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( lazy2DFileSource, metadata ) );
 	}
