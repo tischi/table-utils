@@ -3,6 +3,7 @@ package de.embl.cba.tables.modelview.views.bdv;
 import bdv.util.BdvFunctions;
 import bdv.util.BdvHandle;
 import bdv.util.BdvOptions;
+import bdv.util.volatiles.VolatileViews;
 import bdv.viewer.DisplayMode;
 import bdv.viewer.Source;
 import bdv.viewer.VisibilityAndGrouping;
@@ -216,8 +217,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			initBdv();
 		}
 
-
-
 		final Map< String, Object > metadata = sourceAndMetadata.getMetadata().get();
 
 		if ( metadata.containsKey( Metadata.EXCLUSIVE_IMAGE_SET ) )
@@ -363,80 +362,80 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 				labelSourcesARGBConverter );
 	}
 
-	private boolean isEmpty( int selectedGroup )
-	{
-		if ( bdv == null )
-		{
-			return true;
-		}
+//	private boolean isEmpty( int selectedGroup )
+//	{
+//		if ( bdv == null )
+//		{
+//			return true;
+//		}
+//
+//		final int size = bdv.getViewerPanel().getState().getSourceGroups().get( selectedGroup ).getSourceIds().size();
+//
+//		return size == 0;
+//	}
+//
+//	private String getImageSegmentGroupName( ImageSegment selection )
+//	{
+//		return imageIdToGroupName.get( selection.imageId() );
+//	}
+//
+//	private Integer getImageSegmentGroupIdx( ImageSegment selection )
+//	{
+//		final String groupName = imageIdToGroupName.get( selection.imageId() );
+//		final Integer groupIndex = groupNameToIndex.get( groupName );
+//		return groupIndex;
+//	}
+//
+//	private String getCurrentGroupName()
+//	{
+//		return groupIdxToName.get( getCurrentGroupIdx() );
+//	}
+//
+//	private int getCurrentGroupIdx()
+//	{
+//		return bdv.getViewerPanel().getVisibilityAndGrouping().getCurrentGroup();
+//	}
 
-		final int size = bdv.getViewerPanel().getState().getSourceGroups().get( selectedGroup ).getSourceIds().size();
-
-		return size == 0;
-	}
-
-	private String getImageSegmentGroupName( ImageSegment selection )
-	{
-		return imageIdToGroupName.get( selection.imageId() );
-	}
-
-	private Integer getImageSegmentGroupIdx( ImageSegment selection )
-	{
-		final String groupName = imageIdToGroupName.get( selection.imageId() );
-		final Integer groupIndex = groupNameToIndex.get( groupName );
-		return groupIndex;
-	}
-
-	private String getCurrentGroupName()
-	{
-		return groupIdxToName.get( getCurrentGroupIdx() );
-	}
-
-	private int getCurrentGroupIdx()
-	{
-		return bdv.getViewerPanel().getVisibilityAndGrouping().getCurrentGroup();
-	}
-
-
-	private void configureBdvGrouping()
-	{
-		final Set< String > imageSetNames = imageSourcesModel.get().keySet();
-
-		final VisibilityAndGrouping visibilityAndGrouping = bdv.getViewerPanel().getVisibilityAndGrouping();
-
-		while ( visibilityAndGrouping.getSourceGroups().size() > 1 ) {
-			final SourceGroup g = visibilityAndGrouping.getSourceGroups().get(0);
-			this.bdv.getViewerPanel().removeGroup( g );
-		}
-
-
-		int i = 0;
-		for ( String imageSetName : imageSetNames )
-		{
-			if ( i == 0 )
-			{
-				// first group exists by default => only change name
-				visibilityAndGrouping.setGroupName( 0, imageSetName );
-			}
-			else
-			{
-				bdv.getViewerPanel().addGroup( new SourceGroup( imageSetName ) );
-				visibilityAndGrouping.setGroupName( i, imageSetName );
-			}
-
-			i++;
-		}
-
-		visibilityAndGrouping.setGroupingEnabled( true );
-		visibilityAndGrouping.setDisplayMode( DisplayMode.GROUP );
-
-//		isBdvGroupingConfigured = true;
-	}
-
-	private void addMostRecentSourceToGroup( int groupIdx )
-	{
-		bdv.getViewerPanel().getVisibilityAndGrouping().addSourceToGroup( bdv.getViewerPanel().getState().numSources() - 1, groupIdx );
-	}
+//
+//	private void configureBdvGrouping()
+//	{
+//		final Set< String > imageSetNames = imageSourcesModel.get().keySet();
+//
+//		final VisibilityAndGrouping visibilityAndGrouping = bdv.getViewerPanel().getVisibilityAndGrouping();
+//
+//		while ( visibilityAndGrouping.getSourceGroups().size() > 1 ) {
+//			final SourceGroup g = visibilityAndGrouping.getSourceGroups().get(0);
+//			this.bdv.getViewerPanel().removeGroup( g );
+//		}
+//
+//
+//		int i = 0;
+//		for ( String imageSetName : imageSetNames )
+//		{
+//			if ( i == 0 )
+//			{
+//				// first group exists by default => only change name
+//				visibilityAndGrouping.setGroupName( 0, imageSetName );
+//			}
+//			else
+//			{
+//				bdv.getViewerPanel().addGroup( new SourceGroup( imageSetName ) );
+//				visibilityAndGrouping.setGroupName( i, imageSetName );
+//			}
+//
+//			i++;
+//		}
+//
+//		visibilityAndGrouping.setGroupingEnabled( true );
+//		visibilityAndGrouping.setDisplayMode( DisplayMode.GROUP );
+//
+////		isBdvGroupingConfigured = true;
+//	}
+//
+//	private void addMostRecentSourceToGroup( int groupIdx )
+//	{
+//		bdv.getViewerPanel().getVisibilityAndGrouping().addSourceToGroup( bdv.getViewerPanel().getState().numSources() - 1, groupIdx );
+//	}
 
 	private void initBdvOptions( ImageSourcesModel imageSourcesModel )
 	{

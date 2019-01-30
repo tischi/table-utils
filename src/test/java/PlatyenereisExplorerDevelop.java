@@ -61,7 +61,7 @@ public class PlatyenereisExplorerDevelop
 				imageSourcesModel,
 				annotatedImageSegments,
 				categoricalColumns,
-				false,
+				true,
 				initialSources );
 
 	}
