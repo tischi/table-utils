@@ -4,7 +4,7 @@ import net.imglib2.FinalInterval;
 
 public class DefaultImageSegmentBuilder
 {
-	private String imageSetName = getDefaultImageSetName();
+	private String imageId = getDefaultImageIdName();
 	private double label = getDefaultLabel();
 	private int timePoint = getDefaultTimePoint();
 	private double x = getDefaultX();
@@ -15,7 +15,7 @@ public class DefaultImageSegmentBuilder
 	public DefaultImageSegment build()
 	{
 		final DefaultImageSegment defaultImageSegment = new DefaultImageSegment(
-				imageSetName,
+				imageId,
 				label,
 				timePoint,
 				x,
@@ -27,7 +27,7 @@ public class DefaultImageSegmentBuilder
 
 	public DefaultImageSegmentBuilder setImageId( String imageSetName )
 	{
-		this.imageSetName = imageSetName;
+		this.imageId = imageSetName;
 		return this;
 	}
 
@@ -68,9 +68,9 @@ public class DefaultImageSegmentBuilder
 		return this;
 	}
 
-	public static String getDefaultImageSetName()
+	public static String getDefaultImageIdName()
 	{
-		return "ImageSet";
+		return "ImageId";
 	}
 
 	public static double getDefaultLabel()

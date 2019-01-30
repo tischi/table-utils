@@ -26,11 +26,15 @@ public class TableBdvObjectModelDevelopment
 		final ArrayList< String > categoricalColumns = new ArrayList<>();
 		categoricalColumns.add( "Label" );
 
+		ArrayList< String > initialSources = new ArrayList< String >();
+		initialSources.add( imageSourcesModel.get().keySet().iterator().next() );
+
 		DataModelUtils.buildModelsAndViews(
 				imageSourcesModel,
 				annotatedImageSegments,
 				categoricalColumns,
-				true );
+				true,
+				initialSources );
 	}
 
 	public static ArrayList< DefaultAnnotatedImageSegment > createImageSegments( File tableFile )
@@ -46,7 +50,7 @@ public class TableBdvObjectModelDevelopment
 		return TableUtils.segmentsFromTableFile(
 				tableFile,
 				",",
-				coordinateToColumnNameMap );
+				coordinateToColumnNameMap, new DefaultImageSegmentBuilder() );
 	}
 
 	public static DefaultImageSourcesModel createImageSourcesModel()
@@ -56,7 +60,7 @@ public class TableBdvObjectModelDevelopment
 		final DefaultImageSourcesModel imageSourcesModel = new DefaultImageSourcesModel( true );
 
 		imageSourcesModel.addLabelSource(
-				DefaultImageSegmentBuilder.getDefaultImageSetName(),
+				DefaultImageSegmentBuilder.getDefaultImageIdName(),
 				labelSource );
 
 		return imageSourcesModel;

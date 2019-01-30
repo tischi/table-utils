@@ -24,15 +24,16 @@ public class SegmentUtils
 
 	public static DefaultImageSegment segmentFromFeatures(
 			Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
-			HashMap< String, Object > columnValueMap )
+			HashMap< String, Object > columnValueMap,
+			DefaultImageSegmentBuilder segmentBuilder )
 	{
-		final DefaultImageSegmentBuilder segmentBuilder = new DefaultImageSegmentBuilder();
 
 		for( ImageSegmentCoordinate coordinate : coordinateColumnMap.keySet() )
 		{
 			final String colName = coordinateColumnMap.get( coordinate ).getA();
 
 			columnValueMap.get( colName );
+
 			switch ( coordinate )
 			{
 				case X:

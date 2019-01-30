@@ -201,10 +201,11 @@ public class TableUtils
 		return new JTable( model );
 	}
 
-	public static ArrayList< DefaultAnnotatedImageSegment > segmentsFromTableFile (
+	public static ArrayList< DefaultAnnotatedImageSegment > segmentsFromTableFile(
 			File file,
 			String delim,
-			Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap
+			Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
+			DefaultImageSegmentBuilder segmentBuilder
 	)
 	{
 
@@ -216,12 +217,12 @@ public class TableUtils
 
 		ArrayList< String > columns = getColumnNames( rowsInTable, delim );
 
-		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
-		{
-			final String columnName = columns.get( columnIndex );
-
-			//setColumnIndex( coordinateColumnMap, columnIndex, columnName );
-		}
+//		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
+//		{
+//			final String columnName = columns.get( columnIndex );
+//
+//			//setColumnIndex( coordinateColumnMap, columnIndex, columnName );
+//		}
 
 		for ( int row = 1; row < rowsInTable.size(); ++row )
 		{
@@ -236,10 +237,12 @@ public class TableUtils
 				addColumn( columnValueMap, feature, string );
 			}
 
+
 			final DefaultImageSegment segment =
 					SegmentUtils.segmentFromFeatures(
-						coordinateColumnMap,
-						columnValueMap );
+							coordinateColumnMap,
+							columnValueMap,
+							segmentBuilder );
 
 
 			final TableRow tableRow = new DefaultTableRow( columnValueMap, row - 1  );

@@ -94,18 +94,15 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 
 	private static String sourceName( File file )
 	{
-		String dataSourceName = null;
+		String dataSourceName = file.getName().replaceAll( BDV_XML_SUFFIX, "" );
 
-		if ( file.getName().endsWith( BDV_XML_SUFFIX ) )
-		{
-			dataSourceName = file.getName().replaceAll( BDV_XML_SUFFIX, "" );
-		}
-		else if ( file.getName().endsWith( IMARIS_SUFFIX ) )
-		{
-			dataSourceName = file.getName().replaceAll( IMARIS_SUFFIX, "" );
-		}
+		dataSourceName = getProSPrName( dataSourceName );
 
+		return dataSourceName;
+	}
 
+	private static String getProSPrName( String dataSourceName )
+	{
 		if ( dataSourceName.contains( NEW_PROSPR ) )
 		{
 			dataSourceName= dataSourceName.replace( NEW_PROSPR, MEDS );
@@ -118,7 +115,6 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 		{
 			dataSourceName = dataSourceName + OLD;
 		}
-
 		return dataSourceName;
 	}
 
@@ -158,7 +154,7 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 				final ArrayList< SourceAndConverter< ? > > sources = new ArrayList<>();
 				BigDataViewer.initSetups( spimData, converterSetups, sources );
 
-				source = ( Source< T > ) sources.get( 0 );
+				source = ( Source< T > ) sources.get( 0 ).getSpimSource();
 
 				// TODO: handle the transforms properly (I must have the code somewhere...)
 				//spimData.getViewRegistrations().getViewRegistrationsOrdered().get( 0 ).getTransformList()/

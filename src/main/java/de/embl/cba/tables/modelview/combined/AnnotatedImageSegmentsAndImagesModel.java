@@ -45,11 +45,6 @@ public class AnnotatedImageSegmentsAndImagesModel< T extends AnnotatedImageSegme
 		}
 	}
 
-	public T getSegment( int listIndex )
-	{
-		return annotatedImageSegments.get( listIndex );
-	}
-
 	@Override
 	public T getSegment( String imageSetName, Double label, int timePoint )
 	{

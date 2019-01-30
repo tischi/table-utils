@@ -17,16 +17,18 @@ public class DataModelUtils
 {
 	/**
 	 * Builds derived models and views from the inputs.
-	 *
-	 * @param imageSourcesModel
+	 *  @param imageSourcesModel
 	 * @param annotatedImageSegments
 	 * @param categoricalColumns
 	 * @param centerOnSegment
+	 * @param initialSources
 	 */
 	public static void buildModelsAndViews(
 			ImageSourcesModel imageSourcesModel,
 			ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments,
-			ArrayList< String > categoricalColumns, boolean centerOnSegment )
+			ArrayList< String > categoricalColumns,
+			boolean centerOnSegment,
+			ArrayList< String > initialSources )
 	{
 		final AnnotatedImageSegmentsAndImagesModel dataModel =
 				new AnnotatedImageSegmentsAndImagesModel(
@@ -48,7 +50,10 @@ public class DataModelUtils
 		final ImageSegmentsBdvView imageSegmentsBdvView = new ImageSegmentsBdvView(
 				dataModel,
 				selectionModel,
-				selectionColoringModel, centerOnSegment );
+				selectionColoringModel,
+				centerOnSegment,
+				initialSources
+				);
 
 
 		final TableRowsTableView tableView = new TableRowsTableView(

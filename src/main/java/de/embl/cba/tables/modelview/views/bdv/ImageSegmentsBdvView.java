@@ -59,10 +59,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	//	private int nextSourceIndex;
 
 	public ImageSegmentsBdvView(
-			final ImagesAndSegmentsModel< T > imagesAndSegmentsModel,
-			final SelectionModel< T > selectionModel,
-			final SelectionColoringModel< T > selectionColoringModel,
-			boolean centerOnSegment )
+			final ImagesAndSegmentsModel imagesAndSegmentsModel,
+			final SelectionModel selectionModel,
+			final SelectionColoringModel selectionColoringModel,
+			final boolean centerOnSegment,
+			final ArrayList< String > initialSources)
 	{
 		this.imagesAndSegmentsModel = imagesAndSegmentsModel;
 		this.selectionModel = selectionModel;
@@ -84,9 +85,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 //		configureGroupingNames();
 
-		final String firstSource = imageSourcesModel.get().keySet().iterator().next();
-
-		showSource( firstSource, imageSourcesModel.get().get( firstSource ) );
+		for ( String sourceName : initialSources )
+		{
+			showSource( sourceName, imageSourcesModel.get().get( sourceName ) );
+		}
 
 		registerAsSelectionListener( selectionModel );
 
@@ -163,7 +165,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private void showSegmentImage( ImageSegment imageSegment )
 	{
 		final String imageId = imageSegment.imageId();
+
+		if ( currentLabelSource.getMetadata().get().get( NAME ).equals( imageId ) ) return;
+
 		final SourceAndMetadata sourceAndMetadata = imageSourcesModel.get().get( imageId );
+
 		showSource( imageId, sourceAndMetadata );
 
 		// get source from imageSources by this name imageSegment.imageId();
@@ -209,6 +215,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		{
 			initBdv();
 		}
+
+
 
 		final Map< String, Object > metadata = sourceAndMetadata.getMetadata().get();
 
