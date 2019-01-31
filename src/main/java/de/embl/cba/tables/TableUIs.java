@@ -13,7 +13,7 @@ public class TableUIs
 	public static void addColumnUI( TableRowsTableView tableView )
 	{
 		final GenericDialog gd = new GenericDialog( "New Column" );
-		gd.addStringField( "Column name", "MyNewColumn", 30 );
+		gd.addStringField( "Column name", "Column", 30 );
 		gd.addStringField( "Default value [Text or Numeric]", "None", 30 );
 
 		gd.showDialog();

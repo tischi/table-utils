@@ -62,7 +62,7 @@ public class CellProfilerOutputExplorerCommand< R extends RealType< R > & Native
 				imageSourcesModel,
 				annotatedImageSegments,
 				categoricalColumns,
-				false,
+				true,
 				initialSources );
 
 	}

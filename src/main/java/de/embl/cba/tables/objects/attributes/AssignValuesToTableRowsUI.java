@@ -183,12 +183,12 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 
 		final int columnIndex = getColumnIndex( column );
 
-		final Object previousValue = tableView.getTable().getModel().getValueAt(
+		final Object valueToBeReplaced = tableView.getTable().getModel().getValueAt(
 				row.rowIndex(),
 				columnIndex
 		);
 
-		if ( previousValue.getClass().equals( Double.class ) )
+		if ( valueToBeReplaced.getClass().equals( Double.class ) )
 		{
 			try
 			{

@@ -47,13 +47,14 @@ public class DataModelUtils
 				coloringModel,
 				selectionModel );
 
-		final ImageSegmentsBdvView imageSegmentsBdvView = new ImageSegmentsBdvView(
-				dataModel,
-				selectionModel,
-				selectionColoringModel,
-				centerOnSegment,
-				initialSources
-				);
+		final ImageSegmentsBdvView imageSegmentsBdvView =
+				new ImageSegmentsBdvView(
+						dataModel,
+						selectionModel,
+						selectionColoringModel,
+						centerOnSegment,
+						initialSources
+						);
 
 
 		final TableRowsTableView tableView = new TableRowsTableView(

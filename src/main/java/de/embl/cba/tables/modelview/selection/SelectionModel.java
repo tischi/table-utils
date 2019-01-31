@@ -17,7 +17,6 @@ public interface SelectionModel< T >
 	 */
 	public boolean isSelected( final T object );
 
-
 	/**
 	 * Sets the selected state of a object.
 	 *

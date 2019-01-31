@@ -1,10 +1,12 @@
 package de.embl.cba.tables.modelview.views.bdv;
 
+import bdv.tools.brightness.ConverterSetup;
 import bdv.util.BdvFunctions;
 import bdv.util.BdvHandle;
 import bdv.util.BdvOptions;
 import bdv.viewer.Source;
 import bdv.viewer.state.SourceState;
+import bdv.viewer.state.ViewerState;
 import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringListener;
@@ -19,6 +21,7 @@ import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.modelview.views.ImageSegmentLabelsARGBConverter;
+import net.imglib2.realtransform.AffineTransform3D;
 import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
 import org.scijava.ui.behaviour.util.Behaviours;
@@ -54,7 +57,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private HashMap< String, Integer > groupNameToIndex;
 	private boolean centerOnSegment;
 	private SourceAndMetadata currentLabelSource;
-	//	private int nextSourceIndex;
+	private T selfSelection;
 
 	public ImageSegmentsBdvView(
 			final ImagesAndSegmentsModel imagesAndSegmentsModel,
@@ -121,9 +124,9 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		} );
 	}
 
-	public void registerAsSelectionListener( SelectionModel< ? extends ImageSegment > selectionModel )
+	public void registerAsSelectionListener( SelectionModel< T > selectionModel )
 	{
-		selectionModel.listeners().add( new SelectionListener< ImageSegment >()
+		selectionModel.listeners().add( new SelectionListener< T >()
 		{
 			@Override
 			public void selectionChanged()
@@ -132,8 +135,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			}
 
 			@Override
-			public void selectionEvent( ImageSegment selection, boolean selected )
+			public void selectionEvent( T selection, boolean selected )
 			{
+				if ( selfSelection != null && selection == selfSelection ) return;
+
 				if ( selected )
 				{
 					centerBdvOnSegment( selection );
@@ -209,35 +214,48 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	 */
 	public void showSource( String imageId, SourceAndMetadata sourceAndMetadata )
 	{
-		if ( bdv == null )
-		{
-			initBdv();
-		}
-
 		final Map< String, Object > metadata = sourceAndMetadata.getMetadata().get();
 
-		if ( metadata.containsKey( Metadata.EXCLUSIVE_IMAGE_SET ) )
+		if( metadata.containsKey( Metadata.EXCLUSIVE_IMAGE_SET ) )
 		{
-			removeAllSources();
+			showExclusiveImageSet( metadata );
+		}
+		else
+		{
+			showSingleSource( imageId, sourceAndMetadata );
+		}
+	}
+
+	public void applyViewerState( ViewerState viewerState )
+	{
+		if ( viewerState != null )
+		{
+			final AffineTransform3D transform3D = new AffineTransform3D();
+			viewerState.getViewerTransform( transform3D );
+			bdv.getViewerPanel().setCurrentViewerTransform( transform3D );
+
+			// TODO: also try to copy the brightness and other settings
+		}
+	}
+
+	public void showExclusiveImageSet( Map< String, Object > metadata )
+	{
+		ViewerState viewerState = null;
+
+		if ( bdv != null  )
+		{
+			viewerState = removeAllSources();
 		}
 
-		showSingleSource( imageId, sourceAndMetadata );
+		final ArrayList< String > imageIDs = ( ArrayList< String > ) metadata.get( Metadata.EXCLUSIVE_IMAGE_SET );
 
-		if ( metadata.containsKey( Metadata.EXCLUSIVE_IMAGE_SET ) )
+		for ( String associatedImageId : imageIDs )
 		{
-			final ArrayList< String > imageIDs = ( ArrayList< String > ) metadata.get( Metadata.EXCLUSIVE_IMAGE_SET );
-
-			for ( String associatedImageId : imageIDs )
-			{
-				if ( ! associatedImageId.equals( imageId ) )
-				{
-					final SourceAndMetadata associatedSourceAndMetadata = imageSourcesModel.sources().get( associatedImageId );
-
-					showSingleSource( associatedImageId, associatedSourceAndMetadata );
-				}
-			}
+			final SourceAndMetadata associatedSourceAndMetadata = imageSourcesModel.sources().get( associatedImageId );
+			showSingleSource( associatedImageId, associatedSourceAndMetadata );
 		}
 
+		applyViewerState( viewerState );
 	}
 
 	/**
@@ -279,19 +297,25 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 //		bdvOptions = bdvOptions.addTo( bdv );
 	}
 
-	private void removeAllSources()
+	private ViewerState removeAllSources()
 	{
-		if ( bdv != null )
-		{
-			final List< SourceState< ? > > sources = bdv.getViewerPanel().getState().getSources();
-			final int numSources = sources.size();
 
-			for ( int i = numSources - 1; i >= 0; --i )
-			{
-				final Source< ? > source = sources.get( i ).getSpimSource();
-				bdv.getViewerPanel().removeSource( source );
-			}
+		final ViewerState state = bdv.getViewerPanel().getState();
+
+		final List< SourceState< ? > > sources = state.getSources();
+		final List< ConverterSetup > converterSetups = bdv.getSetupAssignments().getConverterSetups();
+		final int numSources = sources.size();
+
+		for ( int i = numSources - 1; i >= 0; --i )
+		{
+			final Source< ? > source = sources.get( i ).getSpimSource();
+			bdv.getViewerPanel().removeSource( source );
+
+			final ConverterSetup converterSetup = converterSetups.get( i );
+			bdv.getSetupAssignments().removeSetup( converterSetup );
 		}
+
+		return state;
 	}
 
 //	private synchronized void populateAndShowGroup( int groupIndex )
@@ -507,6 +531,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			{
 				final String imageId = ( String ) currentLabelSource.getMetadata().get().get( NAME );
 				final T segment = imagesAndSegmentsModel.getSegment( imageId, label, timePoint );
+				selfSelection = segment;
 				selectionModel.toggle( segment );
 			}
 		}

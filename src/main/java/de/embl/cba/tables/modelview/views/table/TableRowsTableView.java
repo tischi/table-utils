@@ -263,16 +263,16 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		menu.add( addColumnMenuItem() );
 
-		menu.add( valueAssignmentMenuItem() );
+		menu.add( assignValuesMenuItem() );
 
 		return menu;
     }
 
-	private JMenuItem valueAssignmentMenuItem()
+	private JMenuItem assignValuesMenuItem()
 	{
 		final JMenuItem menuItem = new JMenuItem( "Assign Values To Selected Objects..." );
 		final TableRowsTableView tableRowsTableView = this;
-		menuItem.addActionListener( new ActionListener()    
+		menuItem.addActionListener( new ActionListener()
 		{
 			@Override
 			public void actionPerformed( ActionEvent e )
@@ -505,6 +505,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			{
 				if ( e.getValueIsAdjusting() ) return;
 
+				if ( table.getSelectedRow() == -1 ) return;
+
 				recentlySelectedRowInView = table.getSelectedRow();
 
 				final int row = table.convertRowIndexToModel( recentlySelectedRowInView );
@@ -516,9 +518,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		} );
 	}
 
-	public void registerAsSelectionListener( SelectionModel< ? extends TableRow > selectionModel )
+	public void registerAsSelectionListener( SelectionModel< T > selectionModel )
 	{
-		selectionModel.listeners().add( new SelectionListener< TableRow >()
+		selectionModel.listeners().add( new SelectionListener< T >()
 		{
 			@Override
 			public synchronized void selectionChanged()
