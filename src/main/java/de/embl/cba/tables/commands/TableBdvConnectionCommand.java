@@ -111,16 +111,7 @@ public class TableBdvConnectionCommand < R extends RealType< R > & NativeType< R
 
 	public JTable loadTable( File file )
 	{
-		try
-		{
-			return TableUtils.loadTable( file, null );
-		}
-		catch ( IOException e )
-		{
-			e.printStackTrace();
-		}
-
-		return null;
+		return TableUtils.loadTable( file, null );
 	}
 
 	public static RandomAccessibleIntervalSource4D loadImage( File file )

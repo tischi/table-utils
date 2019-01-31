@@ -65,7 +65,7 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 	}
 
 	@Override
-	public Map< String, SourceAndMetadata > get()
+	public Map< String, SourceAndMetadata > sources()
 	{
 		return nameToSourceAndMetadata;
 	}

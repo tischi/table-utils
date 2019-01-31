@@ -16,8 +16,9 @@ public class CellProfilerImageSourcesModelCreator
 	public static final String IMAGE_SET_INDEX_COLUMN = "ImageNumber";
 	public static final String FOLDER = "PathName_";
 	public static final String FILE = "FileName_";
-
 	public static final String OBJECTS = "Objects_";
+
+
 	private final File tableFile;
 	private final String imageRootPathInTable;
 	private final String imageRootPathOnThisComputer;
@@ -30,7 +31,7 @@ public class CellProfilerImageSourcesModelCreator
 			File tableFile,
 			String imageRootPathInTable,
 			String imageRootPathOnThisComputer,
-			String delim ) throws IOException
+			String delim )
 	{
 		this.tableFile = tableFile;
 		this.imageRootPathInTable = imageRootPathInTable;
@@ -57,7 +58,7 @@ public class CellProfilerImageSourcesModelCreator
 	private CellProfilerImageSourcesModel createImageSourcesModel(
 			JTable table,
 			int imageSetIdColumnIndex,
-			HashMap< String, FolderAndFileColumn > images ) throws IOException
+			HashMap< String, FolderAndFileColumn > images )
 	{
 
 		final HashSet< String > imageFilePaths = new HashSet<>();

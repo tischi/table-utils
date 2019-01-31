@@ -232,7 +232,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 //	public String getCoordinateColumn( ImageSegmentCoordinate imageSegmentCoordinate )
 //	{
-//		return segmentCoordinateToColumnMap.get( imageSegmentCoordinate );
+//		return segmentCoordinateToColumnMap.sources( imageSegmentCoordinate );
 //	}
 //
 //    private Map< ImageSegmentCoordinate, String > emptyObjectCoordinateColumnMap()
@@ -270,9 +270,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private JMenuItem valueAssignmentMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "Assign Values..." );
+		final JMenuItem menuItem = new JMenuItem( "Assign Values To Selected Objects..." );
 		final TableRowsTableView tableRowsTableView = this;
-		menuItem.addActionListener( new ActionListener()
+		menuItem.addActionListener( new ActionListener()    
 		{
 			@Override
 			public void actionPerformed( ActionEvent e )
@@ -308,7 +308,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private JMenuItem addColumnMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "Add Column..." );
+		final JMenuItem menuItem = new JMenuItem( "New Column..." );
 
 		final TableRowsTableView tableView = this;
 
@@ -369,7 +369,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 //    	if ( ! segmentCoordinateToColumnMap.containsKey( imageSegmentCoordinate ) )
 //			return false;
 //
-//    	if( segmentCoordinateToColumnMap.get( imageSegmentCoordinate ) == NO_COLUMN_SELECTED )
+//    	if( segmentCoordinateToColumnMap.sources( imageSegmentCoordinate ) == NO_COLUMN_SELECTED )
 //			return false;
 //
 //        return true;
@@ -377,9 +377,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 //
 //    public Double getObjectCoordinate( ImageSegmentCoordinate imageSegmentCoordinate, int row )
 //    {
-//        if ( segmentCoordinateToColumnMap.get( imageSegmentCoordinate ) != NO_COLUMN_SELECTED )
+//        if ( segmentCoordinateToColumnMap.sources( imageSegmentCoordinate ) != NO_COLUMN_SELECTED )
 //        {
-//            final int columnIndex = table.getColumnModel().getColumnIndex( segmentCoordinateToColumnMap.get( imageSegmentCoordinate ) );
+//            final int columnIndex = table.getColumnModel().getColumnIndex( segmentCoordinateToColumnMap.sources( imageSegmentCoordinate ) );
 //            return ( Double ) table.getValueAt( row, columnIndex );
 //        }
 //        else
@@ -459,7 +459,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 //
 //		final String objectKey = getObjectKey( label, timePoint );
 //
-//		final Integer rowIndex = objectRowMap.get( objectKey );
+//		final Integer rowIndex = objectRowMap.sources( objectKey );
 //
 //		return rowIndex;
 //	}

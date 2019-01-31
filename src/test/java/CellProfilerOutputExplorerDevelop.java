@@ -25,15 +25,15 @@ public class CellProfilerOutputExplorerDevelop
 	{
 		//final File file = new File( TestTableLoading.class.getResource( "cellprofiler-table.txt" ).getFileColumn() );
 
-		final File tableFile = new File("/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt");
+		final File tableFile = new File("/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data/2019-01-31/concatenated_tables/merged_images_nuclei.txt");
 
 //		final File file = new File("/Volumes/cba/exchange/Daja-Christian/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt" );
 		//final JTable table = TableUtils.loadTable( file, "\t" );
 
 		final CellProfilerImageSourcesModelCreator modelCreator = new CellProfilerImageSourcesModelCreator(
 				tableFile,
-				"/Volumes/cba/exchange/Daja-Christian",
-				"/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data",
+				"/Volumes/cba/exchange/Daja-Christian/20190116_for_classification_interphase_versus_mitotic",
+				"/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data/2019-01-31",
 				"\t"
 		);
 
@@ -46,7 +46,7 @@ public class CellProfilerOutputExplorerDevelop
 
 
 		ArrayList< String > initialSources = new ArrayList< String >();
-		initialSources.add( imageSourcesModel.get().keySet().iterator().next() );
+		initialSources.add( imageSourcesModel.sources().keySet().iterator().next() );
 
 		DataModelUtils.buildModelsAndViews(
 				imageSourcesModel,
@@ -60,12 +60,12 @@ public class CellProfilerOutputExplorerDevelop
 	public static ArrayList< DefaultAnnotatedImageSegment > createCellProfilerImageSegments( File tableFile )
 	{
 
-		final HashMap< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateToColumnNameAndIndexMap = new HashMap<>();
+		final HashMap< ImageSegmentCoordinate, String > coordinateToColumnNameAndIndexMap = new HashMap<>();
 		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.ImageId,
-				new ValuePair( "ImageNumber" + SegmentUtils.SEVERAL_COLUMN_SEPARATOR + "FileName_Objects_Nuclei_Grayscale",  null ) );
-		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Label, new ValuePair( "Number_Object_Number",  null ) );
-		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.X, new ValuePair("Location_Center_X", null ) );
-		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Y, new ValuePair("Location_Center_Y", null ) );
+				"ImageNumber" + SegmentUtils.MULTIPLE_COLUMN_SEPARATOR + "FileName_Objects_Nuclei_Labels" );
+		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Label,"Number_Object_Number" );
+		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.X, "Location_Center_X" );
+		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Y, "Location_Center_Y" );
 
 		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments
 				= TableUtils.segmentsFromTableFile(

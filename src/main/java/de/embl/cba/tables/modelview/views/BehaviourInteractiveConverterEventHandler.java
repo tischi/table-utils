@@ -220,9 +220,9 @@ public class BehaviourInteractiveConverterEventHandler
 	{
 //		if ( selectableConverter.getSelections() == null ) return true;
 //
-//		if ( selectableConverter.getSelections().get( timepoint ) == null ) return true;
+//		if ( selectableConverter.getSelections().sources( timepoint ) == null ) return true;
 //
-//		if ( selectableConverter.getSelections().get( timepoint ).contains( selected ) ) return false;
+//		if ( selectableConverter.getSelections().sources( timepoint ).contains( selected ) ) return false;
 //
 		return true;
 	}

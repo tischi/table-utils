@@ -32,7 +32,7 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 	}
 
 	@Override
-	public Map< String, SourceAndMetadata > get()
+	public Map< String, SourceAndMetadata > sources()
 	{
 		return nameToSourceAndMetadata;
 	}
@@ -121,20 +121,6 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( lazy2DFileSource, metadata ) );
 	}
-
-//	public void addIntensityImageSource( String imageId, File labelSource, ArrayList< String > imageSetIDs )
-//	{
-//		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( imageId, labelSource );
-//
-//		final Metadata metadata = new Metadata();
-//		metadata.get().put( FLAVOUR, INTENSITY_SOURCE_FLAVOUR );
-//		metadata.get().put( DIMENSIONS, 2 );
-//		metadata.get().put( EXCLUSIVE_IMAGE_SET, imageSetIDs );
-//		metadata.get().put( NAME, imageId );
-//
-//		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( lazy2DFileSource, metadata ) );
-//	}
-
 
 	public static < T extends NumericType< T > >
 	RandomAccessibleIntervalSource< T > imagePlus2DAsSource3D( String name, ImagePlus imagePlus )

@@ -7,22 +7,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class DefaultImageSourcesModel implements ImageSourcesModel
 {
 	private Map< String, ArrayList< Source< ? > > > imageSetToSources;
 	private Map< Source< ? >, String > sourceToMetaData;
 
-	private final boolean is2D;
-
 	public DefaultImageSourcesModel( boolean is2D )
 	{
+		// TODO!!
 		this.imageSetToSources = new HashMap<>(  );
 		this.sourceToMetaData = new HashMap<>(  );
-		this.is2D = is2D;
+	}
+
+	@Override
+	public Map< String, SourceAndMetadata > sources()
+	{
+		return null;
 	}
 
 //	@Override
-//	public Map< String, ArrayList< Source< ? > > > get()
+//	public Map< String, ArrayList< Source< ? > > > sources()
 //	{
 //		return imageSetToSources;
 //	}
@@ -30,7 +35,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 //	@Override
 //	public String getImageSourceMetaData( Source< ? > source )
 //	{
-//		return sourceToMetaData.get( source );
+//		return sourceToMetaData.sources( source );
 //	}
 //
 //	@Override
@@ -65,9 +70,4 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 		}
 	}
 
-	@Override
-	public Map< String, SourceAndMetadata > get()
-	{
-		return null;
-	}
 }

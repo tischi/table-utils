@@ -80,7 +80,7 @@ public class TableUtils
 		bfw.close();
 	}
 
-	public static JTable loadTable( final File file, String delim ) throws IOException
+	public static JTable loadTable( final File file, String delim )
 	{
 		ArrayList< String > rows = readRows( file );
 
@@ -206,7 +206,7 @@ public class TableUtils
 	public static ArrayList< DefaultAnnotatedImageSegment > segmentsFromTableFile(
 			final File file,
 			String delim,
-			final Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
+			final Map< ImageSegmentCoordinate, String > coordinateColumnMap,
 			final DefaultImageSegmentBuilder segmentBuilder
 	)
 	{
@@ -221,7 +221,7 @@ public class TableUtils
 
 //		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
 //		{
-//			final String columnName = columns.get( columnIndex );
+//			final String columnName = columns.sources( columnIndex );
 //
 //			//setColumnIndex( coordinateColumnMap, columnIndex, columnName );
 //		}
@@ -296,16 +296,18 @@ public class TableUtils
 			}
 
 
-			final TableRowMap tableRowMap = new DefaultTableRowMap( columnToValues, row - 1  );
+			final TableRowFromColumns tableRowMap =
+					new TableRowFromColumns( columnToValues, row - 1);
 
-			final DefaultImageSegment segment =
-					SegmentUtils.segmentFromTableRowMap(
-							coordinateColumnMap,
-							tableRowMap,
-							segmentBuilder );
-
-
-			tableRowMaps.add( tableRowMap );
+			// TODO
+//			final DefaultImageSegment segment =
+//					SegmentUtils.segmentFromTableRowMap(
+//							coordinateColumnMap,
+//							tableRowMap,
+//							segmentBuilder );
+//
+//
+//			tableRowMaps.add( tableRowMap );
 //
 //			segments.add( new DefaultAnnotatedImageSegment( null, tableRow ) );
 		}

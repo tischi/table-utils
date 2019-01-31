@@ -8,7 +8,7 @@ import java.util.Map;
 public class SegmentUtils
 {
 
-	public static final String SEVERAL_COLUMN_SEPARATOR = "____";
+	public static final String MULTIPLE_COLUMN_SEPARATOR = "____";
 
 	@Deprecated
 	public static String getKey( Double label )
@@ -23,14 +23,14 @@ public class SegmentUtils
 	}
 
 	public static DefaultImageSegment segmentFromFeatures(
-			Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
+			Map< ImageSegmentCoordinate, String > coordinateColumnMap,
 			HashMap< String, Object > columnValueMap,
 			DefaultImageSegmentBuilder segmentBuilder )
 	{
 
 		for( ImageSegmentCoordinate coordinate : coordinateColumnMap.keySet() )
 		{
-			final String colName = coordinateColumnMap.get( coordinate ).getA();
+			final String colName = coordinateColumnMap.get( coordinate );
 
 			columnValueMap.get( colName );
 
@@ -52,9 +52,9 @@ public class SegmentUtils
 					segmentBuilder.setLabel( ( double ) columnValueMap.get( colName ) );
 					break;
 				case ImageId:
-					if ( colName.contains( SEVERAL_COLUMN_SEPARATOR ) )
+					if ( colName.contains( MULTIPLE_COLUMN_SEPARATOR ) )
 					{
-						final String[] columns = colName.split( SEVERAL_COLUMN_SEPARATOR );
+						final String[] columns = colName.split( MULTIPLE_COLUMN_SEPARATOR );
 						String imageId = "";
 						for ( String column : columns )
 						{
@@ -106,9 +106,9 @@ public class SegmentUtils
 					segmentBuilder.setLabel(  Double.parseDouble((String)  tableRowMap.get( colName ) ));
 					break;
 				case ImageId:
-					if ( colName.contains( SEVERAL_COLUMN_SEPARATOR ) )
+					if ( colName.contains( MULTIPLE_COLUMN_SEPARATOR ) )
 					{
-						final String[] columns = colName.split( SEVERAL_COLUMN_SEPARATOR );
+						final String[] columns = colName.split( MULTIPLE_COLUMN_SEPARATOR );
 						String imageId = "";
 						for ( String column : columns )
 						{

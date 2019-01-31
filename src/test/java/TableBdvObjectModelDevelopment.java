@@ -27,7 +27,7 @@ public class TableBdvObjectModelDevelopment
 		categoricalColumns.add( "Label" );
 
 		ArrayList< String > initialSources = new ArrayList< String >();
-		initialSources.add( imageSourcesModel.get().keySet().iterator().next() );
+		initialSources.add( imageSourcesModel.sources().keySet().iterator().next() );
 
 		DataModelUtils.buildModelsAndViews(
 				imageSourcesModel,
@@ -42,10 +42,10 @@ public class TableBdvObjectModelDevelopment
 
 		final ArrayList< DefaultAnnotatedImageSegment > segments = new ArrayList<>();
 
-		final HashMap< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateToColumnNameMap = new HashMap<>();
-		coordinateToColumnNameMap.put( ImageSegmentCoordinate.Label, new ValuePair( "Label",  null ) );
-		coordinateToColumnNameMap.put( ImageSegmentCoordinate.X, new ValuePair("X", null ) );
-		coordinateToColumnNameMap.put( ImageSegmentCoordinate.Y, new ValuePair("Y", null ) );
+		final HashMap< ImageSegmentCoordinate, String > coordinateToColumnNameMap = new HashMap<>();
+		coordinateToColumnNameMap.put( ImageSegmentCoordinate.Label, "Label" );
+		coordinateToColumnNameMap.put( ImageSegmentCoordinate.X, "X" );
+		coordinateToColumnNameMap.put( ImageSegmentCoordinate.Y, "Y" );
 
 		return TableUtils.segmentsFromTableFile(
 				tableFile,

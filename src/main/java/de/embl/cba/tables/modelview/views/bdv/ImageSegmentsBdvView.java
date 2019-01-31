@@ -85,7 +85,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		for ( String sourceName : initialSources )
 		{
-			showSource( sourceName, imageSourcesModel.get().get( sourceName ) );
+			showSource( sourceName, imageSourcesModel.sources().get( sourceName ) );
 		}
 
 		registerAsSelectionListener( selectionModel );
@@ -97,7 +97,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 //	public void configureGroupingNames()
 //	{
-//		final Set< String > imageSetNames = imageSourcesModel.get().keySet();
+//		final Set< String > imageSetNames = imageSourcesModel.sources().keySet();
 //
 //		int i = 0;
 //		for ( String imageSetName : imageSetNames )
@@ -166,11 +166,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		if ( currentLabelSource.getMetadata().get().get( NAME ).equals( imageId ) ) return;
 
-		final SourceAndMetadata sourceAndMetadata = imageSourcesModel.get().get( imageId );
+		final SourceAndMetadata sourceAndMetadata = imageSourcesModel.sources().get( imageId );
 
 		showSource( imageId, sourceAndMetadata );
 
-		// get source from imageSources by this name imageSegment.imageId();
+		// sources source from imageSources by this name imageSegment.imageId();
 		// and showSource( source );
 		// if source.metadata.contains("ShowExclusivelyWith") => remove all other sources
 		// else simply add the source
@@ -231,7 +231,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			{
 				if ( ! associatedImageId.equals( imageId ) )
 				{
-					final SourceAndMetadata associatedSourceAndMetadata = imageSourcesModel.get().get( associatedImageId );
+					final SourceAndMetadata associatedSourceAndMetadata = imageSourcesModel.sources().get( associatedImageId );
 
 					showSingleSource( associatedImageId, associatedSourceAndMetadata );
 				}
@@ -296,19 +296,19 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 //	private synchronized void populateAndShowGroup( int groupIndex )
 //	{
-//		final String groupName = groupIdxToName.get( groupIndex );
+//		final String groupName = groupIdxToName.sources( groupIndex );
 //
-//		final Set< String > sourceNames = imageSourcesModel.get().get( groupName ).keySet();
+//		final Set< String > sourceNames = imageSourcesModel.sources().sources( groupName ).keySet();
 //
 //		for ( String sourceName : sourceNames )
 //		{
-//			//imageSourcesModel.get().get( groupName );
-////			if ( imageSourcesModel.getMetaData( groupName, sourceName ).get( show ) )
+//			//imageSourcesModel.sources().sources( groupName );
+////			if ( imageSourcesModel.getMetaData( groupName, sourceName ).sources( show ) )
 //
 //
 //			final Map< String, Object > imageSourceMetaData = imageSourcesModel.getMetaData( sourceName );
 //
-//			if ( imageSourceMetaData.get( FLAVOUR ).equals( LABEL_SOURCE_FLAVOUR ) )
+//			if ( imageSourceMetaData.sources( FLAVOUR ).equals( LABEL_SOURCE_FLAVOUR ) )
 //			{
 //				Source labelSource = asLabelSource( groupName, source );
 //
@@ -337,7 +337,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 //
 ////			sourceIndexToName.put( nextSourceIndex, sourceName );
 //
-//			//sourceIndexToFlavour.put( nextSourceIndex, ( String ) imageSourceMetaData.get( FLAVOUR ) );
+//			//sourceIndexToFlavour.put( nextSourceIndex, ( String ) imageSourceMetaData.sources( FLAVOUR ) );
 //			visibilityAndGrouping.addSourceToGroup( nextSourceIndex, groupIndex );
 //			visibilityAndGrouping.setSourceActive( nextSourceIndex, true );
 //			nextSourceIndex++;
@@ -366,26 +366,26 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 //			return true;
 //		}
 //
-//		final int size = bdv.getViewerPanel().getState().getSourceGroups().get( selectedGroup ).getSourceIds().size();
+//		final int size = bdv.getViewerPanel().getState().getSourceGroups().sources( selectedGroup ).getSourceIds().size();
 //
 //		return size == 0;
 //	}
 //
 //	private String getImageSegmentGroupName( ImageSegment selection )
 //	{
-//		return imageIdToGroupName.get( selection.imageId() );
+//		return imageIdToGroupName.sources( selection.imageId() );
 //	}
 //
 //	private Integer getImageSegmentGroupIdx( ImageSegment selection )
 //	{
-//		final String groupName = imageIdToGroupName.get( selection.imageId() );
-//		final Integer groupIndex = groupNameToIndex.get( groupName );
+//		final String groupName = imageIdToGroupName.sources( selection.imageId() );
+//		final Integer groupIndex = groupNameToIndex.sources( groupName );
 //		return groupIndex;
 //	}
 //
 //	private String getCurrentGroupName()
 //	{
-//		return groupIdxToName.get( getCurrentGroupIdx() );
+//		return groupIdxToName.sources( getCurrentGroupIdx() );
 //	}
 //
 //	private int getCurrentGroupIdx()
@@ -396,12 +396,12 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 //
 //	private void configureBdvGrouping()
 //	{
-//		final Set< String > imageSetNames = imageSourcesModel.get().keySet();
+//		final Set< String > imageSetNames = imageSourcesModel.sources().keySet();
 //
 //		final VisibilityAndGrouping visibilityAndGrouping = bdv.getViewerPanel().getVisibilityAndGrouping();
 //
 //		while ( visibilityAndGrouping.getSourceGroups().size() > 1 ) {
-//			final SourceGroup g = visibilityAndGrouping.getSourceGroups().get(0);
+//			final SourceGroup g = visibilityAndGrouping.getSourceGroups().sources(0);
 //			this.bdv.getViewerPanel().removeGroup( g );
 //		}
 //

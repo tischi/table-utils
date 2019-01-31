@@ -27,7 +27,7 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 	private Point location;
 
 
-	// TODO: make this only work on TableRows (get rid of TableView dependency)
+	// TODO: make this only work on TableRows (sources rid of TableView dependency)
 
 	public AssignValuesToTableRowsUI( TableRowsTableView tableView )
 	{
