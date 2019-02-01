@@ -4,6 +4,7 @@ import bdv.tools.brightness.ConverterSetup;
 import bdv.util.BdvFunctions;
 import bdv.util.BdvHandle;
 import bdv.util.BdvOptions;
+import bdv.util.BdvStackSource;
 import bdv.viewer.Source;
 import bdv.viewer.state.SourceState;
 import bdv.viewer.state.ViewerState;
@@ -58,6 +59,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private boolean centerOnSegment;
 	private SourceAndMetadata currentLabelSource;
 	private T recentFocus;
+	private ViewerState recentViewerState;
+	private List< ConverterSetup > recentConverterSetups;
 
 	public ImageSegmentsBdvView(
 			final ImagesAndSegmentsModel imagesAndSegmentsModel,
@@ -226,68 +229,116 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		}
 		else
 		{
-			showSingleSource( imageId, sourceAndMetadata );
+			showSingleSource( imageId, sourceAndMetadata, null, null );
 		}
 	}
 
-	public void applyViewerState( ViewerState viewerState )
+	public void applyRecentViewerSettings( )
 	{
-		if ( viewerState != null )
+		if ( recentViewerState != null )
 		{
-			final AffineTransform3D transform3D = new AffineTransform3D();
-			viewerState.getViewerTransform( transform3D );
-			bdv.getViewerPanel().setCurrentViewerTransform( transform3D );
+			applyViewerStateTransform( recentViewerState );
 
-			// TODO: also try to copy the brightness and other settings
+			applyViewerStateVisibility( recentViewerState );
+
+			//applyDisplaySettings( recentConverterSetups );
+
 		}
+	}
+
+	public void applyViewerStateVisibility( ViewerState viewerState )
+	{
+		final int numSources = bdv.getViewerPanel().getVisibilityAndGrouping().numSources();
+		for ( int i = 0; i < numSources; i++ )
+		{
+			if ( viewerState.getVisibleSourceIndices().contains( i ) )
+			{
+				bdv.getViewerPanel().getVisibilityAndGrouping().setSourceActive( i, true );
+			}
+			else
+			{
+				bdv.getViewerPanel().getVisibilityAndGrouping().setSourceActive( i, false );
+			}
+		}
+	}
+
+
+	public void applyViewerStateTransform( ViewerState viewerState )
+	{
+		final AffineTransform3D transform3D = new AffineTransform3D();
+		viewerState.getViewerTransform( transform3D );
+		bdv.getViewerPanel().setCurrentViewerTransform( transform3D );
 	}
 
 	public void showExclusiveImageSet( Map< String, Object > metadata )
 	{
-		ViewerState viewerState = null;
-
-		if ( bdv != null  )
-		{
-			viewerState = removeAllSources();
-		}
+		if ( bdv != null  ) removeAllSources();
 
 		final ArrayList< String > imageIDs = ( ArrayList< String > ) metadata.get( Metadata.EXCLUSIVE_IMAGE_SET );
 
-		for ( String associatedImageId : imageIDs )
+		for ( int i = 0; i < imageIDs.size(); i++ )
 		{
-			final SourceAndMetadata associatedSourceAndMetadata = imageSourcesModel.sources().get( associatedImageId );
-			showSingleSource( associatedImageId, associatedSourceAndMetadata );
+			final SourceAndMetadata associatedSourceAndMetadata =
+					imageSourcesModel.sources().get( imageIDs.get( i ) );
+
+			if ( recentConverterSetups != null )
+			{
+				showSingleSource(
+						imageIDs.get( i ),
+						associatedSourceAndMetadata,
+						recentConverterSetups.get( i ).getDisplayRangeMin(),
+						recentConverterSetups.get( i ).getDisplayRangeMax() );
+			}
+			else
+			{
+				showSingleSource(
+						imageIDs.get( i ),
+						associatedSourceAndMetadata,
+						null,
+						null );
+			}
 		}
 
-		applyViewerState( viewerState );
+		applyRecentViewerSettings( );
 	}
+
 
 	/**
 	 * Shows a single source
 	 *
-	 *
-	 * @param imageId
+	 *  @param imageId
 	 * @param sourceAndMetadata
+	 * @param displayRangeMin
+	 * @param displayRangeMax
 	 */
-	public void showSingleSource( String imageId, SourceAndMetadata sourceAndMetadata )
+	public void showSingleSource(
+			String imageId,
+			SourceAndMetadata sourceAndMetadata,
+			Double displayRangeMin,
+			Double displayRangeMax )
 	{
 		final Map< String, Object > metadata = sourceAndMetadata.getMetadata().get();
-		final Source< ? > source = sourceAndMetadata.getSource();
+		Source< ? > source = sourceAndMetadata.getSource();
+
+		if ( metadata.containsKey( FLAVOUR ) && metadata.get( FLAVOUR ).equals( LABEL_SOURCE_FLAVOUR ) )
+		{
+			source = asLabelSource( imageId, source );
+			currentLabelSource = sourceAndMetadata;
+		}
 
 		if ( metadata.containsKey( DIMENSIONS ) && metadata.get( DIMENSIONS ).equals( 2 ) )
 		{
 			bdvOptions = bdvOptions.is2D();
 		}
+		
+		final BdvStackSource stackSource = BdvFunctions.show( source, bdvOptions );
 
-		if ( metadata.containsKey( FLAVOUR ) && metadata.get( FLAVOUR ).equals( LABEL_SOURCE_FLAVOUR ) )
+		if ( displayRangeMin != null && displayRangeMax != null )
 		{
-			bdv = BdvFunctions.show( asLabelSource( imageId, source ), bdvOptions ).getBdvHandle();
-			currentLabelSource = sourceAndMetadata;
+			stackSource.setDisplayRange( displayRangeMin, displayRangeMax );
 		}
-		else
-		{
-			bdv = BdvFunctions.show( source, bdvOptions ).getBdvHandle();
-		}
+
+		bdv = stackSource.getBdvHandle();
 
 		bdvOptions = bdvOptions.addTo( bdv );
 	}
@@ -301,13 +352,13 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 //		bdvOptions = bdvOptions.addTo( bdv );
 	}
 
-	private ViewerState removeAllSources()
+	private void removeAllSources()
 	{
 
-		final ViewerState state = bdv.getViewerPanel().getState();
+		recentViewerState = bdv.getViewerPanel().getState();
+		recentConverterSetups = new ArrayList<>( bdv.getSetupAssignments().getConverterSetups() );
 
-		final List< SourceState< ? > > sources = state.getSources();
-		final List< ConverterSetup > converterSetups = bdv.getSetupAssignments().getConverterSetups();
+		final List< SourceState< ? > > sources = recentViewerState.getSources();
 		final int numSources = sources.size();
 
 		for ( int i = numSources - 1; i >= 0; --i )
@@ -315,11 +366,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			final Source< ? > source = sources.get( i ).getSpimSource();
 			bdv.getViewerPanel().removeSource( source );
 
-			final ConverterSetup converterSetup = converterSetups.get( i );
+			final ConverterSetup converterSetup = recentConverterSetups.get( i );
 			bdv.getSetupAssignments().removeSetup( converterSetup );
 		}
 
-		return state;
 	}
 
 //	private synchronized void populateAndShowGroup( int groupIndex )
