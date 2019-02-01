@@ -57,7 +57,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private HashMap< String, Integer > groupNameToIndex;
 	private boolean centerOnSegment;
 	private SourceAndMetadata currentLabelSource;
-	private T selfSelection;
+	private T recentFocus;
 
 	public ImageSegmentsBdvView(
 			final ImagesAndSegmentsModel imagesAndSegmentsModel,
@@ -135,19 +135,23 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			}
 
 			@Override
-			public void selectionEvent( T selection, boolean selected )
+			public void focusEvent( T selection )
 			{
-				if ( selfSelection != null && selection == selfSelection ) return;
-
-				if ( selected )
+				if ( recentFocus != null
+						&& selection == recentFocus )
 				{
+					return;
+				}
+				else
+				{
+					recentFocus = selection;
 					centerBdvOnSegment( selection );
 				}
 			}
 		} );
 	}
 
-	public void centerBdvOnSegment( ImageSegment selection )
+	public synchronized void centerBdvOnSegment( ImageSegment selection )
 	{
 		showSegmentImage( selection );
 
@@ -531,8 +535,14 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			{
 				final String imageId = ( String ) currentLabelSource.getMetadata().get().get( NAME );
 				final T segment = imagesAndSegmentsModel.getSegment( imageId, label, timePoint );
-				selfSelection = segment;
+
 				selectionModel.toggle( segment );
+
+				if ( selectionModel.isSelected( segment ) )
+				{
+					recentFocus = segment;
+					selectionModel.focus( segment );
+				}
 			}
 		}
 	}

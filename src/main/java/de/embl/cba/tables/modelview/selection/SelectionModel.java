@@ -34,7 +34,25 @@ public interface SelectionModel< T >
 	 *            a object.
 	 */
 	public void toggle( final T object );
-	
+
+
+	/**
+	 * Focus on an object without changing its selection state.
+	 *
+	 * @param object
+	 *            a object.
+	 */
+	public void focus( final T object );
+
+
+	/**
+	 * Get the focus state of an object
+	 *
+	 * @param object
+	 *            a object.
+	 */
+	public boolean isFocused( final T object );
+
 	/**
 	 * Sets the selected state of a collection of segments.
 	 *
@@ -45,6 +63,8 @@ public interface SelectionModel< T >
 	 * @return {@code true} if the selection was changed by this call.
 	 */
 	public boolean setSelected( final Collection< T > objects, final boolean select );
+
+
 
 	/**
 	 * Clears this selection.

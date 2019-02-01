@@ -75,7 +75,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		createTable();
 		createMenuBar();
 		showTable();
-		installRowSelectionListener();
+		registerAsListSelectionListener();
 		configureTableRowColoring( tableRowsModel, selectionModel );
 	}
 
@@ -165,6 +165,12 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		final String column = getColumnNames().get( col );
 
 		final int row = table.convertRowIndexToModel( rowInView );
+
+		if ( selectionModel.isFocused( tableRowsModel.getTableRows().get( row ) ) )
+		{
+			return Color.BLUE;
+		}
+
 		if ( selectionModel.isSelected( tableRowsModel.getTableRows().get( row ) ) )
 		{
 			final ARGBType argbType = new ARGBType();
@@ -172,10 +178,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			final Color color = new Color( ARGBType.red( argbType.get() ), ARGBType.green( argbType.get() ), ARGBType.blue( argbType.get() ) );
 			return color;
 		}
-		else
-		{
-			return Color.WHITE;
-		}
+
+		return Color.WHITE;
 	}
 
 	public void registerAsColoringListener( SelectionColoringModel< T > selectionColoringModel )
@@ -496,7 +500,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		table.repaint();
 	}
 
-	public void installRowSelectionListener()
+	public void registerAsListSelectionListener()
 	{
 		table.getSelectionModel().addListSelectionListener( new ListSelectionListener()
 		{
@@ -505,15 +509,17 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			{
 				if ( e.getValueIsAdjusting() ) return;
 
-				if ( table.getSelectedRow() == -1 ) return;
+				if ( table.getSelectedRow() == -1 )
+				{
+					return;
+				}
 
 				recentlySelectedRowInView = table.getSelectedRow();
 
 				final int row = table.convertRowIndexToModel( recentlySelectedRowInView );
 
-				// TODO: currently one can only select single rows (not even unselect,
-				// because it was to complex with all the listeners)
-				selectionModel.setSelected( tableRowsModel.getTableRows().get( row ), true );
+				selectionModel.focus( tableRowsModel.getTableRows().get( row ) );
+				table.repaint();
 			}
 		} );
 	}
@@ -548,22 +554,21 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			}
 
 			@Override
-			public void selectionEvent( TableRow selection, boolean selected )
+			public void focusEvent( T selection )
 			{
-				if ( selected )
-				{
-					final int rowInView = table.convertRowIndexToView( selection.rowIndex() );
-
-					if ( rowInView == recentlySelectedRowInView ) return;
-
-					moveToRowInView( rowInView );
-				}
-				else
-				{
-					// TODO: change color of selected rows
-				}
+				moveToSelectedTableRow( selection );
 			}
+
 		} );
+	}
+
+	public void moveToSelectedTableRow( TableRow selection )
+	{
+		final int rowInView = table.convertRowIndexToView( selection.rowIndex() );
+
+		if ( rowInView == recentlySelectedRowInView ) return;
+
+		moveToRowInView( rowInView );
 	}
 
 	private JMenu createColoringMenu()

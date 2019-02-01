@@ -12,10 +12,9 @@ public interface SelectionListener< T >
 	public void selectionChanged();
 
 	/**
-	 * Notifies when a selection event happened,
-	 * also when this did not change the list
-	 * of currently selected items.
+	 * Notifies when a focus event happened.
+	 * Focus events do not necessarily enter the selection at all..
 	 */
-	public void selectionEvent( T selection, boolean selected );
+	public void focusEvent( T selection );
 
 }

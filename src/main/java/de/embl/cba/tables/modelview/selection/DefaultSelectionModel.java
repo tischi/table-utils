@@ -8,6 +8,7 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 {
 	private final Listeners.SynchronizedList< SelectionListener > listeners;
 	private final Set< T > selected;
+	private T focusObject;
 
 	public DefaultSelectionModel()
 	{
@@ -50,7 +51,6 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 					public void run()
 					{
 						listener.selectionChanged();
-						listener.selectionEvent( object, false );
 					}
 				}).start();
 			}
@@ -71,7 +71,6 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 					public void run()
 					{
 						listener.selectionChanged();
-						listener.selectionEvent( object, true );
 					}
 				}).start();
 			}
@@ -88,6 +87,37 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 		else
 		{
 			add( object );
+		}
+	}
+
+	@Override
+	public void focus( T object )
+	{
+		focusObject = object;
+
+		for ( SelectionListener listener : listeners.list )
+		{
+			new Thread( new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					listener.focusEvent( object );
+				}
+			}).start();
+		}
+	}
+
+	@Override
+	public boolean isFocused( T object )
+	{
+		if ( focusObject != null && focusObject.equals( object ) )
+		{
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 

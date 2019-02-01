@@ -29,6 +29,9 @@ public class CellProfilerOutputExplorerCommand< R extends RealType< R > & Native
 	@Parameter ( label = "Label Image Column Name" )
 	public String lableImageColumnName = "FileName_Objects_Nuclei_Labels";
 
+	@Parameter ( label = "Apply Path Mapping" )
+	public boolean applyPathMapping = false;
+
 	@Parameter ( label = "Image Path Mapping (Table)" )
 	public String imageRootPathInTable = "/Volumes/cba/exchange/Daja-Christian/20190116_for_classification_interphase_versus_mitotic";
 
@@ -38,22 +41,13 @@ public class CellProfilerOutputExplorerCommand< R extends RealType< R > & Native
 	@Override
 	public void run()
 	{
-
-		final CellProfilerImageSourcesModelCreator modelCreator = new CellProfilerImageSourcesModelCreator(
-				inputTableFile,
-				imageRootPathInTable,
-				imageRootPathOnThisComputer,
-				"\t"
-		);
-
-		final CellProfilerImageSourcesModel imageSourcesModel = modelCreator.getModel();
+		final CellProfilerImageSourcesModel imageSourcesModel
+				= createCellProfilerImageSourcesModel();
 
 		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments
 				= createCellProfilerImageSegments( inputTableFile );
 
 		final ArrayList< String > categoricalColumns = new ArrayList<>();
-		categoricalColumns.add( "Label" );
-
 
 		ArrayList< String > initialSources = new ArrayList< String >();
 		initialSources.add( imageSourcesModel.sources().keySet().iterator().next() );
@@ -64,7 +58,24 @@ public class CellProfilerOutputExplorerCommand< R extends RealType< R > & Native
 				categoricalColumns,
 				true,
 				initialSources );
+	}
 
+	public CellProfilerImageSourcesModel createCellProfilerImageSourcesModel()
+	{
+		if ( ! applyPathMapping )
+		{
+			imageRootPathInTable = "";
+			imageRootPathOnThisComputer = "";
+		}
+
+		final CellProfilerImageSourcesModelCreator modelCreator = new CellProfilerImageSourcesModelCreator(
+				inputTableFile,
+				imageRootPathInTable,
+				imageRootPathOnThisComputer,
+				"\t"
+		);
+
+		return modelCreator.getModel();
 	}
 
 	public ArrayList< DefaultAnnotatedImageSegment > createCellProfilerImageSegments( File tableFile )
