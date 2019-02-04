@@ -3,12 +3,10 @@ package de.embl.cba.tables.commands;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
-import de.embl.cba.tables.modelview.combined.DefaultImageSegmentsModel;
 import de.embl.cba.tables.modelview.combined.GeneratingImageSegmentsModel;
 import de.embl.cba.tables.modelview.images.DefaultImageSourcesModel;
 import de.embl.cba.tables.modelview.images.Metadata;
 import de.embl.cba.tables.modelview.images.SourceLoader;
-import de.embl.cba.tables.modelview.segments.AnnotatedImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
@@ -44,7 +42,7 @@ public class ExploreLabelImageCommand< R extends RealType< R > & NativeType< R >
 		imageSourcesModel.addSource(
 				labelSourceLoader.getRandomAccessibleIntervalSource4D(),
 				inputLabelMasksFile.getName(),
-				Metadata.SourceFlavour.LabelSource,
+				Metadata.Flavour.LabelSource,
 				labelSourceLoader.getNumSpatialDimensions() );
 
 		final GeneratingImageSegmentsModel generatingImageSegmentsModel = new GeneratingImageSegmentsModel();
@@ -66,8 +64,7 @@ public class ExploreLabelImageCommand< R extends RealType< R > & NativeType< R >
 						imageSourcesModel,
 						generatingImageSegmentsModel,
 						selectionModel,
-						selectionColoringModel,
-						initialSources
+						selectionColoringModel
 				);
 
 		/**

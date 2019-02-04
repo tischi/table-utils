@@ -13,12 +13,12 @@ public class SourceAndMetadata
 		this.metadata = metadata;
 	}
 
-	public Source< ? > getSource()
+	public Source< ? > source()
 	{
 		return source;
 	}
 
-	public Metadata getMetadata()
+	public Metadata metadata()
 	{
 		return metadata;
 	}

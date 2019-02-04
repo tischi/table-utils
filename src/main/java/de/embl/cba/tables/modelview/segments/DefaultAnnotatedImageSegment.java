@@ -4,6 +4,7 @@ import net.imglib2.FinalInterval;
 
 import java.util.LinkedHashMap;
 
+
 public class DefaultAnnotatedImageSegment implements AnnotatedImageSegment
 {
 	private final TableRow tableRow;
@@ -23,9 +24,9 @@ public class DefaultAnnotatedImageSegment implements AnnotatedImageSegment
 	}
 
 	@Override
-	public double label()
+	public double labelId()
 	{
-		return imageSegment.label();
+		return imageSegment.labelId();
 	}
 
 	@Override

@@ -5,9 +5,11 @@ import net.imglib2.RealLocalizable;
 
 public interface ImageSegment extends RealLocalizable
 {
-	ImageSegmentId getImageSegmentId();
+	String imageId();
+
+	double labelId();
+
+	int timePoint();
 
 	FinalInterval boundingBox();
-
-
 }

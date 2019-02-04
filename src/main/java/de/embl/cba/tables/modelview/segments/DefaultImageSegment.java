@@ -2,30 +2,46 @@ package de.embl.cba.tables.modelview.segments;
 
 import net.imglib2.FinalInterval;
 
-import java.util.Objects;
-
 public class DefaultImageSegment implements ImageSegment
 {
-	private final ImageSegmentId imageSegmentId;
 	private final FinalInterval boundingBox;
 	private final double[] position;
+	private final String imageId;
+	private final double labelId;
+	private final int timePoint;
 
 	public DefaultImageSegment(
-			ImageSegmentId imageSegmentId,
+			String imageId,
+			double labelId,
+			int timePoint,
 			double x,
 			double y,
 			double z,
 			FinalInterval boundingBox )
 	{
-		this.imageSegmentId = imageSegmentId;
+		this.imageId = imageId;
+		this.labelId = labelId;
+		this.timePoint = timePoint;
 		this.boundingBox = boundingBox;
 		this.position = new double[]{ x, y, z };
 	}
 
 	@Override
-	public ImageSegmentId getImageSegmentId()
+	public String imageId()
 	{
-		return imageSegmentId;
+		return imageId;
+	}
+
+	@Override
+	public double labelId()
+	{
+		return labelId;
+	}
+
+	@Override
+	public int timePoint()
+	{
+		return timePoint;
 	}
 
 	@Override

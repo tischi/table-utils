@@ -203,7 +203,7 @@ public class TableUtils
 
 
 	// TODO: replace by more performant version
-	public static ArrayList< DefaultAnnotatedImageSegment > segmentsFromTableFile(
+	public static ArrayList< AnnotatedImageSegment > segmentsFromTableFile(
 			final File file,
 			String delim,
 			final Map< ImageSegmentCoordinate, String > coordinateColumnMap,
@@ -211,7 +211,7 @@ public class TableUtils
 	)
 	{
 
-		final ArrayList< DefaultAnnotatedImageSegment > segments = new ArrayList<>();
+		final ArrayList< AnnotatedImageSegment > segments = new ArrayList<>();
 
 		final ArrayList< String > rowsInTable = readRows( file );
 

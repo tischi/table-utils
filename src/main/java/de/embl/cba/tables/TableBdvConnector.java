@@ -256,7 +256,7 @@ public class TableBdvConnector
 			{
 				if ( ! objectTablePanel.hasCoordinate( ImageSegmentCoordinate.Label ) )
 				{
-					Logger.warn( "Please specify the object label getColumn:\n" +
+					Logger.warn( "Please specify the object labelId getColumn:\n" +
 							"[ Objects > Select coordinates... ]" );
 					return;
 				}

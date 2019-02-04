@@ -5,15 +5,23 @@ import java.util.Objects;
 public class ImageSegmentId
 {
 	private final String imageId;
-	private final double label;
+	private final double labelId;
 	private final int timePoint;
 
-	public ImageSegmentId( String imageId, double label, int timePoint )
+	public ImageSegmentId( String imageId, double labelId, int timePoint )
 	{
 		this.imageId = imageId;
-		this.label = label;
+		this.labelId = labelId;
 		this.timePoint = timePoint;
 	}
+
+	public ImageSegmentId( ImageSegment imageSegment )
+	{
+		this.imageId = imageSegment.imageId();
+		this.labelId = imageSegment.labelId();
+		this.timePoint = imageSegment.timePoint();
+	}
+
 
 	@Override
 	public boolean equals( Object o )
@@ -21,7 +29,7 @@ public class ImageSegmentId
 		if ( this == o ) return true;
 		if ( o == null || getClass() != o.getClass() ) return false;
 		ImageSegmentId that = ( ImageSegmentId ) o;
-		return Double.compare( that.label, label ) == 0 &&
+		return Double.compare( that.labelId, labelId ) == 0 &&
 				timePoint == that.timePoint &&
 				Objects.equals( imageId, that.imageId );
 	}
@@ -29,21 +37,8 @@ public class ImageSegmentId
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash( imageId, label, timePoint );
+		return Objects.hash( imageId, labelId, timePoint );
 	}
 
-	public String getImageId()
-	{
-		return imageId;
-	}
 
-	public double getLabel()
-	{
-		return label;
-	}
-
-	public int getTimePoint()
-	{
-		return timePoint;
-	}
 }

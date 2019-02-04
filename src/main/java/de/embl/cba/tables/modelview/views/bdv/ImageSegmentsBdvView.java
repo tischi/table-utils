@@ -14,7 +14,6 @@ import de.embl.cba.tables.modelview.coloring.ColoringListener;
 import de.embl.cba.tables.modelview.coloring.ColoringModel;
 import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
-import de.embl.cba.tables.modelview.combined.GeneratingImageSegmentsModel;
 import de.embl.cba.tables.modelview.combined.ImageSegmentsModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
 import de.embl.cba.tables.modelview.images.Metadata;
@@ -61,9 +60,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			final ImageSourcesModel imageSourcesModel,
 			final ImageSegmentsModel< T > imageSegmentsModel,
 			final SelectionModel< T > selectionModel,
-			final SelectionColoringModel< T > selectionColoringModel,
-			final ArrayList< String > initialImageSources // TODO: move into imageSourcesModel!
-	)
+			final SelectionColoringModel< T > selectionColoringModel)
 	{
 		this.imageSourcesModel = imageSourcesModel;
 		this.imageSegmentsModel = imageSegmentsModel;
@@ -72,10 +69,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		initBdvOptions( this.imageSourcesModel );
 
-		for ( String sourceName : initialImageSources )
-		{
-			showSource( sourceName, this.imageSourcesModel.sources().get( sourceName ) );
-		}
+		showSource( this.imageSourcesModel.sources().values().iterator().next() );
 
 		registerAsSelectionListener( selectionModel );
 
@@ -132,38 +126,38 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		showSegmentImage( imageSegment );
 
-		bdv.getBdvHandle().getViewerPanel().setTimepoint( imageSegment.getImageSegmentId().getTimePoint() );
+		bdv.getBdvHandle().getViewerPanel().setTimepoint( imageSegment.timePoint() );
 
 		final double[] position = new double[ 3 ];
 		imageSegment.localize( position );
 		BdvUtils.moveToPosition(
 				bdv,
 				position,
-				imageSegment.getImageSegmentId().getTimePoint(),
+				imageSegment.timePoint(),
 				500 );
 	}
 
 	private void showSegmentImage( ImageSegment imageSegment )
 	{
-		final String imageId = imageSegment.getImageSegmentId().getImageId();
+		final String imageId = imageSegment.imageId();
 
-		if ( currentLabelSource.getMetadata().get().get( NAME ).equals( imageId ) ) return;
+		if ( currentLabelSource.metadata().get().get( NAME ).equals( imageId ) ) return;
 
-		final SourceAndMetadata sourceAndMetadata = imageSourcesModel.sources().get( imageId );
+		final SourceAndMetadata sourceAndMetadata
+				= imageSourcesModel.sources().get( imageId );
 
-		showSource( imageId, sourceAndMetadata );
+		showSource( sourceAndMetadata );
 
 	}
 
 	/**
 	 * ...will show more sources if required by metadata...
 	 *
-	 * @param imageId
 	 * @param sourceAndMetadata
 	 */
-	public void showSource( String imageId, SourceAndMetadata sourceAndMetadata )
+	public void showSource( SourceAndMetadata sourceAndMetadata )
 	{
-		final Map< String, Object > metadata = sourceAndMetadata.getMetadata().get();
+		final Map< String, Object > metadata = sourceAndMetadata.metadata().get();
 
 		if( metadata.containsKey( Metadata.EXCLUSIVE_IMAGE_SET ) )
 		{
@@ -171,7 +165,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		}
 		else
 		{
-			showSingleSource( imageId, sourceAndMetadata, null, null );
+			showSingleSource(
+					sourceAndMetadata,
+					null,
+					null );
 		}
 	}
 
@@ -226,7 +223,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			if ( recentConverterSetups != null )
 			{
 				showSingleSource(
-						imageIDs.get( i ),
 						associatedSourceAndMetadata,
 						recentConverterSetups.get( i ).getDisplayRangeMin(),
 						recentConverterSetups.get( i ).getDisplayRangeMax() );
@@ -234,7 +230,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			else
 			{
 				showSingleSource(
-						imageIDs.get( i ),
 						associatedSourceAndMetadata,
 						null,
 						null );
@@ -248,23 +243,21 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	/**
 	 * Shows a single source
 	 *
-	 *  @param imageId
 	 * @param sourceAndMetadata
 	 * @param displayRangeMin
 	 * @param displayRangeMax
 	 */
 	public void showSingleSource(
-			String imageId,
 			SourceAndMetadata sourceAndMetadata,
 			Double displayRangeMin,
 			Double displayRangeMax )
 	{
-		final Map< String, Object > metadata = sourceAndMetadata.getMetadata().get();
-		Source< ? > source = sourceAndMetadata.getSource();
+		final Map< String, Object > metadata = sourceAndMetadata.metadata().get();
+		Source< ? > source = sourceAndMetadata.source();
 
-		if ( metadata.containsKey( FLAVOUR ) && metadata.get( FLAVOUR ).equals( SourceFlavour.LabelSource ) )
+		if ( metadata.containsKey( FLAVOUR ) && metadata.get( FLAVOUR ).equals( Flavour.LabelSource ) )
 		{
-			source = asLabelSource( imageId, source );
+			source = asLabelSource( sourceAndMetadata );
 			currentLabelSource = sourceAndMetadata;
 		}
 
@@ -366,16 +359,16 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 //	}
 //
 
-	private Source asLabelSource( String imageId, Source source )
+	private Source asLabelSource( SourceAndMetadata sourceAndMetadata )
 	{
 		ImageSegmentLabelsARGBConverter labelSourcesARGBConverter =
 				new ImageSegmentLabelsARGBConverter(
 						imageSegmentsModel,
-						imageId,
+						( String )sourceAndMetadata.metadata().get().get( Metadata.NAME ),
 						selectionColoringModel );
 
 		return new ARGBConvertedRealSource(
-				source,
+				sourceAndMetadata.source(),
 				labelSourcesARGBConverter );
 	}
 
@@ -521,15 +514,15 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		final RealPoint imageSegmentCoordinate = BdvUtils.getGlobalMouseCoordinates( bdv );
 
 		final double labelId = BdvUtils.getValueAtGlobalCoordinates(
-				currentLabelSource.getSource(),
+				currentLabelSource.source(),
 				imageSegmentCoordinate,
 				timePoint );
 
 		if ( labelId == BACKGROUND ) return;
 
-		if ( currentLabelSource.getMetadata().get().containsKey( NAME ) )
+		if ( currentLabelSource.metadata().get().containsKey( NAME ) )
 		{
-			final String imageId = ( String ) currentLabelSource.getMetadata().get().get( NAME );
+			final String imageId = ( String ) currentLabelSource.metadata().get().get( NAME );
 
 			final ImageSegmentId imageSegmentId = new ImageSegmentId( imageId, labelId, timePoint );
 

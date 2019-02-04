@@ -109,7 +109,11 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 		}
 	}
 
-	public void addSource( String imageId, File file, ArrayList< String > imageSetIDs, String flavor )
+	public void addSource(
+			String imageId,
+			File file,
+			ArrayList< String > imageSetIDs,
+			Flavour flavor )
 	{
 		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( imageId, file );
 

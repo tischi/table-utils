@@ -13,7 +13,7 @@ public class Metadata
 	public static final String EXCLUSIVE_IMAGE_SET = "ExclusivelyShowWith";
 
 
-	public enum SourceFlavour
+	public enum Flavour
 	{
 		LabelSource,
 		IntensitySource

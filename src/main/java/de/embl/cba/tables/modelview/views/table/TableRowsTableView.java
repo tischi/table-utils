@@ -430,17 +430,17 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 //			final int rowInView )
 //	{
 //		final int rowInModel = table.convertRowIndexToModel( rowInView );
-//		final Double label = ( Double ) table.getValueAt( rowInModel, labelColumnIndex );
+//		final Double labelId = ( Double ) table.getValueAt( rowInModel, labelColumnIndex );
 //
 //		String key;
 //		if ( timeColumnIndex == -1 )
 //		{
-//			key = getObjectKey( label );
+//			key = getObjectKey( labelId );
 //		}
 //		else
 //		{
 //			final Double timePoint = ( Double ) table.getValueAt( rowInModel, timeColumnIndex );
-//			key = getObjectKey( label, timePoint.intValue() );
+//			key = getObjectKey( labelId, timePoint.intValue() );
 //		}
 //
 //		return key;
@@ -457,26 +457,26 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 //		return timeColumnIndex;
 //	}
 
-//	public int getRowIndex( Double label, Integer timePoint )
+//	public int getRowIndex( Double labelId, Integer timePoint )
 //	{
 //		if ( objectRowMap == null ) createObjectRowMap();
 //
-//		final String objectKey = getObjectKey( label, timePoint );
+//		final String objectKey = getObjectKey( labelId, timePoint );
 //
 //		final Integer rowIndex = objectRowMap.sources( objectKey );
 //
 //		return rowIndex;
 //	}
 
-//	private String getObjectKey( Double label )
+//	private String getObjectKey( Double labelId )
 //	{
-//		return getObjectKey( label, null );
+//		return getObjectKey( labelId, null );
 //	}
 
-//	private String getObjectKey( Double label, Integer time )
+//	private String getObjectKey( Double labelId, Integer time )
 //	{
-//		if ( time == null ) return label.toString();
-//		else return label.toString() + "_" + time.toString();
+//		if ( time == null ) return labelId.toString();
+//		else return labelId.toString() + "_" + time.toString();
 //	}
 
 	public double[] getMinMaxValues( String column )

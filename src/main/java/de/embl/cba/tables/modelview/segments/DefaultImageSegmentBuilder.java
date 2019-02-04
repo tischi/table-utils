@@ -14,14 +14,14 @@ public class DefaultImageSegmentBuilder
 
 	public DefaultImageSegment build()
 	{
-		final DefaultImageSegment defaultImageSegment = new DefaultImageSegment(
-				imageId,
-				label,
-				timePoint,
-				x,
-				y,
-				z,
-				boundingBox );
+		final DefaultImageSegment defaultImageSegment
+				= new DefaultImageSegment(
+						imageId,
+						label,
+						timePoint ,
+						x, y, z,
+						boundingBox );
+
 		return defaultImageSegment;
 	}
 

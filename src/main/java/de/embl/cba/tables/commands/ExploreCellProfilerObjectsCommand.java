@@ -1,13 +1,19 @@
 package de.embl.cba.tables.commands;
 
+import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
+import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
+import de.embl.cba.tables.modelview.combined.DefaultImageSegmentsModel;
+import de.embl.cba.tables.modelview.combined.DefaultTableRowsModel;
 import de.embl.cba.tables.modelview.combined.ImageAndTableModels;
 import de.embl.cba.tables.modelview.images.CellProfilerImageSourcesModel;
 import de.embl.cba.tables.modelview.images.CellProfilerImageSourcesModelCreator;
-import de.embl.cba.tables.modelview.segments.DefaultAnnotatedImageSegment;
-import de.embl.cba.tables.modelview.segments.DefaultImageSegmentBuilder;
-import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
-import de.embl.cba.tables.modelview.segments.SegmentUtils;
+import de.embl.cba.tables.modelview.segments.*;
+import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
+import de.embl.cba.tables.modelview.selection.SelectionModel;
+import de.embl.cba.tables.modelview.views.bdv.ImageSegmentsBdvView;
+import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
@@ -44,20 +50,43 @@ public class ExploreCellProfilerObjectsCommand< R extends RealType< R > & Native
 		final CellProfilerImageSourcesModel imageSourcesModel
 				= createCellProfilerImageSourcesModel();
 
-		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments
+		final ArrayList< AnnotatedImageSegment > annotatedImageSegments
 				= createCellProfilerImageSegments( inputTableFile );
 
 		final ArrayList< String > categoricalColumns = new ArrayList<>();
+		categoricalColumns.add( "Label" );
 
-		ArrayList< String > initialSources = new ArrayList< String >();
-		initialSources.add( imageSourcesModel.sources().keySet().iterator().next() );
+		final SelectionModel< AnnotatedImageSegment > selectionModel
+				= new DefaultSelectionModel<>();
 
-		ImageAndTableModels.buildModelsAndViews(
-				imageSourcesModel,
-				annotatedImageSegments,
-				categoricalColumns,
-				true,
-				initialSources );
+		final DynamicCategoryColoringModel< AnnotatedImageSegment > coloringModel
+				= new DynamicCategoryColoringModel<>( new GlasbeyARGBLut(), 50 );
+
+		final SelectionColoringModel< AnnotatedImageSegment > selectionColoringModel
+				= new SelectionColoringModel<>(
+				coloringModel,
+				selectionModel );
+
+		final DefaultImageSegmentsModel< AnnotatedImageSegment > imageSegmentsModel
+				= new DefaultImageSegmentsModel<>( annotatedImageSegments );
+
+		final ImageSegmentsBdvView imageSegmentsBdvView =
+				new ImageSegmentsBdvView(
+						imageSourcesModel,
+						imageSegmentsModel,
+						selectionModel,
+						selectionColoringModel );
+
+
+		final DefaultTableRowsModel< AnnotatedImageSegment > tableRowsModel
+				= new DefaultTableRowsModel<>( annotatedImageSegments );
+
+		final TableRowsTableView tableView = new TableRowsTableView(
+				tableRowsModel,
+				selectionModel,
+				selectionColoringModel,
+				categoricalColumns );
+
 	}
 
 	public CellProfilerImageSourcesModel createCellProfilerImageSourcesModel()
@@ -78,7 +107,7 @@ public class ExploreCellProfilerObjectsCommand< R extends RealType< R > & Native
 		return modelCreator.getModel();
 	}
 
-	public ArrayList< DefaultAnnotatedImageSegment > createCellProfilerImageSegments( File tableFile )
+	public ArrayList< AnnotatedImageSegment > createCellProfilerImageSegments( File tableFile )
 	{
 		final HashMap< ImageSegmentCoordinate, String > coordinateToColumnNameAndIndexMap = new HashMap<>();
 		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.ImageId, "ImageNumber" + SegmentUtils.MULTIPLE_COLUMN_SEPARATOR + lableImageColumnName );
@@ -86,7 +115,7 @@ public class ExploreCellProfilerObjectsCommand< R extends RealType< R > & Native
 		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.X, "Location_Center_X" );
 		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Y, "Location_Center_Y" );
 
-		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments
+		final ArrayList< AnnotatedImageSegment > annotatedImageSegments
 				= TableUtils.segmentsFromTableFile(
 						tableFile,
 						null,

@@ -36,7 +36,7 @@ public class BehaviourInteractiveConverterEventHandler
 	private static final int BACKGROUND = 0;
 
 	/**
-	 * Selection of argbconversion (segments) in a label source.
+	 * Selection of argbconversion (segments) in a labelId source.
 	 * @param bdv Bdv window in which the source is shown.
 	 */
 	public BehaviourInteractiveConverterEventHandler( Bdv bdv,
@@ -231,7 +231,7 @@ public class BehaviourInteractiveConverterEventHandler
 	{
 		if ( isNewSelection( label, timepoint  ) )
 		{
-			//selectableConverter.selectionChanged( label, timepoint, true );
+			//selectableConverter.selectionChanged( labelId, timepoint, true );
 		}
 	}
 

@@ -5,7 +5,6 @@ import de.embl.cba.tables.cellprofiler.FolderAndFileColumn;
 
 import javax.swing.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -137,11 +136,11 @@ public class CellProfilerImageSourcesModelCreator
 		{
 			if ( imageId.contains( OBJECTS ) )
 			{
-				imageSourcesModel.addSource( imageId, new File( imagePath ), imageSetIds, Metadata.LABEL_SOURCE_FLAVOUR );
+				imageSourcesModel.addSource( imageId, new File( imagePath ), imageSetIds, Metadata.Flavour.LabelSource );
 			}
 			else
 			{
-				imageSourcesModel.addSource( imageId, new File( imagePath ), imageSetIds, Metadata.INTENSITY_SOURCE_FLAVOUR );
+				imageSourcesModel.addSource( imageId, new File( imagePath ), imageSetIds, Metadata.Flavour.IntensitySource );
 			}
 		}
 

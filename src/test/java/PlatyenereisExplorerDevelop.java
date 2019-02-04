@@ -51,18 +51,11 @@ public class PlatyenereisExplorerDevelop
 		final ArrayList< String > categoricalColumns = new ArrayList<>();
 		categoricalColumns.add( "label_id" );
 
-
 		ArrayList< String > initialSources = new ArrayList< String >();
 		initialSources.add( "em-raw-full-res" );
 		initialSources.add( "em-segmented-cells-labels" );
 
-		ImageAndTableModels.buildModelsAndViews(
-				imageSourcesModel,
-				annotatedImageSegments,
-				categoricalColumns,
-				true,
-				initialSources );
-
+		// TODO
 	}
 
 	public static ArrayList< DefaultAnnotatedImageSegment > createCellSegments( File tableFile )

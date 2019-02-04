@@ -26,7 +26,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 
 	public void addSource( Source< ? > source,
 						   String imageId,
-						   SourceFlavour flavor,
+						   Flavour flavor,
 						   int numSpatialDimensions )
 	{
 

@@ -1,14 +1,11 @@
 package de.embl.cba.tables.modelview.combined;
 
 import bdv.util.BdvHandle;
-import bdv.viewer.Source;
 import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.tables.modelview.images.Metadata;
 import de.embl.cba.tables.modelview.images.SourceAndMetadata;
 import de.embl.cba.tables.modelview.segments.DefaultImageSegment;
-import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentId;
-import net.imglib2.FinalInterval;
 import net.imglib2.RealPoint;
 
 import java.util.HashMap;
@@ -39,25 +36,23 @@ public class GeneratingImageSegmentsModel implements ImageSegmentsModel< Default
 
 	public void addSegment()
 	{
-		final String imageId = ( String ) labelSourceAndMetadata.getMetadata().get().get( Metadata.NAME );
+		final String imageId = ( String ) labelSourceAndMetadata.metadata().get().get( Metadata.NAME );
 
 		final RealPoint userClickCoordinate = BdvUtils.getGlobalMouseCoordinates( bdv );
 		final int timepoint = bdv.getBdvHandle().getViewerPanel().getState().getCurrentTimepoint();
 		final double labelId = BdvUtils.getValueAtGlobalCoordinates(
-				labelSourceAndMetadata.getSource(),
+				labelSourceAndMetadata.source(),
 				userClickCoordinate,
 				timepoint );
 
-		final ImageSegmentId imageSegmentId = new ImageSegmentId( imageId, labelId, timepoint );
-
 		final DefaultImageSegment imageSegment = new DefaultImageSegment(
-				imageSegmentId,
+				imageId, labelId, timepoint,
 				userClickCoordinate.getDoublePosition( 0 ),
 				userClickCoordinate.getDoublePosition( 1 ),
 				userClickCoordinate.getDoublePosition( 2 ),
 				null );
 
-		keyToSegment.put( imageSegmentId, imageSegment );
+		keyToSegment.put( new ImageSegmentId( imageSegment ), imageSegment );
 	}
 
 	public void setBdv( BdvHandle bdv )

@@ -20,46 +20,45 @@ public class ImageAndTableModels
 	 *  @param imageSourcesModel
 	 * @param annotatedImageSegments
 	 * @param categoricalColumns
-	 * @param centerOnSegment
 	 * @param initialSources
 	 */
 	public static void buildModelsAndViews(
 			ImageSourcesModel imageSourcesModel,
 			ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments,
-			ArrayList< String > categoricalColumns,
-			ArrayList< String > initialSources )
+			ArrayList< String > categoricalColumns )
 	{
-		final AnnotatedImageSegmentsAndImagesModel dataModel =
-				new AnnotatedImageSegmentsAndImagesModel(
-						"Data",
-						annotatedImageSegments,
-						imageSourcesModel );
-
-		final SelectionModel< AnnotatedImageSegment > selectionModel
-				= new DefaultSelectionModel<>();
-
-		final DynamicCategoryColoringModel< AnnotatedImageSegment > coloringModel
-				= new DynamicCategoryColoringModel<>( new GlasbeyARGBLut(), 50 );
-
-		final SelectionColoringModel< AnnotatedImageSegment > selectionColoringModel
-				= new SelectionColoringModel<>(
-				coloringModel,
-				selectionModel );
-
-		final ImageSegmentsBdvView imageSegmentsBdvView =
-				new ImageSegmentsBdvView(
-						imageSourcesModel, dataModel,
-						selectionModel,
-						selectionColoringModel,
-						initialSources
-						);
-
-
-		final TableRowsTableView tableView = new TableRowsTableView(
-				dataModel,
-				selectionModel,
-				selectionColoringModel,
-				categoricalColumns );
+//		final AnnotatedImageSegmentsModel imageSegmentsModel =
+//				new AnnotatedImageSegmentsModel(
+//						"Data",
+//						annotatedImageSegments,
+//						imageSourcesModel );
+//
+//		new DefaultImageSegmentsModel< AnnotatedImageSegment >( annotatedImageSegments )
+//
+//		final SelectionModel< AnnotatedImageSegment > selectionModel
+//				= new DefaultSelectionModel<>();
+//
+//		final DynamicCategoryColoringModel< AnnotatedImageSegment > coloringModel
+//				= new DynamicCategoryColoringModel<>( new GlasbeyARGBLut(), 50 );
+//
+//		final SelectionColoringModel< AnnotatedImageSegment > selectionColoringModel
+//				= new SelectionColoringModel<>(
+//				coloringModel,
+//				selectionModel );
+//
+//		final ImageSegmentsBdvView imageSegmentsBdvView =
+//				new ImageSegmentsBdvView(
+//						imageSourcesModel,
+//						imageSegmentsModel,
+//						selectionModel,
+//						selectionColoringModel );
+//
+//
+//		final TableRowsTableView tableView = new TableRowsTableView(
+//				imageSegmentsModel,
+//				selectionModel,
+//				selectionColoringModel,
+//				categoricalColumns );
 	}
 
 
