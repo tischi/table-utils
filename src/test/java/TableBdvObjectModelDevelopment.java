@@ -1,12 +1,11 @@
 import bdv.util.RandomAccessibleIntervalSource;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.combined.DataModelUtils;
+import de.embl.cba.tables.modelview.combined.ImageAndTableModels;
 import de.embl.cba.tables.modelview.images.DefaultImageSourcesModel;
 import de.embl.cba.tables.modelview.segments.DefaultAnnotatedImageSegment;
 import de.embl.cba.tables.modelview.segments.DefaultImageSegmentBuilder;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import net.imglib2.type.numeric.RealType;
-import net.imglib2.util.ValuePair;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +28,7 @@ public class TableBdvObjectModelDevelopment
 		ArrayList< String > initialSources = new ArrayList< String >();
 		initialSources.add( imageSourcesModel.sources().keySet().iterator().next() );
 
-		DataModelUtils.buildModelsAndViews(
+		ImageAndTableModels.buildModelsAndViews(
 				imageSourcesModel,
 				annotatedImageSegments,
 				categoricalColumns,

@@ -84,7 +84,7 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 			metadata.get().put( FLAVOUR, INTENSITY_SOURCE_FLAVOUR );
 		}
 
-		metadata.get().put( DIMENSIONS, 3 );
+		metadata.get().put( NUM_SPATIAL_DIMENSIONS, 3 );
 		metadata.get().put( NAME, sourceName( file ) );
 
 		return metadata;

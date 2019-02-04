@@ -1,7 +1,5 @@
-import de.embl.cba.tables.commands.CellProfilerOutputExplorerCommand;
+import de.embl.cba.tables.commands.ExploreCellProfilerObjectsCommand;
 import net.imagej.ImageJ;
-
-import java.util.concurrent.ExecutionException;
 
 
 public class RunCellProfilerOutputExplorerCommand
@@ -12,7 +10,7 @@ public class RunCellProfilerOutputExplorerCommand
 		ij.ui().showUI();
 
 
-		ij.command().run( CellProfilerOutputExplorerCommand.class, true );
+		ij.command().run( ExploreCellProfilerObjectsCommand.class, true );
 	}
 }
 

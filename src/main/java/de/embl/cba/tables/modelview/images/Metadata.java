@@ -7,10 +7,18 @@ public class Metadata
 {
 	public static final String NAME = "Name";
 	public static final String FLAVOUR = "Flavour";
-	public static final String LABEL_SOURCE_FLAVOUR = "LabelSource";
-	public static final String INTENSITY_SOURCE_FLAVOUR = "IntensitySource";
-	public static final String DIMENSIONS = "Dimensions";
+//	public static final String LABEL_SOURCE_FLAVOUR = "LabelSource";
+//	public static final String INTENSITY_SOURCE_FLAVOUR = "IntensitySource";
+	public static final String NUM_SPATIAL_DIMENSIONS = "Dimensions";
 	public static final String EXCLUSIVE_IMAGE_SET = "ExclusivelyShowWith";
+
+
+	public enum SourceFlavour
+	{
+		LabelSource,
+		IntensitySource
+	}
+
 
 	private final Map< String, Object > metadata;
 

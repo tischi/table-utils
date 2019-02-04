@@ -52,16 +52,9 @@ public class AnnotatedImageSegmentsAndImagesModel< T extends AnnotatedImageSegme
 		return keyToSegmentMap.get( segmentKey );
 	}
 
-
 	public ImageSourcesModel getImageSourcesModel()
 	{
 		return imageSourcesModel;
-	}
-
-	@Override
-	public ArrayList< T > getImageSegments()
-	{
-		return annotatedImageSegments;
 	}
 
 	public static Object getSegmentKey( String imageSetName, Double label, Integer timePoint )

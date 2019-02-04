@@ -115,7 +115,7 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 
 		final Metadata metadata = new Metadata();
 		metadata.get().put( FLAVOUR, flavor );
-		metadata.get().put( DIMENSIONS, 2 );
+		metadata.get().put( NUM_SPATIAL_DIMENSIONS, 2 );
 		metadata.get().put( EXCLUSIVE_IMAGE_SET, imageSetIDs );
 		metadata.get().put( NAME, imageId );
 

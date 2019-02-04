@@ -1,7 +1,7 @@
 package de.embl.cba.tables.commands;
 
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.combined.DataModelUtils;
+import de.embl.cba.tables.modelview.combined.ImageAndTableModels;
 import de.embl.cba.tables.modelview.images.CellProfilerImageSourcesModel;
 import de.embl.cba.tables.modelview.images.CellProfilerImageSourcesModelCreator;
 import de.embl.cba.tables.modelview.segments.DefaultAnnotatedImageSegment;
@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>CellProfiler Output" )
-public class CellProfilerOutputExplorerCommand< R extends RealType< R > & NativeType< R > >
+@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>CellProfiler Objects" )
+public class ExploreCellProfilerObjectsCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {
 	@Parameter ( label = "CellProfiler Table" )
@@ -52,7 +52,7 @@ public class CellProfilerOutputExplorerCommand< R extends RealType< R > & Native
 		ArrayList< String > initialSources = new ArrayList< String >();
 		initialSources.add( imageSourcesModel.sources().keySet().iterator().next() );
 
-		DataModelUtils.buildModelsAndViews(
+		ImageAndTableModels.buildModelsAndViews(
 				imageSourcesModel,
 				annotatedImageSegments,
 				categoricalColumns,

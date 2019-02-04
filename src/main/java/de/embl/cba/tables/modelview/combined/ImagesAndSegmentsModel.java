@@ -10,6 +10,4 @@ public interface ImagesAndSegmentsModel< T extends ImageSegment >
 	T getSegment( String imageSetName, Double label, int timePoint );
 
 	ImageSourcesModel getImageSourcesModel();
-
-	ArrayList< T > getImageSegments();
 }

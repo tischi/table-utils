@@ -1,12 +1,11 @@
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.combined.DataModelUtils;
+import de.embl.cba.tables.modelview.combined.ImageAndTableModels;
 import de.embl.cba.tables.modelview.images.CellProfilerImageSourcesModel;
 import de.embl.cba.tables.modelview.images.CellProfilerImageSourcesModelCreator;
 import de.embl.cba.tables.modelview.segments.DefaultAnnotatedImageSegment;
 import de.embl.cba.tables.modelview.segments.DefaultImageSegmentBuilder;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
-import net.imglib2.util.ValuePair;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +47,7 @@ public class CellProfilerOutputExplorerDevelop
 		ArrayList< String > initialSources = new ArrayList< String >();
 		initialSources.add( imageSourcesModel.sources().keySet().iterator().next() );
 
-		DataModelUtils.buildModelsAndViews(
+		ImageAndTableModels.buildModelsAndViews(
 				imageSourcesModel,
 				annotatedImageSegments,
 				categoricalColumns,

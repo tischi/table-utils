@@ -13,7 +13,7 @@ import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
 
 import java.util.ArrayList;
 
-public class DataModelUtils
+public class ImageAndTableModels
 {
 	/**
 	 * Builds derived models and views from the inputs.
@@ -27,7 +27,6 @@ public class DataModelUtils
 			ImageSourcesModel imageSourcesModel,
 			ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments,
 			ArrayList< String > categoricalColumns,
-			boolean centerOnSegment,
 			ArrayList< String > initialSources )
 	{
 		final AnnotatedImageSegmentsAndImagesModel dataModel =
@@ -49,10 +48,9 @@ public class DataModelUtils
 
 		final ImageSegmentsBdvView imageSegmentsBdvView =
 				new ImageSegmentsBdvView(
-						dataModel,
+						imageSourcesModel, dataModel,
 						selectionModel,
 						selectionColoringModel,
-						centerOnSegment,
 						initialSources
 						);
 
@@ -63,4 +61,6 @@ public class DataModelUtils
 				selectionColoringModel,
 				categoricalColumns );
 	}
+
+
 }

@@ -26,13 +26,11 @@ import org.scijava.plugin.Plugin;
 
 import javax.swing.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 
-@Deprecated
 @Plugin(type = Command.class, menuPath = "Plugins>Measurement>Browse Table And Image" )
-public class TableBdvConnectionCommand < R extends RealType< R > & NativeType< R > >
+public class ExploreLabelImageAndTableCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {
 	@Parameter ( label = "Results table" )
