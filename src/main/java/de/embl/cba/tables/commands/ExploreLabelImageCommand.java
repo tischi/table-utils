@@ -3,7 +3,7 @@ package de.embl.cba.tables.commands;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
-import de.embl.cba.tables.modelview.combined.GeneratingImageSegmentsModel;
+import de.embl.cba.tables.modelview.combined.GeneratingNoPositionImageSegmentsModel;
 import de.embl.cba.tables.modelview.images.DefaultImageSourcesModel;
 import de.embl.cba.tables.modelview.images.Metadata;
 import de.embl.cba.tables.modelview.images.SourceLoader;
@@ -45,7 +45,8 @@ public class ExploreLabelImageCommand< R extends RealType< R > & NativeType< R >
 				Metadata.Flavour.LabelSource,
 				labelSourceLoader.getNumSpatialDimensions() );
 
-		final GeneratingImageSegmentsModel generatingImageSegmentsModel = new GeneratingImageSegmentsModel();
+		final GeneratingNoPositionImageSegmentsModel generatingImageSegmentsModel
+				= new GeneratingNoPositionImageSegmentsModel();
 
 		final SelectionModel< ImageSegment > selectionModel =
 				new DefaultSelectionModel< ImageSegment >();
@@ -66,13 +67,6 @@ public class ExploreLabelImageCommand< R extends RealType< R > & NativeType< R >
 						selectionModel,
 						selectionColoringModel
 				);
-
-		/**
-		 * Provide information to generate image segments on the fly when the user clicks
-		 */
-		generatingImageSegmentsModel.setBdv( imageSegmentsBdvView.getBdv() );
-		generatingImageSegmentsModel.setSourceAndMetadata( imageSourcesModel.sources().values().iterator().next() );
-
 
 	}
 

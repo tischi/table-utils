@@ -11,13 +11,14 @@ import net.imglib2.RealPoint;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GeneratingImageSegmentsModel implements ImageSegmentsModel< DefaultImageSegment >
+public class MouseClickGeneratingImageSegmentsModel
+		implements ImageSegmentsModel< DefaultImageSegment >
 {
 	private final Map< ImageSegmentId, DefaultImageSegment > keyToSegment;
 	private BdvHandle bdv;
 	private SourceAndMetadata labelSourceAndMetadata;
 
-	public GeneratingImageSegmentsModel( )
+	public MouseClickGeneratingImageSegmentsModel( )
 	{
 		keyToSegment = new HashMap<>(  );
 	}
@@ -27,16 +28,16 @@ public class GeneratingImageSegmentsModel implements ImageSegmentsModel< Default
 	{
 		if ( ! keyToSegment.keySet().contains( imageSegmentId ) )
 		{
-			addSegment();
+			addSegment( imageSegmentId );
 		}
 
 		return keyToSegment.get( imageSegmentId );
 
 	}
 
-	public void addSegment()
+	private synchronized void addSegment( ImageSegmentId imageSegmentId )
 	{
-		final String imageId = ( String ) labelSourceAndMetadata.metadata().get().get( Metadata.NAME );
+		final String imageId = ( String ) labelSourceAndMetadata.metadata().getMap().get( Metadata.NAME );
 
 		final RealPoint userClickCoordinate = BdvUtils.getGlobalMouseCoordinates( bdv );
 		final int timepoint = bdv.getBdvHandle().getViewerPanel().getState().getCurrentTimepoint();
@@ -52,7 +53,7 @@ public class GeneratingImageSegmentsModel implements ImageSegmentsModel< Default
 				userClickCoordinate.getDoublePosition( 2 ),
 				null );
 
-		keyToSegment.put( new ImageSegmentId( imageSegment ), imageSegment );
+		keyToSegment.put( imageSegmentId, imageSegment );
 	}
 
 	public void setBdv( BdvHandle bdv )

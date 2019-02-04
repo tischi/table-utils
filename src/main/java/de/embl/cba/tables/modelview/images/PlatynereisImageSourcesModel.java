@@ -77,15 +77,15 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 
 		if ( file.toString().contains( LABELS_FILE_ID ) )
 		{
-			metadata.get().put( FLAVOUR, Flavour.LabelSource );
+			metadata.getMap().put( FLAVOUR, Flavour.LabelSource );
 		}
 		else
 		{
-			metadata.get().put( FLAVOUR, Flavour.IntensitySource );
+			metadata.getMap().put( FLAVOUR, Flavour.IntensitySource );
 		}
 
-		metadata.get().put( NUM_SPATIAL_DIMENSIONS, 3 );
-		metadata.get().put( NAME, sourceName( file ) );
+		metadata.getMap().put( NUM_SPATIAL_DIMENSIONS, 3 );
+		metadata.getMap().put( NAME, sourceName( file ) );
 
 		return metadata;
 	}

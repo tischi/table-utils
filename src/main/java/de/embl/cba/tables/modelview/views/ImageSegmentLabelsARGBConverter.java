@@ -21,11 +21,11 @@ public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
 
 	public ImageSegmentLabelsARGBConverter(
 			ImageSegmentsModel< T > imageSegmentsModel,
-			String imageSetId,
+			String imageId,
 			ColoringModel coloringModel )
 	{
 		this.imageSegmentsModel = imageSegmentsModel;
-		this.imageSetId = imageSetId;
+		this.imageSetId = imageId;
 		this.coloringModel = coloringModel;
 		timePointIndex = 0;
 	}

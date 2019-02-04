@@ -7,11 +7,8 @@ public class Metadata
 {
 	public static final String NAME = "Name";
 	public static final String FLAVOUR = "Flavour";
-//	public static final String LABEL_SOURCE_FLAVOUR = "LabelSource";
-//	public static final String INTENSITY_SOURCE_FLAVOUR = "IntensitySource";
 	public static final String NUM_SPATIAL_DIMENSIONS = "Dimensions";
 	public static final String EXCLUSIVE_IMAGE_SET = "ExclusivelyShowWith";
-
 
 	public enum Flavour
 	{
@@ -19,15 +16,17 @@ public class Metadata
 		IntensitySource
 	}
 
-
 	private final Map< String, Object > metadata;
 
-	public Metadata( )
+	public Metadata()
 	{
-		this.metadata = new HashMap<>( );
+		metadata = new HashMap<>( );
+		metadata.put( FLAVOUR, Flavour.IntensitySource );
+		metadata.put( NAME, "Image" );
+		metadata.put( NUM_SPATIAL_DIMENSIONS, 3 );
 	}
 
-	public Map< String, Object > get()
+	public Map< String, Object > getMap()
 	{
 		return metadata;
 	};

@@ -118,10 +118,10 @@ public class CellProfilerImageSourcesModel implements ImageSourcesModel
 		final Lazy2DFileSource lazy2DFileSource = new Lazy2DFileSource( imageId, file );
 
 		final Metadata metadata = new Metadata();
-		metadata.get().put( FLAVOUR, flavor );
-		metadata.get().put( NUM_SPATIAL_DIMENSIONS, 2 );
-		metadata.get().put( EXCLUSIVE_IMAGE_SET, imageSetIDs );
-		metadata.get().put( NAME, imageId );
+		metadata.getMap().put( FLAVOUR, flavor );
+		metadata.getMap().put( NUM_SPATIAL_DIMENSIONS, 2 );
+		metadata.getMap().put( EXCLUSIVE_IMAGE_SET, imageSetIDs );
+		metadata.getMap().put( NAME, imageId );
 
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( lazy2DFileSource, metadata ) );
 	}

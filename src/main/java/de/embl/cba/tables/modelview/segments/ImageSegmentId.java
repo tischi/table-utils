@@ -22,7 +22,6 @@ public class ImageSegmentId
 		this.timePoint = imageSegment.timePoint();
 	}
 
-
 	@Override
 	public boolean equals( Object o )
 	{
@@ -40,5 +39,18 @@ public class ImageSegmentId
 		return Objects.hash( imageId, labelId, timePoint );
 	}
 
+	public String getImageId()
+	{
+		return imageId;
+	}
 
+	public double getLabelId()
+	{
+		return labelId;
+	}
+
+	public int getTimePoint()
+	{
+		return timePoint;
+	}
 }

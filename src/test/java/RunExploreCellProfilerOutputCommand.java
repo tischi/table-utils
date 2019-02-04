@@ -2,7 +2,7 @@ import de.embl.cba.tables.commands.ExploreCellProfilerObjectsCommand;
 import net.imagej.ImageJ;
 
 
-public class RunCellProfilerOutputExplorerCommand
+public class RunExploreCellProfilerOutputCommand
 {
 	public static void main( String[] args )
 	{
