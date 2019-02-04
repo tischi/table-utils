@@ -9,6 +9,7 @@ import bdv.viewer.Source;
 import bdv.viewer.state.SourceState;
 import bdv.viewer.state.ViewerState;
 import de.embl.cba.bdv.utils.BdvUtils;
+import de.embl.cba.bdv.utils.objects3d.ConnectedComponentExtractorAnd3DViewer;
 import de.embl.cba.bdv.utils.overlays.BdvGrayValuesOverlay;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringListener;
@@ -56,6 +57,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private T recentFocus;
 	private ViewerState recentViewerState;
 	private List< ConverterSetup > recentConverterSetups;
+	private double voxelSpacing3DView;
 
 	public ImageSegmentsBdvView(
 			final ImageSourcesModel imageSourcesModel,
@@ -330,7 +332,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		installSelectNoneBehaviour( );
 		installSelectionColoringModeBehaviour( );
 		installRandomColorShufflingBehaviour();
-		//if( is3D() ) install3DViewBehaviour();
+		install3DViewBehaviour();
 	}
 
 	private void installRandomColorShufflingBehaviour()
@@ -376,14 +378,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			return;
 		}
 
-		final int timePoint = getCurrentTimePoint();
-
-		final RealPoint imageSegmentCoordinate = BdvUtils.getGlobalMouseCoordinates( bdv );
-
-		final double labelId = BdvUtils.getValueAtGlobalCoordinates(
-				currentLabelSource.source(),
-				imageSegmentCoordinate,
-				timePoint );
+		final double labelId = getLabelIdAtCurrentMouseCoordinates();
 
 		if ( labelId == BACKGROUND ) return;
 
@@ -391,7 +386,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		{
 			final String imageId = ( String ) currentLabelSource.metadata().getMap().get( NAME );
 
-			final ImageSegmentId imageSegmentId = new ImageSegmentId( imageId, labelId, timePoint );
+			final ImageSegmentId imageSegmentId = new ImageSegmentId( imageId, labelId, getCurrentTimePoint() );
 
 			final T segment = imageSegmentsModel.getImageSegment( imageSegmentId );
 
@@ -405,6 +400,14 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		}
 	}
 
+	private double getLabelIdAtCurrentMouseCoordinates()
+	{
+		return BdvUtils.getValueAtGlobalCoordinates(
+					currentLabelSource.source(),
+					BdvUtils.getGlobalMouseCoordinates( bdv ),
+					getCurrentTimePoint() );
+	}
+
 	private void installSelectionColoringModeBehaviour( )
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
@@ -412,6 +415,33 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			selectionColoringModel.iterateSelectionMode();
 			BdvUtils.repaint( bdv );
 		}, name + "-iterate-selection", iterateSelectionModeTrigger );
+	}
+
+	private void install3DViewBehaviour( )
+	{
+		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
+		{
+			if ( getLabelIdAtCurrentMouseCoordinates() != BACKGROUND )
+			{
+				viewObjectAtCurrentMouseCoordinatesIn3D();
+			}
+		}, name + "-view-3d", viewIn3DTrigger );
+	}
+
+	private void viewObjectAtCurrentMouseCoordinatesIn3D()
+	{
+		new Thread( new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				voxelSpacing3DView = 0.2;
+				new ConnectedComponentExtractorAnd3DViewer( currentLabelSource.source() )
+						.extractAndShowIn3D(
+								BdvUtils.getGlobalMouseCoordinates( bdv ),
+								voxelSpacing3DView );
+			}
+		} ).start();
 	}
 
 	private int getCurrentTimePoint()
