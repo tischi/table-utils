@@ -8,8 +8,6 @@ import java.util.Map;
 public class SegmentUtils
 {
 
-	public static final String MULTIPLE_COLUMN_SEPARATOR = "____";
-
 	@Deprecated
 	public static String getKey( Double label )
 	{
@@ -52,21 +50,7 @@ public class SegmentUtils
 					segmentBuilder.setLabel( ( double ) columnValueMap.get( colName ) );
 					break;
 				case ImageId:
-					if ( colName.contains( MULTIPLE_COLUMN_SEPARATOR ) )
-					{
-						final String[] columns = colName.split( MULTIPLE_COLUMN_SEPARATOR );
-						String imageId = "";
-						for ( String column : columns )
-						{
-							imageId += columnValueMap.get( column ).toString();
-						}
-						segmentBuilder.setImageId( imageId );
-					}
-					else
-					{
-						segmentBuilder.setImageId( columnValueMap.get( colName ).toString() );
-					}
-
+					segmentBuilder.setImageId( columnValueMap.get( colName ).toString() );
 					break;
 
 			}
@@ -106,21 +90,7 @@ public class SegmentUtils
 					segmentBuilder.setLabel(  Double.parseDouble((String)  tableRowMap.get( colName ) ));
 					break;
 				case ImageId:
-					if ( colName.contains( MULTIPLE_COLUMN_SEPARATOR ) )
-					{
-						final String[] columns = colName.split( MULTIPLE_COLUMN_SEPARATOR );
-						String imageId = "";
-						for ( String column : columns )
-						{
-							imageId += tableRowMap.get( column ).toString();
-						}
-						segmentBuilder.setImageId( imageId );
-					}
-					else
-					{
-						segmentBuilder.setImageId( tableRowMap.get( colName ).toString() );
-					}
-
+					segmentBuilder.setImageId( tableRowMap.get( colName ).toString() );
 					break;
 
 			}

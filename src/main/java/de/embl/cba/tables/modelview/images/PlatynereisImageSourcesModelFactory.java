@@ -12,11 +12,11 @@ import java.io.IOException;
 import java.util.*;
 
 
-public class PlatynereisImageSourcesModelCreator
+public class PlatynereisImageSourcesModelFactory
 {
 	private final PlatynereisImageSourcesModel sourcesModel;
 
-	public PlatynereisImageSourcesModelCreator( File directory ) throws IOException
+	public PlatynereisImageSourcesModelFactory( File directory ) throws IOException
 	{
 		ArrayList< File > imageFiles = getImageFiles( directory, ".*.xml" );
 

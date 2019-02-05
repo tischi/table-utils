@@ -74,7 +74,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		showSource( this.imageSourcesModel.sources().values().iterator().next() );
 
-		new BdvGrayValuesOverlay( bdv, 20 );
+		//new BdvGrayValuesOverlay( bdv, 20 ); // TODO: makes problems when removing sources
 
 		registerAsSelectionListener( selectionModel );
 
@@ -152,7 +152,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 				= imageSourcesModel.sources().get( imageId );
 
 		showSource( sourceAndMetadata );
-
 	}
 
 	/**
@@ -286,7 +285,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void removeAllSources()
 	{
-
 		recentViewerState = bdv.getViewerPanel().getState();
 		recentConverterSetups = new ArrayList<>( bdv.getSetupAssignments().getConverterSetups() );
 

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class ImageAndTableModels
 {
 	/**
-	 * Builds derived models and views from the inputs.
+	 * Builds derived tablemodels and views from the inputs.
 	 *  @param imageSourcesModel
 	 * @param annotatedImageSegments
 	 * @param categoricalColumns

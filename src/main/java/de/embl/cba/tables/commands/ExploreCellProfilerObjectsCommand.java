@@ -6,9 +6,9 @@ import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.combined.DefaultImageSegmentsModel;
 import de.embl.cba.tables.modelview.combined.DefaultTableRowsModel;
-import de.embl.cba.tables.modelview.combined.ImageAndTableModels;
-import de.embl.cba.tables.modelview.images.CellProfilerImageSourcesModel;
-import de.embl.cba.tables.modelview.images.CellProfilerImageSourcesModelCreator;
+import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
+import de.embl.cba.tables.modelview.images.ImageSourcesModelFromAnnotatedSegmentsFactory;
+import de.embl.cba.tables.modelview.images.TableImageSourcesModelCreator;
 import de.embl.cba.tables.modelview.segments.*;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
@@ -32,8 +32,11 @@ public class ExploreCellProfilerObjectsCommand< R extends RealType< R > & Native
 	@Parameter ( label = "CellProfiler Table" )
 	public File inputTableFile;
 
-	@Parameter ( label = "Label Image Column Name" )
-	public String lableImageColumnName = "FileName_Objects_Nuclei_Labels";
+	@Parameter ( label = "Label Image Path Name Column" )
+	public String labelImageFileNameColumn = "FileName_Objects_Nuclei_Labels";
+
+	@Parameter ( label = "Label Image File Name Column" )
+	public String labelImagePathNameColumn = "PathName_Objects_Nuclei_Labels";
 
 	@Parameter ( label = "Apply Path Mapping" )
 	public boolean applyPathMapping = false;
@@ -47,11 +50,19 @@ public class ExploreCellProfilerObjectsCommand< R extends RealType< R > & Native
 	@Override
 	public void run()
 	{
-		final CellProfilerImageSourcesModel imageSourcesModel
-				= createCellProfilerImageSourcesModel();
-
+		
 		final ArrayList< AnnotatedImageSegment > annotatedImageSegments
 				= createCellProfilerImageSegments( inputTableFile );
+
+		final ImageSourcesModelFromAnnotatedSegmentsFactory< AnnotatedImageSegment > factory
+				= new ImageSourcesModelFromAnnotatedSegmentsFactory<>(
+					annotatedImageSegments,
+					imageRootPathInTable, // TODO: make PathMapper class
+					imageRootPathOnThisComputer,
+					2
+			);
+
+		final FileImageSourcesModel imageSourcesModel = factory.getImageSourcesModel();
 
 		final ArrayList< String > categoricalColumns = new ArrayList<>();
 		categoricalColumns.add( "Label" );
@@ -64,8 +75,8 @@ public class ExploreCellProfilerObjectsCommand< R extends RealType< R > & Native
 
 		final SelectionColoringModel< AnnotatedImageSegment > selectionColoringModel
 				= new SelectionColoringModel<>(
-				coloringModel,
-				selectionModel );
+					coloringModel,
+					selectionModel );
 
 		final DefaultImageSegmentsModel< AnnotatedImageSegment > imageSegmentsModel
 				= new DefaultImageSegmentsModel<>( annotatedImageSegments );
@@ -76,7 +87,6 @@ public class ExploreCellProfilerObjectsCommand< R extends RealType< R > & Native
 						imageSegmentsModel,
 						selectionModel,
 						selectionColoringModel );
-
 
 		final DefaultTableRowsModel< AnnotatedImageSegment > tableRowsModel
 				= new DefaultTableRowsModel<>( annotatedImageSegments );
@@ -89,7 +99,7 @@ public class ExploreCellProfilerObjectsCommand< R extends RealType< R > & Native
 
 	}
 
-	public CellProfilerImageSourcesModel createCellProfilerImageSourcesModel()
+	public FileImageSourcesModel createCellProfilerImageSourcesModel()
 	{
 		if ( ! applyPathMapping )
 		{
@@ -97,29 +107,38 @@ public class ExploreCellProfilerObjectsCommand< R extends RealType< R > & Native
 			imageRootPathOnThisComputer = "";
 		}
 
-		final CellProfilerImageSourcesModelCreator modelCreator = new CellProfilerImageSourcesModelCreator(
-				inputTableFile,
-				imageRootPathInTable,
-				imageRootPathOnThisComputer,
-				"\t"
-		);
+		final TableImageSourcesModelCreator modelCreator =
+				new TableImageSourcesModelCreator(
+					inputTableFile,
+					imageRootPathInTable,
+					imageRootPathOnThisComputer,
+					"\t",
+						2 );
 
-		return modelCreator.getModel();
+		return modelCreator.getImageSourcesModel();
 	}
 
 	public ArrayList< AnnotatedImageSegment > createCellProfilerImageSegments( File tableFile )
 	{
 		final HashMap< ImageSegmentCoordinate, String > coordinateToColumnNameAndIndexMap = new HashMap<>();
-		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.ImageId, "ImageNumber" + SegmentUtils.MULTIPLE_COLUMN_SEPARATOR + lableImageColumnName );
+
+		coordinateToColumnNameAndIndexMap.put(
+				ImageSegmentCoordinate.ImageId,
+				labelImageFileNameColumn + SegmentUtils.FOLDER_AND_FILE_COLUMNS + labelImagePathNameColumn  );
+
 		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Label, "Number_Object_Number");
 		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.X, "Location_Center_X" );
 		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Y, "Location_Center_Y" );
+
+		// TODO: merge FileAndPath columns at this point
+		// TODO: also fix the pathmapping here.
 
 		final ArrayList< AnnotatedImageSegment > annotatedImageSegments
 				= TableUtils.segmentsFromTableFile(
 						tableFile,
 						null,
-						coordinateToColumnNameAndIndexMap, new DefaultImageSegmentBuilder() );
+						coordinateToColumnNameAndIndexMap,
+						new DefaultImageSegmentBuilder() );
 
 		return annotatedImageSegments;
 	}

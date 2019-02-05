@@ -8,7 +8,7 @@ public class Metadata
 	public static final String NAME = "Name";
 	public static final String FLAVOUR = "Flavour";
 	public static final String NUM_SPATIAL_DIMENSIONS = "Number of spatial dimensions";
-	public static final String EXCLUSIVE_IMAGE_SET = "Exclusively show with";
+	public static final String EXCLUSIVE_IMAGE_SET = "Exclusive image set";
 
 	public enum Flavour
 	{

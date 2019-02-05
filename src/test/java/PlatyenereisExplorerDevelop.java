@@ -1,7 +1,6 @@
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.modelview.combined.ImageAndTableModels;
 import de.embl.cba.tables.modelview.images.PlatynereisImageSourcesModel;
-import de.embl.cba.tables.modelview.images.PlatynereisImageSourcesModelCreator;
+import de.embl.cba.tables.modelview.images.PlatynereisImageSourcesModelFactory;
 import de.embl.cba.tables.modelview.segments.DefaultAnnotatedImageSegment;
 import de.embl.cba.tables.modelview.segments.DefaultImageSegmentBuilder;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
@@ -46,7 +45,7 @@ public class PlatyenereisExplorerDevelop
 
 
 		final PlatynereisImageSourcesModel imageSourcesModel
-				= new PlatynereisImageSourcesModelCreator( directory ).getModel();
+				= new PlatynereisImageSourcesModelFactory( directory ).getModel();
 
 		final ArrayList< String > categoricalColumns = new ArrayList<>();
 		categoricalColumns.add( "label_id" );

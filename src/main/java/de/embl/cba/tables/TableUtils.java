@@ -1,6 +1,6 @@
 package de.embl.cba.tables;
 
-import de.embl.cba.tables.models.ColumnClassAwareTableModel;
+import de.embl.cba.tables.tablemodels.ColumnClassAwareTableModel;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
 import de.embl.cba.tables.modelview.segments.*;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
@@ -219,14 +219,6 @@ public class TableUtils
 
 		ArrayList< String > columns = getColumnNames( rowsInTable, delim );
 
-//		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
-//		{
-//			final String columnName = columns.sources( columnIndex );
-//
-//			//setColumnIndex( coordinateColumnMap, columnIndex, columnName );
-//		}
-
-
 		for ( int row = 1; row < rowsInTable.size(); ++row )
 		{
 			final LinkedHashMap< String, Object > columnValueMap = new LinkedHashMap<>();
@@ -245,7 +237,6 @@ public class TableUtils
 							coordinateColumnMap,
 							columnValueMap,
 							segmentBuilder );
-
 
 			final TableRow tableRow = new DefaultTableRow( columnValueMap, row - 1  );
 

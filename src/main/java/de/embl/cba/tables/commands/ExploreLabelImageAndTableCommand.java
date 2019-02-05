@@ -29,7 +29,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 
-@Plugin(type = Command.class, menuPath = "Plugins>Measurement>Browse Table And Image" )
+@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Label Image And Table" )
 public class ExploreLabelImageAndTableCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {

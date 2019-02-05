@@ -50,7 +50,7 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 	public static final String NEW_PROSPR = "-new";
 	public static final String AVG_PROSPR = "-avg";
 
-	public static final String CELLULAR_MODELS = "cellular-models";
+	public static final String CELLULAR_MODELS = "cellular-tablemodels";
 	public static final CharSequence MEDS = "-MEDs" ;
 	public static final CharSequence SPMS = "-SPMs";
 	public static final String OLD = "-OLD";
