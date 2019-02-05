@@ -12,12 +12,12 @@ public class FolderAndFileColumn
 	}
 
 
-	public String getFileColumn()
+	public String fileColumn()
 	{
 		return fileColumn;
 	}
 
-	public String getFolderColumn()
+	public String folderColumn()
 	{
 		return folderColumn;
 	}

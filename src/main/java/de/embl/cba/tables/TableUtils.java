@@ -202,13 +202,12 @@ public class TableUtils
 	}
 
 
-	// TODO: replace by more performant version
+	// TODO: replace by more performant column based version (see below)
 	public static ArrayList< AnnotatedImageSegment > segmentsFromTableFile(
 			final File file,
 			String delim,
 			final Map< ImageSegmentCoordinate, String > coordinateColumnMap,
-			final DefaultImageSegmentBuilder segmentBuilder
-	)
+			final DefaultImageSegmentBuilder segmentBuilder )
 	{
 
 		final ArrayList< AnnotatedImageSegment > segments = new ArrayList<>();
@@ -305,6 +304,42 @@ public class TableUtils
 
 		return segments;
 
+	}
+
+	public static LinkedHashMap< String, ArrayList< Object > > columnsFromTableFile(
+			final File file,
+			String delim )
+	{
+
+		final ArrayList< DefaultAnnotatedImageSegment > segments = new ArrayList<>();
+
+		final ArrayList< String > rowsInTable = readRows( file );
+
+		delim = autoDelim( delim, rowsInTable );
+
+		ArrayList< String > columns = getColumnNames( rowsInTable, delim );
+
+		final LinkedHashMap< String, ArrayList< Object > > columnToValues
+				= new LinkedHashMap<>();
+
+		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
+		{
+			final String columnName = columns.get( columnIndex );
+			columnToValues.put( columnName, new ArrayList<>(  ) );
+		}
+
+		for ( int row = 1; row < rowsInTable.size(); ++row )
+		{
+			StringTokenizer st = new StringTokenizer( rowsInTable.get( row ), delim );
+
+			for ( String column : columns )
+			{
+				final String string = st.nextToken();
+				columnToValues.get( column ).add( string );
+			}
+		}
+
+		return columnToValues;
 	}
 
 	public static void addColumn(
@@ -543,6 +578,13 @@ public class TableUtils
 		return tablePath.relativize( imagePath );
 	}
 
+	public static Path getRelativeImagePath( String tableFile, String imageFile )
+	{
+		final Path imagePath = Paths.get( imageFile );
+		final Path tablePath = Paths.get( tableFile );
+
+		return tablePath.relativize( imagePath );
+	}
 
 	public static double asDouble( Object featureValue )
 	{

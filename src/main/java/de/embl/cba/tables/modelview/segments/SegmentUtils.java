@@ -91,6 +91,7 @@ public class SegmentUtils
 					break;
 				case ImageId:
 					segmentBuilder.setImageId( tableRowMap.get( colName ).toString() );
+
 					break;
 
 			}

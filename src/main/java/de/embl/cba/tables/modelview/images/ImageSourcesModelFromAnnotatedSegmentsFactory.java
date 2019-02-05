@@ -12,36 +12,27 @@ import java.util.Set;
 
 public class ImageSourcesModelFromAnnotatedSegmentsFactory< T extends AnnotatedImageSegment >
 {
-	public static final String IMAGE_SET_INDEX_COLUMN = "ImageNumber";
+	// TODO: REMOVE
 	public static final String FOLDER = "PathName_";
 	public static final String FILE = "FileName_";
 	public static final String OBJECTS = "Objects_";
 
 	private final ArrayList< T > annotatedImageSegments;
-	private final String imageRootPathInTable;
-	private final String imageRootPathOnThisComputer;
-
 	private Set< String > columns;
 	private FileImageSourcesModel imageSourcesModel;
-	private final HashMap< String, FolderAndFileColumn > imageNameToPathColumns;
+	private final HashMap< String, FolderAndFileColumn > imageNameToFolderAndFileColumns;
 	private final int numSpatialDimensions;
 
 	public ImageSourcesModelFromAnnotatedSegmentsFactory(
 			ArrayList< T > annotatedImageSegments,
-			String imageRootPathInTable,
-			String imageRootPathOnThisComputer,
 			int numSpatialDimensions )
 	{
 		this.annotatedImageSegments = annotatedImageSegments;
-
-		this.imageRootPathInTable = imageRootPathInTable;
-		this.imageRootPathOnThisComputer = imageRootPathOnThisComputer;
-
 		this.numSpatialDimensions = numSpatialDimensions;
 
 		columns = annotatedImageSegments.get( 0 ).cells().keySet();
 
-		imageNameToPathColumns = identifyImagePathColumns();
+		imageNameToFolderAndFileColumns = identifyImagePathColumns();
 
 		imageSourcesModel = createImageSourcesModel();
 	}
@@ -59,7 +50,7 @@ public class ImageSourcesModelFromAnnotatedSegmentsFactory< T extends AnnotatedI
 		{
 			ArrayList< String > imageSetIds = getImageSetIds( annotatedImageSegment );
 
-			for ( String imageName : imageNameToPathColumns.keySet() )
+			for ( String imageName : imageNameToFolderAndFileColumns.keySet() )
 			{
 				String imagePath = getImagePath( imageName, annotatedImageSegment );
 				String imageId = annotatedImageSegment.imageId();
@@ -83,7 +74,7 @@ public class ImageSourcesModelFromAnnotatedSegmentsFactory< T extends AnnotatedI
 	private ArrayList< String > getImageSetIds( TableRow tableRow )
 	{
 		ArrayList< String > imageSetIds = new ArrayList<>(  );
-		for ( String imageName : imageNameToPathColumns.keySet() )
+		for ( String imageName : imageNameToFolderAndFileColumns.keySet() )
 		{
 			String imageId = getImagePath( imageName, tableRow );
 			imageSetIds.add( imageId );
@@ -108,8 +99,8 @@ public class ImageSourcesModelFromAnnotatedSegmentsFactory< T extends AnnotatedI
 
 	private String getImagePath( String imageName, TableRow tableRow )
 	{
-		final String folderColumn = imageNameToPathColumns.get( imageName ).getFolderColumn();
-		final String fileColumn = imageNameToPathColumns.get( imageName ).getFileColumn();
+		final String folderColumn = imageNameToFolderAndFileColumns.get( imageName ).folderColumn();
+		final String fileColumn = imageNameToFolderAndFileColumns.get( imageName ).fileColumn();
 		final String folderName = ( String ) tableRow.cells().get( folderColumn );
 		final String fileName = ( String ) tableRow.cells().get( fileColumn );
 
@@ -123,8 +114,6 @@ public class ImageSourcesModelFromAnnotatedSegmentsFactory< T extends AnnotatedI
 			Metadata.Flavour imageFlavour,
 			ArrayList< String > imageSetIds )
 	{
-		imagePath = getMappedPath( imagePath );
-
 		imageSourcesModel.addSource(
 				imageId,
 				new File( imagePath ),
@@ -133,14 +122,7 @@ public class ImageSourcesModelFromAnnotatedSegmentsFactory< T extends AnnotatedI
 				numSpatialDimensions );
 	}
 
-	private String getMappedPath( String imagePath )
-	{
-		if ( imageRootPathInTable != null )
-		{
-			imagePath = imagePath.replace( imageRootPathInTable, imageRootPathOnThisComputer );
-		}
-		return imagePath;
-	}
+
 
 	public HashMap< String, FolderAndFileColumn > identifyImagePathColumns( )
 	{

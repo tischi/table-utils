@@ -19,7 +19,7 @@ public class CellProfilerOutputExplorer
 
 	public static void main( String[] args ) throws IOException
 	{
-		//final File file = new File( TestTableLoading.class.getResource( "cellprofiler-table.txt" ).getFileColumn() );
+		//final File file = new File( TestTableLoading.class.getResource( "cellprofiler-table.txt" ).fileColumn() );
 
 //		final File file = new File("/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt");
 

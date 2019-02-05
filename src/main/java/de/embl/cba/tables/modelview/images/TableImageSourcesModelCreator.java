@@ -107,8 +107,8 @@ public class TableImageSourcesModelCreator
 
 	private String getImagePath( String imageName, int row )
 	{
-		final String folderColumn = imageNameToPathColumns.get( imageName ).getFolderColumn();
-		final String fileColumn = imageNameToPathColumns.get( imageName ).getFileColumn();
+		final String folderColumn = imageNameToPathColumns.get( imageName ).folderColumn();
+		final String fileColumn = imageNameToPathColumns.get( imageName ).fileColumn();
 
 		final String folderName = ( String ) table.getValueAt(
 				row,

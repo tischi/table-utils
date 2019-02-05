@@ -44,8 +44,8 @@ public class CellProfilerTableParser
 
 				for ( String image : images.keySet() )
 				{
-					final String folderColumn = images.get( image ).getFolderColumn();
-					final String fileColumn = images.get( image ).getFileColumn();
+					final String folderColumn = images.get( image ).folderColumn();
+					final String fileColumn = images.get( image ).fileColumn();
 
 					final String folderName = ( String ) table.getValueAt(
 							row,
