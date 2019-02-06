@@ -31,33 +31,21 @@ import static de.embl.cba.tables.modelview.images.Metadata.*;
 public class PlatynereisImageSourcesModel implements ImageSourcesModel
 {
 
-	public static final String DEFAULT_EM_RAW_FILE_ID = "em-raw-full-res"; //"em-raw-100nm"; //"em-raw-10nm-10nm-25nm"; //"em-raw-100nm"; //
+	public static final String DEFAULT_EM_RAW_FILE_ID = "em-raw-full-res";
 	public static final String DEFAULT_LABELS_FILE_ID = "em-segmented-cells-labels" ;
 	public static final String LABELS_FILE_ID = "-labels" ;
 
 	public static final String BDV_XML_SUFFIX = ".xml";
-	public static final String IMARIS_SUFFIX = ".ims";
-	public static final double PROSPR_SCALING_IN_MICROMETER = 0.5;
-	public static final String EM_RAW_FILE_ID = "em-raw-"; //"em-raw-100nm"; //"em-raw-10nm-10nm-25nm"; //"em-raw-100nm"; //
-	public static final String EM_SEGMENTED_FILE_ID = "em-segmented";
+	public static final String EM_RAW_FILE_ID = "em-raw-";
 	public static final String EM_FILE_ID = "em-";
-	public static final String SELECTION_UI = "Data sources";
-	public static final String POSITION_UI = "Move to position";
-	public static final Color DEFAULT_GENE_COLOR = new Color( 255, 0, 255, 255 );
-	public static final Color DEFAULT_EM_RAW_COLOR = new Color( 255, 255, 255, 255 );
-	public static final Color DEFAULT_EM_SEGMENTATION_COLOR = new Color( 255, 0, 0, 255 );
-	public static final double ZOOM_REGION_SIZE = 50.0;
 	public static final String NEW_PROSPR = "-new";
 	public static final String AVG_PROSPR = "-avg";
 
-	public static final String CELLULAR_MODELS = "cellular-tablemodels";
-	public static final CharSequence MEDS = "-MEDs" ;
-	public static final CharSequence SPMS = "-SPMs";
+	public static final String MEDS = "-MEDs" ;
+	public static final String SPMS = "-SPMs";
 	public static final String OLD = "-OLD";
 
-
 	private final Map< String, SourceAndMetadata > nameToSourceAndMetadata;
-
 
 	public PlatynereisImageSourcesModel( )
 	{
@@ -75,6 +63,9 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 	{
 		final Metadata metadata = new Metadata();
 
+		metadata.getMap().put( DISPLAY_RANGE_MIN, 0 );
+		metadata.getMap().put( DISPLAY_RANGE_MAX, 1000 );
+
 		if ( file.toString().contains( LABELS_FILE_ID ) )
 		{
 			metadata.getMap().put( FLAVOUR, Flavour.LabelSource );
@@ -82,6 +73,22 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 		else
 		{
 			metadata.getMap().put( FLAVOUR, Flavour.IntensitySource );
+		}
+
+		if ( file.toString().contains( DEFAULT_EM_RAW_FILE_ID ) )
+		{
+			metadata.getMap().put( SHOW_INITIALLY, true );
+		}
+
+		if ( file.toString().contains( DEFAULT_LABELS_FILE_ID ) )
+		{
+			metadata.getMap().put( SHOW_INITIALLY, true );
+		}
+
+		if ( file.toString().contains( EM_RAW_FILE_ID ) )
+		{
+			metadata.getMap().put( DISPLAY_RANGE_MIN, 0 );
+			metadata.getMap().put( DISPLAY_RANGE_MAX, 255 );
 		}
 
 		metadata.getMap().put( NUM_SPATIAL_DIMENSIONS, 3 );
@@ -220,15 +227,4 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( lazySpimSource, metadata ) );
 	}
 
-
-	public static < T extends NumericType< T > >
-	RandomAccessibleIntervalSource< T > imagePlus2DAsSource3D( String name, ImagePlus imagePlus )
-	{
-		RandomAccessibleInterval< RealType > wrap = ImageJFunctions.wrapReal( imagePlus );
-
-		// needs to be at least 3D
-		wrap = Views.addDimension( wrap, 0, 0);
-
-		return new RandomAccessibleIntervalSource( wrap, Util.getTypeFromInterval( wrap ), name );
-	}
 }

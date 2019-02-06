@@ -1,4 +1,4 @@
-package de.embl.cba.tables.modelview.views;
+package de.embl.cba.tables.modelview.coloring;
 
 import bdv.viewer.TimePointListener;
 import de.embl.cba.tables.modelview.coloring.ColoringModel;

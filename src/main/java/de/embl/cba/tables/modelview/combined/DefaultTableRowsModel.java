@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 public class DefaultTableRowsModel< T extends TableRow > implements TableRowsModel< T >
 {
+	// TODO: add columnTypes here?
+
 	private final ArrayList< T > tableRows;
 
 	public DefaultTableRowsModel( ArrayList< T > tableRows )

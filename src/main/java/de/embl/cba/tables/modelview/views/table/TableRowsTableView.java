@@ -30,7 +30,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 //	public static final String NO_COLUMN_SELECTED = "No column selected";
 
 	private final SelectionModel< T > selectionModel;
-	private final ArrayList< String > categoricalColumns;
 	private final TableRowsModel< T > tableRowsModel;
 	private final SelectionColoringModel< T > selectionColoringModel;
 
@@ -49,14 +48,12 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	public TableRowsTableView(
 			final TableRowsModel< T > tableRowsModel,
 			final SelectionModel< T > selectionModel,
-			final SelectionColoringModel< T > selectionColoringModel,
-			ArrayList< String > categoricalColumns )
+			final SelectionColoringModel< T > selectionColoringModel )
 	{
 		super( new GridLayout(1, 0 ) );
 		this.tableRowsModel = tableRowsModel;
 		this.selectionColoringModel = selectionColoringModel;
 		this.selectionModel = selectionModel;
-		this.categoricalColumns = categoricalColumns;
 
 		selectedRowsInView = new ArrayList<>(  );
 

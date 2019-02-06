@@ -16,7 +16,7 @@ public class PlatynereisImageSourcesModelFactory
 {
 	private final PlatynereisImageSourcesModel sourcesModel;
 
-	public PlatynereisImageSourcesModelFactory( File directory ) throws IOException
+	public PlatynereisImageSourcesModelFactory( File directory )
 	{
 		ArrayList< File > imageFiles = getImageFiles( directory, ".*.xml" );
 

@@ -4,7 +4,6 @@ import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
 import de.embl.cba.tables.modelview.segments.TableRow;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,16 +21,16 @@ public class ImageSourcesModelFactory< T extends TableRowImageSegment >
 	private final int numSpatialDimensions;
 
 	private FileImageSourcesModel imageSourcesModel;
-	private String tableFolder;
+	private String tablePath;
 
 	public ImageSourcesModelFactory(
 			ArrayList< T > tableRowImageSegments,
-			String tableFolder,
+			String tablePath,
 			int numSpatialDimensions )
 	{
 		this.tableRowImageSegments = tableRowImageSegments;
 		this.numSpatialDimensions = numSpatialDimensions;
-		this.tableFolder = tableFolder;
+		this.tablePath = tablePath;
 
 		columns = tableRowImageSegments.get( 0 ).cells().keySet();
 
@@ -65,7 +64,7 @@ public class ImageSourcesModelFactory< T extends TableRowImageSegment >
 				{
 					final Metadata.Flavour imageFlavour = getImageFlavour( imageName );
 
-					final Path absoluteImagePath = TableUtils.getAbsolutePath( tableFolder, imagePath );
+					final Path absoluteImagePath = TableUtils.getAbsolutePath( tablePath, imagePath );
 
 					final String imageDisplayName = absoluteImagePath.getFileName().toString();
 

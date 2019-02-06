@@ -1,20 +1,12 @@
 package de.embl.cba.tables.commands;
 
-import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.cellprofiler.FolderAndFileColumn;
-import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
-import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
-import de.embl.cba.tables.modelview.combined.DefaultImageSegmentsModel;
-import de.embl.cba.tables.modelview.combined.DefaultTableRowsModel;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModelFactory;
 import de.embl.cba.tables.modelview.images.TableImageSourcesModelFactory;
 import de.embl.cba.tables.modelview.segments.*;
-import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
-import de.embl.cba.tables.modelview.selection.SelectionModel;
-import de.embl.cba.tables.modelview.views.bdv.ImageSegmentsBdvView;
-import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
+import de.embl.cba.tables.modelview.views.DefaultBdvAndTableView;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
@@ -42,12 +34,6 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 	@Parameter ( label = "CellProfiler Table" )
 	public File inputTableFile;
 
-	@Parameter ( label = "LabelId Image File Name Column" )
-	public String labelImageFileNameColumn = "FileName_Objects_Nuclei_Labels";
-
-	@Parameter ( label = "LabelId Image Folder Name Column" )
-	public String labelImagePathNameColumn = "PathName_Objects_Nuclei_Labels";
-
 	@Parameter ( label = "Apply Path Mapping" )
 	public boolean isPathMapping = false;
 
@@ -63,68 +49,18 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 	@Override
 	public void run()
 	{
-
 		final ArrayList< ColumnBasedTableRowImageSegment > tableRowImageSegments
 				= createAnnotatedImageSegments( inputTableFile );
+
+		final String tablePath = inputTableFile.toString();
 
 		final FileImageSourcesModel imageSourcesModel =
 				new ImageSourcesModelFactory(
 						tableRowImageSegments,
-						inputTableFile.toString(),
+						tablePath,
 						2 ).getImageSourcesModel();
 
-		final ArrayList< String > categoricalColumns = new ArrayList<>();
-		categoricalColumns.add( "Label" );
-
-		final SelectionModel< ColumnBasedTableRowImageSegment > selectionModel
-				= new DefaultSelectionModel<>();
-
-		final DynamicCategoryColoringModel< ColumnBasedTableRowImageSegment > coloringModel
-				= new DynamicCategoryColoringModel<>( new GlasbeyARGBLut(), 50 );
-
-		final SelectionColoringModel< ColumnBasedTableRowImageSegment > selectionColoringModel
-				= new SelectionColoringModel<>(
-					coloringModel,
-					selectionModel );
-
-		final DefaultImageSegmentsModel< ColumnBasedTableRowImageSegment > imageSegmentsModel
-				= new DefaultImageSegmentsModel<>( tableRowImageSegments );
-
-		final DefaultTableRowsModel< ColumnBasedTableRowImageSegment > tableRowsModel
-				= new DefaultTableRowsModel<>( tableRowImageSegments );
-
-		final ImageSegmentsBdvView imageSegmentsBdvView =
-				new ImageSegmentsBdvView(
-						imageSourcesModel,
-						imageSegmentsModel,
-						selectionModel,
-						selectionColoringModel );
-
-		final TableRowsTableView tableView = new TableRowsTableView(
-				tableRowsModel,
-				selectionModel,
-				selectionColoringModel,
-				categoricalColumns );
-
-	}
-
-	public FileImageSourcesModel createCellProfilerImageSourcesModel()
-	{
-		if ( !isPathMapping )
-		{
-			imageRootPathInTable = "";
-			imageRootPathOnThisComputer = "";
-		}
-
-		final TableImageSourcesModelFactory modelCreator =
-				new TableImageSourcesModelFactory(
-					inputTableFile,
-					imageRootPathInTable,
-					imageRootPathOnThisComputer,
-					"\t",
-						2 );
-
-		return modelCreator.getImageSourcesModel();
+		DefaultBdvAndTableView.show( tableRowImageSegments, imageSourcesModel );
 	}
 
 	private ArrayList< ColumnBasedTableRowImageSegment > createAnnotatedImageSegments( File tableFile )
@@ -232,7 +168,6 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 		return pathColumn;
 	}
 
-
 	private String getMappedPath( String imagePath )
 	{
 		imagePath = imagePath.replace( imageRootPathInTable, imageRootPathOnThisComputer );
@@ -257,14 +192,17 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 
 	private String getMatchingFileColumn( String image, Set< String > columns )
 	{
+		String matchingFileColumn = null;
+
 		for ( String column : columns )
 		{
 			if ( column.contains( CELLPROFILER_FILE_COLUMN_PREFIX ) && column.contains( image ) )
 			{
-				return column;
+				matchingFileColumn = column;
+				break;
 			}
 		}
 
-		return null;
+		return matchingFileColumn;
 	}
 }

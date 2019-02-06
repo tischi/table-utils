@@ -1,144 +1,97 @@
 package de.embl.cba.tables.commands;
 
-import bdv.util.Bdv;
-import bdv.util.BdvFunctions;
-import bdv.util.BdvOptions;
-import bdv.util.RandomAccessibleIntervalSource4D;
-import bdv.viewer.Source;
-import de.embl.cba.bdv.utils.selection.BdvSelectionEventHandler;
-import de.embl.cba.bdv.utils.sources.SelectableARGBConvertedRealSource;
-import de.embl.cba.bdv.utils.wrap.Wraps;
-import de.embl.cba.tables.Logger;
-import de.embl.cba.tables.TableBdvConnector;
 import de.embl.cba.tables.TableUtils;
-import de.embl.cba.tables.objects.ObjectTablePanel;
-import ij.IJ;
-import ij.ImagePlus;
-import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.img.display.imagej.ImageJFunctions;
+import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
+import de.embl.cba.tables.modelview.images.ImageSourcesModelFactory;
+import de.embl.cba.tables.modelview.segments.ColumnBasedTableRowImageSegment;
+import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
+import de.embl.cba.tables.modelview.segments.SegmentUtils;
+import de.embl.cba.tables.modelview.views.DefaultBdvAndTableView;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
-import net.imglib2.util.Util;
-import net.imglib2.view.Views;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 
 @Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Label Image and Segments Table" )
 public class ExploreLabelImageAndSegmentsTableCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {
-	@Parameter ( label = "Results table" )
-	public File inputTableFile;
+	@Parameter ( label = "Label mask image (single channel, 2D+t or 3D+t)" )
+	public File labelMasksFile;
 
-	@Parameter ( label = "LabelId mask (single channel, 2D+t or 3D+t)" )
-	public File inputLabelMasksFile;
+	@Parameter ( label = "Segments table" )
+	public File tableFile;
 
-	@Parameter ( label = "Intensities (optional)", required = false )
-	public File inputIntensitiesFile;
+	@Parameter ( label = "Intensities image (optional)", required = false )
+	public File intensitiesFile;
+
+
+	private LinkedHashMap< String, ArrayList< Object > > columns;
 
 	@Override
 	public void run()
 	{
-		final JTable table = loadTable( inputTableFile );
+		final ArrayList< ColumnBasedTableRowImageSegment > tableRowImageSegments
+				= createAnnotatedImageSegments( tableFile );
 
-		final SelectableARGBConvertedRealSource labelsSource = loadLabels();
+		final String tablePath = tableFile.toString();
 
-		final Bdv bdv = showImagesWithBdv( labelsSource );
+		final FileImageSourcesModel imageSourcesModel =
+				new ImageSourcesModelFactory(
+						tableRowImageSegments,
+						tablePath,
+						2 ).getImageSourcesModel();
 
-		ObjectTablePanel objectTablePanel = createAndShowTablePanel( table );
-
-		TableBdvConnector tableBdvConnector = new TableBdvConnector(
-				objectTablePanel,
-				new BdvSelectionEventHandler( bdv, labelsSource )
-		);
-
-		tableBdvConnector.setSelectionByAttribute( true );
-
-//		new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
+		DefaultBdvAndTableView.show( tableRowImageSegments, imageSourcesModel );
 	}
 
-	public ObjectTablePanel createAndShowTablePanel( JTable table )
+	private ArrayList<ColumnBasedTableRowImageSegment> createAnnotatedImageSegments(
+			File inputTableFile )
 	{
-		ObjectTablePanel objectTablePanel = new ObjectTablePanel( table, inputTableFile.getName() );
-		objectTablePanel.showTable();
-		return objectTablePanel;
+		columns = TableUtils.columnsFromTableFile( tableFile, null );
+
+		final HashMap< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn
+				= getImageSegmentCoordinateToColumn( pathColumnNames );
+
+		final ArrayList< ColumnBasedTableRowImageSegment > segments
+				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, imageSegmentCoordinateToColumn );
+
+		return segments;
 	}
 
-	public Bdv showImagesWithBdv( SelectableARGBConvertedRealSource labelsSource )
+	private HashMap< ImageSegmentCoordinate, ArrayList< Object > > getImageSegmentCoordinateToColumn( ArrayList< String > pathColumnNames )
 	{
-		int nT = getNumTimePoints( labelsSource );
+		final HashMap< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn
+				= new HashMap<>();
 
-		final long nZ = labelsSource.getSource( 0, 0 ).dimension( 2 );
+		String labelImagePathColumnName = getLabelImagePathColumnName( pathColumnNames );
 
-		BdvOptions bdvOptions = BdvOptions.options();
+		imageSegmentCoordinateToColumn.put(
+				ImageSegmentCoordinate.ImageId,
+				columns.get( labelImagePathColumnName ));
 
-		if ( nZ == 1 ) bdvOptions = bdvOptions.is2D();
+		// TODO: UI?
+//		imageSegmentCoordinateToColumn.put(
+//				ImageSegmentCoordinate.LabelId,
+//				columns.get( COLUMN_NAME_OBJECT_LABEL ) );
+//
+//		imageSegmentCoordinateToColumn.put(
+//				ImageSegmentCoordinate.X,
+//				columns.get( COLUMN_NAME_OBJECT_LOCATION_CENTER_X ) );
+//
+//		imageSegmentCoordinateToColumn.put(
+//				ImageSegmentCoordinate.Y,
+//				columns.get( COLUMN_NAME_OBJECT_LOCATION_CENTER_Y ) );
 
-		return BdvFunctions.show(
-					labelsSource,
-					nT,
-					bdvOptions ).getBdvHandle();
+		return imageSegmentCoordinateToColumn;
 	}
 
-	public static int getNumTimePoints( Source labelsSource )
-	{
-		int nT = 0;
-		while ( labelsSource.isPresent( nT  ) ) nT++;
-		return nT;
-	}
-
-
-	public SelectableARGBConvertedRealSource loadLabels()
-	{
-		final ArrayList< RandomAccessibleIntervalSource4D< R > > sources =
-				Wraps.imagePlusAsSource4DChannelList( IJ.openImage( inputLabelMasksFile.toString() ) );
-
-		if ( sources.size() > 1 )
-		{
-			Logger.error( "LabelId input image must be single channel!" );
-			return null;
-		}
-
-		return new SelectableARGBConvertedRealSource( sources.get( 0 ) );
-	}
-
-	public JTable loadTable( File file )
-	{
-		return TableUtils.loadTable( file, null );
-	}
-
-	public static RandomAccessibleIntervalSource4D loadImage( File file )
-	{
-		final ImagePlus imagePlus = IJ.openImage( file.toString() );
-
-		if ( imagePlus.getNChannels() > 1 )
-		{
-			Logger.error( "Only single channel images are supported.");
-			return null;
-		}
-
-		RandomAccessibleInterval< RealType > wrap = ImageJFunctions.wrapReal( imagePlus );
-
-		if ( imagePlus.getNFrames() == 1 )
-		{
-			// needs to be a movie
-			wrap = Views.addDimension( wrap, 0, 0 );
-		}
-
-		if ( imagePlus.getNSlices() == 1 )
-		{
-			// needs to be 3D
-			wrap = Views.addDimension( wrap, 0, 0 );
-			wrap = Views.permute( wrap, 2, 3 );
-		}
-
-		return new RandomAccessibleIntervalSource4D( wrap, Util.getTypeFromInterval( wrap ), imagePlus.getTitle() );
-	}
 
 }

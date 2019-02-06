@@ -15,15 +15,15 @@ public class RunTableBdvConnectionCommand
 
 		final HashMap< String, Object > parameters = new HashMap<>();
 
-		parameters.put( "inputTableFile",
+		parameters.put( "tableFile",
 				new File( RunTableBdvConnectionCommand.class.getResource(
 						"2d-16bit-labelMask-Morphometry.csv" ).getFile() ) );
 
-		parameters.put( "inputLabelMasksFile",
+		parameters.put( "labelMasksFile",
 				new File( RunTableBdvConnectionCommand.class.getResource(
 						"2d-16bit-labelMask.tif" ).getFile() ) );
 
-		parameters.put( "inputIntensitiesFile", null );
+		parameters.put( "intensitiesFile", null );
 
 		ij.command().run( TableBdvConnectionCommand.class, true, parameters );
 	}

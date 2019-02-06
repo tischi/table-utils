@@ -587,9 +587,9 @@ public class TableUtils
 		return tablePath.relativize( imagePath );
 	}
 
-	public static Path getAbsolutePath( String folder, String relativePath )
+	public static Path getAbsolutePath( String referenceFile, String relativePath )
 	{
-		final Path path = Paths.get( folder, relativePath );
+		final Path path = Paths.get( referenceFile, relativePath );
 		final Path normalize = path.normalize();
 		return normalize;
 	}

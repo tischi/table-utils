@@ -14,15 +14,15 @@ public class RunTableBdvConnectionCommand2DTime
 
 		final HashMap< String, Object > parameters = new HashMap<>();
 
-		parameters.put( "inputTableFile",
+		parameters.put( "tableFile",
 				new File( RunTableBdvConnectionCommand.class.getResource(
 						"2d+t-8bit-labelMasks-table.txt" ).getFile() ) );
 
-		parameters.put( "inputLabelMasksFile",
+		parameters.put( "labelMasksFile",
 				new File( RunTableBdvConnectionCommand.class.getResource(
 						"2d+t-8bit-labelMasks.zip" ).getFile() ) );
 
-		parameters.put( "inputIntensitiesFile", null );
+		parameters.put( "intensitiesFile", null );
 
 		ij.command().run( TableBdvConnectionCommand.class, true, parameters );
 	}

@@ -23,7 +23,7 @@ import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentId;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
-import de.embl.cba.tables.modelview.views.ImageSegmentLabelsARGBConverter;
+import de.embl.cba.tables.modelview.coloring.ImageSegmentLabelsARGBConverter;
 import net.imglib2.realtransform.AffineTransform3D;
 import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
@@ -70,7 +70,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		initBdvOptions( );
 
-		showSource( this.imageSourcesModel.sources().values().iterator().next() );
+		showInitialSources( );
 
 		//new BdvGrayValuesOverlay( bdv, 20 ); // TODO: makes problems when removing sources
 
@@ -79,6 +79,31 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		registerAsColoringListener( selectionColoringModel );
 
 		installBdvBehaviours();
+	}
+
+	public ImageSourcesModel getImageSourcesModel()
+	{
+		return imageSourcesModel;
+	}
+
+	private void showInitialSources()
+	{
+		boolean isShownAtLeastOne = false;
+
+		for ( SourceAndMetadata sourceAndMetadata : imageSourcesModel.sources().values() )
+		{
+			if ( sourceAndMetadata.metadata().getMap().get( Metadata.SHOW_INITIALLY ) )
+			{
+				showSource( sourceAndMetadata );
+				isShownAtLeastOne = true;
+			}
+		}
+
+		if ( ! isShownAtLeastOne )
+		{
+			imageSourcesModel.sources().values().iterator().next();
+		}
+
 	}
 
 	public BdvHandle getBdv()
@@ -270,14 +295,26 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		final BdvStackSource stackSource = BdvFunctions.show( source, bdvOptions );
 
-		if ( displayRangeMin != null && displayRangeMax != null )
-		{
-			stackSource.setDisplayRange( displayRangeMin, displayRangeMax );
-		}
+		setDisplayRange( stackSource, displayRangeMin, displayRangeMax, metadata );
 
 		bdv = stackSource.getBdvHandle();
 
 		bdvOptions = bdvOptions.addTo( bdv );
+	}
+
+	private void setDisplayRange( BdvStackSource stackSource, Double displayRangeMin, Double displayRangeMax, Map< String, Object > metadata )
+	{
+		if ( displayRangeMin != null && displayRangeMax != null )
+		{
+			stackSource.setDisplayRange( displayRangeMin, displayRangeMax );
+		}
+		else if ( metadata.containsKey( Metadata.DISPLAY_RANGE_MIN )
+				&& metadata.containsKey( Metadata.DISPLAY_RANGE_MAX )  )
+		{
+			stackSource.setDisplayRange(
+					metadata.get( Metadata.DISPLAY_RANGE_MIN ),
+					metadata.get( Metadata.DISPLAY_RANGE_MAX )
+		}
 	}
 
 
