@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class TableImageSourcesModelCreator
+public class TableImageSourcesModelFactory
 {
 	public static final String IMAGE_SET_INDEX_COLUMN = "ImageNumber";
 	public static final String FOLDER = "PathName_";
@@ -27,7 +27,7 @@ public class TableImageSourcesModelCreator
 	private final JTable table;
 	private final int numSpatialDimensions;
 
-	public TableImageSourcesModelCreator(
+	public TableImageSourcesModelFactory(
 			File tableFile,
 			String imageRootPathInTable,
 			String imageRootPathOnThisComputer,
@@ -132,6 +132,7 @@ public class TableImageSourcesModelCreator
 
 		imageSourcesModel.addSource(
 				imageId,
+				imageId,
 				new File( imagePath ),
 				imageSetIds,
 				imageFlavour,
@@ -147,7 +148,7 @@ public class TableImageSourcesModelCreator
 		return imagePath;
 	}
 
-	public HashMap< String, FolderAndFileColumn > identifyImagePathColumns( )
+	private HashMap< String, FolderAndFileColumn > identifyImagePathColumns( )
 	{
 		final HashMap< String, FolderAndFileColumn > images = new HashMap<>();
 		for ( String column : columns )

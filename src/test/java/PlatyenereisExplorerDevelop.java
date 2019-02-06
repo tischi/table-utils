@@ -1,7 +1,7 @@
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.images.PlatynereisImageSourcesModel;
 import de.embl.cba.tables.modelview.images.PlatynereisImageSourcesModelFactory;
-import de.embl.cba.tables.modelview.segments.DefaultAnnotatedImageSegment;
+import de.embl.cba.tables.modelview.segments.DefaultTableRowImageSegment;
 import de.embl.cba.tables.modelview.segments.DefaultImageSegmentBuilder;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 
@@ -35,7 +35,7 @@ public class PlatyenereisExplorerDevelop
 		final File cellTable =
 				new File( "/Volumes/arendt/EM_6dpf_segmentation/EM-Prospr/label_attributes/em-segmented-cells-labels-morphology-v2.csv" );
 
-		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments
+		final ArrayList< DefaultTableRowImageSegment > annotatedImageSegments
 				= createCellSegments( cellTable );
 
 		/**
@@ -57,10 +57,10 @@ public class PlatyenereisExplorerDevelop
 		// TODO
 	}
 
-	public static ArrayList< DefaultAnnotatedImageSegment > createCellSegments( File tableFile )
+	public static ArrayList< DefaultTableRowImageSegment > createCellSegments( File tableFile )
 	{
 		final HashMap< ImageSegmentCoordinate, String > coordinateToColumnMap = new HashMap<>();
-		coordinateToColumnMap.put( ImageSegmentCoordinate.Label, "label_id" );
+		coordinateToColumnMap.put( ImageSegmentCoordinate.LabelId, "label_id" );
 		coordinateToColumnMap.put( ImageSegmentCoordinate.X, "com_x_microns" );
 		coordinateToColumnMap.put( ImageSegmentCoordinate.Y, "com_y_microns" );
 		coordinateToColumnMap.put( ImageSegmentCoordinate.Z, "com_z_microns" );
@@ -69,7 +69,7 @@ public class PlatyenereisExplorerDevelop
 
 		segmentBuilder.setImageId( "em-segmented-cells-labels" );
 
-		final ArrayList< DefaultAnnotatedImageSegment > annotatedImageSegments
+		final ArrayList< DefaultTableRowImageSegment > annotatedImageSegments
 				= TableUtils.segmentsFromTableFileColumnWise(
 					tableFile,
 					null,

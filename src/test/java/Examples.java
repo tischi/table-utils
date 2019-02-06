@@ -44,6 +44,6 @@ public abstract class Examples
 
 		objectTablePanel.showTable();
 
-		objectTablePanel.setCoordinateColumn( ImageSegmentCoordinate.Label, jTable.getColumnName( 0 ) );
+		objectTablePanel.setCoordinateColumn( ImageSegmentCoordinate.LabelId, jTable.getColumnName( 0 ) );
 	}
 }

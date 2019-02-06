@@ -31,7 +31,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 	{
 
 		final Metadata metadata = new Metadata();
-		metadata.getMap().put( NAME, imageId );
+		metadata.getMap().put( DISPLAY_NAME, imageId );
 		metadata.getMap().put( FLAVOUR, flavor );
 		metadata.getMap().put( NUM_SPATIAL_DIMENSIONS, numSpatialDimensions );
 

@@ -67,7 +67,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 //		segmentCoordinateToColumnMap = emptyObjectCoordinateColumnMap();
 //
 //		segmentCoordinateToColumnMap.put(
-//				ImageSegmentCoordinate.Label,
+//				ImageSegmentCoordinate.LabelId,
 //				tableRowsModel.getLabelFeatureName() );
 
 		categoricalLabelColoringRandomSeed = 50;
@@ -412,7 +412,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 //		objectRowMap = new ConcurrentHashMap();
 //
 //		final int labelColumnIndex =
-//				table.getColumnModel().getColumnIndex( getCoordinateColumn( ImageSegmentCoordinate.Label ) );
+//				table.getColumnModel().getColumnIndex( getCoordinateColumn( ImageSegmentCoordinate.LabelId ) );
 //
 //		int timeColumnIndex = getTimeColumnIndex();
 //

@@ -10,7 +10,6 @@ import bdv.viewer.state.SourceState;
 import bdv.viewer.state.ViewerState;
 import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.objects3d.ConnectedComponentExtractorAnd3DViewer;
-import de.embl.cba.bdv.utils.overlays.BdvGrayValuesOverlay;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringListener;
 import de.embl.cba.tables.modelview.coloring.ColoringModel;
@@ -25,7 +24,6 @@ import de.embl.cba.tables.modelview.segments.ImageSegmentId;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.modelview.views.ImageSegmentLabelsARGBConverter;
-import net.imglib2.RealPoint;
 import net.imglib2.realtransform.AffineTransform3D;
 import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
@@ -146,7 +144,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		final String imageId = imageSegment.imageId();
 
-		if ( currentLabelSource.metadata().getMap().get( NAME ).equals( imageId ) ) return;
+		if ( currentLabelSource.metadata().getMap().get( DISPLAY_NAME ).equals( imageId ) ) return;
 
 		final SourceAndMetadata sourceAndMetadata
 				= imageSourcesModel.sources().get( imageId );
@@ -306,7 +304,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		ImageSegmentLabelsARGBConverter labelSourcesARGBConverter =
 				new ImageSegmentLabelsARGBConverter(
 						imageSegmentsModel,
-						( String )sourceAndMetadata.metadata().getMap().get( Metadata.NAME ),
+						( String )sourceAndMetadata.metadata().getMap().get( Metadata.IMAGE_ID ),
 						selectionColoringModel );
 
 		return new ARGBConvertedRealSource(
@@ -380,9 +378,9 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		if ( labelId == BACKGROUND ) return;
 
-		if ( currentLabelSource.metadata().getMap().containsKey( NAME ) )
+		if ( currentLabelSource.metadata().getMap().containsKey( DISPLAY_NAME ) )
 		{
-			final String imageId = ( String ) currentLabelSource.metadata().getMap().get( NAME );
+			final String imageId = ( String ) currentLabelSource.metadata().getMap().get( DISPLAY_NAME );
 
 			final ImageSegmentId imageSegmentId = new ImageSegmentId( imageId, labelId, getCurrentTimePoint() );
 

@@ -100,7 +100,7 @@ public class TableBdvConnector
 			@Override
 			public void selectionChanged( double label, int timepoint, boolean selected )
 			{
-				if ( ! objectTablePanel.hasCoordinate( ImageSegmentCoordinate.Label ) ) return;
+				if ( ! objectTablePanel.hasCoordinate( ImageSegmentCoordinate.LabelId ) ) return;
 
 				int row = getRow( label, timepoint );
 				selectedRows.add( row );
@@ -120,7 +120,7 @@ public class TableBdvConnector
 			//@Override
 			public void valueUnselected( double objectLabel, int timepoint )
 			{
-				if ( ! objectTablePanel.hasCoordinate( ImageSegmentCoordinate.Label ) ) return;
+				if ( ! objectTablePanel.hasCoordinate( ImageSegmentCoordinate.LabelId ) ) return;
 
 				int row = getRow( objectLabel, timepoint );
 				selectedRows.remove( row );
@@ -177,11 +177,11 @@ public class TableBdvConnector
 			{
 				if( me.isControlDown() )
 				{
-					if ( objectTablePanel.hasCoordinate( ImageSegmentCoordinate.Label ) )
+					if ( objectTablePanel.hasCoordinate( ImageSegmentCoordinate.LabelId ) )
 					{
 						final int selectedRow = table.getSelectedRow();
 
-						final Double objectLabel = objectTablePanel.getObjectCoordinate( ImageSegmentCoordinate.Label, selectedRow );
+						final Double objectLabel = objectTablePanel.getObjectCoordinate( ImageSegmentCoordinate.LabelId, selectedRow );
 
 						Integer timepoint = getTimepoint( selectedRow );
 
@@ -191,7 +191,7 @@ public class TableBdvConnector
 					}
 					else
 					{
-						Logger.error( "Please specify the Object Label getColumn!" );
+						Logger.error( "Please specify the Object LabelId getColumn!" );
 					}
 				}
 			}
@@ -202,9 +202,9 @@ public class TableBdvConnector
 	public Integer getTimepoint( int selectedRow )
 	{
 		Integer timepoint = 0;
-		if ( objectTablePanel.hasCoordinate( ImageSegmentCoordinate.Label.T ) )
+		if ( objectTablePanel.hasCoordinate( ImageSegmentCoordinate.LabelId.T ) )
 		{
-			final Double timepointDouble = (Double) objectTablePanel.getObjectCoordinate( ImageSegmentCoordinate.Label.T, selectedRow );
+			final Double timepointDouble = (Double) objectTablePanel.getObjectCoordinate( ImageSegmentCoordinate.LabelId.T, selectedRow );
 			timepoint = timepointDouble.intValue();
 		}
 		return timepoint;
@@ -254,7 +254,7 @@ public class TableBdvConnector
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
-				if ( ! objectTablePanel.hasCoordinate( ImageSegmentCoordinate.Label ) )
+				if ( ! objectTablePanel.hasCoordinate( ImageSegmentCoordinate.LabelId ) )
 				{
 					Logger.warn( "Please specify the object labelId getColumn:\n" +
 							"[ Objects > Select coordinates... ]" );

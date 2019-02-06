@@ -3,9 +3,9 @@ package de.embl.cba.tables.modelview.segments;
 public enum ImageSegmentCoordinate
 {
 	ImageId,
-	Label,
+	LabelId,
 	X,
 	Y,
 	Z,
-	T;
+	T
 }

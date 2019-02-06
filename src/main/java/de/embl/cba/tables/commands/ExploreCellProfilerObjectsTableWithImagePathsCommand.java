@@ -8,8 +8,8 @@ import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.combined.DefaultImageSegmentsModel;
 import de.embl.cba.tables.modelview.combined.DefaultTableRowsModel;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
-import de.embl.cba.tables.modelview.images.ImageSourcesModelFromAnnotatedSegmentsFactory;
-import de.embl.cba.tables.modelview.images.TableImageSourcesModelCreator;
+import de.embl.cba.tables.modelview.images.ImageSourcesModelFactory;
+import de.embl.cba.tables.modelview.images.TableImageSourcesModelFactory;
 import de.embl.cba.tables.modelview.segments.*;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
@@ -22,7 +22,6 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -30,20 +29,23 @@ import java.util.Set;
 
 
 @Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>CellProfiler Objects Table" )
-public class ExploreCellProfilerObjectsTableCommand< R extends RealType< R > & NativeType< R > >
+public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {
 	public static final String CELLPROFILER_FOLDER_COLUMN_PREFIX = "PathName_";
 	public static final String CELLPROFILER_FILE_COLUMN_PREFIX = "FileName_";
 	public static final String OBJECTS = "Objects_";
+	public static final String COLUMN_NAME_OBJECT_LABEL = "Number_Object_Number";
+	public static final String COLUMN_NAME_OBJECT_LOCATION_CENTER_X = "Location_Center_X";
+	public static final String COLUMN_NAME_OBJECT_LOCATION_CENTER_Y = "Location_Center_Y";
 
 	@Parameter ( label = "CellProfiler Table" )
 	public File inputTableFile;
 
-	@Parameter ( label = "Label Image File Name Column" )
+	@Parameter ( label = "LabelId Image File Name Column" )
 	public String labelImageFileNameColumn = "FileName_Objects_Nuclei_Labels";
 
-	@Parameter ( label = "Label Image Folder Name Column" )
+	@Parameter ( label = "LabelId Image Folder Name Column" )
 	public String labelImagePathNameColumn = "PathName_Objects_Nuclei_Labels";
 
 	@Parameter ( label = "Apply Path Mapping" )
@@ -53,6 +55,7 @@ public class ExploreCellProfilerObjectsTableCommand< R extends RealType< R > & N
 	public String imageRootPathInTable = "/Volumes/cba/exchange/Daja-Christian/20190116_for_classification_interphase_versus_mitotic";
 
 	@Parameter ( label = "Image Path Mapping (This Computer)" )
+
 	public String imageRootPathOnThisComputer = "/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data/2019-01-31";
 	private HashMap< String, FolderAndFileColumn > imageNameToFolderAndFileColumns;
 	private LinkedHashMap< String, ArrayList< Object > > columns;
@@ -61,32 +64,34 @@ public class ExploreCellProfilerObjectsTableCommand< R extends RealType< R > & N
 	public void run()
 	{
 
-		final ArrayList< AnnotatedImageSegment > annotatedImageSegments
+		final ArrayList< ColumnBasedTableRowImageSegment > tableRowImageSegments
 				= createAnnotatedImageSegments( inputTableFile );
 
-		final ImageSourcesModelFromAnnotatedSegmentsFactory< AnnotatedImageSegment > factory
-				= new ImageSourcesModelFromAnnotatedSegmentsFactory(
-					annotatedImageSegments,
-					2 );
-
-		final FileImageSourcesModel imageSourcesModel = factory.getImageSourcesModel();
+		final FileImageSourcesModel imageSourcesModel =
+				new ImageSourcesModelFactory(
+						tableRowImageSegments,
+						inputTableFile.toString(),
+						2 ).getImageSourcesModel();
 
 		final ArrayList< String > categoricalColumns = new ArrayList<>();
 		categoricalColumns.add( "Label" );
 
-		final SelectionModel< AnnotatedImageSegment > selectionModel
+		final SelectionModel< ColumnBasedTableRowImageSegment > selectionModel
 				= new DefaultSelectionModel<>();
 
-		final DynamicCategoryColoringModel< AnnotatedImageSegment > coloringModel
+		final DynamicCategoryColoringModel< ColumnBasedTableRowImageSegment > coloringModel
 				= new DynamicCategoryColoringModel<>( new GlasbeyARGBLut(), 50 );
 
-		final SelectionColoringModel< AnnotatedImageSegment > selectionColoringModel
+		final SelectionColoringModel< ColumnBasedTableRowImageSegment > selectionColoringModel
 				= new SelectionColoringModel<>(
 					coloringModel,
 					selectionModel );
 
-		final DefaultImageSegmentsModel< AnnotatedImageSegment > imageSegmentsModel
-				= new DefaultImageSegmentsModel<>( annotatedImageSegments );
+		final DefaultImageSegmentsModel< ColumnBasedTableRowImageSegment > imageSegmentsModel
+				= new DefaultImageSegmentsModel<>( tableRowImageSegments );
+
+		final DefaultTableRowsModel< ColumnBasedTableRowImageSegment > tableRowsModel
+				= new DefaultTableRowsModel<>( tableRowImageSegments );
 
 		final ImageSegmentsBdvView imageSegmentsBdvView =
 				new ImageSegmentsBdvView(
@@ -94,9 +99,6 @@ public class ExploreCellProfilerObjectsTableCommand< R extends RealType< R > & N
 						imageSegmentsModel,
 						selectionModel,
 						selectionColoringModel );
-
-		final DefaultTableRowsModel< AnnotatedImageSegment > tableRowsModel
-				= new DefaultTableRowsModel<>( annotatedImageSegments );
 
 		final TableRowsTableView tableView = new TableRowsTableView(
 				tableRowsModel,
@@ -114,8 +116,8 @@ public class ExploreCellProfilerObjectsTableCommand< R extends RealType< R > & N
 			imageRootPathOnThisComputer = "";
 		}
 
-		final TableImageSourcesModelCreator modelCreator =
-				new TableImageSourcesModelCreator(
+		final TableImageSourcesModelFactory modelCreator =
+				new TableImageSourcesModelFactory(
 					inputTableFile,
 					imageRootPathInTable,
 					imageRootPathOnThisComputer,
@@ -125,45 +127,69 @@ public class ExploreCellProfilerObjectsTableCommand< R extends RealType< R > & N
 		return modelCreator.getImageSourcesModel();
 	}
 
-	private ArrayList< AnnotatedImageSegment > createAnnotatedImageSegments( File tableFile )
+	private ArrayList< ColumnBasedTableRowImageSegment > createAnnotatedImageSegments( File tableFile )
 	{
 		columns = TableUtils.columnsFromTableFile( tableFile, null );
 
-		replaceFoldersAndFilesByPathsColumn();
+		final ArrayList< String > pathColumnNames = replaceFolderAndFileColumnsByPathColumn();
 
-		int a = 1;
+		final HashMap< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn
+				= getImageSegmentCoordinateToColumn( pathColumnNames );
 
+		final ArrayList< ColumnBasedTableRowImageSegment > segments
+				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, imageSegmentCoordinateToColumn );
 
-//			final HashMap< ImageSegmentCoordinate, String > coordinateToColumnNameAndIndexMap = new HashMap<>();
-//
-//		coordinateToColumnNameAndIndexMap.put(
-//				ImageSegmentCoordinate.ImageId,
-//				labelImageFileNameColumn + SegmentUtils.FOLDER_AND_FILE_COLUMNS + labelImagePathNameColumn  );
-//
-//		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Label, "Number_Object_Number");
-//		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.X, "Location_Center_X" );
-//		coordinateToColumnNameAndIndexMap.put( ImageSegmentCoordinate.Y, "Location_Center_Y" );
-//
-//
-//
-//		final ArrayList< AnnotatedImageSegment > annotatedImageSegments
-//				= TableUtils.segmentsFromTableFile(
-//						tableFile,
-//						null,
-//						coordinateToColumnNameAndIndexMap,
-//						new DefaultImageSegmentBuilder() );
-//
-//		return annotatedImageSegments;
-
-		return null;
+		return segments;
 	}
 
-	private void replaceFoldersAndFilesByPathsColumn()
+	private HashMap< ImageSegmentCoordinate, ArrayList< Object > > getImageSegmentCoordinateToColumn( ArrayList< String > pathColumnNames )
+	{
+		final HashMap< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn
+				= new HashMap<>();
+
+		String labelImagePathColumnName = getLabelImagePathColumnName( pathColumnNames );
+
+		imageSegmentCoordinateToColumn.put(
+				ImageSegmentCoordinate.ImageId,
+				columns.get( labelImagePathColumnName ));
+
+		imageSegmentCoordinateToColumn.put(
+				ImageSegmentCoordinate.LabelId,
+				columns.get( COLUMN_NAME_OBJECT_LABEL ) );
+
+		imageSegmentCoordinateToColumn.put(
+				ImageSegmentCoordinate.X,
+				columns.get( COLUMN_NAME_OBJECT_LOCATION_CENTER_X ) );
+
+		imageSegmentCoordinateToColumn.put(
+				ImageSegmentCoordinate.Y,
+				columns.get( COLUMN_NAME_OBJECT_LOCATION_CENTER_Y ) );
+
+		return imageSegmentCoordinateToColumn;
+	}
+
+	private String getLabelImagePathColumnName( ArrayList< String > pathColumnNames )
+	{
+		String labelImagePathColumnName = "";
+		for ( String pathColumnName : pathColumnNames )
+		{
+			if ( pathColumnName.contains( OBJECTS ) )
+			{
+				labelImagePathColumnName = pathColumnName;
+				break;
+			}
+		}
+		return labelImagePathColumnName;
+	}
+
+	private ArrayList< String > replaceFolderAndFileColumnsByPathColumn()
 	{
 		final int numRows = columns.values().iterator().next().size();
 		imageNameToFolderAndFileColumns = fetchFolderAndFileColumns( columns.keySet() );
 
 		final String tableFile = inputTableFile.toString();
+
+		final ArrayList< String > pathColumnNames = new ArrayList<>();
 
 		for ( String imageName : imageNameToFolderAndFileColumns.keySet() )
 		{
@@ -183,7 +209,7 @@ public class ExploreCellProfilerObjectsTableCommand< R extends RealType< R > & N
 					imagePath = getMappedPath( imagePath );
 				}
 
-				imagePath = TableUtils.getRelativeImagePath( tableFile, imagePath ).toString();
+				imagePath = TableUtils.getRelativePath( tableFile, imagePath ).toString();
 
 				pathColumn.add( imagePath );
 			}
@@ -193,8 +219,10 @@ public class ExploreCellProfilerObjectsTableCommand< R extends RealType< R > & N
 
 			final String pathColumnName = getPathColumnName( imageName );
 			columns.put( pathColumnName, pathColumn );
-
+			pathColumnNames.add( pathColumnName );
 		}
+
+		return pathColumnNames;
 	}
 
 	public String getPathColumnName( String imageName )
@@ -204,21 +232,6 @@ public class ExploreCellProfilerObjectsTableCommand< R extends RealType< R > & N
 		return pathColumn;
 	}
 
-//	private String getImagePath( String imageName, LinkedHashMap< String, ArrayList< Object > > columns )
-//	{
-//		final String folderColumn = imageNameToFolderAndFileColumns.get( imageName ).folderColumn();
-//		final String fileColumn = imageNameToFolderAndFileColumns.get( imageName ).fileColumn();
-//
-//		final String folderName = ( String ) table.getValueAt(
-//				row,
-//				table.getColumnModel().getColumnIndex( folderColumn ) );
-//
-//		final String fileName = ( String ) table.getValueAt(
-//				row,
-//				table.getColumnModel().getColumnIndex( fileColumn ) );
-//
-//		return folderName + File.separator + fileName;
-//	}
 
 	private String getMappedPath( String imagePath )
 	{

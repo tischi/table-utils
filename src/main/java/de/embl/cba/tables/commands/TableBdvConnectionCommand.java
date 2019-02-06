@@ -38,7 +38,7 @@ public class TableBdvConnectionCommand < R extends RealType< R > & NativeType< R
 	@Parameter ( label = "Results table" )
 	public File inputTableFile;
 
-	@Parameter ( label = "Label mask (single channel, 2D+t or 3D+t)" )
+	@Parameter ( label = "LabelId mask (single channel, 2D+t or 3D+t)" )
 	public File inputLabelMasksFile;
 
 	@Parameter ( label = "Intensities (optional)", required = false )
@@ -103,7 +103,7 @@ public class TableBdvConnectionCommand < R extends RealType< R > & NativeType< R
 
 		if ( sources.size() > 1 )
 		{
-			Logger.error( "Label input image must be single channel!" );
+			Logger.error( "LabelId input image must be single channel!" );
 			return null;
 		}
 

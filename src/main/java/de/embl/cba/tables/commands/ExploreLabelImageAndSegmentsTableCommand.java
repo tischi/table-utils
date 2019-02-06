@@ -29,14 +29,14 @@ import java.io.File;
 import java.util.ArrayList;
 
 
-@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Label Image And Table" )
-public class ExploreLabelImageAndTableCommand< R extends RealType< R > & NativeType< R > >
+@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Label Image and Segments Table" )
+public class ExploreLabelImageAndSegmentsTableCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {
 	@Parameter ( label = "Results table" )
 	public File inputTableFile;
 
-	@Parameter ( label = "Label mask (single channel, 2D+t or 3D+t)" )
+	@Parameter ( label = "LabelId mask (single channel, 2D+t or 3D+t)" )
 	public File inputLabelMasksFile;
 
 	@Parameter ( label = "Intensities (optional)", required = false )
@@ -101,7 +101,7 @@ public class ExploreLabelImageAndTableCommand< R extends RealType< R > & NativeT
 
 		if ( sources.size() > 1 )
 		{
-			Logger.error( "Label input image must be single channel!" );
+			Logger.error( "LabelId input image must be single channel!" );
 			return null;
 		}
 

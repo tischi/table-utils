@@ -21,11 +21,11 @@ import java.io.File;
 import java.util.ArrayList;
 
 
-@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Objects Table" )
-public class ExploreObjectsTableCommand< R extends RealType< R > & NativeType< R > >
+@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Objects Table with Image Paths " )
+public class ExploreObjectsTableWithImagePathsCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {
-	@Parameter ( label = "Label image (single channel, 2D+t or 3D+t)" )
+	@Parameter ( label = "LabelId image (single channel, 2D+t or 3D+t)" )
 	public File inputLabelMasksFile;
 
 	@Parameter ( label = "Intensities (optional)", required = false )

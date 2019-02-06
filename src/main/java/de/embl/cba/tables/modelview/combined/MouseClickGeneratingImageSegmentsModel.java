@@ -37,7 +37,7 @@ public class MouseClickGeneratingImageSegmentsModel
 
 	private synchronized void addSegment( ImageSegmentId imageSegmentId )
 	{
-		final String imageId = ( String ) labelSourceAndMetadata.metadata().getMap().get( Metadata.NAME );
+		final String imageId = ( String ) labelSourceAndMetadata.metadata().getMap().get( Metadata.DISPLAY_NAME );
 
 		final RealPoint userClickCoordinate = BdvUtils.getGlobalMouseCoordinates( bdv );
 		final int timepoint = bdv.getBdvHandle().getViewerPanel().getState().getCurrentTimepoint();

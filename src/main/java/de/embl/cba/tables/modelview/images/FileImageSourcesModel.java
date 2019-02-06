@@ -63,6 +63,7 @@ public class FileImageSourcesModel implements ImageSourcesModel
 			if ( source == null )
 			{
 				final ImagePlus imagePlus = IJ.openImage( file.toString() );
+				imagePlus.setTitle( name );
 				source = Wraps.imagePlusAsSource4DChannelList( imagePlus ).get( 0 );
 			}
 
@@ -108,6 +109,7 @@ public class FileImageSourcesModel implements ImageSourcesModel
 
 	public void addSource(
 			String imageId,
+			String imageDisplayName,
 			File file,
 			ArrayList< String > imageSetIDs,
 			Flavour flavor,
@@ -115,13 +117,15 @@ public class FileImageSourcesModel implements ImageSourcesModel
 	{
 		if ( nameToSourceAndMetadata.containsKey( imageId ) ) return;
 
-		final FileSource fileSource = new FileSource( imageId, file );
+		final FileSource fileSource = new FileSource( imageDisplayName, file );
 
 		final Metadata metadata = new Metadata();
 		metadata.getMap().put( FLAVOUR, flavor );
 		metadata.getMap().put( NUM_SPATIAL_DIMENSIONS, numSpatialDimensions );
 		metadata.getMap().put( EXCLUSIVE_IMAGE_SET, imageSetIDs );
-		metadata.getMap().put( NAME, imageId );
+		metadata.getMap().put( DISPLAY_NAME, imageDisplayName );
+		metadata.getMap().put( IMAGE_ID, imageId );
+
 
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( fileSource, metadata ) );
 	}

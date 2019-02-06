@@ -48,7 +48,7 @@ public class ExampleInteractiveObjectGrouping
 
 		final ObjectTablePanel objectTablePanel = new ObjectTablePanel( jTable, "Table" );
 		objectTablePanel.showTable();
-		objectTablePanel.setCoordinateColumn( ImageSegmentCoordinate.Label, jTable.getColumnName( 0 ) );
+		objectTablePanel.setCoordinateColumn( ImageSegmentCoordinate.LabelId, jTable.getColumnName( 0 ) );
 		objectTablePanel.addColumn( "MyGrouping", "None" );
 
 		/**

@@ -2,8 +2,7 @@ package de.embl.cba.tables.modelview.segments;
 
 import net.imglib2.util.ValuePair;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SegmentUtils
 {
@@ -46,7 +45,7 @@ public class SegmentUtils
 				case T:
 					segmentBuilder.setTimePoint( ( int ) columnValueMap.get( colName ) );
 					break;
-				case Label:
+				case LabelId:
 					segmentBuilder.setLabel( ( double ) columnValueMap.get( colName ) );
 					break;
 				case ImageId:
@@ -86,7 +85,7 @@ public class SegmentUtils
 				case T:
 					segmentBuilder.setTimePoint( Integer.parseInt( (String) tableRowMap.get( colName ) ));
 					break;
-				case Label:
+				case LabelId:
 					segmentBuilder.setLabel(  Double.parseDouble((String)  tableRowMap.get( colName ) ));
 					break;
 				case ImageId:
@@ -133,7 +132,7 @@ public class SegmentUtils
 							Integer.parseInt(
 									rowEntries[ col ] ) );
 					break;
-				case Label:
+				case LabelId:
 					segmentBuilder.setLabel(
 							Double.parseDouble(
 									rowEntries[ col ] ) );
@@ -147,4 +146,27 @@ public class SegmentUtils
 
 		return segmentBuilder.build();
 	}
+
+
+	public static ArrayList< ColumnBasedTableRowImageSegment > tableRowImageSegmentsFromColumns(
+			final LinkedHashMap< String, ArrayList< Object > > columns,
+			final Map< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn )
+	{
+
+		final ArrayList< ColumnBasedTableRowImageSegment > columnBasedTableRowImageSegments
+				= new ArrayList<>();
+
+		final int numRows = columns.values().iterator().next().size();
+
+		for ( int row = 0; row < numRows; row++ )
+		{
+			final ColumnBasedTableRowImageSegment segment
+					= new ColumnBasedTableRowImageSegment( row, columns, imageSegmentCoordinateToColumn );
+			columnBasedTableRowImageSegments.add( segment );
+		}
+
+		return columnBasedTableRowImageSegments;
+
+	}
+
 }

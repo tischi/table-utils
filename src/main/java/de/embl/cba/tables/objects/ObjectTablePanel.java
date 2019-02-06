@@ -254,7 +254,7 @@ public class ObjectTablePanel extends JPanel
 		objectRowMap = new ConcurrentHashMap();
 
 		final int labelColumnIndex =
-				table.getColumnModel().getColumnIndex( getCoordinateColumn( ImageSegmentCoordinate.Label ) );
+				table.getColumnModel().getColumnIndex( getCoordinateColumn( ImageSegmentCoordinate.LabelId ) );
 
 		int timeColumnIndex = getTimeColumnIndex();
 
@@ -300,7 +300,7 @@ public class ObjectTablePanel extends JPanel
 	{
 		final ConcurrentHashMap map = new ConcurrentHashMap();
 
-		final int labelColumnIndex0 = table.getColumnModel().getColumnIndex( getCoordinateColumn( ImageSegmentCoordinate.Label ) );
+		final int labelColumnIndex0 = table.getColumnModel().getColumnIndex( getCoordinateColumn( ImageSegmentCoordinate.LabelId ) );
 		final int labelColumnIndex1 = table.getColumnModel().getColumnIndex( column1 );
 
 		final int rowCount = table.getRowCount();

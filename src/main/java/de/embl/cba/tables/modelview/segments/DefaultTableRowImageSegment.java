@@ -5,13 +5,13 @@ import net.imglib2.FinalInterval;
 import java.util.LinkedHashMap;
 
 
-public class DefaultAnnotatedImageSegment implements AnnotatedImageSegment
+public class DefaultTableRowImageSegment implements TableRowImageSegment
 {
 	private final TableRow tableRow;
 	private final ImageSegment imageSegment;
 
-	public DefaultAnnotatedImageSegment( ImageSegment imageSegment,
-										 TableRow tableRow )
+	public DefaultTableRowImageSegment( ImageSegment imageSegment,
+										TableRow tableRow )
 	{
 		this.imageSegment = imageSegment;
 		this.tableRow = tableRow;

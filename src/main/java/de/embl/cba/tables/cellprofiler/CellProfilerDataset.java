@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class CellProfilerDataset
 {
 	// TODO: make enum
-	public static final String OBJECT_LABEL_MASK = "Object Label Mask";
+	public static final String OBJECT_LABEL_MASK = "Object LabelId Mask";
 	public static final String INTENSITY_IMAGE = "Intensity Image";
 
 	final private Object datasetIndex;

@@ -203,14 +203,14 @@ public class TableUtils
 
 
 	// TODO: replace by more performant column based version (see below)
-	public static ArrayList< AnnotatedImageSegment > segmentsFromTableFile(
+	public static ArrayList< TableRowImageSegment > segmentsFromTableFile(
 			final File file,
 			String delim,
 			final Map< ImageSegmentCoordinate, String > coordinateColumnMap,
 			final DefaultImageSegmentBuilder segmentBuilder )
 	{
 
-		final ArrayList< AnnotatedImageSegment > segments = new ArrayList<>();
+		final ArrayList< TableRowImageSegment > segments = new ArrayList<>();
 
 		final ArrayList< String > rowsInTable = readRows( file );
 
@@ -239,14 +239,14 @@ public class TableUtils
 
 			final TableRow tableRow = new DefaultTableRow( columnValueMap, row - 1  );
 
-			segments.add( new DefaultAnnotatedImageSegment( segment, tableRow ) );
+			segments.add( new DefaultTableRowImageSegment( segment, tableRow ) );
 		}
 
 		return segments;
 
 	}
 
-	public static ArrayList< DefaultAnnotatedImageSegment > segmentsFromTableFileColumnWise(
+	public static ArrayList< DefaultTableRowImageSegment > segmentsFromTableFileColumnWise(
 			final File file,
 			String delim,
 			final Map< ImageSegmentCoordinate, String > coordinateColumnMap,
@@ -254,7 +254,7 @@ public class TableUtils
 	)
 	{
 
-		final ArrayList< DefaultAnnotatedImageSegment > segments = new ArrayList<>();
+		final ArrayList< DefaultTableRowImageSegment > segments = new ArrayList<>();
 
 		final ArrayList< String > rowsInTable = readRows( file );
 
@@ -306,12 +306,13 @@ public class TableUtils
 
 	}
 
+
 	public static LinkedHashMap< String, ArrayList< Object > > columnsFromTableFile(
 			final File file,
 			String delim )
 	{
 
-		final ArrayList< DefaultAnnotatedImageSegment > segments = new ArrayList<>();
+		final ArrayList< DefaultTableRowImageSegment > segments = new ArrayList<>();
 
 		final ArrayList< String > rowsInTable = readRows( file );
 
@@ -566,11 +567,11 @@ public class TableUtils
 			String imageName )
 	{
 		if ( imageFile == null ) return;
-		final Path relativeImagePath = getRelativeImagePath( tableFile, imageFile );
+		final Path relativeImagePath = getRelativePath( tableFile, imageFile );
 		TableUtils.addColumn( table, "RelativeImagePath_" + imageName, relativeImagePath );
 	}
 
-	public static Path getRelativeImagePath( File tableFile, File imageFile )
+	public static Path getRelativePath( File tableFile, File imageFile )
 	{
 		final Path imagePath = Paths.get( imageFile.toString() );
 		final Path tablePath = Paths.get( tableFile.toString() );
@@ -578,13 +579,21 @@ public class TableUtils
 		return tablePath.relativize( imagePath );
 	}
 
-	public static Path getRelativeImagePath( String tableFile, String imageFile )
+	public static Path getRelativePath( String tableFile, String imageFile )
 	{
 		final Path imagePath = Paths.get( imageFile );
 		final Path tablePath = Paths.get( tableFile );
 
 		return tablePath.relativize( imagePath );
 	}
+
+	public static Path getAbsolutePath( String folder, String relativePath )
+	{
+		final Path path = Paths.get( folder, relativePath );
+		final Path normalize = path.normalize();
+		return normalize;
+	}
+
 
 	public static double asDouble( Object featureValue )
 	{

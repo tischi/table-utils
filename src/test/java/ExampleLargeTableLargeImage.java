@@ -51,7 +51,7 @@ public class ExampleLargeTableLargeImage
 				"\t" );
 
 		final ObjectTablePanel objectTablePanel = new ObjectTablePanel( jTable );
-		objectTablePanel.setCoordinateColumn( ImageSegmentCoordinate.Label, "label_id" );
+		objectTablePanel.setCoordinateColumn( ImageSegmentCoordinate.LabelId, "label_id" );
 		objectTablePanel.setCoordinateColumn( ImageSegmentCoordinate.X, "com_x_microns" );
 		objectTablePanel.setCoordinateColumn( ImageSegmentCoordinate.Y, "com_y_microns" );
 		objectTablePanel.setCoordinateColumn( ImageSegmentCoordinate.Z, "com_z_microns" );

@@ -85,7 +85,7 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 		}
 
 		metadata.getMap().put( NUM_SPATIAL_DIMENSIONS, 3 );
-		metadata.getMap().put( NAME, sourceName( file ) );
+		metadata.getMap().put( DISPLAY_NAME, sourceName( file ) );
 
 		return metadata;
 	}
