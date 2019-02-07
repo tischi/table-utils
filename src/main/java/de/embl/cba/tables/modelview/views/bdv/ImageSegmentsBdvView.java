@@ -267,6 +267,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	}
 
 
+	public BdvStackSource showSingleSource( SourceAndMetadata sourceAndMetadata )
+	{
+		return showSingleSource( sourceAndMetadata, null, null);
+	}
+
 	/**
 	 * Shows a single source
 	 *  @param sourceAndMetadata
