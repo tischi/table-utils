@@ -629,9 +629,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		final int columnIndex = table.getColumnModel().getColumnIndex( column );
 
-		if ( ! categoricalColumns.contains( column )
-				&&
-				Number.class.isAssignableFrom( table.getColumnClass( columnIndex ) ) )
+		if ( Number.class.isAssignableFrom( table.getColumnClass( columnIndex ) ) )
 		{
 			final double[] minMaxValues = getMinMaxValues( column );
 

@@ -92,7 +92,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		for ( SourceAndMetadata sourceAndMetadata : imageSourcesModel.sources().values() )
 		{
-			if ( sourceAndMetadata.metadata().getMap().get( Metadata.SHOW_INITIALLY ) )
+			if ( (boolean) sourceAndMetadata.metadata().getMap().get( Metadata.SHOW_INITIALLY ) )
 			{
 				showSource( sourceAndMetadata );
 				isShownAtLeastOne = true;
@@ -305,19 +305,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	public void removeSingleSource( BdvStackSource bdvStackSource )
 	{
-		removeSource( bdv, bdvStackSource );
-	}
-
-	private static void removeSource( BdvHandle bdv, BdvStackSource bdvStackSource )
-	{
-		final int sourceIndex = BdvUtils.getSourceIndex( bdv, bdvStackSource );
-
-		final List< SourceState< ? > > sources = bdv.getViewerPanel().getVisibilityAndGrouping().getSources();
-		final Source< ? > source = sources.get( sourceIndex ).getSpimSource();
-		bdv.getViewerPanel().removeSource( source );
-
-		final ConverterSetup converterSetup =  bdv.getSetupAssignments().getConverterSetups().get( sourceIndex );
-		bdv.getSetupAssignments().removeSetup( converterSetup );
+		BdvUtils.removeSource( bdv, bdvStackSource );
 	}
 
 	private void setDisplayRange( BdvStackSource stackSource, Double displayRangeMin, Double displayRangeMax, Map< String, Object > metadata )
@@ -330,8 +318,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 				&& metadata.containsKey( Metadata.DISPLAY_RANGE_MAX )  )
 		{
 			stackSource.setDisplayRange(
-					metadata.get( Metadata.DISPLAY_RANGE_MIN ),
-					metadata.get( Metadata.DISPLAY_RANGE_MAX ) );
+					( Double ) metadata.get( Metadata.DISPLAY_RANGE_MIN ),
+					( Double ) metadata.get( Metadata.DISPLAY_RANGE_MAX ) );
 		}
 	}
 

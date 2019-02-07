@@ -60,7 +60,7 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 						tablePath,
 						2 ).getImageSourcesModel();
 
-		DefaultBdvAndTableView.show( tableRowImageSegments, imageSourcesModel );
+		new DefaultBdvAndTableView( tableRowImageSegments, imageSourcesModel );
 	}
 
 	private ArrayList< ColumnBasedTableRowImageSegment > createAnnotatedImageSegments( File tableFile )

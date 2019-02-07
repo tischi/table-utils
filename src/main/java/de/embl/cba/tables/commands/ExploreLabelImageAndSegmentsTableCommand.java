@@ -49,7 +49,8 @@ public class ExploreLabelImageAndSegmentsTableCommand< R extends RealType< R > &
 						tablePath,
 						2 ).getImageSourcesModel();
 
-		DefaultBdvAndTableView.show( tableRowImageSegments, imageSourcesModel );
+		new DefaultBdvAndTableView( tableRowImageSegments, imageSourcesModel );
+
 	}
 
 	private ArrayList<ColumnBasedTableRowImageSegment> createAnnotatedImageSegments(
@@ -58,7 +59,7 @@ public class ExploreLabelImageAndSegmentsTableCommand< R extends RealType< R > &
 		columns = TableUtils.columnsFromTableFile( tableFile, null );
 
 		final HashMap< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn
-				= getImageSegmentCoordinateToColumn( pathColumnNames );
+				= getImageSegmentCoordinateToColumn( );
 
 		final ArrayList< ColumnBasedTableRowImageSegment > segments
 				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, imageSegmentCoordinateToColumn );
@@ -66,16 +67,16 @@ public class ExploreLabelImageAndSegmentsTableCommand< R extends RealType< R > &
 		return segments;
 	}
 
-	private HashMap< ImageSegmentCoordinate, ArrayList< Object > > getImageSegmentCoordinateToColumn( ArrayList< String > pathColumnNames )
+	private HashMap< ImageSegmentCoordinate, ArrayList< Object > > getImageSegmentCoordinateToColumn( )
 	{
 		final HashMap< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn
 				= new HashMap<>();
 
-		String labelImagePathColumnName = getLabelImagePathColumnName( pathColumnNames );
-
-		imageSegmentCoordinateToColumn.put(
-				ImageSegmentCoordinate.ImageId,
-				columns.get( labelImagePathColumnName ));
+//		String labelImagePathColumnName = getLabelImagePathColumnName( pathColumnNames );
+//
+//		imageSegmentCoordinateToColumn.put(
+//				ImageSegmentCoordinate.ImageId,
+//				columns.get( labelImagePathColumnName ));
 
 		// TODO: UI?
 //		imageSegmentCoordinateToColumn.put(
