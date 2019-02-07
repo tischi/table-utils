@@ -1,5 +1,6 @@
 package de.embl.cba.tables.modelview.images;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ public class Metadata
 	public static final String SHOW_INITIALLY = "Show initially";
 	public static final String DISPLAY_RANGE_MIN = "Display Range Min";
 	public static final String DISPLAY_RANGE_MAX = "Display Range Max";
+	public static final String COLOR = "Color";
 
 	public enum Flavour
 	{
@@ -31,6 +33,8 @@ public class Metadata
 		metadata.put( IMAGE_ID, "Image001" );
 		metadata.put( NUM_SPATIAL_DIMENSIONS, 3 );
 		metadata.put( SHOW_INITIALLY, false );
+		metadata.put( COLOR, Color.white );
+
 	}
 
 	public Map< String, Object > getMap()

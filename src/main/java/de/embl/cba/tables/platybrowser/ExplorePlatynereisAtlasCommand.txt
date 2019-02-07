@@ -1,4 +1,4 @@
-package de.embl.cba.tables.commands;
+package de.embl.cba.tables.platybrowser;
 
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModel;

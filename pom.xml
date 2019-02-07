@@ -8,6 +8,7 @@
 		<version>24.0.0</version>
 	</parent>
 
+	<groupId>de.embl.cba</groupId>
 	<artifactId>table-utils</artifactId>
 	<version>0.2.00</version>
 
@@ -123,7 +124,7 @@
 		<dependency>
 			<groupId>de.embl.cba</groupId>
 			<artifactId>bdv-utils</artifactId>
-			<version>0.1.28</version>
+			<version>0.2.00</version>
 		</dependency>
 
 	</dependencies>

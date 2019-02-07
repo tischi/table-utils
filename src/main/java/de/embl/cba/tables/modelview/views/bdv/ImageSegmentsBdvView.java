@@ -269,12 +269,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	/**
 	 * Shows a single source
-	 *
-	 * @param sourceAndMetadata
+	 *  @param sourceAndMetadata
 	 * @param displayRangeMin
 	 * @param displayRangeMax
 	 */
-	public void showSingleSource(
+	public BdvStackSource showSingleSource(
 			SourceAndMetadata sourceAndMetadata,
 			Double displayRangeMin,
 			Double displayRangeMax )
@@ -300,6 +299,25 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		bdv = stackSource.getBdvHandle();
 
 		bdvOptions = bdvOptions.addTo( bdv );
+
+		return stackSource;
+	}
+
+	public void removeSingleSource( BdvStackSource bdvStackSource )
+	{
+		removeSource( bdv, bdvStackSource );
+	}
+
+	private static void removeSource( BdvHandle bdv, BdvStackSource bdvStackSource )
+	{
+		final int sourceIndex = BdvUtils.getSourceIndex( bdv, bdvStackSource );
+
+		final List< SourceState< ? > > sources = bdv.getViewerPanel().getVisibilityAndGrouping().getSources();
+		final Source< ? > source = sources.get( sourceIndex ).getSpimSource();
+		bdv.getViewerPanel().removeSource( source );
+
+		final ConverterSetup converterSetup =  bdv.getSetupAssignments().getConverterSetups().get( sourceIndex );
+		bdv.getSetupAssignments().removeSetup( converterSetup );
 	}
 
 	private void setDisplayRange( BdvStackSource stackSource, Double displayRangeMin, Double displayRangeMax, Map< String, Object > metadata )
@@ -313,7 +331,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		{
 			stackSource.setDisplayRange(
 					metadata.get( Metadata.DISPLAY_RANGE_MIN ),
-					metadata.get( Metadata.DISPLAY_RANGE_MAX )
+					metadata.get( Metadata.DISPLAY_RANGE_MAX ) );
 		}
 	}
 
@@ -481,5 +499,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		return bdv.getBdvHandle().getViewerPanel().getState().getCurrentTimepoint();
 	}
+
 
 }
