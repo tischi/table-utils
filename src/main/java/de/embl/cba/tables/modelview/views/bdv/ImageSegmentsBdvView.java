@@ -70,9 +70,9 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		this.voxelSpacing3DView = 0.2;
 
-		initBdvOptions( );
+		initBdvOptions();
 
-		showInitialSources( );
+		showInitialSources();
 
 		//new BdvGrayValuesOverlay( bdv, 20 ); // TODO: makes problems when removing sources
 
@@ -90,20 +90,20 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void showInitialSources()
 	{
-		boolean isShownAtLeastOne = false;
+		boolean isShownNone = true;
 
 		for ( SourceAndMetadata sourceAndMetadata : imageSourcesModel.sources().values() )
 		{
 			if ( (boolean) sourceAndMetadata.metadata().get( Metadata.SHOW_INITIALLY ) )
 			{
 				showSource( sourceAndMetadata );
-				isShownAtLeastOne = true;
+				isShownNone = false;
 			}
 		}
 
-		if ( ! isShownAtLeastOne )
+		if ( isShownNone )
 		{
-			imageSourcesModel.sources().values().iterator().next();
+			showSource( imageSourcesModel.sources().values().iterator().next() );
 		}
 
 	}
@@ -138,8 +138,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			@Override
 			public void focusEvent( T selection )
 			{
-				if ( recentFocus != null
-						&& selection == recentFocus )
+				if ( recentFocus != null && selection == recentFocus )
 				{
 					return;
 				}
@@ -171,7 +170,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		final String imageId = imageSegment.imageId();
 
-		if ( currentLabelSource.metadata().get( DISPLAY_NAME ).equals( imageId ) ) return;
+		if ( currentLabelSource.metadata().get( IMAGE_ID ).equals( imageId ) ) return;
 
 		final SourceAndMetadata sourceAndMetadata
 				= imageSourcesModel.sources().get( imageId );
@@ -425,17 +424,15 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void toggleSelectionAtMousePosition()
 	{
-		if (currentLabelSource == null) {
-			return;
-		}
+		if ( currentLabelSource == null ) return;
 
 		final double labelId = getLabelIdAtCurrentMouseCoordinates();
 
 		if ( labelId == BACKGROUND ) return;
 
-		if ( currentLabelSource.metadata().containsKey( DISPLAY_NAME ) )
+		if ( currentLabelSource.metadata().containsKey( IMAGE_ID ) )
 		{
-			final String imageId = ( String ) currentLabelSource.metadata().get( DISPLAY_NAME );
+			final String imageId = ( String ) currentLabelSource.metadata().get( IMAGE_ID );
 
 			final ImageSegmentId imageSegmentId = new ImageSegmentId( imageId, labelId, getCurrentTimePoint() );
 

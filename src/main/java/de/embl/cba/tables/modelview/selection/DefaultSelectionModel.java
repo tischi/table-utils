@@ -97,14 +97,7 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 
 		for ( SelectionListener listener : listeners.list )
 		{
-			new Thread( new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					listener.focusEvent( object );
-				}
-			}).start();
+			new Thread( () -> listener.focusEvent( object ) ).start();
 		}
 	}
 
