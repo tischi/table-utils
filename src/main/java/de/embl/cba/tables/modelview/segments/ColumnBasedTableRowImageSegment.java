@@ -4,6 +4,7 @@ import net.imglib2.FinalInterval;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -15,16 +16,16 @@ import java.util.Map;
 public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 {
 	private final int row;
-	private final LinkedHashMap< String, ArrayList< Object > > columns;
-	private final Map< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn;
+	private final LinkedHashMap< String, List< Object > > columns;
+	private final Map< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn;
 	private double[] position;
 	private LinkedHashMap< String, Object > cells;
 
 
 	public ColumnBasedTableRowImageSegment(
 			int row,
-			LinkedHashMap<String, ArrayList<Object>> columns,
-			Map<ImageSegmentCoordinate, ArrayList<Object>> imageSegmentCoordinateToColumn )
+			LinkedHashMap< String, List< Object > > columns,
+			Map< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn )
 	{
 		this.row = row;
 		this.columns = columns;

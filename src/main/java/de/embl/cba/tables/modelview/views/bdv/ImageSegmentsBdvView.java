@@ -68,6 +68,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		this.selectionModel = selectionModel;
 		this.selectionColoringModel = selectionColoringModel;
 
+		this.voxelSpacing3DView = 0.2;
+
 		initBdvOptions( );
 
 		showInitialSources( );
@@ -175,6 +177,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 				= imageSourcesModel.sources().get( imageId );
 
 		showSource( sourceAndMetadata );
+	}
+
+	public void setVoxelSpacing3DView( double voxelSpacing3DView )
+	{
+		this.voxelSpacing3DView = voxelSpacing3DView;
 	}
 
 	/**
@@ -479,7 +486,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			@Override
 			public void run()
 			{
-				voxelSpacing3DView = 0.2;
 				new ConnectedComponentExtractorAnd3DViewer( currentLabelSource.source() )
 						.extractAndShowIn3D(
 								BdvUtils.getGlobalMouseCoordinates( bdv ),

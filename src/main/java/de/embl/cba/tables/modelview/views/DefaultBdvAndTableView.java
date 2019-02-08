@@ -5,7 +5,7 @@ import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.combined.DefaultImageSegmentsModel;
 import de.embl.cba.tables.modelview.combined.DefaultTableRowsModel;
-import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
+import de.embl.cba.tables.modelview.images.ImageSourcesModel;
 import de.embl.cba.tables.modelview.segments.ColumnBasedTableRowImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
@@ -13,15 +13,18 @@ import de.embl.cba.tables.modelview.views.bdv.ImageSegmentsBdvView;
 import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DefaultBdvAndTableView
 {
-	private final ArrayList< ColumnBasedTableRowImageSegment > tableRowImageSegments;
-	private final FileImageSourcesModel imageSourcesModel;
+	private final List< ColumnBasedTableRowImageSegment > tableRowImageSegments;
+	private final ImageSourcesModel imageSourcesModel;
 	private ImageSegmentsBdvView imageSegmentsBdvView;
 	private TableRowsTableView tableRowsTableView;
 
-	public DefaultBdvAndTableView( ArrayList< ColumnBasedTableRowImageSegment > tableRowImageSegments, FileImageSourcesModel imageSourcesModel )
+	public DefaultBdvAndTableView(
+			List< ColumnBasedTableRowImageSegment > tableRowImageSegments,
+			ImageSourcesModel imageSourcesModel )
 	{
 		this.tableRowImageSegments = tableRowImageSegments;
 		this.imageSourcesModel = imageSourcesModel;

@@ -4,6 +4,7 @@ import de.embl.cba.tables.tablemodels.ColumnClassAwareTableModel;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
 import de.embl.cba.tables.modelview.segments.*;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
+import ij.measure.ResultsTable;
 import net.imglib2.util.ValuePair;
 import org.scijava.table.GenericTable;
 
@@ -307,42 +308,6 @@ public class TableUtils
 	}
 
 
-	public static LinkedHashMap< String, ArrayList< Object > > columnsFromTableFile(
-			final File file,
-			String delim )
-	{
-
-		final ArrayList< DefaultTableRowImageSegment > segments = new ArrayList<>();
-
-		final ArrayList< String > rowsInTable = readRows( file );
-
-		delim = autoDelim( delim, rowsInTable );
-
-		ArrayList< String > columns = getColumnNames( rowsInTable, delim );
-
-		final LinkedHashMap< String, ArrayList< Object > > columnToValues
-				= new LinkedHashMap<>();
-
-		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
-		{
-			final String columnName = columns.get( columnIndex );
-			columnToValues.put( columnName, new ArrayList<>(  ) );
-		}
-
-		for ( int row = 1; row < rowsInTable.size(); ++row )
-		{
-			StringTokenizer st = new StringTokenizer( rowsInTable.get( row ), delim );
-
-			for ( String column : columns )
-			{
-				final String string = st.nextToken();
-				columnToValues.get( column ).add( string );
-			}
-		}
-
-		return columnToValues;
-	}
-
 	public static void addColumn(
 			HashMap< String, Object > columnValueMap,
 			String column,
@@ -435,7 +400,7 @@ public class TableUtils
 		return Double.parseDouble( rowEntries[ columnIndex ] );
 	}
 
-	public static JTable jTableFromSegmentList( ArrayList< ? extends TableRow > tableRows )
+	public static JTable jTableFromSegmentList( List< ? extends TableRow > tableRows )
 	{
 
 		/**
@@ -470,9 +435,9 @@ public class TableUtils
 	}
 
 
-	public static ArrayList< String > getColumnNames( JTable jTable )
+	public static List< String > getColumnNames( JTable jTable )
 	{
-		final ArrayList< String > columnNames = new ArrayList<>();
+		final List< String > columnNames = new ArrayList<>();
 
 		for ( int columnIndex = 0; columnIndex < jTable.getColumnCount(); columnIndex++ )
 		{
@@ -593,8 +558,7 @@ public class TableUtils
 		final Path normalize = path.normalize();
 		return normalize;
 	}
-
-
+	
 	public static double asDouble( Object featureValue )
 	{
 		double value;
@@ -626,4 +590,5 @@ public class TableUtils
 
 		return new double[]{ min, max };
 	}
+
 }

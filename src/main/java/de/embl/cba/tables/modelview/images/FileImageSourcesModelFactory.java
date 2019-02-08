@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 
-public class ImageSourcesModelFactory< T extends TableRowImageSegment >
+public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 {
 	public static final String PATH = "Path_";
 	public static final String OBJECTS = "Objects_";
@@ -23,7 +23,7 @@ public class ImageSourcesModelFactory< T extends TableRowImageSegment >
 	private FileImageSourcesModel imageSourcesModel;
 	private String tablePath;
 
-	public ImageSourcesModelFactory(
+	public FileImageSourcesModelFactory(
 			ArrayList< T > tableRowImageSegments,
 			String tablePath,
 			int numSpatialDimensions )
@@ -116,7 +116,7 @@ public class ImageSourcesModelFactory< T extends TableRowImageSegment >
 		return flavour;
 	}
 
-	public HashMap< String, String > getImageNameToPathColumnName( )
+	private HashMap< String, String > getImageNameToPathColumnName( )
 	{
 		final HashMap< String, String > imageNameToPathColumnName = new HashMap<>();
 		for ( String column : columns )

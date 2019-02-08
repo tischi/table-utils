@@ -14,7 +14,7 @@ public class RunTableBdvConnectionCommand2DTime
 
 		final HashMap< String, Object > parameters = new HashMap<>();
 
-		parameters.put( "tableFile",
+		parameters.put( "resultsTable",
 				new File( RunTableBdvConnectionCommand.class.getResource(
 						"2d+t-8bit-labelMasks-table.txt" ).getFile() ) );
 

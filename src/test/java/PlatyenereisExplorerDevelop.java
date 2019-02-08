@@ -22,7 +22,7 @@ public class PlatyenereisExplorerDevelop
 	{
 		//final File file = new File( TestTableLoading.class.getResource( "cellprofiler-table.txt" ).fileColumn() );
 
-//		final File tableFile = new File("/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt");
+//		final File resultsTable = new File("/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt");
 
 //		final File file = new File("/Volumes/cba/exchange/Daja-Christian/20190116_for_classification_interphase_versus_mitotic/concatenated_tables/merged_images_nuclei.txt" );
 		//final JTable table = TableUtils.loadTable( file, "\t" );

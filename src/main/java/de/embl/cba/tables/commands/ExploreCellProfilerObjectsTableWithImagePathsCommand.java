@@ -1,10 +1,10 @@
 package de.embl.cba.tables.commands;
 
+import de.embl.cba.tables.TableColumns;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.cellprofiler.FolderAndFileColumn;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
-import de.embl.cba.tables.modelview.images.ImageSourcesModelFactory;
-import de.embl.cba.tables.modelview.images.TableImageSourcesModelFactory;
+import de.embl.cba.tables.modelview.images.FileImageSourcesModelFactory;
 import de.embl.cba.tables.modelview.segments.*;
 import de.embl.cba.tables.modelview.views.DefaultBdvAndTableView;
 import net.imglib2.type.NativeType;
@@ -14,10 +14,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Set;
+import java.util.*;
 
 
 @Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>CellProfiler Objects Table" )
@@ -44,18 +41,18 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 
 	public String imageRootPathOnThisComputer = "/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data/2019-01-31";
 	private HashMap< String, FolderAndFileColumn > imageNameToFolderAndFileColumns;
-	private LinkedHashMap< String, ArrayList< Object > > columns;
+	private LinkedHashMap< String, List< Object > > columns;
 
 	@Override
 	public void run()
 	{
-		final ArrayList< ColumnBasedTableRowImageSegment > tableRowImageSegments
+		final List< ColumnBasedTableRowImageSegment > tableRowImageSegments
 				= createAnnotatedImageSegments( inputTableFile );
 
 		final String tablePath = inputTableFile.toString();
 
 		final FileImageSourcesModel imageSourcesModel =
-				new ImageSourcesModelFactory(
+				new FileImageSourcesModelFactory(
 						tableRowImageSegments,
 						tablePath,
 						2 ).getImageSourcesModel();
@@ -63,16 +60,16 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 		new DefaultBdvAndTableView( tableRowImageSegments, imageSourcesModel );
 	}
 
-	private ArrayList< ColumnBasedTableRowImageSegment > createAnnotatedImageSegments( File tableFile )
+	private List< ColumnBasedTableRowImageSegment > createAnnotatedImageSegments( File tableFile )
 	{
-		columns = TableUtils.columnsFromTableFile( tableFile, null );
+		columns = TableColumns.columnsFromTableFile( tableFile, null );
 
-		final ArrayList< String > pathColumnNames = replaceFolderAndFileColumnsByPathColumn();
+		final List< String > pathColumnNames = replaceFolderAndFileColumnsByPathColumn();
 
-		final HashMap< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn
+		final HashMap< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn
 				= getImageSegmentCoordinateToColumn( pathColumnNames );
 
-		final ArrayList< ColumnBasedTableRowImageSegment > segments
+		final List< ColumnBasedTableRowImageSegment > segments
 				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, imageSegmentCoordinateToColumn );
 
 		return segments;

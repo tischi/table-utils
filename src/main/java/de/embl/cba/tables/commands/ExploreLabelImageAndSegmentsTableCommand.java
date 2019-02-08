@@ -1,8 +1,8 @@
 package de.embl.cba.tables.commands;
 
-import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.TableColumns;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
-import de.embl.cba.tables.modelview.images.ImageSourcesModelFactory;
+import de.embl.cba.tables.modelview.images.FileImageSourcesModelFactory;
 import de.embl.cba.tables.modelview.segments.ColumnBasedTableRowImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
@@ -17,12 +17,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 
 @Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Label Image and Segments Table" )
 public class ExploreLabelImageAndSegmentsTableCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {
+	private static final String COLUMN_NAME_LABEL_IMAGE_ID = "LabelImageId";
+
 	@Parameter ( label = "Label mask image (single channel, 2D+t or 3D+t)" )
 	public File labelMasksFile;
 
@@ -33,7 +36,7 @@ public class ExploreLabelImageAndSegmentsTableCommand< R extends RealType< R > &
 	public File intensitiesFile;
 
 
-	private LinkedHashMap< String, ArrayList< Object > > columns;
+	private LinkedHashMap< String, List< Object > > columns;
 
 	@Override
 	public void run()
@@ -44,7 +47,7 @@ public class ExploreLabelImageAndSegmentsTableCommand< R extends RealType< R > &
 		final String tablePath = tableFile.toString();
 
 		final FileImageSourcesModel imageSourcesModel =
-				new ImageSourcesModelFactory(
+				new FileImageSourcesModelFactory(
 						tableRowImageSegments,
 						tablePath,
 						2 ).getImageSourcesModel();
@@ -54,20 +57,25 @@ public class ExploreLabelImageAndSegmentsTableCommand< R extends RealType< R > &
 	}
 
 	private ArrayList<ColumnBasedTableRowImageSegment> createAnnotatedImageSegments(
-			File inputTableFile )
+			File tableFile )
 	{
-		columns = TableUtils.columnsFromTableFile( tableFile, null );
+		columns = TableColumns.columnsFromTableFile( tableFile, null );
+
+		columns = TableColumns.addLabelImageIdColumn(
+				this.columns,
+				COLUMN_NAME_LABEL_IMAGE_ID,
+				"em-segmented-cells-labels" );
 
 		final HashMap< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn
-				= getImageSegmentCoordinateToColumn( );
+				= createImageSegmentCoordinateToColumn( );
 
-		final ArrayList< ColumnBasedTableRowImageSegment > segments
+		final List< ColumnBasedTableRowImageSegment > segments
 				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, imageSegmentCoordinateToColumn );
 
 		return segments;
 	}
 
-	private HashMap< ImageSegmentCoordinate, ArrayList< Object > > getImageSegmentCoordinateToColumn( )
+	private HashMap< ImageSegmentCoordinate, ArrayList< Object > > createImageSegmentCoordinateToColumn( )
 	{
 		final HashMap< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn
 				= new HashMap<>();

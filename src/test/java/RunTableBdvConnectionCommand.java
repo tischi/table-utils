@@ -15,7 +15,7 @@ public class RunTableBdvConnectionCommand
 
 		final HashMap< String, Object > parameters = new HashMap<>();
 
-		parameters.put( "tableFile",
+		parameters.put( "resultsTable",
 				new File( RunTableBdvConnectionCommand.class.getResource(
 						"2d-16bit-labelMask-Morphometry.csv" ).getFile() ) );
 
