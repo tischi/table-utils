@@ -17,8 +17,12 @@ public class RunExploreMorphoLibJSegmentationCommand
 
 		final ResultsTable resultsTable = new ResultsTable( 10 );
 		resultsTable.show( "Table" );
-
 		resultsTable.addValue( "Column01", 10 );
+
+		final ResultsTable resultsTable2 = new ResultsTable( 10 );
+		resultsTable2.show( "Table2" );
+		resultsTable2.addValue( "Column01", 10 );
+
 
 //		final net.imagej.table.ResultsTable resultsTable1 = new net.imagej.table.ResultsTable();
 

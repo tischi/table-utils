@@ -8,7 +8,7 @@ public class TableRowFromColumns implements TableRow
 	private final int rowIndex;
 
 	public TableRowFromColumns(
-			LinkedHashMap< String, ArrayList< Object > > columnToValues,
+			LinkedHashMap< String, List< Object > > columnToValues,
 			int rowIndex )
 	{
 		this.rowIndex = rowIndex;
@@ -36,11 +36,11 @@ public class TableRowFromColumns implements TableRow
 	 */
 	class ColumnToValue extends LinkedHashMap< String, Object >
 	{
-		private final LinkedHashMap< String, ArrayList< Object > > columnToValues;
+		private final LinkedHashMap< String, List< Object > > columnToValues;
 		private final int rowIndex;
 
 		public ColumnToValue(
-				LinkedHashMap< String, ArrayList< Object > > columnToValues,
+				LinkedHashMap< String, List< Object > > columnToValues,
 				int rowIndex )
 		{
 			super( columnToValues );

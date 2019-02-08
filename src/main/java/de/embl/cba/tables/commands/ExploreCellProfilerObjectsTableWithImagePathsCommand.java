@@ -75,9 +75,9 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 		return segments;
 	}
 
-	private HashMap< ImageSegmentCoordinate, ArrayList< Object > > getImageSegmentCoordinateToColumn( ArrayList< String > pathColumnNames )
+	private HashMap< ImageSegmentCoordinate, List< Object > > getImageSegmentCoordinateToColumn( List< String > pathColumnNames )
 	{
-		final HashMap< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn
+		final HashMap< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn
 				= new HashMap<>();
 
 		String labelImagePathColumnName = getLabelImagePathColumnName( pathColumnNames );
@@ -101,7 +101,7 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 		return imageSegmentCoordinateToColumn;
 	}
 
-	private String getLabelImagePathColumnName( ArrayList< String > pathColumnNames )
+	private String getLabelImagePathColumnName( List< String > pathColumnNames )
 	{
 		String labelImagePathColumnName = "";
 		for ( String pathColumnName : pathColumnNames )
@@ -115,23 +115,23 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 		return labelImagePathColumnName;
 	}
 
-	private ArrayList< String > replaceFolderAndFileColumnsByPathColumn()
+	private List< String > replaceFolderAndFileColumnsByPathColumn()
 	{
 		final int numRows = columns.values().iterator().next().size();
 		imageNameToFolderAndFileColumns = fetchFolderAndFileColumns( columns.keySet() );
 
 		final String tableFile = inputTableFile.toString();
 
-		final ArrayList< String > pathColumnNames = new ArrayList<>();
+		final List< String > pathColumnNames = new ArrayList<>();
 
 		for ( String imageName : imageNameToFolderAndFileColumns.keySet() )
 		{
 			final String fileColumnName = imageNameToFolderAndFileColumns.get( imageName ).fileColumn();
 			final String folderColumnName = imageNameToFolderAndFileColumns.get( imageName ).folderColumn();
-			final ArrayList< Object > fileColumn = columns.get( fileColumnName );
-			final ArrayList< Object > folderColumn = columns.get( folderColumnName );
+			final List< Object > fileColumn = columns.get( fileColumnName );
+			final List< Object > folderColumn = columns.get( folderColumnName );
 
-			final ArrayList< Object > pathColumn = new ArrayList<>();
+			final List< Object > pathColumn = new ArrayList<>();
 
 			for ( int row = 0; row < numRows; row++ )
 			{

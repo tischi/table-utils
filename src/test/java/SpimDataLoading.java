@@ -36,8 +36,8 @@ public class SpimDataLoading
 		/**
 		 * Version 01: show a Volatile Source extracted from SpimData
 		 */
-		final ArrayList< ConverterSetup > converterSetups = new ArrayList<>();
-		final ArrayList< SourceAndConverter< ? > > sources = new ArrayList<>();
+		final List< ConverterSetup > converterSetups = new ArrayList<>();
+		final List< SourceAndConverter< ? > > sources = new ArrayList<>();
 		BigDataViewer.initSetups( spimData, converterSetups, sources );
 		final Source< ? extends Volatile< ? > > volatileSpimSource = sources.get( 0 ).asVolatile().getSpimSource();
 		final BdvStackSource< ? extends Volatile< ? > > show = BdvFunctions.show( volatileSpimSource );

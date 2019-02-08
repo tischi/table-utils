@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -36,14 +37,10 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private JFrame frame;
     private JScrollPane scrollPane;
     private JMenuBar menuBar;
-//    private Map< ImageSegmentCoordinate, String > segmentCoordinateToColumnMap;
-//	private ConcurrentHashMap< String, Integer > objectRowMap;
 	private Map< String, double[] > columnsMinMaxMap;
 	private JTable table;
 	private int categoricalLabelColoringRandomSeed;
-	private ArrayList< Integer > selectedRowsInView;
 	private int recentlySelectedRowInView;
-	private String currentColoringColumn;
 
 	public TableRowsTableView(
 			final TableRowsModel< T > tableRowsModel,
@@ -55,17 +52,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		this.selectionColoringModel = selectionColoringModel;
 		this.selectionModel = selectionModel;
 
-		selectedRowsInView = new ArrayList<>(  );
-
 		registerAsSelectionListener( selectionModel );
 
 		registerAsColoringListener( selectionColoringModel );
-
-//		segmentCoordinateToColumnMap = emptyObjectCoordinateColumnMap();
-//
-//		segmentCoordinateToColumnMap.put(
-//				ImageSegmentCoordinate.LabelId,
-//				tableRowsModel.getLabelFeatureName() );
 
 		categoricalLabelColoringRandomSeed = 50;
 
@@ -73,11 +62,11 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		createMenuBar();
 		showTable();
 		registerAsListSelectionListener();
-		configureTableRowColoring( tableRowsModel, selectionModel );
+		configureTableRowColoring();
 	}
 
 
-	public void configureTableRowColoring( TableRowsModel< T > tableRowsModel, SelectionModel< T > selectionModel )
+	public void configureTableRowColoring( )
 	{
 		table.setDefaultRenderer( Double.class, new DefaultTableCellRenderer()
 		{
@@ -158,9 +147,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private Color getColour( int rowInView, int columnInView )
 	{
-		final int col = table.convertColumnIndexToModel( columnInView );
-		final String column = getColumnNames().get( col );
-
 		final int row = table.convertRowIndexToModel( rowInView );
 
 		if ( selectionModel.isFocused( tableRowsModel.getTableRows().get( row ) ) )
@@ -181,14 +167,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	public void registerAsColoringListener( SelectionColoringModel< T > selectionColoringModel )
 	{
-		selectionColoringModel.listeners().add( new ColoringListener()
-		{
-			@Override
-			public void coloringChanged()
-			{
-				table.repaint( );
-			}
-		} );
+		selectionColoringModel.listeners().add( () -> table.repaint( ) );
 	}
 
 	private void createTable()
@@ -294,14 +273,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			@Override
 			public void actionPerformed( ActionEvent e )
 			{
-				try
-				{
-					TableUIs.saveTableUI( table );
-				}
-				catch ( IOException e1 )
-				{
-					e1.printStackTrace();
-				}
+				TableUIs.saveTableUI( table );
 			}
 		} );
 		return menuItem;
@@ -394,7 +366,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		TableUtils.addColumn( table.getModel(), column, defaultValue );
 	}
 
-	public ArrayList< String > getColumnNames()
+	public List< String > getColumnNames()
 	{
 		return TableUtils.getColumnNames( table );
 	}
@@ -625,8 +597,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		// the column classes....(and even if, some are numeric but should be treated
 		// categorical
 
-		currentColoringColumn = column;
-
 		final int columnIndex = table.getColumnModel().getColumnIndex( column );
 
 		if ( Number.class.isAssignableFrom( table.getColumnClass( columnIndex ) ) )
@@ -643,12 +613,13 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 			selectionColoringModel.setWrappedColoringModel( coloringModel );
 
-			final NumericColoringModelDialog dialog =
-					new NumericColoringModelDialog(
-							column,
-							coloringModel );
 
 			// TODO: whether and how to automatically close this dialog?
+			new NumericColoringModelDialog(
+					column,
+					coloringModel );
+
+
 		}
 		else
 		{

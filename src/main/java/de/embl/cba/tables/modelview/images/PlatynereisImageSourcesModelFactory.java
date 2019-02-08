@@ -10,6 +10,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 
 public class PlatynereisImageSourcesModelFactory
@@ -18,7 +19,7 @@ public class PlatynereisImageSourcesModelFactory
 
 	public PlatynereisImageSourcesModelFactory( File directory )
 	{
-		ArrayList< File > imageFiles = getImageFiles( directory, ".*.xml" );
+		List< File > imageFiles = getImageFiles( directory, ".*.xml" );
 
 		sourcesModel = new PlatynereisImageSourcesModel();
 
@@ -34,10 +35,10 @@ public class PlatynereisImageSourcesModelFactory
 		return sourcesModel;
 	}
 
-	public ArrayList< File > getImageFiles( File inputDirectory, String filePattern )
+	public List< File > getImageFiles( File inputDirectory, String filePattern )
 	{
 		Logger.log( "Fetching image files..." );
-		final ArrayList< File > fileList = FileUtils.getFileList( inputDirectory, filePattern );
+		final List< File > fileList = FileUtils.getFileList( inputDirectory, filePattern );
 		Logger.log( "Number of image files: " +  fileList.size() );
 		Collections.sort( fileList, new SortFilesIgnoreCase());
 		return fileList;

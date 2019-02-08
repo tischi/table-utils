@@ -9,7 +9,6 @@ public class RunExploreCellProfilerOutputCommand
 		final ImageJ ij = new ImageJ();
 		ij.ui().showUI();
 
-
 		ij.command().run( ExploreCellProfilerObjectsTableWithImagePathsCommand.class, true );
 	}
 }

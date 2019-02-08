@@ -1,11 +1,12 @@
-package de.embl.cba.tables.tablemodels;
+package de.embl.cba.tables.modelview.tables;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ColumnClassAwareTableModel extends DefaultTableModel
 {
-	ArrayList< Class > columnClasses;
+	List< Class > columnClasses;
 
 	public ColumnClassAwareTableModel( )
 	{

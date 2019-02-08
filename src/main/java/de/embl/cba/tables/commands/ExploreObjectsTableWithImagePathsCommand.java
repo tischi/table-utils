@@ -19,6 +19,7 @@ import org.scijava.plugin.Plugin;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 
 @Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Objects Table with Image Paths " )
@@ -57,7 +58,7 @@ public class ExploreObjectsTableWithImagePathsCommand< R extends RealType< R > &
 		final SelectionColoringModel< ImageSegment > selectionColoringModel
 				= new SelectionColoringModel< ImageSegment >( coloringModel, selectionModel );
 
-		final ArrayList< String > initialSources = new ArrayList<>();
+		final List< String > initialSources = new ArrayList<>();
 		initialSources.add( imageSourcesModel.sources().keySet().iterator().next() );
 
 		final ImageSegmentsBdvView imageSegmentsBdvView =

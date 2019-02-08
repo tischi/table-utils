@@ -17,7 +17,7 @@ public class DefaultTableRowsModel< T extends TableRow > implements TableRowsMod
 	}
 
 	@Override
-	public ArrayList< T > getTableRows()
+	public List< T > getTableRows()
 	{
 		return tableRows;
 	}

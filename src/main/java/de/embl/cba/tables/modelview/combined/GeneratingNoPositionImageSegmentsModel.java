@@ -1,12 +1,7 @@
 package de.embl.cba.tables.modelview.combined;
 
-import bdv.util.BdvHandle;
-import de.embl.cba.bdv.utils.BdvUtils;
-import de.embl.cba.tables.modelview.images.Metadata;
-import de.embl.cba.tables.modelview.images.SourceAndMetadata;
 import de.embl.cba.tables.modelview.segments.DefaultImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentId;
-import net.imglib2.RealPoint;
 
 import java.util.HashMap;
 import java.util.Map;

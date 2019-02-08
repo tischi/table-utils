@@ -5,9 +5,7 @@ import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
 import de.embl.cba.tables.modelview.segments.TableRow;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 
 public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
@@ -15,16 +13,16 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 	public static final String PATH = "Path_";
 	public static final String OBJECTS = "Objects_";
 
-	private final ArrayList< T > tableRowImageSegments;
+	private final List< T > tableRowImageSegments;
 	private Set< String > columns;
-	private final HashMap< String, String > imageNameToPathColumnName;
+	private final Map< String, String > imageNameToPathColumnName;
 	private final int numSpatialDimensions;
 
 	private FileImageSourcesModel imageSourcesModel;
 	private String tablePath;
 
 	public FileImageSourcesModelFactory(
-			ArrayList< T > tableRowImageSegments,
+			List< T > tableRowImageSegments,
 			String tablePath,
 			int numSpatialDimensions )
 	{
@@ -52,7 +50,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		{
 			final Set< String > imageNames = imageNameToPathColumnName.keySet();
 
-			ArrayList< String > imageSetIds = getImageSetIds( tableRowImageSegment, imageNames );
+			final List< String > imageSetIds = getImageSetIds( tableRowImageSegment, imageNames );
 
 			for ( String imageName : imageNames )
 			{
@@ -88,7 +86,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		return tableRow.cells().get( imagePathColumn ).toString();
 	}
 
-	private ArrayList< String > getImageSetIds( TableRow tableRow, Set< String > imageNames )
+	private List< String > getImageSetIds( TableRow tableRow, Set< String > imageNames )
 	{
 		ArrayList< String > imageSetIds = new ArrayList<>(  );
 
@@ -116,7 +114,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		return flavour;
 	}
 
-	private HashMap< String, String > getImageNameToPathColumnName( )
+	private Map< String, String > getImageNameToPathColumnName( )
 	{
 		final HashMap< String, String > imageNameToPathColumnName = new HashMap<>();
 		for ( String column : columns )

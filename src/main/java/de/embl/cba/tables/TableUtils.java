@@ -1,10 +1,9 @@
 package de.embl.cba.tables;
 
-import de.embl.cba.tables.tablemodels.ColumnClassAwareTableModel;
+import de.embl.cba.tables.modelview.tables.ColumnClassAwareTableModel;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
 import de.embl.cba.tables.modelview.segments.*;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
-import ij.measure.ResultsTable;
 import net.imglib2.util.ValuePair;
 import org.scijava.table.GenericTable;
 
@@ -83,15 +82,15 @@ public class TableUtils
 
 	public static JTable loadTable( final File file, String delim )
 	{
-		ArrayList< String > rows = readRows( file );
+		List< String > rows = readRows( file );
 
 		return createJTableFromStringList( rows, delim );
 	}
 
 	
-	public static ArrayList< String > readRows( File file )
+	public static List< String > readRows( File file )
 	{
-		ArrayList< String > rows = new ArrayList<>();
+		List< String > rows = new ArrayList<>();
 
 		try
 		{
@@ -114,11 +113,11 @@ public class TableUtils
 	}
 
 
-	public static ArrayList< String > getColumnNames( ArrayList< String > strings, String delim )
+	public static List< String > getColumnNames( List< String > strings, String delim )
 	{
 		StringTokenizer st = new StringTokenizer( strings.get( 0 ), delim );
 
-		ArrayList< String > featureNames = new ArrayList<>();
+		List< String > featureNames = new ArrayList<>();
 
 		while ( st.hasMoreTokens() )
 		{
@@ -127,7 +126,7 @@ public class TableUtils
 		return featureNames;
 	}
 
-	public static String autoDelim( String delim, ArrayList< String > strings )
+	public static String autoDelim( String delim, List< String > strings )
 	{
 		if ( delim == null )
 		{
@@ -143,14 +142,14 @@ public class TableUtils
 		return delim;
 	}
 
-	public static JTable createJTableFromStringList( ArrayList< String > strings, String delim )
+	public static JTable createJTableFromStringList( List< String > strings, String delim )
 	{
 
 		delim = autoDelim( delim, strings );
 
 		StringTokenizer st = new StringTokenizer( strings.get( 0 ), delim );
 
-		ArrayList< String > colNames = new ArrayList<>();
+		List< String > colNames = new ArrayList<>();
 
 		while ( st.hasMoreTokens() )
 		{
@@ -204,20 +203,20 @@ public class TableUtils
 
 
 	// TODO: replace by more performant column based version (see below)
-	public static ArrayList< TableRowImageSegment > segmentsFromTableFile(
+	public static List< TableRowImageSegment > segmentsFromTableFile(
 			final File file,
 			String delim,
 			final Map< ImageSegmentCoordinate, String > coordinateColumnMap,
 			final DefaultImageSegmentBuilder segmentBuilder )
 	{
 
-		final ArrayList< TableRowImageSegment > segments = new ArrayList<>();
+		final List< TableRowImageSegment > segments = new ArrayList<>();
 
-		final ArrayList< String > rowsInTable = readRows( file );
+		final List< String > rowsInTable = readRows( file );
 
 		delim = autoDelim( delim, rowsInTable );
 
-		ArrayList< String > columns = getColumnNames( rowsInTable, delim );
+		List< String > columns = getColumnNames( rowsInTable, delim );
 
 		for ( int row = 1; row < rowsInTable.size(); ++row )
 		{
@@ -247,7 +246,7 @@ public class TableUtils
 
 	}
 
-	public static ArrayList< DefaultTableRowImageSegment > segmentsFromTableFileColumnWise(
+	public static List< DefaultTableRowImageSegment > segmentsFromTableFileColumnWise(
 			final File file,
 			String delim,
 			final Map< ImageSegmentCoordinate, String > coordinateColumnMap,
@@ -255,15 +254,15 @@ public class TableUtils
 	)
 	{
 
-		final ArrayList< DefaultTableRowImageSegment > segments = new ArrayList<>();
+		final List< DefaultTableRowImageSegment > segments = new ArrayList<>();
 
-		final ArrayList< String > rowsInTable = readRows( file );
+		final List< String > rowsInTable = readRows( file );
 
 		delim = autoDelim( delim, rowsInTable );
 
-		ArrayList< String > columns = getColumnNames( rowsInTable, delim );
+		List< String > columns = getColumnNames( rowsInTable, delim );
 
-		final LinkedHashMap< String, ArrayList< Object > > columnToValues = new LinkedHashMap<>();
+		final LinkedHashMap< String, List< Object > > columnToValues = new LinkedHashMap<>();
 
 		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
 		{
@@ -273,7 +272,7 @@ public class TableUtils
 		}
 
 
-		final ArrayList< TableRowMap > tableRowMaps = new ArrayList<>();
+		final List< TableRowMap > tableRowMaps = new ArrayList<>();
 		for ( int row = 1; row < rowsInTable.size(); ++row )
 		{
 //			final LinkedHashMap< String, Object > columnValueMap = new LinkedHashMap<>();
@@ -558,7 +557,7 @@ public class TableUtils
 		final Path normalize = path.normalize();
 		return normalize;
 	}
-	
+
 	public static double asDouble( Object featureValue )
 	{
 		double value;

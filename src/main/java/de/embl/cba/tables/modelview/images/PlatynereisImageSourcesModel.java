@@ -2,28 +2,22 @@ package de.embl.cba.tables.modelview.images;
 
 import bdv.BigDataViewer;
 import bdv.tools.brightness.ConverterSetup;
-import bdv.util.RandomAccessibleIntervalSource;
 import bdv.viewer.Interpolation;
 import bdv.viewer.Source;
 import bdv.viewer.SourceAndConverter;
-import ij.ImagePlus;
 import mpicbg.spim.data.SpimData;
 import mpicbg.spim.data.SpimDataException;
 import mpicbg.spim.data.XmlIoSpimData;
 import mpicbg.spim.data.sequence.VoxelDimensions;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealRandomAccessible;
-import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.NumericType;
-import net.imglib2.type.numeric.RealType;
-import net.imglib2.util.Util;
-import net.imglib2.view.Views;
 
-import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static de.embl.cba.tables.modelview.images.Metadata.*;
@@ -63,36 +57,36 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 	{
 		final Metadata metadata = new Metadata();
 
-		metadata.getMap().put( DISPLAY_RANGE_MIN, 0 );
-		metadata.getMap().put( DISPLAY_RANGE_MAX, 1000 );
+		metadata.put( DISPLAY_RANGE_MIN, 0 );
+		metadata.put( DISPLAY_RANGE_MAX, 1000 );
 
 		if ( file.toString().contains( LABELS_FILE_ID ) )
 		{
-			metadata.getMap().put( FLAVOUR, Flavour.LabelSource );
+			metadata.put( FLAVOUR, Flavour.LabelSource );
 		}
 		else
 		{
-			metadata.getMap().put( FLAVOUR, Flavour.IntensitySource );
+			metadata.put( FLAVOUR, Flavour.IntensitySource );
 		}
 
 		if ( file.toString().contains( DEFAULT_EM_RAW_FILE_ID ) )
 		{
-			metadata.getMap().put( SHOW_INITIALLY, true );
+			metadata.put( SHOW_INITIALLY, true );
 		}
 
 		if ( file.toString().contains( DEFAULT_LABELS_FILE_ID ) )
 		{
-			metadata.getMap().put( SHOW_INITIALLY, true );
+			metadata.put( SHOW_INITIALLY, true );
 		}
 
 		if ( file.toString().contains( EM_RAW_FILE_ID ) )
 		{
-			metadata.getMap().put( DISPLAY_RANGE_MIN, 0 );
-			metadata.getMap().put( DISPLAY_RANGE_MAX, 255 );
+			metadata.put( DISPLAY_RANGE_MIN, 0 );
+			metadata.put( DISPLAY_RANGE_MAX, 255 );
 		}
 
-		metadata.getMap().put( NUM_SPATIAL_DIMENSIONS, 3 );
-		metadata.getMap().put( DISPLAY_NAME, sourceName( file ) );
+		metadata.put( NUM_SPATIAL_DIMENSIONS, 3 );
+		metadata.put( DISPLAY_NAME, sourceName( file ) );
 
 		return metadata;
 	}
@@ -157,8 +151,8 @@ public class PlatynereisImageSourcesModel implements ImageSourcesModel
 			if ( source == null )
 			{
 				final SpimData spimData = openSpimData( file );
-				final ArrayList< ConverterSetup > converterSetups = new ArrayList<>();
-				final ArrayList< SourceAndConverter< ? > > sources = new ArrayList<>();
+				final List< ConverterSetup > converterSetups = new ArrayList<>();
+				final List< SourceAndConverter< ? > > sources = new ArrayList<>();
 				BigDataViewer.initSetups( spimData, converterSetups, sources );
 
 				source = ( Source< T > ) sources.get( 0 ).asVolatile().getSpimSource();

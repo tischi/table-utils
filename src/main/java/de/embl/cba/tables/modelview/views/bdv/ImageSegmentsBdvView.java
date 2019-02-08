@@ -94,7 +94,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		for ( SourceAndMetadata sourceAndMetadata : imageSourcesModel.sources().values() )
 		{
-			if ( (boolean) sourceAndMetadata.metadata().getMap().get( Metadata.SHOW_INITIALLY ) )
+			if ( (boolean) sourceAndMetadata.metadata().get( Metadata.SHOW_INITIALLY ) )
 			{
 				showSource( sourceAndMetadata );
 				isShownAtLeastOne = true;
@@ -171,7 +171,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		final String imageId = imageSegment.imageId();
 
-		if ( currentLabelSource.metadata().getMap().get( DISPLAY_NAME ).equals( imageId ) ) return;
+		if ( currentLabelSource.metadata().get( DISPLAY_NAME ).equals( imageId ) ) return;
 
 		final SourceAndMetadata sourceAndMetadata
 				= imageSourcesModel.sources().get( imageId );
@@ -191,7 +191,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	 */
 	public void showSource( SourceAndMetadata sourceAndMetadata )
 	{
-		final Map< String, Object > metadata = sourceAndMetadata.metadata().getMap();
+		final Map< String, Object > metadata = sourceAndMetadata.metadata();
 
 		if( metadata.containsKey( Metadata.EXCLUSIVE_IMAGE_SET ) )
 		{
@@ -247,7 +247,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		if ( bdv != null  ) removeAllSources();
 
-		final ArrayList< String > imageIDs = ( ArrayList< String > ) metadata.get( Metadata.EXCLUSIVE_IMAGE_SET );
+		final List< String > imageIDs = ( ArrayList< String > ) metadata.get( Metadata.EXCLUSIVE_IMAGE_SET );
 
 		for ( int i = 0; i < imageIDs.size(); i++ )
 		{
@@ -290,7 +290,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			Double displayRangeMin,
 			Double displayRangeMax )
 	{
-		final Map< String, Object > metadata = sourceAndMetadata.metadata().getMap();
+		final Map< String, Object > metadata = sourceAndMetadata.metadata();
 		Source< ? > source = sourceAndMetadata.source();
 
 		if ( metadata.containsKey( FLAVOUR ) && metadata.get( FLAVOUR ).equals( Flavour.LabelSource ) )
@@ -359,7 +359,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		ImageSegmentLabelsARGBConverter labelSourcesARGBConverter =
 				new ImageSegmentLabelsARGBConverter(
 						imageSegmentsModel,
-						( String )sourceAndMetadata.metadata().getMap().get( Metadata.IMAGE_ID ),
+						( String )sourceAndMetadata.metadata().get( Metadata.IMAGE_ID ),
 						selectionColoringModel );
 
 		return new ARGBConvertedRealSource(
@@ -433,9 +433,9 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		if ( labelId == BACKGROUND ) return;
 
-		if ( currentLabelSource.metadata().getMap().containsKey( DISPLAY_NAME ) )
+		if ( currentLabelSource.metadata().containsKey( DISPLAY_NAME ) )
 		{
-			final String imageId = ( String ) currentLabelSource.metadata().getMap().get( DISPLAY_NAME );
+			final String imageId = ( String ) currentLabelSource.metadata().get( DISPLAY_NAME );
 
 			final ImageSegmentId imageSegmentId = new ImageSegmentId( imageId, labelId, getCurrentTimePoint() );
 

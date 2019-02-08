@@ -36,6 +36,9 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 	public ImagePlus intensityImagePlus;
 
 	@Parameter ( label = "Results table" )
+	public ResultsTable resultsTable0;
+
+	@Parameter ( label = "Results table" )
 	public ij.measure.ResultsTable resultsTable;
 
 	private LinkedHashMap< String, List< Object > > columns;

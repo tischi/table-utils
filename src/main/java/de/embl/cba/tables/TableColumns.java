@@ -30,11 +30,11 @@ public class TableColumns
 			final File file,
 			String delim )
 	{
-		final ArrayList< String > rowsInTable = TableUtils.readRows( file );
+		final List< String > rowsInTable = TableUtils.readRows( file );
 
 		delim = TableUtils.autoDelim( delim, rowsInTable );
 
-		ArrayList< String > columns = TableUtils.getColumnNames( rowsInTable, delim );
+		List< String > columns = TableUtils.getColumnNames( rowsInTable, delim );
 
 		final LinkedHashMap< String, List< Object > > columnToValues
 				= new LinkedHashMap<>();
@@ -66,7 +66,7 @@ public class TableColumns
 	{
 		final int numRows = columns.values().iterator().next().size();
 
-		final ArrayList< Object > labelImageIdColumn = new ArrayList<>();
+		final List< Object > labelImageIdColumn = new ArrayList<>();
 		for ( int row = 0; row < numRows; row++ )
 		{
 			labelImageIdColumn.add( labelImageId );

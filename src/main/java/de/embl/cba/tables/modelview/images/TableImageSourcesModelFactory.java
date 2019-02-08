@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class TableImageSourcesModelFactory
@@ -21,7 +22,7 @@ public class TableImageSourcesModelFactory
 	private final String imageRootPathOnThisComputer;
 	private final String delim;
 
-	private ArrayList< String > columns;
+	private List< String > columns;
 	private FileImageSourcesModel imageSourcesModel;
 	private final HashMap< String, FolderAndFileColumn > imageNameToPathColumns;
 	private final JTable table;
@@ -59,7 +60,7 @@ public class TableImageSourcesModelFactory
 
 		for ( int row = 0; row < table.getModel().getRowCount(); row++ )
 		{
-			ArrayList< String > imageSetIds = getImageSetIds( row );
+			List< String > imageSetIds = getImageSetIds( row );
 
 			for ( String imageName : imageNameToPathColumns.keySet() )
 			{
@@ -79,9 +80,9 @@ public class TableImageSourcesModelFactory
 		return imageSourcesModel;
 	}
 
-	private ArrayList< String > getImageSetIds( int row )
+	private List< String > getImageSetIds( int row )
 	{
-		ArrayList< String > imageSetIds = new ArrayList<>(  );
+		List< String > imageSetIds = new ArrayList<>(  );
 		for ( String imageName : imageNameToPathColumns.keySet() )
 		{
 			String imageId = getImagePath( imageName, row );
@@ -126,7 +127,7 @@ public class TableImageSourcesModelFactory
 			String imageId,
 			String imagePath,
 			Metadata.Flavour imageFlavour,
-			ArrayList< String > imageSetIds )
+			List< String > imageSetIds )
 	{
 		imagePath = getMappedPath( imagePath );
 

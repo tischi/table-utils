@@ -41,7 +41,7 @@ public class ExploreLabelImageAndSegmentsTableCommand< R extends RealType< R > &
 	@Override
 	public void run()
 	{
-		final ArrayList< ColumnBasedTableRowImageSegment > tableRowImageSegments
+		final List< ColumnBasedTableRowImageSegment > tableRowImageSegments
 				= createAnnotatedImageSegments( tableFile );
 
 		final String tablePath = tableFile.toString();
@@ -56,7 +56,7 @@ public class ExploreLabelImageAndSegmentsTableCommand< R extends RealType< R > &
 
 	}
 
-	private ArrayList<ColumnBasedTableRowImageSegment> createAnnotatedImageSegments(
+	private List<ColumnBasedTableRowImageSegment> createAnnotatedImageSegments(
 			File tableFile )
 	{
 		columns = TableColumns.columnsFromTableFile( tableFile, null );
@@ -66,7 +66,7 @@ public class ExploreLabelImageAndSegmentsTableCommand< R extends RealType< R > &
 				COLUMN_NAME_LABEL_IMAGE_ID,
 				"em-segmented-cells-labels" );
 
-		final HashMap< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn
+		final HashMap< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn
 				= createImageSegmentCoordinateToColumn( );
 
 		final List< ColumnBasedTableRowImageSegment > segments
@@ -75,9 +75,9 @@ public class ExploreLabelImageAndSegmentsTableCommand< R extends RealType< R > &
 		return segments;
 	}
 
-	private HashMap< ImageSegmentCoordinate, ArrayList< Object > > createImageSegmentCoordinateToColumn( )
+	private HashMap< ImageSegmentCoordinate, List< Object > > createImageSegmentCoordinateToColumn( )
 	{
-		final HashMap< ImageSegmentCoordinate, ArrayList< Object > > imageSegmentCoordinateToColumn
+		final HashMap< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn
 				= new HashMap<>();
 
 //		String labelImagePathColumnName = getLabelImagePathColumnName( pathColumnNames );
