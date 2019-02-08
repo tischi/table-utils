@@ -56,6 +56,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private ViewerState recentViewerState;
 	private List< ConverterSetup > recentConverterSetups;
 	private double voxelSpacing3DView;
+	private Set< SourceAndMetadata > currentSources;
 
 	public ImageSegmentsBdvView(
 			final ImageSourcesModel imageSourcesModel,
@@ -94,16 +95,16 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		for ( SourceAndMetadata sourceAndMetadata : imageSourcesModel.sources().values() )
 		{
-			if ( (boolean) sourceAndMetadata.metadata().get( Metadata.SHOW_INITIALLY ) )
+			if ( sourceAndMetadata.metadata().showInitially )
 			{
-				showSource( sourceAndMetadata );
+				showSourceSet( sourceAndMetadata );
 				isShownNone = false;
 			}
 		}
 
 		if ( isShownNone )
 		{
-			showSource( imageSourcesModel.sources().values().iterator().next() );
+			showSourceSet( imageSourcesModel.sources().values().iterator().next() );
 		}
 
 	}
@@ -170,12 +171,12 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		final String imageId = imageSegment.imageId();
 
-		if ( currentLabelSource.metadata().get( IMAGE_ID ).equals( imageId ) ) return;
+		if ( currentLabelSource.metadata().imageId.equals( imageId ) ) return;
 
 		final SourceAndMetadata sourceAndMetadata
 				= imageSourcesModel.sources().get( imageId );
 
-		showSource( sourceAndMetadata );
+		showSourceSet( sourceAndMetadata );
 	}
 
 	public void setVoxelSpacing3DView( double voxelSpacing3DView )
@@ -188,21 +189,9 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	 *
 	 * @param sourceAndMetadata
 	 */
-	public void showSource( SourceAndMetadata sourceAndMetadata )
+	public void showSourceSet( SourceAndMetadata sourceAndMetadata )
 	{
-		final Map< String, Object > metadata = sourceAndMetadata.metadata();
-
-		if( metadata.containsKey( Metadata.EXCLUSIVE_IMAGE_SET ) )
-		{
-			showExclusiveImageSet( metadata );
-		}
-		else
-		{
-			showSingleSource(
-					sourceAndMetadata,
-					null,
-					null );
-		}
+		showExclusiveImageSet( sourceAndMetadata.metadata().imageSet );
 	}
 
 	public void applyRecentViewerSettings( )
@@ -212,9 +201,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			applyViewerStateTransform( recentViewerState );
 
 			applyViewerStateVisibility( recentViewerState );
-
-			//applyDisplaySettings( recentConverterSetups );
-
 		}
 	}
 
@@ -242,95 +228,94 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		bdv.getViewerPanel().setCurrentViewerTransform( transform3D );
 	}
 
-	public void showExclusiveImageSet( Map< String, Object > metadata )
+	public void showExclusiveImageSet( List< String > imageIDs )
 	{
 		if ( bdv != null  ) removeAllSources();
 
-		final List< String > imageIDs = ( ArrayList< String > ) metadata.get( Metadata.EXCLUSIVE_IMAGE_SET );
-
-		for ( int i = 0; i < imageIDs.size(); i++ )
+		for ( int sourceIndex = 0; sourceIndex < imageIDs.size(); sourceIndex++ )
 		{
 			final SourceAndMetadata associatedSourceAndMetadata =
-					imageSourcesModel.sources().get( imageIDs.get( i ) );
+					imageSourcesModel.sources().get( imageIDs.get( sourceIndex ) );
 
-			if ( recentConverterSetups != null )
-			{
-				showSingleSource(
-						associatedSourceAndMetadata,
-						recentConverterSetups.get( i ).getDisplayRangeMin(),
-						recentConverterSetups.get( i ).getDisplayRangeMax() );
-			}
-			else
-			{
-				showSingleSource(
-						associatedSourceAndMetadata,
-						null,
-						null );
-			}
+			applyRecentDisplaySettings( sourceIndex, associatedSourceAndMetadata );
+
+			showSource( associatedSourceAndMetadata );
 		}
 
 		applyRecentViewerSettings( );
 	}
 
-
-	public BdvStackSource showSingleSource( SourceAndMetadata sourceAndMetadata )
+	private void applyRecentDisplaySettings( int i, SourceAndMetadata associatedSourceAndMetadata )
 	{
-		return showSingleSource( sourceAndMetadata, null, null);
+		if ( recentConverterSetups != null )
+		{
+			associatedSourceAndMetadata.metadata().put(
+					DISPLAY_RANGE_MIN,
+					recentConverterSetups.get( i ).getDisplayRangeMin());
+
+			associatedSourceAndMetadata.metadata().put(
+					DISPLAY_RANGE_MAX,
+					recentConverterSetups.get( i ).getDisplayRangeMax());
+		}
 	}
+
 
 	/**
 	 * Shows a single source
-	 *  @param sourceAndMetadata
+	 * @param sourceAndMetadata
 	 * @param displayRangeMin
 	 * @param displayRangeMax
 	 */
-	public BdvStackSource showSingleSource(
-			SourceAndMetadata sourceAndMetadata,
-			Double displayRangeMin,
-			Double displayRangeMax )
+	public BdvStackSource showSource( SourceAndMetadata sourceAndMetadata )
 	{
-		final Map< String, Object > metadata = sourceAndMetadata.metadata();
+		final Metadata metadata = sourceAndMetadata.metadata();
 		Source< ? > source = sourceAndMetadata.source();
 
-		if ( metadata.containsKey( FLAVOUR ) && metadata.get( FLAVOUR ).equals( Flavour.LabelSource ) )
+		if ( metadata.flavour == Flavour.LabelSource )
 		{
 			source = asLabelSource( sourceAndMetadata );
 			currentLabelSource = sourceAndMetadata;
 		}
 
-		if ( metadata.containsKey( NUM_SPATIAL_DIMENSIONS ) && metadata.get( NUM_SPATIAL_DIMENSIONS ).equals( 2 ) )
+		if ( metadata.numSpatialDimensions == 2 )
 		{
 			bdvOptions = bdvOptions.is2D();
 		}
 
-		final BdvStackSource stackSource = BdvFunctions.show( source, bdvOptions );
+		final BdvStackSource bdvStackSource = BdvFunctions.show( source, bdvOptions );
 
-		setDisplayRange( stackSource, displayRangeMin, displayRangeMax, metadata );
+		setDisplayRange( bdvStackSource, metadata );
 
-		bdv = stackSource.getBdvHandle();
+		bdv = bdvStackSource.getBdvHandle();
 
 		bdvOptions = bdvOptions.addTo( bdv );
 
-		return stackSource;
+		metadata.bdvStackSource = bdvStackSource;
+
+		currentSources.add( sourceAndMetadata );
+
+		return bdvStackSource;
 	}
 
-	public void removeSingleSource( BdvStackSource bdvStackSource )
+	public void removeSource( BdvStackSource bdvStackSource )
 	{
+		currentSources.remove( bdvStackSource );
 		BdvUtils.removeSource( bdv, bdvStackSource );
 	}
 
-	private void setDisplayRange( BdvStackSource stackSource, Double displayRangeMin, Double displayRangeMax, Map< String, Object > metadata )
+	public Set< SourceAndMetadata > getCurrentSources()
 	{
-		if ( displayRangeMin != null && displayRangeMax != null )
-		{
-			stackSource.setDisplayRange( displayRangeMin, displayRangeMax );
-		}
-		else if ( metadata.containsKey( Metadata.DISPLAY_RANGE_MIN )
-				&& metadata.containsKey( Metadata.DISPLAY_RANGE_MAX )  )
+		return Collections.unmodifiableSet( currentSources );
+	}
+
+	private void setDisplayRange( BdvStackSource stackSource, Map< String, Object > metadata )
+	{
+		if ( metadata.containsKey( Metadata.displayRangeMin )
+				&& metadata.containsKey( Metadata.displayRangeMax )  )
 		{
 			stackSource.setDisplayRange(
-					( Double ) metadata.get( Metadata.DISPLAY_RANGE_MIN ),
-					( Double ) metadata.get( Metadata.DISPLAY_RANGE_MAX ) );
+					( Double ) metadata.get( Metadata.displayRangeMin ),
+					( Double ) metadata.get( Metadata.displayRangeMax ) );
 		}
 	}
 
@@ -358,7 +343,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		ImageSegmentLabelsARGBConverter labelSourcesARGBConverter =
 				new ImageSegmentLabelsARGBConverter(
 						imageSegmentsModel,
-						( String )sourceAndMetadata.metadata().get( Metadata.IMAGE_ID ),
+						( String )sourceAndMetadata.metadata().get( Metadata.imageId ),
 						selectionColoringModel );
 
 		return new ARGBConvertedRealSource(

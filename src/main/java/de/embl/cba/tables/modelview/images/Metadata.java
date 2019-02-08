@@ -1,21 +1,27 @@
 package de.embl.cba.tables.modelview.images;
+import bdv.util.BdvStackSource;
 
-import java.awt.*;
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-public class Metadata extends HashMap< String, Object >
+import static de.embl.cba.tables.modelview.images.Metadata.Flavour.IntensitySource;
+
+public class Metadata
 {
-	// TODO: make enum
-	public static final String DISPLAY_NAME = "Display Name";
-	public static final String IMAGE_ID = "ImageId";
-	public static final String FLAVOUR = "Flavour";
-	public static final String NUM_SPATIAL_DIMENSIONS = "Number of spatial dimensions";
-	public static final String EXCLUSIVE_IMAGE_SET = "Exclusive image set";
-	public static final String SHOW_INITIALLY = "Show initially";
-	public static final String DISPLAY_RANGE_MIN = "Display Range Min";
-	public static final String DISPLAY_RANGE_MAX = "Display Range Max";
-	public static final String COLOR = "Color";
+	public String displayName = "Image";
+	public String imageId;
+	public List< String > imageSet = new ArrayList<>();
+	public Flavour flavour = IntensitySource;
+	public int numSpatialDimensions = 3;
+	public boolean showInitially = false;
+	public Double displayRangeMin = 0.0;
+	public Double displayRangeMax = 255.0;
+	public Color color = Color.white;
+	public BdvStackSource bdvStackSource = null;
+
+	private static int id = 0;
 
 	public enum Flavour
 	{
@@ -25,12 +31,7 @@ public class Metadata extends HashMap< String, Object >
 
 	public Metadata()
 	{
-		super();
-		put( FLAVOUR, Flavour.IntensitySource );
-		put( DISPLAY_NAME, "Image" );
-		put( IMAGE_ID, "Image001" );
-		put( NUM_SPATIAL_DIMENSIONS, 3 );
-		put( SHOW_INITIALLY, false );
-		put( COLOR, Color.white );
+		imageId = "ImageId" + id++;
+		imageSet.add( imageId );
 	}
 }
