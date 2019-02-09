@@ -22,7 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 
-@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>LabelId Image" )
+//@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Explore Label Image" )
 public class ExploreLabelImageCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {

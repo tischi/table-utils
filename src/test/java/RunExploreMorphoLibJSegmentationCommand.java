@@ -27,17 +27,24 @@ public class RunExploreMorphoLibJSegmentationCommand
 		IJ.open( RunExploreMorphoLibJSegmentationCommand.class.getResource(
 				"blobs-lbl-Morphometry.csv" ).getFile() );
 
+		createResultsTable( "test" );
+
 		ij.command().run( ExploreMorphoLibJSegmentationCommand.class, true );
 	}
 
 	private static ResultsTable createResultsTable( String title )
 	{
-		final ResultsTable resultsTable = new ResultsTable();
-		resultsTable.addValue( "Column01", 10.0 );
-		resultsTable.addValue( "Column01", 10.0 );
-		resultsTable.addValue( "Column01", 20.0 );
-		resultsTable.show( title );
-		return resultsTable;
+//		final ResultsTable rt = new ResultsTable();
+//		rt.addLabel( "1" );
+//		rt.addLabel( "2" );
+//		rt.addLabel( "3" );
+//		rt.incrementCounter();
+//		rt.addValue( "Column01", 10.0 );
+//		rt.addValue( "Column01", 10.0 );
+//		rt.addValue( "Column01", 20.0 );
+//		rt.show( title );
+//		return rt;
+		return null;
 	}
 }
 

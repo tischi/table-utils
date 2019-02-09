@@ -1,32 +1,70 @@
 package de.embl.cba.tables;
 
-import de.embl.cba.tables.modelview.segments.DefaultTableRowImageSegment;
 import ij.measure.ResultsTable;
-
 import java.io.File;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class TableColumns
 {
 	public static LinkedHashMap< String,List< Object > > columnsFromImageJ1ResultsTable(
 			ResultsTable resultsTable )
 	{
+
 		List< String > columnNames = Arrays.asList( resultsTable.getHeadings() );
+		final int numRows = resultsTable.size();
 
 		final LinkedHashMap< String, List< Object > > columnNamesToValues
 				= new LinkedHashMap<>();
 
-		for ( int columnIndex = 0; columnIndex < columnNames.size(); columnIndex++ )
+		for ( String columnName : columnNames )
 		{
-			final String columnName = columnNames.get( columnIndex );
-			final float[] floats = resultsTable.getColumn( columnIndex );
-			final List< Object > list = new ArrayList<>( floats.length );
-			for ( float value : floats ) list.add( (double) value );
+			System.out.println( "Parsing column: " + columnName );
+
+			final double[] columnValues = getColumnValues( resultsTable, columnName );
+
+			final List< Object > list = new ArrayList<>( );
+			for ( int row = 0; row < numRows; ++row )
+			{
+				list.add( columnValues[ row ] );
+			}
+
 			columnNamesToValues.put( columnName, list );
 		}
 
 		return columnNamesToValues;
+	}
+
+	private static double[] getColumnValues( ResultsTable table, String heading )
+	{
+		String[] allHeaders = table.getHeadings();
+
+		// Check if column header corresponds to row label header
+		boolean hasRowLabels = hasRowLabelColumn(table);
+		if (hasRowLabels && heading.equals(allHeaders[0]))
+		{
+			// need to parse row label column
+			int nr = table.size();
+			double[] values = new double[nr];
+			for (int r = 0; r < nr; r++)
+			{
+				String label = table.getLabel(r);
+				values[r] = Double.parseDouble(label);
+			}
+			return values;
+		}
+
+		// determine index of column
+		int index = table.getColumnIndex(heading);
+		if ( index == ResultsTable.COLUMN_NOT_FOUND )
+		{
+			throw new RuntimeException("Unable to find column index from header: " + heading);
+		}
+		return table.getColumnAsDoubles(index);
+	}
+
+	private static final boolean hasRowLabelColumn( ResultsTable table )
+	{
+		return table.getLastColumn() == (table.getHeadings().length-2);
 	}
 
 	public static LinkedHashMap< String, List< Object > > columnsFromTableFile( final File file )

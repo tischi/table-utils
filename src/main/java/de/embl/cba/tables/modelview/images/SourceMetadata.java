@@ -23,7 +23,7 @@ public class SourceMetadata
 	public int numSpatialDimensions = 3;
 	public boolean showInitially = false;
 	public Double displayRangeMin = 0.0;
-	public Double displayRangeMax = 255.0;
+	public Double displayRangeMax = 500.0;
 	public Color displayColor = Color.white;
 	public BdvStackSource bdvStackSource = null;
 	public AffineTransform3D sourceTransform = new AffineTransform3D();

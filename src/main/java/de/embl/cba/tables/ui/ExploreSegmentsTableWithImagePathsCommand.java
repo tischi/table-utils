@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 
-@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Segments Table with Image Paths" )
+//@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Segments Table with Image Paths" )
 public class ExploreSegmentsTableWithImagePathsCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {

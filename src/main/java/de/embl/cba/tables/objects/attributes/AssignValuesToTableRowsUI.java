@@ -46,8 +46,11 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 
 	public void showUI( Set< T > selectedRows )
 	{
+		System.out.println( "AssignValuesToTableRowsUI.Debug.selectedRows" );
 		this.selectedRows = selectedRows;
+		System.out.println( "AssignValuesToTableRowsUI.Debug.updateUIComponents" );
 		updateUIComponents();
+		System.out.println( "AssignValuesToTableRowsUI.Debug.showFrame" );
 		showFrame();
 	}
 
@@ -74,7 +77,9 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 
 	public void updateUIComponents()
 	{
+		System.out.println( "AssignValuesToTableRowsUI.Debug.updateColumnComboBox" );
 		updateColumnComboBox();
+		System.out.println( "AssignValuesToTableRowsUI.Debug.updateAttributeComboBox" );
 		updateAttributeComboBox();
 	}
 
@@ -89,8 +94,6 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 
 	private void showFrame()
 	{
-		this.revalidate();
-		this.repaint();
 		frame = new JFrame();
 		if ( location != null ) frame.setLocation( location );
 		frame.add( this );

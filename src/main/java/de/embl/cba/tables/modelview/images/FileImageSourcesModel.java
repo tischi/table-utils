@@ -105,7 +105,7 @@ public class FileImageSourcesModel implements ImageSourcesModel
 			if( metadata.flavour == Flavour.LabelSource || imagePlus.getBitDepth() == 8 )
 			{
 				metadata.displayRangeMin = 0.0;
-				metadata.displayRangeMax = 255.0;
+				metadata.displayRangeMax = 500.0;
 			}
 			else if( imagePlus.getBitDepth() == 16 )
 			{

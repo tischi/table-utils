@@ -28,7 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 
-@Plugin(type = Command.class, initializer = "init", menuPath = "Plugins>Segmentation>Explore>MorphoLibJ Segmentation" )
+@Plugin(type = Command.class, initializer = "init", menuPath = "Plugins>Segmentation>Explore>Explore MorphoLibJ Segmentation" )
 public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & NativeType< R > >
 		extends DynamicCommand
 {
