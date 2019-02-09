@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
@@ -48,7 +49,7 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 	public void showUI( Set< T > selectedRows )
 	{
 		this.selectedRows = selectedRows;
-		updateColumnComboBox();
+		updateUIComponents();
 		showFrame();
 	}
 
@@ -59,16 +60,14 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 
 			selectedColumn = ( String ) columnComboBox.getSelectedItem();
 			selectedAttribute = ( String ) attributeComboBox.getSelectedItem();
-			attributeComboBox.addItem( selectedAttribute );
-			columnComboBox.setSelectedItem( selectedColumn );
-
+			
 			assignAttributes(
 					selectedColumn,
 					selectedRows,
 					selectedAttribute
 					);
 
-			updateUIComponents();
+			location = frame.getLocation();
 			frame.dispose();
 		} );
 
@@ -77,16 +76,17 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 
 	public void updateUIComponents()
 	{
-		location = frame.getLocation();
+		updateColumnComboBox();
+		updateAttributeComboBox();
+	}
 
+	private void updateAttributeComboBox()
+	{
 		if ( ! selectedAttributes.contains( selectedAttribute ) )
 		{
 			selectedAttributes.add( selectedAttribute );
-			attributeComboBox.removeItem( NEW_ATTRIBUTE );
 			attributeComboBox.addItem( selectedAttribute );
 		}
-
-		columnComboBox.setSelectedItem( selectedColumn );
 	}
 
 	private void showFrame()
@@ -136,12 +136,15 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 
 	private void updateColumnComboBox()
 	{
+		final List< String > columnNames = tableView.getColumnNames();
+
 		columnComboBox.removeAllItems();
 
-		for ( String name : tableView.getColumnNames() )
-		{
+		for ( String name : columnNames )
 			columnComboBox.addItem( name );
-		}
+
+		if ( selectedColumn != null )
+			columnComboBox.setSelectedItem( selectedColumn );
 	}
 
 	private void assignAttributes(

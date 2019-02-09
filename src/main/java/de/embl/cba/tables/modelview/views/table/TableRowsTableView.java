@@ -262,7 +262,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private JMenuItem createSaveAsMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "Save as" );
+		final JMenuItem menuItem = new JMenuItem( "Save as..." );
 		menuItem.addActionListener( e -> TableUIs.saveTableUI( table ) );
 		return menuItem;
 	}
