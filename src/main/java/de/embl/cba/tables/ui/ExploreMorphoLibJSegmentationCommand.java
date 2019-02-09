@@ -1,9 +1,9 @@
-package de.embl.cba.tables.commands;
+package de.embl.cba.tables.ui;
 
 import de.embl.cba.bdv.utils.wrap.Wraps;
 import de.embl.cba.tables.TableColumns;
 import de.embl.cba.tables.modelview.images.DefaultImageSourcesModel;
-import de.embl.cba.tables.modelview.images.Metadata;
+import de.embl.cba.tables.modelview.images.SourceMetadata;
 import de.embl.cba.tables.modelview.segments.ColumnBasedTableRowImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
@@ -16,7 +16,6 @@ import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -59,7 +58,7 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 		imageSourcesModel.addSource(
 				Wraps.imagePlusAsSource4DChannelList( labelMaskImagePlus ).get( 0 ),
 				labelMaskId,
-				Metadata.Flavour.LabelSource,
+				SourceMetadata.Flavour.LabelSource,
 				numSpatialDimensions
 				);
 

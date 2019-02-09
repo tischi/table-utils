@@ -1,4 +1,4 @@
-import de.embl.cba.tables.commands.ExploreLabelImageCommand;
+import de.embl.cba.tables.ui.ExploreLabelImageCommand;
 import net.imagej.ImageJ;
 
 public class RunExploreLabelImageCommand

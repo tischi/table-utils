@@ -1,4 +1,4 @@
-import de.embl.cba.tables.commands.ExploreCellProfilerObjectsTableWithImagePathsCommand;
+import de.embl.cba.tables.ui.ExploreCellProfilerObjectsTableWithImagePathsCommand;
 import net.imagej.ImageJ;
 
 

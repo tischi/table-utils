@@ -5,7 +5,7 @@ import bdv.viewer.Source;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.embl.cba.tables.modelview.images.Metadata.*;
+import static de.embl.cba.tables.modelview.images.SourceMetadata.*;
 
 
 public class DefaultImageSourcesModel implements ImageSourcesModel
@@ -30,10 +30,10 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 						   int numSpatialDimensions )
 	{
 
-		final Metadata metadata = new Metadata();
-		metadata.put( DISPLAY_NAME, imageId );
-		metadata.put( FLAVOUR, flavor );
-		metadata.put( NUM_SPATIAL_DIMENSIONS, numSpatialDimensions );
+		final SourceMetadata metadata = new SourceMetadata();
+		metadata.imageId = imageId;
+		metadata.flavour = flavor;
+		metadata.numSpatialDimensions = numSpatialDimensions;
 
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( source, metadata ) );
 	}

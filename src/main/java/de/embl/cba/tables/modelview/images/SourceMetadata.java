@@ -3,22 +3,22 @@ import bdv.util.BdvStackSource;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import static de.embl.cba.tables.modelview.images.Metadata.Flavour.IntensitySource;
+import static de.embl.cba.tables.modelview.images.SourceMetadata.Flavour.IntensitySource;
 
-public class Metadata
+
+public class SourceMetadata
 {
 	public String displayName = "Image";
 	public String imageId;
-	public List< String > imageSet = new ArrayList<>();
+	public List< String > imageSetIDs = new ArrayList<>();
 	public Flavour flavour = IntensitySource;
 	public int numSpatialDimensions = 3;
 	public boolean showInitially = false;
 	public Double displayRangeMin = 0.0;
 	public Double displayRangeMax = 255.0;
-	public Color color = Color.white;
+	public Color displayColor = Color.white;
 	public BdvStackSource bdvStackSource = null;
 
 	private static int id = 0;
@@ -29,9 +29,9 @@ public class Metadata
 		IntensitySource
 	}
 
-	public Metadata()
+	public SourceMetadata()
 	{
 		imageId = "ImageId" + id++;
-		imageSet.add( imageId );
+		imageSetIDs.add( imageId );
 	}
 }

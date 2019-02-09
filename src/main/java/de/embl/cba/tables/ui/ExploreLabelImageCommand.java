@@ -1,11 +1,11 @@
-package de.embl.cba.tables.commands;
+package de.embl.cba.tables.ui;
 
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.combined.GeneratingNoPositionImageSegmentsModel;
 import de.embl.cba.tables.modelview.images.DefaultImageSourcesModel;
-import de.embl.cba.tables.modelview.images.Metadata;
+import de.embl.cba.tables.modelview.images.SourceMetadata;
 import de.embl.cba.tables.modelview.images.SourceLoader;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
@@ -19,11 +19,10 @@ import org.scijava.plugin.Plugin;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 
-@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Objects Table with Image Paths " )
-public class ExploreObjectsTableWithImagePathsCommand< R extends RealType< R > & NativeType< R > >
+@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>LabelId Image" )
+public class ExploreLabelImageCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {
 	@Parameter ( label = "LabelId image (single channel, 2D+t or 3D+t)" )
@@ -43,7 +42,7 @@ public class ExploreObjectsTableWithImagePathsCommand< R extends RealType< R > &
 		imageSourcesModel.addSource(
 				labelSourceLoader.getRandomAccessibleIntervalSource4D(),
 				inputLabelMasksFile.getName(),
-				Metadata.Flavour.LabelSource,
+				SourceMetadata.Flavour.LabelSource,
 				labelSourceLoader.getNumSpatialDimensions() );
 
 		final GeneratingNoPositionImageSegmentsModel generatingImageSegmentsModel
@@ -58,7 +57,7 @@ public class ExploreObjectsTableWithImagePathsCommand< R extends RealType< R > &
 		final SelectionColoringModel< ImageSegment > selectionColoringModel
 				= new SelectionColoringModel< ImageSegment >( coloringModel, selectionModel );
 
-		final List< String > initialSources = new ArrayList<>();
+		final ArrayList< String > initialSources = new ArrayList<>();
 		initialSources.add( imageSourcesModel.sources().keySet().iterator().next() );
 
 		final ImageSegmentsBdvView imageSegmentsBdvView =

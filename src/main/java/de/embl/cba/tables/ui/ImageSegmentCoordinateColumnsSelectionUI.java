@@ -1,7 +1,6 @@
-package de.embl.cba.tables.objects;
+package de.embl.cba.tables.ui;
 
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
-import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,48 +12,31 @@ import java.util.ArrayList;
 import static de.embl.cba.tables.SwingUtils.horizontalLayoutPanel;
 
 
-public class ObjectCoordinateColumnsSelectionUI extends JPanel
+public class ImageSegmentCoordinateColumnsSelectionUI extends JPanel
 {
-	private final TableRowsTableView §1objectTablePanel;
+	private static final String NO_COLUMN_SELECTED = "None";
 
-	private ArrayList< String > choices;
+	private ArrayList< String > columnChoices;
 	private JFrame frame;
 	private static Point frameLocation;
 
-	public ObjectCoordinateColumnsSelectionUI( ObjectTablePanel objectTablePanel )
+	public ImageSegmentCoordinateColumnsSelectionUI( ArrayList< String > columns )
 	{
-		this.objectTablePanel = null;
+		setColumnChoices( columns );
 
-		this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
-
-		initColumnChoices();
-
-		for ( ImageSegmentCoordinate coordinate : ImageSegmentCoordinate.values())
-		{
-			addColumnSelectionUI( this, coordinate );
-		}
+		addColumnSelectionUIs();
 
 		addOKButton();
 
 		showUI();
 	}
 
-	public ObjectCoordinateColumnsSelectionUI( TableRowsTableView objectTablePanel )
+	private void addColumnSelectionUIs()
 	{
-		this.objectTablePanel = objectTablePanel;
-
-		this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
-
-		initColumnChoices();
-
-		for ( ImageSegmentCoordinate coordinate : ImageSegmentCoordinate.values())
+		for ( ImageSegmentCoordinate coordinate : ImageSegmentCoordinate.values() )
 		{
 			addColumnSelectionUI( this, coordinate );
 		}
-
-		addOKButton();
-
-		showUI();
 	}
 
 	private void addOKButton()
@@ -73,11 +55,11 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 		add( okButton );
 	}
 
-	private void initColumnChoices()
+	private void setColumnChoices( ArrayList< String > columns )
 	{
-		choices = new ArrayList<>( );
-		choices.add( ObjectTablePanel.NO_COLUMN_SELECTED );
-		choices.addAll( objectTablePanel.getColumnNames() );
+		columnChoices = new ArrayList<>( );
+		columnChoices.add( NO_COLUMN_SELECTED );
+		columnChoices.addAll( columns );
 	}
 
 	private void addColumnSelectionUI( final JPanel panel, final ImageSegmentCoordinate coordinate )
@@ -89,12 +71,12 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 		final JComboBox jComboBox = new JComboBox();
 		horizontalLayoutPanel.add( jComboBox );
 
-		for ( String choice : choices )
+		for ( String choice : columnChoices )
 		{
 			jComboBox.addItem( choice );
 		}
 
-		// +1 is due to the option to select no getColumn
+		// +1 is due to the option to select no Column
 		jComboBox.setSelectedItem( objectTablePanel.getCoordinateColumn( coordinate ) );
 
 		jComboBox.addActionListener( new ActionListener()
@@ -112,6 +94,8 @@ public class ObjectCoordinateColumnsSelectionUI extends JPanel
 
 	private void showUI()
 	{
+		this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
+
 		//Create and set up the window.
 		frame = new JFrame("Object coordinates");
 

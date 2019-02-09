@@ -60,7 +60,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 
 				if ( ! imageSourcesModel.sources().containsKey( imageId ) )
 				{
-					final Metadata.Flavour imageFlavour = getImageFlavour( imageName );
+					final SourceMetadata.Flavour imageFlavour = getImageFlavour( imageName );
 
 					final Path absoluteImagePath = TableUtils.getAbsolutePath( tablePath, imagePath );
 
@@ -98,17 +98,17 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		return imageSetIds;
 	}
 
-	private Metadata.Flavour getImageFlavour( String imageName )
+	private SourceMetadata.Flavour getImageFlavour( String imageName )
 	{
-		final Metadata.Flavour flavour;
+		final SourceMetadata.Flavour flavour;
 
 		if ( imageName.contains( OBJECTS ) )
 		{
-			flavour = Metadata.Flavour.LabelSource;
+			flavour = SourceMetadata.Flavour.LabelSource;
 		}
 		else
 		{
-			flavour = Metadata.Flavour.IntensitySource;
+			flavour = SourceMetadata.Flavour.IntensitySource;
 		}
 
 		return flavour;

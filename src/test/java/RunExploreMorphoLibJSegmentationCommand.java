@@ -1,10 +1,6 @@
-import de.embl.cba.tables.commands.ExploreLabelImageCommand;
-import de.embl.cba.tables.commands.ExploreMorphoLibJSegmentationCommand;
+import de.embl.cba.tables.ui.ExploreMorphoLibJSegmentationCommand;
 import ij.ImagePlus;
-import ij.ImageStack;
 import ij.measure.ResultsTable;
-import ij.process.FloatProcessor;
-import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
 import net.imagej.ImageJ;
 

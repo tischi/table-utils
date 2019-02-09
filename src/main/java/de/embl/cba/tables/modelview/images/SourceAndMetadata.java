@@ -5,9 +5,9 @@ import bdv.viewer.Source;
 public class SourceAndMetadata< T >
 {
 	private final Source< T > source;
-	private final Metadata metadata;
+	private final SourceMetadata metadata;
 
-	public SourceAndMetadata( Source< T > source, Metadata metadata )
+	public SourceAndMetadata( Source< T > source, SourceMetadata metadata )
 	{
 		this.source = source;
 		this.metadata = metadata;
@@ -18,7 +18,7 @@ public class SourceAndMetadata< T >
 		return source;
 	}
 
-	public Metadata metadata()
+	public SourceMetadata metadata()
 	{
 		return metadata;
 	}

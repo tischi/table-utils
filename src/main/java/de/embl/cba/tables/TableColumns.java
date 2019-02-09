@@ -26,6 +26,11 @@ public class TableColumns
 		return columnToValues;
 	}
 
+	public static LinkedHashMap< String, List< Object > > columnsFromTableFile( final File file )
+	{
+		return columnsFromTableFile( file, null );
+	}
+
 	public static LinkedHashMap< String, List< Object > > columnsFromTableFile(
 			final File file,
 			String delim )

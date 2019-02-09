@@ -17,7 +17,7 @@ import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.combined.ImageSegmentsModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
-import de.embl.cba.tables.modelview.images.Metadata;
+import de.embl.cba.tables.modelview.images.SourceMetadata;
 import de.embl.cba.tables.modelview.images.SourceAndMetadata;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentId;
@@ -32,7 +32,7 @@ import org.scijava.ui.behaviour.util.Behaviours;
 import java.util.*;
 
 import static de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter.BACKGROUND;
-import static de.embl.cba.tables.modelview.images.Metadata.*;
+import static de.embl.cba.tables.modelview.images.SourceMetadata.*;
 
 public class ImageSegmentsBdvView < T extends ImageSegment >
 {
@@ -70,6 +70,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		this.selectionColoringModel = selectionColoringModel;
 
 		this.voxelSpacing3DView = 0.2;
+		this.currentSources = new HashSet<>( );
 
 		initBdvOptions();
 
@@ -191,7 +192,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	 */
 	public void showSourceSet( SourceAndMetadata sourceAndMetadata )
 	{
-		showExclusiveImageSet( sourceAndMetadata.metadata().imageSet );
+		showExclusiveImageSet( sourceAndMetadata.metadata().imageSetIDs );
 	}
 
 	public void applyRecentViewerSettings( )
@@ -249,13 +250,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		if ( recentConverterSetups != null )
 		{
-			associatedSourceAndMetadata.metadata().put(
-					DISPLAY_RANGE_MIN,
-					recentConverterSetups.get( i ).getDisplayRangeMin());
+			associatedSourceAndMetadata.metadata().displayRangeMin =
+					recentConverterSetups.get( i ).getDisplayRangeMin();
 
-			associatedSourceAndMetadata.metadata().put(
-					DISPLAY_RANGE_MAX,
-					recentConverterSetups.get( i ).getDisplayRangeMax());
+			associatedSourceAndMetadata.metadata().displayRangeMax =
+					recentConverterSetups.get( i ).getDisplayRangeMax();
 		}
 	}
 
@@ -268,7 +267,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	 */
 	public BdvStackSource showSource( SourceAndMetadata sourceAndMetadata )
 	{
-		final Metadata metadata = sourceAndMetadata.metadata();
+		final SourceMetadata metadata = sourceAndMetadata.metadata();
 		Source< ? > source = sourceAndMetadata.source();
 
 		if ( metadata.flavour == Flavour.LabelSource )
@@ -284,7 +283,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		final BdvStackSource bdvStackSource = BdvFunctions.show( source, bdvOptions );
 
-		setDisplayRange( bdvStackSource, metadata );
+		bdvStackSource.setDisplayRange( metadata.displayRangeMin, metadata.displayRangeMax );
 
 		bdv = bdvStackSource.getBdvHandle();
 
@@ -307,18 +306,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		return Collections.unmodifiableSet( currentSources );
 	}
-
-	private void setDisplayRange( BdvStackSource stackSource, Map< String, Object > metadata )
-	{
-		if ( metadata.containsKey( Metadata.displayRangeMin )
-				&& metadata.containsKey( Metadata.displayRangeMax )  )
-		{
-			stackSource.setDisplayRange(
-					( Double ) metadata.get( Metadata.displayRangeMin ),
-					( Double ) metadata.get( Metadata.displayRangeMax ) );
-		}
-	}
-
 
 	private void removeAllSources()
 	{
@@ -343,7 +330,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		ImageSegmentLabelsARGBConverter labelSourcesARGBConverter =
 				new ImageSegmentLabelsARGBConverter(
 						imageSegmentsModel,
-						( String )sourceAndMetadata.metadata().get( Metadata.imageId ),
+						sourceAndMetadata.metadata().imageId,
 						selectionColoringModel );
 
 		return new ARGBConvertedRealSource(
@@ -415,21 +402,18 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		if ( labelId == BACKGROUND ) return;
 
-		if ( currentLabelSource.metadata().containsKey( IMAGE_ID ) )
+		final String imageId = currentLabelSource.metadata().imageId;
+
+		final ImageSegmentId imageSegmentId = new ImageSegmentId( imageId, labelId, getCurrentTimePoint() );
+
+		final T segment = imageSegmentsModel.getImageSegment( imageSegmentId );
+
+		selectionModel.toggle( segment );
+
+		if ( selectionModel.isSelected( segment ) )
 		{
-			final String imageId = ( String ) currentLabelSource.metadata().get( IMAGE_ID );
-
-			final ImageSegmentId imageSegmentId = new ImageSegmentId( imageId, labelId, getCurrentTimePoint() );
-
-			final T segment = imageSegmentsModel.getImageSegment( imageSegmentId );
-
-			selectionModel.toggle( segment );
-
-			if ( selectionModel.isSelected( segment ) )
-			{
-				recentFocus = segment;
-				selectionModel.focus( segment );
-			}
+			recentFocus = segment;
+			selectionModel.focus( segment );
 		}
 	}
 

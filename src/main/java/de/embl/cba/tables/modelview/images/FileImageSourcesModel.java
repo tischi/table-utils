@@ -16,7 +16,7 @@ import net.imglib2.type.numeric.RealType;
 import java.io.File;
 import java.util.*;
 
-import static de.embl.cba.tables.modelview.images.Metadata.*;
+import static de.embl.cba.tables.modelview.images.SourceMetadata.*;
 
 public class FileImageSourcesModel implements ImageSourcesModel
 {
@@ -33,16 +33,15 @@ public class FileImageSourcesModel implements ImageSourcesModel
 		return nameToSourceAndMetadata;
 	}
 
-	class FileSource< R extends RealType< R > & NativeType< R > >
-			implements Source< R >
+	class FileSource< R extends RealType< R > & NativeType< R > > implements Source< R >
 	{
-		private final String name;
+		private final SourceMetadata metadata;
 		private final File file;
 		private RandomAccessibleIntervalSource4D source;
 
-		public FileSource( String name, File file )
+		public FileSource( SourceMetadata metadata, File file )
 		{
-			this.name = name;
+			this.metadata = metadata;
 			this.file = file;
 		}
 
@@ -63,7 +62,19 @@ public class FileImageSourcesModel implements ImageSourcesModel
 			if ( source == null )
 			{
 				final ImagePlus imagePlus = IJ.openImage( file.toString() );
-				imagePlus.setTitle( name );
+				imagePlus.setTitle( metadata.displayName );
+
+				if( metadata.flavour == Flavour.LabelSource || imagePlus.getBitDepth() == 8 )
+				{
+					metadata.displayRangeMin = 0.0;
+					metadata.displayRangeMax = 255.0;
+				}
+				else if( imagePlus.getBitDepth() == 16 )
+				{
+					metadata.displayRangeMin = 0.0;
+					metadata.displayRangeMax = 65535.0;
+				}
+
 				source = Wraps.imagePlusAsSource4DChannelList( imagePlus ).get( 0 );
 			}
 
@@ -117,15 +128,14 @@ public class FileImageSourcesModel implements ImageSourcesModel
 	{
 		if ( nameToSourceAndMetadata.containsKey( imageId ) ) return;
 
-		final FileSource fileSource = new FileSource( imageDisplayName, file );
+		final SourceMetadata metadata = new SourceMetadata();
+		metadata.flavour = flavor;
+		metadata.numSpatialDimensions = numSpatialDimensions;
+		metadata.imageSetIDs = imageSetIDs;
+		metadata.displayName = imageDisplayName;
+		metadata.imageId = imageId;
 
-		final Metadata metadata = new Metadata();
-		metadata.put( FLAVOUR, flavor );
-		metadata.put( NUM_SPATIAL_DIMENSIONS, numSpatialDimensions );
-		metadata.put( EXCLUSIVE_IMAGE_SET, imageSetIDs );
-		metadata.put( DISPLAY_NAME, imageDisplayName );
-		metadata.put( IMAGE_ID, imageId );
-
+		final FileSource fileSource = new FileSource( metadata, file );
 
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( fileSource, metadata ) );
 	}

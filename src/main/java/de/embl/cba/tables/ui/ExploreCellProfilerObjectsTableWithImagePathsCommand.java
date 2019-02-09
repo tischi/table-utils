@@ -1,4 +1,4 @@
-package de.embl.cba.tables.commands;
+package de.embl.cba.tables.ui;
 
 import de.embl.cba.tables.TableColumns;
 import de.embl.cba.tables.TableUtils;
@@ -66,7 +66,7 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 
 		final List< String > pathColumnNames = replaceFolderAndFileColumnsByPathColumn();
 
-		final HashMap< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn
+		final Map< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn
 				= getImageSegmentCoordinateToColumn( pathColumnNames );
 
 		final List< ColumnBasedTableRowImageSegment > segments

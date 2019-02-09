@@ -66,7 +66,7 @@ public class TableImageSourcesModelFactory
 			{
 				String imagePath = getImagePath( imageName, row );
 				String imageId = imagePath;
-				final Metadata.Flavour imageFlavour = getImageFlavour( imageName );
+				final SourceMetadata.Flavour imageFlavour = getImageFlavour( imageName );
 
 				addImageToModel(
 						imageSourcesModel,
@@ -91,16 +91,16 @@ public class TableImageSourcesModelFactory
 		return imageSetIds;
 	}
 
-	private Metadata.Flavour getImageFlavour( String imageName )
+	private SourceMetadata.Flavour getImageFlavour( String imageName )
 	{
-		Metadata.Flavour flavour;
+		SourceMetadata.Flavour flavour;
 		if ( imageName.contains( OBJECTS ) )
 		{
-			flavour = Metadata.Flavour.LabelSource;
+			flavour = SourceMetadata.Flavour.LabelSource;
 		}
 		else
 		{
-			flavour = Metadata.Flavour.IntensitySource;
+			flavour = SourceMetadata.Flavour.IntensitySource;
 		}
 
 		return flavour;
@@ -126,7 +126,7 @@ public class TableImageSourcesModelFactory
 			FileImageSourcesModel imageSourcesModel,
 			String imageId,
 			String imagePath,
-			Metadata.Flavour imageFlavour,
+			SourceMetadata.Flavour imageFlavour,
 			List< String > imageSetIds )
 	{
 		imagePath = getMappedPath( imagePath );
