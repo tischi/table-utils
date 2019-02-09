@@ -55,24 +55,23 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 	private JButton createOkButton()
 	{
 		final JButton okButton = new JButton( "OK" );
-		okButton.addActionListener( new ActionListener()
-		{
-			@Override
-			public void actionPerformed( ActionEvent e )
-			{
-				selectedColumn = ( String ) columnComboBox.getSelectedItem();
-				selectedAttribute = ( String ) attributeComboBox.getSelectedItem();
+		okButton.addActionListener( e -> {
 
-				assignAttributes(
-						selectedColumn,
-						selectedRows,
-						selectedAttribute
-						);
+			selectedColumn = ( String ) columnComboBox.getSelectedItem();
+			selectedAttribute = ( String ) attributeComboBox.getSelectedItem();
+			attributeComboBox.addItem( selectedAttribute );
+			columnComboBox.setSelectedItem( selectedColumn );
 
-				updateUIComponents();
-				frame.dispose();
-			}
+			assignAttributes(
+					selectedColumn,
+					selectedRows,
+					selectedAttribute
+					);
+
+			updateUIComponents();
+			frame.dispose();
 		} );
+
 		return okButton;
 	}
 
@@ -111,10 +110,7 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 		attributeComboBox = new JComboBox();
 		attributeComboBox.setEditable( true );
 		attributeComboBox.addItem( NEW_ATTRIBUTE );
-
 		horizontalLayoutPanel.add( attributeComboBox );
-
-		// TODO: maybe add more items, depending on getColumn
 
 		return horizontalLayoutPanel;
 	}
@@ -131,13 +127,8 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 
 		updateColumnComboBox();
 
-		columnComboBox.addActionListener( new ActionListener()
-		{
-			@Override
-			public void actionPerformed( ActionEvent e )
-			{
-				// TODO: maybe change content of attributeComboBox
-			}
+		columnComboBox.addActionListener( e -> {
+			// TODO: maybe change content of attributeComboBox
 		} );
 
 		return horizontalLayoutPanel;
@@ -150,11 +141,6 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 		for ( String name : tableView.getColumnNames() )
 		{
 			columnComboBox.addItem( name );
-		}
-
-		if ( selectedColumn != null )
-		{
-			columnComboBox.setSelectedItem( selectedColumn );
 		}
 	}
 

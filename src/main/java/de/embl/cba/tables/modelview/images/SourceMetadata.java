@@ -8,6 +8,11 @@ import java.util.List;
 import static de.embl.cba.tables.modelview.images.SourceMetadata.Flavour.IntensitySource;
 
 
+/**
+ * Questions:
+ * - make it rather an interface with methods ?
+ * -
+ */
 public class SourceMetadata
 {
 	public String displayName = "Image";

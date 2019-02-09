@@ -12,4 +12,6 @@ public interface ImageSourcesModel
 	 */
 	Map< String, SourceAndMetadata > sources();
 
+	boolean is2D();
+
 }

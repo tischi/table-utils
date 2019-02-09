@@ -26,6 +26,9 @@ public class ExploreSegmentsTableWithImagePathsCommand< R extends RealType< R > 
 	@Parameter ( label = "Segments table" )
 	public File segmentsTableFile;
 
+	@Parameter ( label = "All images are 2D" )
+	boolean is2D;
+
 	private LinkedHashMap< String, List< Object > > columns;
 
 	@Override
@@ -39,7 +42,7 @@ public class ExploreSegmentsTableWithImagePathsCommand< R extends RealType< R > 
 		final FileImageSourcesModel imageSourcesModel =
 				new FileImageSourcesModelFactory(
 						tableRowImageSegments,
-						tablePath).getImageSourcesModel();
+						tablePath, is2D ).getImageSourcesModel();
 
 		new DefaultBdvAndTableView( tableRowImageSegments, imageSourcesModel );
 	}

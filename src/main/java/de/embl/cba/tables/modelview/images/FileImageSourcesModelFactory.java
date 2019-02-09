@@ -18,15 +18,18 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 	private final Map< String, String > imageNameToPathColumnName;
 	private FileImageSourcesModel imageSourcesModel;
 	private final String tablePath;
+	private final boolean is2D;
 
 	public FileImageSourcesModelFactory(
 			final List< T > tableRowImageSegments,
-			final String tablePath )
+			final String tablePath,
+			boolean is2D )
 	{
 		this.tableRowImageSegments = tableRowImageSegments;
 		this.tablePath = tablePath;
 
 		columns = tableRowImageSegments.get( 0 ).cells().keySet();
+		this.is2D = is2D;
 
 		imageNameToPathColumnName = getImageNameToPathColumnName();
 
@@ -40,7 +43,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 
 	private FileImageSourcesModel createImageSourcesModel( )
 	{
-		imageSourcesModel = new FileImageSourcesModel();
+		imageSourcesModel = new FileImageSourcesModel( is2D );
 
 		for ( TableRowImageSegment tableRowImageSegment : tableRowImageSegments )
 		{
@@ -56,18 +59,16 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 
 				if ( ! imageSourcesModel.sources().containsKey( imageId ) )
 				{
-					final SourceMetadata.Flavour imageFlavour = getImageFlavour( imageName );
-
 					final Path absoluteImagePath = TableUtils.getAbsolutePath( tablePath, imagePath );
 
 					final String imageDisplayName = absoluteImagePath.getFileName().toString();
 
-					imageSourcesModel.addSource(
+					imageSourcesModel.addSourceAndMetadata(
 							imageId,
 							imageDisplayName,
 							absoluteImagePath.toFile(),
 							imageSetIds,
-							imageFlavour );
+							getImageFlavour( imageName ) );
 				}
 			}
 		}

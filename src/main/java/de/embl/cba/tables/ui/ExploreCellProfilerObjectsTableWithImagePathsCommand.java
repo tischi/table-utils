@@ -54,7 +54,8 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 		final FileImageSourcesModel imageSourcesModel =
 				new FileImageSourcesModelFactory(
 						tableRowImageSegments,
-						tablePath ).getImageSourcesModel();
+						tablePath,
+						true ).getImageSourcesModel();
 
 		new DefaultBdvAndTableView( tableRowImageSegments, imageSourcesModel );
 	}

@@ -23,6 +23,11 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 		return nameToSourceAndMetadata;
 	}
 
+	@Override
+	public boolean is2D()
+	{
+		return false;
+	}
 
 	public void addSource( Source< ? > source,
 						   String imageId,

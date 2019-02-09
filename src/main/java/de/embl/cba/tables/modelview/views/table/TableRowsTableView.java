@@ -41,6 +41,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private JTable table;
 	private int categoricalLabelColoringRandomSeed;
 	private int recentlySelectedRowInView;
+	private AssignValuesToTableRowsUI assignObjectAttributesUI;
 
 	public TableRowsTableView(
 			final TableRowsModel< T > tableRowsModel,
@@ -250,32 +251,19 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private JMenuItem assignValuesMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "Assign Values To Selected Objects..." );
-		final TableRowsTableView tableRowsTableView = this;
-		menuItem.addActionListener( new ActionListener()
-		{
-			@Override
-			public void actionPerformed( ActionEvent e )
-			{
-				final AssignValuesToTableRowsUI assignObjectAttributesUI =
-						new AssignValuesToTableRowsUI( tableRowsTableView );
-				assignObjectAttributesUI.showUI( selectionModel.getSelected() );
-			}
+		assignObjectAttributesUI = new AssignValuesToTableRowsUI( this );
+
+		final JMenuItem menuItem = new JMenuItem( "Assign values to selected rows" );
+		menuItem.addActionListener( e -> {
+			assignObjectAttributesUI.showUI( selectionModel.getSelected() );
 		} );
 		return menuItem;
 	}
 
 	private JMenuItem createSaveAsMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "Save as..." );
-		menuItem.addActionListener( new ActionListener()
-		{
-			@Override
-			public void actionPerformed( ActionEvent e )
-			{
-				TableUIs.saveTableUI( table );
-			}
-		} );
+		final JMenuItem menuItem = new JMenuItem( "Save as" );
+		menuItem.addActionListener( e -> TableUIs.saveTableUI( table ) );
 		return menuItem;
 	}
 
@@ -285,38 +273,10 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		final TableRowsTableView tableView = this;
 
-		menuItem.addActionListener( new ActionListener()
-		{
-			@Override
-			public void actionPerformed( ActionEvent e )
-			{
-				TableUIs.addColumnUI( tableView );
-			}
-		} );
+		menuItem.addActionListener( e -> TableUIs.addColumnUI( tableView ) );
 
 		return menuItem;
 	}
-
-//	private JMenu createObjectCoordinateMenu()
-//	{
-//		JMenu menu = new JMenu( "Objects" );
-//
-//		final TableRowsTableView objectTablePanel = this;
-//
-//		final JMenuItem coordinatesMenuItem = new JMenuItem( "Select coordinates..." );
-//		coordinatesMenuItem.addActionListener( new ActionListener()
-//		{
-//			@Override
-//			public void actionPerformed( ActionEvent e )
-//			{
-//				new ObjectCoordinateColumnsSelectionUI( objectTablePanel );
-//			}
-//		} );
-//
-//
-//		menu.add( coordinatesMenuItem );
-//		return menu;
-//	}
 
     public void showTable() {
 

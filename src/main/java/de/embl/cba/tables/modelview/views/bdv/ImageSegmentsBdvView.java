@@ -117,14 +117,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	public void registerAsColoringListener( ColoringModel< T > coloringModel )
 	{
-		coloringModel.listeners().add( new ColoringListener()
-		{
-			@Override
-			public void coloringChanged()
-			{
-				BdvUtils.repaint( bdv );
-			}
-		} );
+		coloringModel.listeners().add( () -> BdvUtils.repaint( bdv ) );
 	}
 
 	public void registerAsSelectionListener( SelectionModel< T > selectionModel )
@@ -341,6 +334,9 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private void initBdvOptions( )
 	{
 		bdvOptions = BdvOptions.options();
+
+		if ( imageSourcesModel.is2D() )
+			bdvOptions = bdvOptions.is2D();
 	}
 
 	private void installBdvBehaviours()
