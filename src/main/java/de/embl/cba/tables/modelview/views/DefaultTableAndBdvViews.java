@@ -7,20 +7,21 @@ import de.embl.cba.tables.modelview.combined.DefaultImageSegmentsModel;
 import de.embl.cba.tables.modelview.combined.DefaultTableRowsModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
 import de.embl.cba.tables.modelview.segments.ColumnBasedTableRowImageSegment;
+import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 
 import java.util.List;
 
-public class DefaultViews
+public class DefaultTableAndBdvViews
 {
-	private final List< ColumnBasedTableRowImageSegment > tableRowImageSegments;
+	private final List< TableRowImageSegment > tableRowImageSegments;
 	private final ImageSourcesModel imageSourcesModel;
 	private ImageSegmentsBdvView imageSegmentsBdvView;
 	private TableRowsTableView tableRowsTableView;
 
-	public DefaultViews(
-			List< ColumnBasedTableRowImageSegment > tableRowImageSegments,
+	public DefaultTableAndBdvViews(
+			List< TableRowImageSegment > tableRowImageSegments,
 			ImageSourcesModel imageSourcesModel )
 	{
 		this.tableRowImageSegments = tableRowImageSegments;
@@ -30,21 +31,21 @@ public class DefaultViews
 
 	private void show( )
 	{
-		final SelectionModel< ColumnBasedTableRowImageSegment > selectionModel
+		final SelectionModel< TableRowImageSegment > selectionModel
 				= new DefaultSelectionModel<>();
 
-		final DynamicCategoryColoringModel< ColumnBasedTableRowImageSegment > coloringModel
+		final DynamicCategoryColoringModel< TableRowImageSegment > coloringModel
 				= new DynamicCategoryColoringModel<>( new GlasbeyARGBLut(), 50 );
 
-		final SelectionColoringModel< ColumnBasedTableRowImageSegment > selectionColoringModel
+		final SelectionColoringModel< TableRowImageSegment > selectionColoringModel
 				= new SelectionColoringModel<>(
 					coloringModel,
 					selectionModel );
 
-		final DefaultImageSegmentsModel< ColumnBasedTableRowImageSegment > imageSegmentsModel
+		final DefaultImageSegmentsModel< TableRowImageSegment > imageSegmentsModel
 				= new DefaultImageSegmentsModel<>( tableRowImageSegments );
 
-		final DefaultTableRowsModel< ColumnBasedTableRowImageSegment > tableRowsModel
+		final DefaultTableRowsModel< TableRowImageSegment > tableRowsModel
 				= new DefaultTableRowsModel<>( tableRowImageSegments );
 
 		imageSegmentsBdvView = new ImageSegmentsBdvView(

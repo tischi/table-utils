@@ -6,7 +6,7 @@ import de.embl.cba.tables.cellprofiler.FolderAndFileColumn;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModelFactory;
 import de.embl.cba.tables.modelview.segments.*;
-import de.embl.cba.tables.modelview.views.DefaultViews;
+import de.embl.cba.tables.modelview.views.DefaultTableAndBdvViews;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
@@ -46,7 +46,7 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 	@Override
 	public void run()
 	{
-		final List< ColumnBasedTableRowImageSegment > tableRowImageSegments
+		final List< TableRowImageSegment > tableRowImageSegments
 				= createAnnotatedImageSegments( inputTableFile );
 
 		final String tablePath = inputTableFile.toString();
@@ -57,10 +57,10 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 						tablePath,
 						true ).getImageSourcesModel();
 
-		new DefaultViews( tableRowImageSegments, imageSourcesModel );
+		new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel );
 	}
 
-	private List< ColumnBasedTableRowImageSegment > createAnnotatedImageSegments( File tableFile )
+	private List< TableRowImageSegment > createAnnotatedImageSegments( File tableFile )
 	{
 		columns = TableColumns.columnsFromTableFile( tableFile, null );
 
@@ -69,7 +69,7 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 		final Map< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn
 				= getImageSegmentCoordinateToColumn( pathColumnNames );
 
-		final List< ColumnBasedTableRowImageSegment > segments
+		final List< TableRowImageSegment > segments
 				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, imageSegmentCoordinateToColumn );
 
 		return segments;

@@ -148,12 +148,12 @@ public class SegmentUtils
 	}
 
 
-	public static List< ColumnBasedTableRowImageSegment > tableRowImageSegmentsFromColumns(
+	public static List< TableRowImageSegment > tableRowImageSegmentsFromColumns(
 			final LinkedHashMap< String, List< Object > > columns,
 			final Map< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn )
 	{
 
-		final List< ColumnBasedTableRowImageSegment > columnBasedTableRowImageSegments
+		final List< TableRowImageSegment > columnBasedTableRowImageSegments
 				= new ArrayList<>();
 
 		final int numRows = columns.values().iterator().next().size();

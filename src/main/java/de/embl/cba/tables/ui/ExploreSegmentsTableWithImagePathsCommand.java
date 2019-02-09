@@ -6,7 +6,8 @@ import de.embl.cba.tables.modelview.images.FileImageSourcesModelFactory;
 import de.embl.cba.tables.modelview.segments.ColumnBasedTableRowImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
-import de.embl.cba.tables.modelview.views.DefaultViews;
+import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
+import de.embl.cba.tables.modelview.views.DefaultTableAndBdvViews;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
@@ -34,7 +35,7 @@ public class ExploreSegmentsTableWithImagePathsCommand< R extends RealType< R > 
 	@Override
 	public void run()
 	{
-		final List< ColumnBasedTableRowImageSegment > tableRowImageSegments
+		final List< TableRowImageSegment > tableRowImageSegments
 				= createSegments( segmentsTableFile );
 
 		final String tablePath = segmentsTableFile.toString();
@@ -44,10 +45,10 @@ public class ExploreSegmentsTableWithImagePathsCommand< R extends RealType< R > 
 						tableRowImageSegments,
 						tablePath, is2D ).getImageSourcesModel();
 
-		new DefaultViews( tableRowImageSegments, imageSourcesModel );
+		new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel );
 	}
 
-	private List<ColumnBasedTableRowImageSegment> createSegments(
+	private List< TableRowImageSegment > createSegments(
 			File tableFile )
 	{
 		columns = TableColumns.columnsFromTableFile( tableFile );
@@ -60,7 +61,7 @@ public class ExploreSegmentsTableWithImagePathsCommand< R extends RealType< R > 
 		final Map< ImageSegmentCoordinate, List< Object > > coordinateToColumn
 				= createCoordinateToColumnMap();
 
-		final List< ColumnBasedTableRowImageSegment > segments
+		final List< TableRowImageSegment > segments
 				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, coordinateToColumn );
 
 		return segments;
