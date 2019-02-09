@@ -3,6 +3,7 @@ package de.embl.cba.tables.modelview.views;
 import bdv.tools.HelpDialog;
 import de.embl.cba.bdv.utils.lut.BlueWhiteRedARGBLut;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
+import de.embl.cba.tables.SwingUtils;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.coloring.*;
@@ -384,7 +385,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		final JMenuItem colorByColumnMenuItem = new JMenuItem( column );
 
-		colorByColumnMenuItem.addActionListener( e -> colorBy( column ) );
+		colorByColumnMenuItem.addActionListener( e -> {
+			new Thread( () -> colorBy( column ) ).start();
+		} );
 
 		return colorByColumnMenuItem;
 	}
@@ -414,15 +417,12 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 			selectionColoringModel.setWrappedColoringModel( coloringModel );
 
-			new NumericColoringModelDialog(
-					columnName,
-					coloringModel );
+			new Thread( () -> new NumericColoringModelDialog( columnName, coloringModel ) ).start();
 		}
 		else
 		{
 			final DynamicCategoryColoringModel< T > coloringModel
-					= new DynamicCategoryColoringModel< >(
-					new GlasbeyARGBLut(), 50
+					= new DynamicCategoryColoringModel< >( new GlasbeyARGBLut(), 50
 			);
 
 			selectionColoringModel.setWrappedColoringModel( coloringModel );

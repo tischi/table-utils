@@ -439,17 +439,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void viewObjectAtCurrentMouseCoordinatesIn3D()
 	{
-		new Thread( new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				new ConnectedComponentExtractorAnd3DViewer( currentLabelSource.source() )
-						.extractAndShowIn3D(
-								BdvUtils.getGlobalMouseCoordinates( bdv ),
-								voxelSpacing3DView );
-			}
-		} ).start();
+		new Thread( () -> new ConnectedComponentExtractorAnd3DViewer( currentLabelSource.source() )
+				.extractAndShowIn3D(
+						BdvUtils.getGlobalMouseCoordinates( bdv ),
+						voxelSpacing3DView ) ).start();
 	}
 
 	private int getCurrentTimePoint()

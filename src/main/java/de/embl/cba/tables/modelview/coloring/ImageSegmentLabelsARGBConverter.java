@@ -54,7 +54,14 @@ public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
 
 		final T imageSegment = imageSegmentsModel.getImageSegment( imageSegmentId );
 
+		if ( imageSegment == null )
+		{
+			int a = 1;
+		}
+
+		color.setValid( true );
 		coloringModel.convert( imageSegment, color.get() );
+
 
 	}
 

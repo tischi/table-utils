@@ -138,14 +138,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 		notifyColoringListeners();
 
 		// chain event notification
-		wrappedColoringModel.listeners().add( new ColoringListener()
-		{
-			@Override
-			public void coloringChanged()
-			{
-				notifyColoringListeners();
-			}
-		} );
+		wrappedColoringModel.listeners().add( () -> notifyColoringListeners() );
 
 	}
 
@@ -153,7 +146,8 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 	{
 		for ( ColoringListener listener : listeners.list )
 		{
-			listener.coloringChanged();
+			new Thread( () -> listener.coloringChanged() ).start();
+
 		}
 	}
 

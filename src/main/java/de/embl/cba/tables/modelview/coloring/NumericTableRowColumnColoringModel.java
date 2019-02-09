@@ -25,7 +25,6 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 			double rangeMin,
 			double rangeMax )
 	{
-
 		this.column = column;
 		this.lut = lut;
 		this.min = rangeMin;
@@ -38,7 +37,7 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	public void convert( T input, ARGBType output )
 	{
 		final Object featureValue = input.cells().get( column );
-		setColorLinearly( output, featureValue );
+		setColorLinearly( featureValue, output );
 	}
 
 
@@ -81,7 +80,7 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	}
 
 
-	public void setColorLinearly( ARGBType output, Object featureValue )
+	public void setColorLinearly( Object featureValue, ARGBType output )
 	{
 		final double value = TableUtils.asDouble( featureValue );
 		double normalisedValue = computeLinearNormalisedValue( value );
