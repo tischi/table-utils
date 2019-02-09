@@ -1,6 +1,6 @@
 package de.embl.cba.tables;
 
-import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
+import de.embl.cba.tables.modelview.views.TableRowsTableView;
 import ij.gui.GenericDialog;
 
 import javax.swing.*;

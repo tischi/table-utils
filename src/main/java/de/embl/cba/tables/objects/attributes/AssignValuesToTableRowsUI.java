@@ -2,13 +2,11 @@ package de.embl.cba.tables.objects.attributes;
 
 import de.embl.cba.tables.SwingUtils;
 import de.embl.cba.tables.modelview.segments.TableRow;
-import de.embl.cba.tables.modelview.views.table.TableRowsTableView;
+import de.embl.cba.tables.modelview.views.TableRowsTableView;
 import org.fife.rsta.ac.js.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

@@ -1,6 +1,7 @@
 package de.embl.cba.tables.modelview.images;
 
 import bdv.viewer.Source;
+import net.imglib2.realtransform.AffineTransform3D;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,12 +33,14 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 	public void addSource( Source< ? > source,
 						   String imageId,
 						   Flavour flavor,
-						   int numSpatialDimensions )
+						   int numSpatialDimensions,
+						   AffineTransform3D transform )
 	{
 
 		final SourceMetadata metadata = new SourceMetadata( imageId );
 		metadata.flavour = flavor;
 		metadata.numSpatialDimensions = numSpatialDimensions;
+		metadata.sourceTransform = transform;
 
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( source, metadata ) );
 	}

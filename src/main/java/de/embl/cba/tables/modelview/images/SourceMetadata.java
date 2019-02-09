@@ -1,5 +1,6 @@
 package de.embl.cba.tables.modelview.images;
 import bdv.util.BdvStackSource;
+import net.imglib2.realtransform.AffineTransform3D;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class SourceMetadata
 	public Double displayRangeMax = 255.0;
 	public Color displayColor = Color.white;
 	public BdvStackSource bdvStackSource = null;
+	public AffineTransform3D sourceTransform = new AffineTransform3D();
 
 	public enum Flavour
 	{

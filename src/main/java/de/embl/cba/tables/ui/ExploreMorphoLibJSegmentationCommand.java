@@ -1,16 +1,18 @@
 package de.embl.cba.tables.ui;
 
 import de.embl.cba.bdv.utils.wrap.Wraps;
+import de.embl.cba.tables.Calibrations;
 import de.embl.cba.tables.TableColumns;
 import de.embl.cba.tables.modelview.images.DefaultImageSourcesModel;
 import de.embl.cba.tables.modelview.images.SourceMetadata;
 import de.embl.cba.tables.modelview.segments.ColumnBasedTableRowImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
-import de.embl.cba.tables.modelview.views.DefaultBdvAndTableView;
+import de.embl.cba.tables.modelview.views.DefaultViews;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.text.TextWindow;
+import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
@@ -32,6 +34,7 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 		extends DynamicCommand
 {
 
+	public static final String LABEL = "Label";
 	@Parameter
 	ObjectService objectService;
 
@@ -67,16 +70,17 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 
 		final DefaultImageSourcesModel imageSourcesModel = new DefaultImageSourcesModel();
 
-		// TODO: transformed source! respect calibration.
 		imageSourcesModel.addSource(
 				Wraps.imagePlusAsSource4DChannelList( labelMaskImagePlus ).get( 0 ),
 				labelMaskId,
 				SourceMetadata.Flavour.LabelSource,
-				numSpatialDimensions
+				numSpatialDimensions,
+				Calibrations.getScalingTransform( labelMaskImagePlus )
 				);
 
-		new DefaultBdvAndTableView( tableRowImageSegments, imageSourcesModel );
+		final DefaultViews views = new DefaultViews( tableRowImageSegments, imageSourcesModel );
 
+		views.getTableRowsTableView().categoricalColumns().add( LABEL );
 	}
 
 	private void init()
@@ -137,7 +141,7 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 
 		coordinateToColumn.put(
 				ImageSegmentCoordinate.LabelId,
-				columns.get( "Label" ) );
+				columns.get( LABEL ) );
 
 		coordinateToColumn.put(
 				ImageSegmentCoordinate.X,

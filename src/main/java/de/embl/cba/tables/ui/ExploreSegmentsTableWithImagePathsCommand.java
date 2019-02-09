@@ -6,7 +6,7 @@ import de.embl.cba.tables.modelview.images.FileImageSourcesModelFactory;
 import de.embl.cba.tables.modelview.segments.ColumnBasedTableRowImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
-import de.embl.cba.tables.modelview.views.DefaultBdvAndTableView;
+import de.embl.cba.tables.modelview.views.DefaultViews;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
@@ -44,7 +44,7 @@ public class ExploreSegmentsTableWithImagePathsCommand< R extends RealType< R > 
 						tableRowImageSegments,
 						tablePath, is2D ).getImageSourcesModel();
 
-		new DefaultBdvAndTableView( tableRowImageSegments, imageSourcesModel );
+		new DefaultViews( tableRowImageSegments, imageSourcesModel );
 	}
 
 	private List<ColumnBasedTableRowImageSegment> createSegments(

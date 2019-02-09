@@ -1,4 +1,4 @@
-package de.embl.cba.tables.modelview.views.bdv;
+package de.embl.cba.tables.modelview.views;
 
 import bdv.tools.brightness.ConverterSetup;
 import bdv.util.BdvFunctions;
@@ -11,7 +11,6 @@ import bdv.viewer.state.ViewerState;
 import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.objects3d.ConnectedComponentExtractorAnd3DViewer;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
-import de.embl.cba.tables.modelview.coloring.ColoringListener;
 import de.embl.cba.tables.modelview.coloring.ColoringModel;
 import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
@@ -185,7 +184,21 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	 */
 	public void showSourceSet( SourceAndMetadata sourceAndMetadata )
 	{
-		showExclusiveImageSet( sourceAndMetadata.metadata().imageSetIDs );
+		final List< String > imageSetIDs = sourceAndMetadata.metadata().imageSetIDs;
+
+		if ( bdv != null  ) removeAllSources();
+
+		for ( int sourceIndex = 0; sourceIndex < imageSetIDs.size(); sourceIndex++ )
+		{
+			final SourceAndMetadata associatedSourceAndMetadata =
+					imageSourcesModel.sources().get( imageSetIDs.get( sourceIndex ) );
+
+			applyRecentDisplaySettings( sourceIndex, associatedSourceAndMetadata );
+
+			showSource( associatedSourceAndMetadata );
+		}
+
+		applyRecentViewerSettings( );
 	}
 
 	public void applyRecentViewerSettings( )
@@ -222,23 +235,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		bdv.getViewerPanel().setCurrentViewerTransform( transform3D );
 	}
 
-	public void showExclusiveImageSet( List< String > imageIDs )
-	{
-		if ( bdv != null  ) removeAllSources();
-
-		for ( int sourceIndex = 0; sourceIndex < imageIDs.size(); sourceIndex++ )
-		{
-			final SourceAndMetadata associatedSourceAndMetadata =
-					imageSourcesModel.sources().get( imageIDs.get( sourceIndex ) );
-
-			applyRecentDisplaySettings( sourceIndex, associatedSourceAndMetadata );
-
-			showSource( associatedSourceAndMetadata );
-		}
-
-		applyRecentViewerSettings( );
-	}
-
 	private void applyRecentDisplaySettings( int i, SourceAndMetadata associatedSourceAndMetadata )
 	{
 		if ( recentConverterSetups != null )
@@ -266,13 +262,13 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		if ( metadata.flavour == Flavour.LabelSource )
 		{
 			source = asLabelSource( sourceAndMetadata );
-			currentLabelSource = sourceAndMetadata;
+			currentLabelSource = sourceAndMetadata; // Currently, there can be only one.
 		}
 
 		if ( metadata.numSpatialDimensions == 2 )
-		{
 			bdvOptions = bdvOptions.is2D();
-		}
+
+		bdvOptions = bdvOptions.sourceTransform( metadata.sourceTransform );
 
 		final BdvStackSource bdvStackSource = BdvFunctions.show( source, bdvOptions );
 

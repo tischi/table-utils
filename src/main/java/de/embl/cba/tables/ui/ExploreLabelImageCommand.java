@@ -10,7 +10,8 @@ import de.embl.cba.tables.modelview.images.SourceLoader;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
-import de.embl.cba.tables.modelview.views.bdv.ImageSegmentsBdvView;
+import de.embl.cba.tables.modelview.views.ImageSegmentsBdvView;
+import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
@@ -43,7 +44,9 @@ public class ExploreLabelImageCommand< R extends RealType< R > & NativeType< R >
 				labelSourceLoader.getRandomAccessibleIntervalSource4D(),
 				inputLabelMasksFile.getName(),
 				SourceMetadata.Flavour.LabelSource,
-				labelSourceLoader.getNumSpatialDimensions() );
+				labelSourceLoader.getNumSpatialDimensions(),
+				new AffineTransform3D() // TODO
+		);
 
 		final GeneratingNoPositionImageSegmentsModel generatingImageSegmentsModel
 				= new GeneratingNoPositionImageSegmentsModel();

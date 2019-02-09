@@ -12,11 +12,20 @@ public class RunExploreMorphoLibJSegmentationCommand
 		final ImageJ ij = new ImageJ();
 		ij.ui().showUI();
 
-		IJ.open( RunExploreMorphoLibJSegmentationCommand.class.getResource(
-				"3d-image-lbl-morpho.csv" ).getFile() );
+//		IJ.open( RunExploreMorphoLibJSegmentationCommand.class.getResource(
+//				"3d-image-lbl-morpho.csv" ).getFile() );
+//
+//		IJ.open( RunExploreMorphoLibJSegmentationCommand.class.getResource(
+//				"3d-image-lbl.zip" ).getFile() );
 
 		IJ.open( RunExploreMorphoLibJSegmentationCommand.class.getResource(
-				"3d-image-lbl.zip" ).getFile() );
+				"blobs.zip" ).getFile() );
+
+		IJ.open( RunExploreMorphoLibJSegmentationCommand.class.getResource(
+				"mask-lbl.zip" ).getFile() );
+
+		IJ.open( RunExploreMorphoLibJSegmentationCommand.class.getResource(
+				"blobs-lbl-Morphometry.csv" ).getFile() );
 
 		ij.command().run( ExploreMorphoLibJSegmentationCommand.class, true );
 	}
