@@ -1,12 +1,11 @@
 package de.embl.cba.tables.ui;
 
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
+import ij.Prefs;
 import ij.gui.GenericDialog;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,11 +15,12 @@ import static de.embl.cba.tables.SwingUtils.horizontalLayoutPanel;
 public class ImageSegmentCoordinateColumnsSelectionDialog
 {
 	private static final String NO_COLUMN_SELECTED = "None";
+	public static final String IMAGE_SEGMENT_COORDINATE_COLUMN_PREFIX = "ImageSegmentCoordinateColumn.";
 
 	private String[] columnChoices;
 	private final GenericDialog gd;
 
-	public ImageSegmentCoordinateColumnsSelectionDialog( ArrayList< String > columns )
+	public ImageSegmentCoordinateColumnsSelectionDialog( Collection< String > columns )
 	{
 		setColumnChoices( columns );
 
@@ -33,23 +33,33 @@ public class ImageSegmentCoordinateColumnsSelectionDialog
 	{
 		for ( ImageSegmentCoordinate coordinate : ImageSegmentCoordinate.values() )
 		{
-			gd.addChoice( coordinate.name(), columnChoices, columnChoices[ 0 ] );
+			final String previousChoice = Prefs.get( getKey( coordinate ), columnChoices[ 0 ] );
+			gd.addChoice( coordinate.toString(), columnChoices, previousChoice );
 		}
 	}
 
 	private Map< ImageSegmentCoordinate, String > collectChoices()
 	{
-		final HashMap< ImageSegmentCoordinate, String > coordinateToColumn = new HashMap<>();
+		final HashMap< ImageSegmentCoordinate, String > coordinateToColumnName = new HashMap<>();
 
 		for ( ImageSegmentCoordinate coordinate : ImageSegmentCoordinate.values() )
 		{
-			coordinateToColumn.put( coordinate, gd.getNextString() );
+			final String columnName = gd.getNextChoice();
+			coordinateToColumnName.put( coordinate, columnName );
+			Prefs.set( getKey( coordinate ), columnName );
 		}
 
-		return coordinateToColumn;
+		Prefs.savePreferences();
+
+		return coordinateToColumnName;
 	}
 
-	private void setColumnChoices( ArrayList< String > columns )
+	private String getKey( ImageSegmentCoordinate coordinate )
+	{
+		return IMAGE_SEGMENT_COORDINATE_COLUMN_PREFIX + coordinate.toString();
+	}
+
+	private void setColumnChoices( Collection< String > columns )
 	{
 		final int numColumns = columns.size();
 
@@ -57,40 +67,13 @@ public class ImageSegmentCoordinateColumnsSelectionDialog
 
 		columnChoices[ 0 ] = NO_COLUMN_SELECTED;
 
-		for ( int i = 0; i < numColumns; i++ )
+		int i = 1;
+		for ( String column : columns )
 		{
-			columnChoices[ i + 1 ] = columns.get( i );
+			columnChoices[ i++ ] = column;
 		}
 	}
 
-	private void addColumnSelectionUI( final JPanel panel, final ImageSegmentCoordinate coordinate )
-	{
-		final JPanel horizontalLayoutPanel = horizontalLayoutPanel();
-
-		horizontalLayoutPanel.add( new JLabel( coordinate.toString() ) );
-
-		final JComboBox jComboBox = new JComboBox();
-		horizontalLayoutPanel.add( jComboBox );
-
-		for ( String choice : columnChoices )
-		{
-			jComboBox.addItem( choice );
-		}
-
-		// +1 is due to the option to select no Column
-		jComboBox.setSelectedItem( objectTablePanel.getCoordinateColumn( coordinate ) );
-
-		jComboBox.addActionListener( new ActionListener()
-		{
-			@Override
-			public void actionPerformed( ActionEvent e )
-			{
-				objectTablePanel.setCoordinateColumn( coordinate, ( String ) jComboBox.getSelectedItem() );
-			}
-		} );
-
-		panel.add( horizontalLayoutPanel );
-	}
 
 	public Map< ImageSegmentCoordinate, String > fetchUserInput()
 	{
@@ -101,7 +84,6 @@ public class ImageSegmentCoordinateColumnsSelectionDialog
 		final Map< ImageSegmentCoordinate, String > coordinateToColumn = collectChoices();
 
 		return coordinateToColumn;
-
 	}
 
 

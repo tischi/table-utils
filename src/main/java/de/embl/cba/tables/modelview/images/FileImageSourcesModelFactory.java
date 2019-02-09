@@ -16,18 +16,14 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 	private final List< T > tableRowImageSegments;
 	private Set< String > columns;
 	private final Map< String, String > imageNameToPathColumnName;
-	private final int numSpatialDimensions;
-
 	private FileImageSourcesModel imageSourcesModel;
-	private String tablePath;
+	private final String tablePath;
 
 	public FileImageSourcesModelFactory(
-			List< T > tableRowImageSegments,
-			String tablePath,
-			int numSpatialDimensions )
+			final List< T > tableRowImageSegments,
+			final String tablePath )
 	{
 		this.tableRowImageSegments = tableRowImageSegments;
-		this.numSpatialDimensions = numSpatialDimensions;
 		this.tablePath = tablePath;
 
 		columns = tableRowImageSegments.get( 0 ).cells().keySet();
@@ -71,8 +67,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 							imageDisplayName,
 							absoluteImagePath.toFile(),
 							imageSetIds,
-							imageFlavour,
-							numSpatialDimensions );
+							imageFlavour );
 				}
 			}
 		}

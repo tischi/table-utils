@@ -64,6 +64,8 @@ public class FileImageSourcesModel implements ImageSourcesModel
 				final ImagePlus imagePlus = IJ.openImage( file.toString() );
 				imagePlus.setTitle( metadata.displayName );
 
+				metadata.numSpatialDimensions = imagePlus.getNSlices() > 1 ? 3 : 2;
+
 				if( metadata.flavour == Flavour.LabelSource || imagePlus.getBitDepth() == 8 )
 				{
 					metadata.displayRangeMin = 0.0;
@@ -123,14 +125,12 @@ public class FileImageSourcesModel implements ImageSourcesModel
 			String imageDisplayName,
 			File file,
 			List< String > imageSetIDs,
-			Flavour flavor,
-			int numSpatialDimensions )
+			Flavour flavor )
 	{
 		if ( nameToSourceAndMetadata.containsKey( imageId ) ) return;
 
 		final SourceMetadata metadata = new SourceMetadata();
 		metadata.flavour = flavor;
-		metadata.numSpatialDimensions = numSpatialDimensions;
 		metadata.imageSetIDs = imageSetIDs;
 		metadata.displayName = imageDisplayName;
 		metadata.imageId = imageId;

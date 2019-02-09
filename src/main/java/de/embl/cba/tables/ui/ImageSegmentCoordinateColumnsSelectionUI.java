@@ -77,16 +77,17 @@ public class ImageSegmentCoordinateColumnsSelectionUI extends JPanel
 		}
 
 		// +1 is due to the option to select no Column
-		jComboBox.setSelectedItem( objectTablePanel.getCoordinateColumn( coordinate ) );
-
-		jComboBox.addActionListener( new ActionListener()
-		{
-			@Override
-			public void actionPerformed( ActionEvent e )
-			{
-				objectTablePanel.setCoordinateColumn( coordinate, ( String ) jComboBox.getSelectedItem() );
-			}
-		} );
+		// TODO
+//		jComboBox.setSelectedItem( objectTablePanel.getCoordinateColumn( coordinate ) );
+//
+//		jComboBox.addActionListener( new ActionListener()
+//		{
+//			@Override
+//			public void actionPerformed( ActionEvent e )
+//			{
+//				objectTablePanel.setCoordinateColumn( coordinate, ( String ) jComboBox.getSelectedItem() );
+//			}
+//		} );
 
 		panel.add( horizontalLayoutPanel );
 	}

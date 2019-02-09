@@ -14,7 +14,6 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +23,6 @@ import java.util.Map;
 public class ExploreSegmentsTableWithImagePathsCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {
-	private static final String COLUMN_NAME_LABEL_IMAGE_ID = "LabelImageId";
-
 	@Parameter ( label = "Segments table" )
 	public File segmentsTableFile;
 
@@ -35,21 +32,19 @@ public class ExploreSegmentsTableWithImagePathsCommand< R extends RealType< R > 
 	public void run()
 	{
 		final List< ColumnBasedTableRowImageSegment > tableRowImageSegments
-				= createAnnotatedImageSegments( segmentsTableFile );
+				= createSegments( segmentsTableFile );
 
 		final String tablePath = segmentsTableFile.toString();
 
 		final FileImageSourcesModel imageSourcesModel =
 				new FileImageSourcesModelFactory(
 						tableRowImageSegments,
-						tablePath,
-						2 ).getImageSourcesModel();
+						tablePath).getImageSourcesModel();
 
 		new DefaultBdvAndTableView( tableRowImageSegments, imageSourcesModel );
-
 	}
 
-	private List<ColumnBasedTableRowImageSegment> createAnnotatedImageSegments(
+	private List<ColumnBasedTableRowImageSegment> createSegments(
 			File tableFile )
 	{
 		columns = TableColumns.columnsFromTableFile( tableFile );
@@ -59,8 +54,8 @@ public class ExploreSegmentsTableWithImagePathsCommand< R extends RealType< R > 
 //				COLUMN_NAME_LABEL_IMAGE_ID,
 //				"em-segmented-cells-labels" );
 
-		final HashMap< ImageSegmentCoordinate, List< Object > > coordinateToColumn
-				= createCoordinateToColumn( );
+		final Map< ImageSegmentCoordinate, List< Object > > coordinateToColumn
+				= createCoordinateToColumnMap();
 
 		final List< ColumnBasedTableRowImageSegment > segments
 				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, coordinateToColumn );
@@ -68,13 +63,24 @@ public class ExploreSegmentsTableWithImagePathsCommand< R extends RealType< R > 
 		return segments;
 	}
 
-	private Map< ImageSegmentCoordinate, List< Object > > createCoordinateToColumn( )
+	private LinkedHashMap< ImageSegmentCoordinate, List< Object > > createCoordinateToColumnMap( )
 	{
 		final ImageSegmentCoordinateColumnsSelectionDialog selectionDialog
 				= new ImageSegmentCoordinateColumnsSelectionDialog( columns.keySet() );
 
-		return selectionDialog.fetchUserInput();
-	}
+		final Map< ImageSegmentCoordinate, String > coordinateToColumnName = selectionDialog.fetchUserInput();
 
+		final LinkedHashMap< ImageSegmentCoordinate, List< Object > > coordinateToColumn = new LinkedHashMap<>();
+
+		for( ImageSegmentCoordinate coordinate : coordinateToColumnName.keySet() )
+		{
+			coordinateToColumn.put(
+					coordinate,
+					columns.get( coordinateToColumnName.get( coordinate ) ) );
+		}
+
+		return coordinateToColumn;
+
+	}
 
 }
