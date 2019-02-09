@@ -2,6 +2,7 @@ package de.embl.cba.tables.modelview.coloring;
 
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import net.imglib2.type.numeric.ARGBType;
+import net.imglib2.type.volatiles.VolatileARGBType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +44,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 
 	@Override
-	public void convert( T input, ARGBType output )
+	public void convert( T input, VolatileARGBType output )
 	{
 		wrappedColoringModel.convert( input, output );
 
@@ -57,7 +58,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 				if ( ! isSelected )
 				{
-					output.mul( brightnessNotSelected );
+					output.get().mul( brightnessNotSelected );
 				}
 				break;
 
@@ -65,7 +66,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 				if ( ! isSelected )
 				{
-					output.mul( 0.0 );
+					output.get().mul( 0.0 );
 				}
 				break;
 
@@ -73,7 +74,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 				if ( isSelected )
 				{
-					output.set( selectionColor );
+					output.get().set( selectionColor );
 				}
 				break;
 
@@ -81,11 +82,11 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 				if ( isSelected )
 				{
-					output.set( selectionColor );
+					output.get().set( selectionColor );
 				}
 				else
 				{
-					output.mul( brightnessNotSelected );
+					output.get().mul( brightnessNotSelected );
 				}
 				break;
 

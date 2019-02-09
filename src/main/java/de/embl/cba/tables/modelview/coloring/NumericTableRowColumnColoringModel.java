@@ -4,6 +4,7 @@ import de.embl.cba.bdv.utils.lut.ARGBLut;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.segments.TableRow;
 import net.imglib2.type.numeric.ARGBType;
+import net.imglib2.type.volatiles.VolatileARGBType;
 
 import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 
@@ -34,9 +35,13 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	}
 
 	@Override
-	public void convert( T input, ARGBType output )
+	public void convert( T input, VolatileARGBType output )
 	{
 		final Object featureValue = input.cells().get( column );
+		if ( featureValue == null )
+		{
+			System.out.println( "FeatureValue NULL");
+		}
 		setColorLinearly( featureValue, output );
 	}
 
@@ -80,12 +85,16 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	}
 
 
-	public void setColorLinearly( Object featureValue, ARGBType output )
+	public void setColorLinearly( Object featureValue, VolatileARGBType output )
 	{
 		final double value = TableUtils.asDouble( featureValue );
 		double normalisedValue = computeLinearNormalisedValue( value );
+		if ( normalisedValue < 0 || normalisedValue > 1 )
+		{
+			System.out.println( "NORMALISATION ISSUE");
+		}
 		final int argb = lut.getARGB( normalisedValue );
-		output.set( argb );
+		output.get().set( argb );
 	}
 
 	public double computeLinearNormalisedValue( double value )
@@ -113,18 +122,12 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 		return normalisedValue;
 	}
 
-	public double createRandom( double x )
-	{
-		double random = ( x * 50 ) * goldenRatio;
-		random = random - ( long ) Math.floor( random );
-		return random;
-	}
 
 	private void notifyColoringListeners()
 	{
 		for ( ColoringListener listener : listeners.list )
 		{
-			listener.coloringChanged();
+			new Thread( () -> listener.coloringChanged() ).start();
 		}
 	}
 }

@@ -6,7 +6,7 @@ import net.imglib2.converter.Converter;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.volatiles.VolatileARGBType;
 
-public interface ColoringModel< T > extends Converter< T, ARGBType >
+public interface ColoringModel< T > extends Converter< T, VolatileARGBType >
 {
 	/**
 	 * Get the list of coloring listeners. Add a {@link ColoringListener} to

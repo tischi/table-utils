@@ -78,7 +78,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	}
 
 	@Override
-	public LinkedHashMap< String, Object > cells()
+	public synchronized LinkedHashMap< String, Object > cells()
 	{
 		setCellsFromColumns();
 
@@ -103,7 +103,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	}
 
 	@Override
-	public void localize( float[] position )
+	public synchronized void localize( float[] position )
 	{
 		setPositionFromColumns();
 
@@ -114,7 +114,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	}
 
 	@Override
-	public void localize( double[] position )
+	public synchronized void localize( double[] position )
 	{
 		setPositionFromColumns();
 
@@ -125,14 +125,14 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	}
 
 	@Override
-	public float getFloatPosition( int d )
+	public synchronized float getFloatPosition( int d )
 	{
 		setPositionFromColumns();
 		return (float) position[ d ];
 	}
 
 	@Override
-	public double getDoublePosition( int d )
+	public synchronized double getDoublePosition( int d )
 	{
 		setPositionFromColumns();
 		return position[ d ];

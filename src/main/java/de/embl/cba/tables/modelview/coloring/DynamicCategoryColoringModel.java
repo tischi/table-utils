@@ -2,6 +2,7 @@ package de.embl.cba.tables.modelview.coloring;
 
 import de.embl.cba.bdv.utils.lut.ARGBLut;
 import net.imglib2.type.numeric.ARGBType;
+import net.imglib2.type.volatiles.VolatileARGBType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class DynamicCategoryColoringModel< T > extends AbstractColoringModel< T 
 	}
 
 	@Override
-	public void convert( T input, ARGBType output )
+	public void convert( T input, VolatileARGBType output )
 	{
 		if( ! inputToColorMap.keySet().contains( input ) )
 		{

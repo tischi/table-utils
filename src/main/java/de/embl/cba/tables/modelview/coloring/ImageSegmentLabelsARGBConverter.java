@@ -37,6 +37,7 @@ public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
 		{
 			if ( ! ( ( Volatile ) label ).isValid() )
 			{
+				color.set( 0 );
 				color.setValid( false );
 				return;
 			}
@@ -49,20 +50,18 @@ public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
 			return;
 		}
 
-		final ImageSegmentId imageSegmentId =
-				new ImageSegmentId( imageId, label.getRealDouble(), timePointIndex );
+		final ImageSegmentId imageSegmentId = new ImageSegmentId( imageId, label.getRealDouble(), timePointIndex );
 
 		final T imageSegment = imageSegmentsModel.getImageSegment( imageSegmentId );
 
 		if ( imageSegment == null )
 		{
+			System.out.println( "ImageSegment NULL");
 			int a = 1;
 		}
 
+		coloringModel.convert( imageSegment, color );
 		color.setValid( true );
-		coloringModel.convert( imageSegment, color.get() );
-
-
 	}
 
 	@Override

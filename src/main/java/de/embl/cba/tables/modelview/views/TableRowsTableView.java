@@ -13,6 +13,7 @@ import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.objects.attributes.AssignValuesToTableRowsUI;
 import net.imglib2.type.numeric.ARGBType;
+import net.imglib2.type.volatiles.VolatileARGBType;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -156,9 +157,10 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		if ( selectionModel.isSelected( tableRowsModel.getTableRows().get( row ) ) )
 		{
-			final ARGBType argbType = new ARGBType();
+			final VolatileARGBType argbType = new VolatileARGBType();
 			selectionColoringModel.convert( tableRowsModel.getTableRows().get( row ), argbType );
-			final Color color = new Color( ARGBType.red( argbType.get() ), ARGBType.green( argbType.get() ), ARGBType.blue( argbType.get() ) );
+			final int colorIndex = argbType.get().get();
+			final Color color = new Color( ARGBType.red( colorIndex ), ARGBType.green( colorIndex ), ARGBType.blue( colorIndex ) );
 			return color;
 		}
 
