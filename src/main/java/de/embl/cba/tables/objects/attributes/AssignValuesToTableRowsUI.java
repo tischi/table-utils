@@ -60,7 +60,7 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 
 			selectedColumn = ( String ) columnComboBox.getSelectedItem();
 			selectedAttribute = ( String ) attributeComboBox.getSelectedItem();
-			
+
 			assignAttributes(
 					selectedColumn,
 					selectedRows,

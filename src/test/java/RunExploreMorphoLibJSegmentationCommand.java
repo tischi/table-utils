@@ -11,16 +11,8 @@ public class RunExploreMorphoLibJSegmentationCommand
 		final ImageJ ij = new ImageJ();
 		ij.ui().showUI();
 
-		final ResultsTable resultsTable = new ResultsTable( 10 );
-		resultsTable.show( "Table" );
-		resultsTable.addValue( "Column01", 10 );
-
-		final ResultsTable resultsTable2 = new ResultsTable( 10 );
-		resultsTable2.show( "Table2" );
-		resultsTable2.addValue( "Column01", 10 );
-
-
-//		final net.imagej.table.ResultsTable resultsTable1 = new net.imagej.table.ResultsTable();
+		createResultsTable( "Table01" );
+		createResultsTable( "Table02" );
 
 		final ImagePlus imagePlus = new ImagePlus(
 				"Image",
@@ -29,6 +21,16 @@ public class RunExploreMorphoLibJSegmentationCommand
 		imagePlus.show();
 
 		ij.command().run( ExploreMorphoLibJSegmentationCommand.class, true );
+	}
+
+	private static ResultsTable createResultsTable( String title )
+	{
+		final ResultsTable resultsTable = new ResultsTable();
+		resultsTable.addValue( "Column01", 10.0 );
+		resultsTable.addValue( "Column01", 10.0 );
+		resultsTable.addValue( "Column01", 20.0 );
+		resultsTable.show( title );
+		return resultsTable;
 	}
 }
 
