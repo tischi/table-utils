@@ -35,8 +35,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 						   int numSpatialDimensions )
 	{
 
-		final SourceMetadata metadata = new SourceMetadata();
-		metadata.imageId = imageId;
+		final SourceMetadata metadata = new SourceMetadata( imageId );
 		metadata.flavour = flavor;
 		metadata.numSpatialDimensions = numSpatialDimensions;
 

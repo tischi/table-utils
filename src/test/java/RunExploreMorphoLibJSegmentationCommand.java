@@ -1,4 +1,5 @@
 import de.embl.cba.tables.ui.ExploreMorphoLibJSegmentationCommand;
+import ij.IJ;
 import ij.ImagePlus;
 import ij.measure.ResultsTable;
 import ij.process.ShortProcessor;
@@ -11,14 +12,11 @@ public class RunExploreMorphoLibJSegmentationCommand
 		final ImageJ ij = new ImageJ();
 		ij.ui().showUI();
 
-		createResultsTable( "Table01" );
-		createResultsTable( "Table02" );
+		IJ.open( RunExploreMorphoLibJSegmentationCommand.class.getResource(
+				"3d-image-lbl-morpho.csv" ).getFile() );
 
-		final ImagePlus imagePlus = new ImagePlus(
-				"Image",
-				new ShortProcessor( 100, 100 ) );
-
-		imagePlus.show();
+		IJ.open( RunExploreMorphoLibJSegmentationCommand.class.getResource(
+				"3d-image-lbl.zip" ).getFile() );
 
 		ij.command().run( ExploreMorphoLibJSegmentationCommand.class, true );
 	}

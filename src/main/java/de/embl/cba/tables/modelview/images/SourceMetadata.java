@@ -26,17 +26,15 @@ public class SourceMetadata
 	public Color displayColor = Color.white;
 	public BdvStackSource bdvStackSource = null;
 
-	private static int id = 0;
-
 	public enum Flavour
 	{
 		LabelSource,
 		IntensitySource
 	}
 
-	public SourceMetadata()
+	public SourceMetadata( String imageId )
 	{
-		imageId = "ImageId" + id++;
-		imageSetIDs.add( imageId );
+		this.imageId = imageId;
+		imageSetIDs.add( this.imageId );
 	}
 }

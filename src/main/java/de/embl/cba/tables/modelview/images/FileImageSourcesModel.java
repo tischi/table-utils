@@ -50,11 +50,10 @@ public class FileImageSourcesModel implements ImageSourcesModel
 	{
 		if ( nameToSourceAndMetadata.containsKey( imageId ) ) return;
 
-		final SourceMetadata metadata = new SourceMetadata();
+		final SourceMetadata metadata = new SourceMetadata( imageId );
 		metadata.flavour = flavor;
 		metadata.imageSetIDs = imageSetIDs;
 		metadata.displayName = imageDisplayName;
-		metadata.imageId = imageId;
 
 		final FileSource fileSource = new FileSource( metadata, file );
 

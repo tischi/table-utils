@@ -56,6 +56,8 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 	@Override
 	public void run()
 	{
+		numSpatialDimensions = labelMaskImagePlus.getNSlices() > 1 ? 3 : 2;
+
 		labelMaskId = labelMaskImagePlus.getTitle();
 
 		resultsTable = titleToResultsTable.get( resultsTableTitle );
@@ -65,8 +67,7 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 
 		final DefaultImageSourcesModel imageSourcesModel = new DefaultImageSourcesModel();
 
-		numSpatialDimensions = labelMaskImagePlus.getNSlices() > 1 ? 3 : 2;
-
+		// TODO: transformed source! respect calibration.
 		imageSourcesModel.addSource(
 				Wraps.imagePlusAsSource4DChannelList( labelMaskImagePlus ).get( 0 ),
 				labelMaskId,
@@ -117,7 +118,7 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 		);
 
 		final HashMap< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn
-				= createImageSegmentCoordinateToColumn();
+				= createSegmentCoordinateToColumnMap();
 
 		final List< ColumnBasedTableRowImageSegment > segments
 				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, imageSegmentCoordinateToColumn );
@@ -125,35 +126,35 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 		return segments;
 	}
 
-	private HashMap< ImageSegmentCoordinate, List< Object > > createImageSegmentCoordinateToColumn( )
+	private HashMap< ImageSegmentCoordinate, List< Object > > createSegmentCoordinateToColumnMap( )
 	{
-		final HashMap< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn
+		final HashMap< ImageSegmentCoordinate, List< Object > > coordinateToColumn
 				= new HashMap<>();
 
-		imageSegmentCoordinateToColumn.put(
+		coordinateToColumn.put(
 				ImageSegmentCoordinate.ImageId,
 				columns.get( COLUMN_NAME_LABEL_IMAGE_ID ));
 
-		imageSegmentCoordinateToColumn.put(
+		coordinateToColumn.put(
 				ImageSegmentCoordinate.LabelId,
 				columns.get( "Label" ) );
 
-		imageSegmentCoordinateToColumn.put(
+		coordinateToColumn.put(
 				ImageSegmentCoordinate.X,
 				columns.get( "Centroid.X" ) );
 
-		imageSegmentCoordinateToColumn.put(
+		coordinateToColumn.put(
 				ImageSegmentCoordinate.Y,
 				columns.get( "Centroid.Y" ) );
 
 		if ( numSpatialDimensions == 3 )
 		{
-			imageSegmentCoordinateToColumn.put(
+			coordinateToColumn.put(
 					ImageSegmentCoordinate.Z,
 					columns.get( "Centroid.Z" ) );
 		}
 
-		return imageSegmentCoordinateToColumn;
+		return coordinateToColumn;
 	}
 
 

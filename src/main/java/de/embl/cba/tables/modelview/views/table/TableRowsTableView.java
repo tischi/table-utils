@@ -502,7 +502,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private JMenu createColoringMenu()
 	{
-		JMenu coloringMenu = new JMenu( "Coloring" );
+		JMenu coloringMenu = new JMenu( "Color by" );
 
 		// coloringMenu.add( createRestoreOriginalColorMenuItem() );
 
@@ -534,19 +534,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private JMenuItem createColorByColumnMenuItem( final String column )
 	{
-		// TODO: also table cells could be colored
+		final JMenuItem colorByColumnMenuItem = new JMenuItem( column );
 
-		final JMenuItem colorByColumnMenuItem = new JMenuItem( "Color " + column );
-
-		colorByColumnMenuItem.addActionListener( new ActionListener()
-		{
-			@Override
-			public void actionPerformed( ActionEvent e )
-			{
-				colorBy( column );
-			}
-
-		} );
+		colorByColumnMenuItem.addActionListener( e -> colorBy( column ) );
 
 		return colorByColumnMenuItem;
 	}

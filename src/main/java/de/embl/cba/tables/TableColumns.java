@@ -5,25 +5,28 @@ import ij.measure.ResultsTable;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TableColumns
 {
 	public static LinkedHashMap< String,List< Object > > columnsFromImageJ1ResultsTable(
 			ResultsTable resultsTable )
 	{
-		List< String > columns = Arrays.asList( resultsTable.getHeadings() );
+		List< String > columnNames = Arrays.asList( resultsTable.getHeadings() );
 
-		final LinkedHashMap< String, List< Object > > columnToValues
+		final LinkedHashMap< String, List< Object > > columnNamesToValues
 				= new LinkedHashMap<>();
 
-		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
+		for ( int columnIndex = 0; columnIndex < columnNames.size(); columnIndex++ )
 		{
-			final String columnName = columns.get( columnIndex );
-			final List< Object > columnEntries = Arrays.asList( resultsTable.getColumn( columnIndex ) );
-			columnToValues.put( columnName, columnEntries );
+			final String columnName = columnNames.get( columnIndex );
+			final float[] floats = resultsTable.getColumn( columnIndex );
+			final List< Object > list = new ArrayList<>( floats.length );
+			for ( float value : floats ) list.add( (double) value );
+			columnNamesToValues.put( columnName, list );
 		}
 
-		return columnToValues;
+		return columnNamesToValues;
 	}
 
 	public static LinkedHashMap< String, List< Object > > columnsFromTableFile( final File file )
@@ -47,7 +50,7 @@ public class TableColumns
 		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
 		{
 			final String columnName = columns.get( columnIndex );
-			columnToValues.put( columnName, new ArrayList<>(  ) );
+			columnToValues.put( columnName, new ArrayList<>( ) );
 		}
 
 		for ( int row = 1; row < rowsInTable.size(); ++row )
