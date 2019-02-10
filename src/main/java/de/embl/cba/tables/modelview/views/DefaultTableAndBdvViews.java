@@ -47,6 +47,7 @@ public class DefaultTableAndBdvViews
 		final DefaultTableRowsModel< TableRowImageSegment > tableRowsModel
 				= new DefaultTableRowsModel<>( tableRowImageSegments );
 
+
 		imageSegmentsBdvView = new ImageSegmentsBdvView(
 				imageSourcesModel,
 				imageSegmentsModel,

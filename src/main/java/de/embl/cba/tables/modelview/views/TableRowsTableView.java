@@ -3,7 +3,6 @@ package de.embl.cba.tables.modelview.views;
 import bdv.tools.HelpDialog;
 import de.embl.cba.bdv.utils.lut.BlueWhiteRedARGBLut;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
-import de.embl.cba.tables.SwingUtils;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.coloring.*;
@@ -13,13 +12,11 @@ import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.objects.attributes.AssignValuesToTableRowsUI;
 import net.imglib2.type.numeric.ARGBType;
-import net.imglib2.type.volatiles.VolatileARGBType;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
 
@@ -213,15 +210,19 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		initHelpDialog();
 		final JMenuItem menuItem = new JMenuItem( "Show help" );
-		menuItem.addActionListener( e -> helpDialog.setVisible( ! helpDialog.isVisible() ) );
+		menuItem.addActionListener( e ->
+				SwingUtilities.invokeLater( () ->
+						helpDialog.setVisible( ! helpDialog.isVisible() ) ) );
 		return menuItem;
 	}
 
 	public void addMenu( JMenuItem menuItem )
 	{
-		menuBar.add( menuItem );
-
-		if ( frame != null ) SwingUtilities.updateComponentTreeUI( frame );
+		SwingUtilities.invokeLater( () ->
+		{
+			menuBar.add( menuItem );
+			if ( frame != null ) SwingUtilities.updateComponentTreeUI( frame );
+		});
 	}
 
 	private JMenu createTableMenu()
@@ -230,7 +231,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
         menu.add( createSaveAsMenuItem() );
 
-		menu.add( addColumnMenuItem() );
+		menu.add( createColumnMenuItem() );
 
 		menu.add( assignValuesMenuItem() );
 
@@ -260,7 +261,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
-	private JMenuItem addColumnMenuItem()
+	private JMenuItem createColumnMenuItem()
 	{
 		final JMenuItem menuItem = new JMenuItem( "New Column..." );
 
@@ -275,23 +276,35 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
     public void showTable()
 	{
-		frame = new JFrame( "Table" );
+		try
+		{
+			SwingUtilities.invokeAndWait( () ->
+			{
+				frame = new JFrame( "Table" );
 
-		createMenuBar( );
+				createMenuBar();
 
-        frame.setJMenuBar( menuBar );
+				frame.setJMenuBar( menuBar );
 
-        //Show the table
-        //frame.add( scrollPane );
+				//Show the table
+				//frame.add( scrollPane );
 
-        //Create and set up the content pane.
-        this.setOpaque(true); //content panes must be opaque
-        frame.setContentPane(this);
+				//Create and set up the content pane.
+				this.setOpaque( true ); //content panes must be opaque
+				frame.setContentPane( this );
 
-        //Display the window.
-        frame.pack();
-        frame.setVisible(true);
-    }
+				//Display the window.
+				frame.pack();
+				frame.setVisible( true );
+			});
+		} catch ( InterruptedException e )
+		{
+			e.printStackTrace();
+		} catch ( InvocationTargetException e )
+		{
+			e.printStackTrace();
+		}
+	}
 
 	public void addColumn( String column, Object defaultValue )
 	{
@@ -334,20 +347,22 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		table.getSelectionModel().addListSelectionListener( e ->
 		{
-			if ( e.getValueIsAdjusting() ) return;
-
-			if ( table.getSelectedRow() == -1 )
+			SwingUtilities.invokeLater( () ->
 			{
-				return;
-			}
+				if ( e.getValueIsAdjusting() ) return;
 
-			recentlySelectedRowInView = table.getSelectedRow();
+				if ( table.getSelectedRow() == -1 ) return;
 
-			final int row = table.convertRowIndexToModel( recentlySelectedRowInView );
+				recentlySelectedRowInView = table.getSelectedRow();
 
-			selectionModel.focus( tableRowsModel.getTableRows().get( row ) );
-			table.repaint();
-		} );
+				final int row = table.convertRowIndexToModel( recentlySelectedRowInView );
+
+				selectionModel.focus( tableRowsModel.getTableRows().get( row ) );
+
+				table.repaint();
+			});
+
+		});
 	}
 
 	public void registerAsSelectionListener( SelectionModel< T > selectionModel )
@@ -357,13 +372,13 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			@Override
 			public synchronized void selectionChanged()
 			{
-				table.repaint();
+				SwingUtilities.invokeLater( () -> table.repaint() );
 			}
 
 			@Override
 			public void focusEvent( T selection )
 			{
-				moveToSelectedTableRow( selection );
+				SwingUtilities.invokeLater( () -> moveToSelectedTableRow( selection ) );
 			}
 
 		} );
@@ -440,7 +455,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	public void initHelpDialog()
 	{
-		helpDialog = new HelpDialog( frame, TableUtils.class.getResource( "/Help.html" ) );
+		helpDialog = new HelpDialog( frame, TableUtils.class.getResource( "/TableUtilsHelp.html" ) );
 	}
 
 
