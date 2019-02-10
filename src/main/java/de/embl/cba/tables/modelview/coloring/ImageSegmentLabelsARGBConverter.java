@@ -60,7 +60,7 @@ public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
 			int a = 1;
 		}
 
-		coloringModel.convert( imageSegment, color );
+		coloringModel.convert( imageSegment, color.get() );
 		color.setValid( true );
 	}
 

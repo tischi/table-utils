@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class CategoryColoringModel< T > extends AbstractColoringModel< T >
 {
-	Map< T, VolatileARGBType > objectColorMap;
+	Map< T, ARGBType > objectColorMap;
 
 	/**
 	 * Objects are converted to colors by the specified
@@ -17,17 +17,17 @@ public class CategoryColoringModel< T > extends AbstractColoringModel< T >
 	 *
 	 * @param objectColorMap
 	 */
-	public CategoryColoringModel( Map< T, VolatileARGBType > objectColorMap )
+	public CategoryColoringModel( Map< T, ARGBType > objectColorMap )
 	{
 		this.objectColorMap = objectColorMap;
 	}
 
 	@Override
-	public void convert( T input, VolatileARGBType output )
+	public void convert( T input, ARGBType output )
 	{
 		if( objectColorMap.keySet().contains( input ) )
 		{
-			output.get().set( objectColorMap.get( input ).get() );
+			output.set( objectColorMap.get( input ).get() );
 		}
 		else
 		{

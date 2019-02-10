@@ -16,4 +16,4 @@ close();
 
 // Explore results
 //
-run("Explore MorphoLibJ Segmentation", "labelmaskimageplus=mask-lbl intensityimageplus=blobs.gif resultstabletitle=mask-lbl-Morphometry");
+run("Explore MorphoLibJ Segmentation");

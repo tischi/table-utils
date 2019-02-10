@@ -12,7 +12,7 @@ import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.objects3d.ConnectedComponentExtractorAnd3DViewer;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.ColoringModel;
-import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
+import de.embl.cba.tables.modelview.coloring.LazyCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.combined.ImageSegmentsModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
@@ -353,9 +353,9 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
 		{
-			if ( selectionColoringModel.getWrappedColoringModel() instanceof DynamicCategoryColoringModel )
+			if ( selectionColoringModel.getWrappedColoringModel() instanceof LazyCategoryColoringModel )
 			{
-				( ( DynamicCategoryColoringModel ) selectionColoringModel.getWrappedColoringModel() ).incRandomSeed();
+				( ( LazyCategoryColoringModel ) selectionColoringModel.getWrappedColoringModel() ).incRandomSeed();
 				BdvUtils.repaint( bdv );
 			}
 		}, name + "-change-coloring-random-seed", incrementCategoricalLutRandomSeedTrigger );

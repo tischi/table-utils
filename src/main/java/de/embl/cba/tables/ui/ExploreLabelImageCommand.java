@@ -1,7 +1,7 @@
 package de.embl.cba.tables.ui;
 
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
-import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
+import de.embl.cba.tables.modelview.coloring.LazyCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.combined.GeneratingNoPositionImageSegmentsModel;
 import de.embl.cba.tables.modelview.images.DefaultImageSourcesModel;
@@ -16,7 +16,6 @@ import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,8 +53,8 @@ public class ExploreLabelImageCommand< R extends RealType< R > & NativeType< R >
 		final SelectionModel< ImageSegment > selectionModel =
 				new DefaultSelectionModel< ImageSegment >();
 
-		final DynamicCategoryColoringModel< ImageSegment > coloringModel =
-				new DynamicCategoryColoringModel< ImageSegment >( new GlasbeyARGBLut(), 50 );
+		final LazyCategoryColoringModel< ImageSegment > coloringModel =
+				new LazyCategoryColoringModel< ImageSegment >( new GlasbeyARGBLut(), 50 );
 
 		final SelectionColoringModel< ImageSegment > selectionColoringModel
 				= new SelectionColoringModel< ImageSegment >( coloringModel, selectionModel );

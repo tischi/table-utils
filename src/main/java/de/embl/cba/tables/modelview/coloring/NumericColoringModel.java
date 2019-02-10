@@ -1,11 +1,11 @@
 package de.embl.cba.tables.modelview.coloring;
 
-import net.imglib2.type.volatiles.VolatileARGBType;
+import net.imglib2.type.numeric.ARGBType;
 
 public interface NumericColoringModel< T > extends ColoringModel< T >
 {
 	@Override
-	void convert( T input, VolatileARGBType output );
+	void convert( T input, ARGBType output );
 
 	double getMin();
 

@@ -16,7 +16,7 @@ public abstract class AbstractColoringModel< T > implements ColoringModel< T >
 	}
 
 	@Override
-	public void convert( T input, VolatileARGBType output )
+	public void convert( T input, ARGBType output )
 	{
 		output.set( 0 );
 	}

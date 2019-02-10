@@ -1,12 +1,11 @@
 package de.embl.cba.tables.modelview.views;
 
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
-import de.embl.cba.tables.modelview.coloring.DynamicCategoryColoringModel;
+import de.embl.cba.tables.modelview.coloring.LazyCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.combined.DefaultImageSegmentsModel;
 import de.embl.cba.tables.modelview.combined.DefaultTableRowsModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
-import de.embl.cba.tables.modelview.segments.ColumnBasedTableRowImageSegment;
 import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
@@ -34,8 +33,8 @@ public class DefaultTableAndBdvViews
 		final SelectionModel< TableRowImageSegment > selectionModel
 				= new DefaultSelectionModel<>();
 
-		final DynamicCategoryColoringModel< TableRowImageSegment > coloringModel
-				= new DynamicCategoryColoringModel<>( new GlasbeyARGBLut(), 50 );
+		final LazyCategoryColoringModel< TableRowImageSegment > coloringModel
+				= new LazyCategoryColoringModel<>( new GlasbeyARGBLut(), 50 );
 
 		final SelectionColoringModel< TableRowImageSegment > selectionColoringModel
 				= new SelectionColoringModel<>(

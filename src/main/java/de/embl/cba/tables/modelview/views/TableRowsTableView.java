@@ -19,7 +19,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
 
@@ -157,9 +157,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		if ( selectionModel.isSelected( tableRowsModel.getTableRows().get( row ) ) )
 		{
-			final VolatileARGBType argbType = new VolatileARGBType();
+			final ARGBType argbType = new ARGBType();
 			selectionColoringModel.convert( tableRowsModel.getTableRows().get( row ), argbType );
-			final int colorIndex = argbType.get().get();
+			final int colorIndex = argbType.get();
 			final Color color = new Color( ARGBType.red( colorIndex ), ARGBType.green( colorIndex ), ARGBType.blue( colorIndex ) );
 			return color;
 		}
@@ -242,16 +242,21 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		assignObjectAttributesUI = new AssignValuesToTableRowsUI( this );
 
 		final JMenuItem menuItem = new JMenuItem( "Assign values to selected rows" );
-		menuItem.addActionListener( e -> {
-			assignObjectAttributesUI.showUI( selectionModel.getSelected() );
-		} );
+
+		menuItem.addActionListener( e ->
+				SwingUtilities.invokeLater( () ->
+						assignObjectAttributesUI.showUI( selectionModel.getSelected() ) ) );
+
 		return menuItem;
 	}
 
 	private JMenuItem createSaveAsMenuItem()
 	{
 		final JMenuItem menuItem = new JMenuItem( "Save as..." );
-		menuItem.addActionListener( e -> TableUIs.saveTableUI( table ) );
+		menuItem.addActionListener( e ->
+				SwingUtilities.invokeLater( () ->
+						TableUIs.saveTableUI( table ) ) );
+
 		return menuItem;
 	}
 
@@ -261,7 +266,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		final TableRowsTableView tableView = this;
 
-		menuItem.addActionListener( e -> TableUIs.addColumnUI( tableView ) );
+		menuItem.addActionListener( e ->
+				SwingUtilities.invokeLater( () ->
+						TableUIs.addColumnUI( tableView ) ) );
 
 		return menuItem;
 	}
@@ -423,8 +430,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		}
 		else
 		{
-			final DynamicCategoryColoringModel< T > coloringModel
-					= new DynamicCategoryColoringModel< >( new GlasbeyARGBLut(), 50
+			final LazyCategoryColoringModel< T > coloringModel
+					= new LazyCategoryColoringModel< >( new GlasbeyARGBLut(), 50
 			);
 
 			selectionColoringModel.setWrappedColoringModel( coloringModel );

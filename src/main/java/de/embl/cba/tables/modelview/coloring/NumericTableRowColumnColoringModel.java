@@ -35,13 +35,9 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	}
 
 	@Override
-	public void convert( T input, VolatileARGBType output )
+	public void convert( T input, ARGBType output )
 	{
 		final Object featureValue = input.cells().get( column );
-		if ( featureValue == null )
-		{
-			System.out.println( "FeatureValue NULL");
-		}
 		setColorLinearly( featureValue, output );
 	}
 
@@ -85,16 +81,12 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	}
 
 
-	public void setColorLinearly( Object featureValue, VolatileARGBType output )
+	public void setColorLinearly( Object featureValue, ARGBType output )
 	{
 		final double value = TableUtils.asDouble( featureValue );
 		double normalisedValue = computeLinearNormalisedValue( value );
-		if ( normalisedValue < 0 || normalisedValue > 1 )
-		{
-			System.out.println( "NORMALISATION ISSUE");
-		}
-		final int argb = lut.getARGB( normalisedValue );
-		output.get().set( argb );
+		final int colorIndex = lut.getARGB( normalisedValue );
+		output.set( colorIndex );
 	}
 
 	public double computeLinearNormalisedValue( double value )

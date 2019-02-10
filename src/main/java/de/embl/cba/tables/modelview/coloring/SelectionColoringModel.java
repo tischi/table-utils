@@ -44,7 +44,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 
 	@Override
-	public void convert( T input, VolatileARGBType output )
+	public void convert( T input, ARGBType output )
 	{
 		wrappedColoringModel.convert( input, output );
 
@@ -58,7 +58,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 				if ( ! isSelected )
 				{
-					output.get().mul( brightnessNotSelected );
+					output.mul( brightnessNotSelected );
 				}
 				break;
 
@@ -66,7 +66,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 				if ( ! isSelected )
 				{
-					output.get().mul( 0.0 );
+					output.mul( 0.0 );
 				}
 				break;
 
@@ -74,7 +74,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 				if ( isSelected )
 				{
-					output.get().set( selectionColor );
+					output.set( selectionColor );
 				}
 				break;
 
@@ -82,11 +82,11 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 				if ( isSelected )
 				{
-					output.get().set( selectionColor );
+					output.set( selectionColor );
 				}
 				else
 				{
-					output.get().mul( brightnessNotSelected );
+					output.mul( brightnessNotSelected );
 				}
 				break;
 

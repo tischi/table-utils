@@ -9,22 +9,21 @@ import java.util.Map;
 
 import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 
-public class DynamicCategoryColoringModel< T > extends AbstractColoringModel< T >
+public class LazyCategoryColoringModel< T > extends AbstractColoringModel< T >
 {
 	Map< T, ARGBType > inputToColorMap;
 	ARGBLut argbLut;
 	private int randomSeed;
 
 	/**
-	 * Objects are converted to colors.
-	 * Colors are dynamically assigned at random
-	 * from the given {@code argbLut} and stored in a map,
-	 * such that same segments will always be converted to same
-	 * colors.
+	 * Colors are lazily assigned to input elements,
+	 * using the given {@code argbLut}.
+	 *
+	 * TODO: better to use here a "generating LUT" rather than a 0...1 LUT
 	 *
 	 * @param argbLut
 	 */
-	public DynamicCategoryColoringModel( ARGBLut argbLut, int randomSeed )
+	public LazyCategoryColoringModel( ARGBLut argbLut, int randomSeed )
 	{
 		this.argbLut = argbLut;
 		this.randomSeed = randomSeed;
@@ -32,13 +31,14 @@ public class DynamicCategoryColoringModel< T > extends AbstractColoringModel< T 
 	}
 
 	@Override
-	public void convert( T input, VolatileARGBType output )
+	public void convert( T input, ARGBType output )
 	{
 		if( ! inputToColorMap.keySet().contains( input ) )
 		{
 			final double random = createRandom( inputToColorMap.size() + 1 );
 			inputToColorMap.put( input, new ARGBType( argbLut.getARGB( random ) ) );
 		}
+
 		output.set( inputToColorMap.get( input ).get() );
 	}
 
