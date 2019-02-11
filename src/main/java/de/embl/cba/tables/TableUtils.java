@@ -117,13 +117,13 @@ public class TableUtils
 	{
 		StringTokenizer st = new StringTokenizer( strings.get( 0 ), delim );
 
-		List< String > featureNames = new ArrayList<>();
+		List< String > columnNames = new ArrayList<>();
 
 		while ( st.hasMoreTokens() )
 		{
-			featureNames.add( st.nextToken() );
+			columnNames.add( st.nextToken().replace( "\"", "" ) );
 		}
-		return featureNames;
+		return columnNames;
 	}
 
 	public static String autoDelim( String delim, List< String > strings )

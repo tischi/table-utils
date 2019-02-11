@@ -31,7 +31,7 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 	public AssignValuesToTableRowsUI( TableRowsTableView tableView )
 	{
 		this.tableView = tableView;
-		selectedAttributes = new HashSet<>();
+		this.selectedAttributes = new HashSet<>();
 
 		this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
 
@@ -46,11 +46,8 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 
 	public void showUI( Set< T > selectedRows )
 	{
-		System.out.println( "AssignValuesToTableRowsUI.Debug.selectedRows" );
 		this.selectedRows = selectedRows;
-		System.out.println( "AssignValuesToTableRowsUI.Debug.updateUIComponents" );
 		updateUIComponents();
-		System.out.println( "AssignValuesToTableRowsUI.Debug.showFrame" );
 		showFrame();
 	}
 

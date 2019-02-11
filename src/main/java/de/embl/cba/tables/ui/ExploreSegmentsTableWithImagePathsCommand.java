@@ -21,7 +21,7 @@ import java.util.Map;
 
 
 //@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Segments Table with Image Paths" )
-public class ExploreSegmentsTableWithImagePathsCommand< R extends RealType< R > & NativeType< R > >
+public class ExploreSegmentsTableWithImagePathsCommand
 		implements Command
 {
 	@Parameter ( label = "Segments table" )

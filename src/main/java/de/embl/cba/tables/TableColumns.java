@@ -97,7 +97,8 @@ public class TableColumns
 
 			for ( String column : columns )
 			{
-				final String string = st.nextToken();
+				String string = st.nextToken();
+				string = string.replace( "\"", "" );
 				columnToValues.get( column ).add( string );
 			}
 		}

@@ -44,7 +44,7 @@ public class TestInteractiveTableBasics
 //
 //		((DefaultTableModel)panel.getTableModel()).addRow( newDoubleRow );
 //
-//		panel.showTable();
+//		panel.createMenusAndTableAndShow();
 
 	}
 }

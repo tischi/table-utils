@@ -36,6 +36,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private int recentlySelectedRowInView;
 	private AssignValuesToTableRowsUI assignObjectAttributesUI;
 	private HelpDialog helpDialog;
+	private Set< String > customColumns;
 
 	public TableRowsTableView(
 			final TableRowsModel< T > tableRowsModel,
@@ -48,12 +49,13 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		this.selectionModel = selectionModel;
 
 		this.categoricalColumns = new HashSet<>(  );
+		this.customColumns = new HashSet<>(  );
 
 		registerAsSelectionListener( selectionModel );
 		registerAsColoringListener( selectionColoringModel );
 
 		createTable();
-		showTable();
+		createMenusAndTableAndShow();
 
 		registerAsListSelectionListener();
 		configureTableRowColoring();
@@ -231,19 +233,20 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
         menu.add( createSaveAsMenuItem() );
 
-		menu.add( createColumnMenuItem() );
+		menu.add( createAddColumnMenuItem() );
 
-		menu.add( assignValuesMenuItem() );
+		menu.add( assignValueMenuItem() );
 
 		return menu;
     }
 
-	private JMenuItem assignValuesMenuItem()
+	private JMenuItem assignValueMenuItem()
 	{
 		assignObjectAttributesUI = new AssignValuesToTableRowsUI( this );
 
-		final JMenuItem menuItem = new JMenuItem( "Assign values to selected rows" );
+		final JMenuItem menuItem = new JMenuItem( "Assign Value to Selected Objects..." );
 
+		// TODO: make only show custom columns
 		menuItem.addActionListener( e ->
 				SwingUtilities.invokeLater( () ->
 						assignObjectAttributesUI.showUI( selectionModel.getSelected() ) ) );
@@ -261,9 +264,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
-	private JMenuItem createColumnMenuItem()
+	private JMenuItem createAddColumnMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "New Column..." );
+		final JMenuItem menuItem = new JMenuItem( "Add Custom Column..." );
 
 		final TableRowsTableView tableView = this;
 
@@ -274,7 +277,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
-    public void showTable()
+    public void createMenusAndTableAndShow()
 	{
 		try
 		{
@@ -308,6 +311,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	public void addColumn( String column, Object defaultValue )
 	{
+		customColumns.add( column );
 		TableUtils.addColumn( table.getModel(), column, defaultValue );
 	}
 
