@@ -6,14 +6,14 @@ import java.util.*;
 
 public class TableColumns
 {
-	public static LinkedHashMap< String,List< Object > > columnsFromImageJ1ResultsTable(
+	public static LinkedHashMap< String, List< ? > > columnsFromImageJ1ResultsTable(
 			ResultsTable resultsTable )
 	{
 
 		List< String > columnNames = Arrays.asList( resultsTable.getHeadings() );
 		final int numRows = resultsTable.size();
 
-		final LinkedHashMap< String, List< Object > > columnNamesToValues
+		final LinkedHashMap< String, List< ? > > columnNamesToValues
 				= new LinkedHashMap<>();
 
 		for ( String columnName : columnNames )
@@ -149,8 +149,8 @@ public class TableColumns
 		}
 	}
 
-	public static LinkedHashMap< String, List< Object > > addLabelImageIdColumn(
-			LinkedHashMap< String, List< Object > > columns,
+	public static LinkedHashMap< String, List< ? > > addLabelImageIdColumn(
+			LinkedHashMap< String, List< ? > > columns,
 			String columnNameLabelImageId,
 			String labelImageId )
 	{

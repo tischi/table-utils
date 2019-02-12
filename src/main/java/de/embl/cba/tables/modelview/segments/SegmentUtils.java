@@ -150,7 +150,7 @@ public class SegmentUtils
 
 	public static List< TableRowImageSegment > tableRowImageSegmentsFromColumns(
 			final LinkedHashMap< String, List< ? > > columns,
-			final Map< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn,
+			final Map< ImageSegmentCoordinate, List< ? > > imageSegmentCoordinateToColumn,
 			boolean isOneBasedTimePoint )
 	{
 

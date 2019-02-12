@@ -61,7 +61,7 @@ public class ExploreSegmentsTableWithImagePathsCommand
 		columns = TableColumns.asTypedColumns(
 				       TableColumns.stringColumnsFromTableFile( tableFile ) );
 
-		final Map< ImageSegmentCoordinate, List< Object > > coordinateToColumn
+		final Map< ImageSegmentCoordinate, List< ? > > coordinateToColumn
 				= createCoordinateToColumnMap();
 
 		final List< TableRowImageSegment > segments
@@ -70,14 +70,14 @@ public class ExploreSegmentsTableWithImagePathsCommand
 		return segments;
 	}
 
-	private LinkedHashMap< ImageSegmentCoordinate, List< Object > > createCoordinateToColumnMap( )
+	private LinkedHashMap< ImageSegmentCoordinate, List< ? > > createCoordinateToColumnMap( )
 	{
 		final ImageSegmentCoordinateColumnsSelectionDialog selectionDialog
 				= new ImageSegmentCoordinateColumnsSelectionDialog( columns.keySet() );
 
 		final Map< ImageSegmentCoordinate, String > coordinateToColumnName = selectionDialog.fetchUserInput();
 
-		final LinkedHashMap< ImageSegmentCoordinate, List< Object > > coordinateToColumn = new LinkedHashMap<>();
+		final LinkedHashMap< ImageSegmentCoordinate, List< ? > > coordinateToColumn = new LinkedHashMap<>();
 
 		for( ImageSegmentCoordinate coordinate : coordinateToColumnName.keySet() )
 		{

@@ -15,8 +15,8 @@ import java.util.Map;
 public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 {
 	private final int row;
-	private final LinkedHashMap< String, List< Object > > columns;
-	private final Map< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn;
+	private final LinkedHashMap< String, List< ? > > columns;
+	private final Map< ImageSegmentCoordinate, List< ? > > imageSegmentCoordinateToColumn;
 	private double[] position;
 	private LinkedHashMap< String, Object > cells;
 	private boolean isOneBasedTimePoint;
@@ -24,8 +24,8 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 
 	public ColumnBasedTableRowImageSegment(
 			int row,
-			LinkedHashMap< String, List< Object > > columns,
-			Map< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn,
+			LinkedHashMap< String, List< ? > > columns,
+			Map< ImageSegmentCoordinate, List< ? > > imageSegmentCoordinateToColumn,
 			boolean isOneBasedTimePoint )
 	{
 		this.row = row;

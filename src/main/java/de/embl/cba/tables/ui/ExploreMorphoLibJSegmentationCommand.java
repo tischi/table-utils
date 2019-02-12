@@ -45,7 +45,7 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 	public String resultsTableTitle;
 
 	private ij.measure.ResultsTable resultsTable;
-	private LinkedHashMap< String, List< Object > > columns;
+	private LinkedHashMap< String, List< ? > > columns;
 	private int numSpatialDimensions;
 	private String labelMaskId;
 	private HashMap< String, ij.measure.ResultsTable > titleToResultsTable;
@@ -137,7 +137,7 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 				COLUMN_NAME_LABEL_IMAGE_ID,
 				labelMaskId );
 
-		final HashMap< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn
+		final HashMap< ImageSegmentCoordinate, List< ? > > imageSegmentCoordinateToColumn
 				= createSegmentCoordinateToColumnMap();
 
 		final List< TableRowImageSegment > segments
@@ -146,9 +146,9 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 		return segments;
 	}
 
-	private HashMap< ImageSegmentCoordinate, List< Object > > createSegmentCoordinateToColumnMap( )
+	private HashMap< ImageSegmentCoordinate, List< ? > > createSegmentCoordinateToColumnMap( )
 	{
-		final HashMap< ImageSegmentCoordinate, List< Object > > coordinateToColumn
+		final HashMap< ImageSegmentCoordinate, List< ? > > coordinateToColumn
 				= new HashMap<>();
 
 		coordinateToColumn.put(
