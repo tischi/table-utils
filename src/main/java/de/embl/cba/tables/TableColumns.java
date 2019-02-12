@@ -109,9 +109,10 @@ public class TableColumns
 
 	public static LinkedHashMap< String, List< ? > > asTypedColumns( LinkedHashMap< String, List< String > > columnToStringValues )
 	{
+		final Set< String > columnNames = columnToStringValues.keySet();
+		final int numRows = columnToStringValues.get( columnNames.iterator().next() ).size();
+
 		final LinkedHashMap< String, List< ? > > columnToValues = new LinkedHashMap<>();
-		final Set< String > columnNames = columnToValues.keySet();
-		final int numRows = columnToValues.get( columnNames.iterator().next() ).size();
 
 		for ( String columnName : columnNames )
 		{
@@ -123,7 +124,16 @@ public class TableColumns
 				final ArrayList< Double > doubles = new ArrayList<>( numRows );
 				for ( int row = 0; row < numRows; ++row )
 				{
-					doubles.add( Double.parseDouble( strings.get( 0 ) ) );
+					doubles.add( Double.parseDouble( strings.get( row ) ) );
+				}
+				columnToValues.put( columnName, doubles );
+			}
+			else if ( columnType == Integer.class )
+			{
+				final ArrayList< Double > doubles = new ArrayList<>( numRows );
+				for ( int row = 0; row < numRows; ++row )
+				{
+					doubles.add( Double.parseDouble( strings.get( row ) ) );
 				}
 				columnToValues.put( columnName, doubles );
 			}
@@ -143,7 +153,7 @@ public class TableColumns
 			Double.parseDouble( string );
 			return Double.class;
 		}
-		catch ( Exception e )
+		catch ( Exception e2 )
 		{
 			return String.class;
 		}

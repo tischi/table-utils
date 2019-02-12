@@ -65,7 +65,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	{
 		if ( imageSegmentCoordinateToColumn.containsKey( ImageSegmentCoordinate.T ) )
 		{
-			int timePoint = Integer.parseInt( imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.T ).get( row ).toString() );
+			int timePoint = ( ( Double ) imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.T ).get( row )).intValue();
 			if ( isOneBasedTimePoint ) timePoint -= 1;
 			return timePoint;
 		}

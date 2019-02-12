@@ -18,7 +18,8 @@ public class DefaultImageSegmentsModel< T extends ImageSegment > implements Imag
 
 		for ( T imageSegment : imageSegments )
 		{
-			idToSegment.put( new ImageSegmentId( imageSegment ), imageSegment );
+			final ImageSegmentId key = new ImageSegmentId( imageSegment );
+			idToSegment.put( key, imageSegment );
 		}
 
 	}
