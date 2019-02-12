@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 
 public class CategoryTableRowColumnColoringModel< T extends TableRow >
-		extends AbstractColoringModel< T >
+		extends AbstractColoringModel< T > implements CategoryColoringModel< T >
 {
 	Map< Object, ARGBType > inputToColorMap;
 	private final String column;
@@ -54,6 +54,7 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 		return random;
 	}
 
+	@Override
 	public void incRandomSeed( )
 	{
 		inputToColorMap.clear();

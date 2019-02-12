@@ -11,9 +11,7 @@ import bdv.viewer.state.ViewerState;
 import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.objects3d.ConnectedComponentExtractorAnd3DViewer;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
-import de.embl.cba.tables.modelview.coloring.ColoringModel;
-import de.embl.cba.tables.modelview.coloring.LazyCategoryColoringModel;
-import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
+import de.embl.cba.tables.modelview.coloring.*;
 import de.embl.cba.tables.modelview.combined.ImageSegmentsModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
 import de.embl.cba.tables.modelview.images.SourceMetadata;
@@ -22,7 +20,6 @@ import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentId;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
-import de.embl.cba.tables.modelview.coloring.ImageSegmentLabelsARGBConverter;
 import net.imglib2.realtransform.AffineTransform3D;
 import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
@@ -353,9 +350,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
 		{
-			if ( selectionColoringModel.getWrappedColoringModel() instanceof LazyCategoryColoringModel )
+			final ColoringModel< T > wrappedColoringModel = selectionColoringModel.getWrappedColoringModel();
+
+			if ( wrappedColoringModel instanceof CategoryColoringModel )
 			{
-				( ( LazyCategoryColoringModel ) selectionColoringModel.getWrappedColoringModel() ).incRandomSeed();
+				( ( CategoryColoringModel ) wrappedColoringModel ).incRandomSeed();
 				BdvUtils.repaint( bdv );
 			}
 		}, name + "-change-coloring-random-seed", incrementCategoricalLutRandomSeedTrigger );
