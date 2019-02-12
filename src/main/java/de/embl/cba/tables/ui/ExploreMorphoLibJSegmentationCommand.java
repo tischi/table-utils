@@ -135,14 +135,13 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 		columns = TableColumns.addLabelImageIdColumn(
 				columns,
 				COLUMN_NAME_LABEL_IMAGE_ID,
-				labelMaskId
-		);
+				labelMaskId );
 
 		final HashMap< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn
 				= createSegmentCoordinateToColumnMap();
 
 		final List< TableRowImageSegment > segments
-				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, imageSegmentCoordinateToColumn );
+				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, imageSegmentCoordinateToColumn, true );
 
 		return segments;
 	}

@@ -3,13 +3,10 @@ package de.embl.cba.tables.ui;
 import de.embl.cba.tables.TableColumns;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModelFactory;
-import de.embl.cba.tables.modelview.segments.ColumnBasedTableRowImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
 import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
 import de.embl.cba.tables.modelview.views.DefaultTableAndBdvViews;
-import net.imglib2.type.NativeType;
-import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -20,30 +17,40 @@ import java.util.List;
 import java.util.Map;
 
 
-//@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Segments Table with Image Paths" )
+@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Segments Table with Image Paths" )
 public class ExploreSegmentsTableWithImagePathsCommand
 		implements Command
 {
-	@Parameter ( label = "Segments table" )
+	@Parameter ( label = "Image Segments Table" )
 	public File segmentsTableFile;
 
-	@Parameter ( label = "All images are 2D" )
+	@Parameter ( label = "2D Images" )
 	boolean is2D;
 
-	private LinkedHashMap< String, List< Object > > columns;
+	@Parameter ( label = "One-based Time-points" )
+	boolean isOneBasedTimePoint;
+
+	@Parameter ( label = "Relative Image Paths" )
+	boolean isRelativeImagePath;
+
+	@Parameter ( label = "Image Root Folder", style = "directory")
+	File imageRootFolder;
+
+	private LinkedHashMap< String, List< ? > > columns;
 
 	@Override
 	public void run()
 	{
+		if ( ! isRelativeImagePath ) imageRootFolder = new File("" );
+
 		final List< TableRowImageSegment > tableRowImageSegments
 				= createSegments( segmentsTableFile );
-
-		final String tablePath = segmentsTableFile.toString();
 
 		final FileImageSourcesModel imageSourcesModel =
 				new FileImageSourcesModelFactory(
 						tableRowImageSegments,
-						tablePath, is2D ).getImageSourcesModel();
+						imageRootFolder.toString(),
+						is2D ).getImageSourcesModel();
 
 		new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel );
 	}
@@ -51,18 +58,14 @@ public class ExploreSegmentsTableWithImagePathsCommand
 	private List< TableRowImageSegment > createSegments(
 			File tableFile )
 	{
-		columns = TableColumns.columnsFromTableFile( tableFile );
-
-//		columns = TableColumns.addLabelImageIdColumn(
-//				this.columns,
-//				COLUMN_NAME_LABEL_IMAGE_ID,
-//				"em-segmented-cells-labels" );
+		columns = TableColumns.asTypedColumns(
+				       TableColumns.stringColumnsFromTableFile( tableFile ) );
 
 		final Map< ImageSegmentCoordinate, List< Object > > coordinateToColumn
 				= createCoordinateToColumnMap();
 
 		final List< TableRowImageSegment > segments
-				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, coordinateToColumn );
+				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, coordinateToColumn, isOneBasedTimePoint );
 
 		return segments;
 	}

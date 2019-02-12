@@ -2,7 +2,6 @@ package de.embl.cba.tables.modelview.segments;
 
 import net.imglib2.FinalInterval;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,16 +19,19 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	private final Map< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn;
 	private double[] position;
 	private LinkedHashMap< String, Object > cells;
+	private boolean isOneBasedTimePoint;
 
 
 	public ColumnBasedTableRowImageSegment(
 			int row,
 			LinkedHashMap< String, List< Object > > columns,
-			Map< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn )
+			Map< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn,
+			boolean isOneBasedTimePoint )
 	{
 		this.row = row;
 		this.columns = columns;
 		this.imageSegmentCoordinateToColumn = imageSegmentCoordinateToColumn;
+		this.isOneBasedTimePoint = isOneBasedTimePoint;
 	}
 
 	private synchronized void setPositionFromColumns()
@@ -63,7 +65,9 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	{
 		if ( imageSegmentCoordinateToColumn.containsKey( ImageSegmentCoordinate.T ) )
 		{
-			return Integer.parseInt( imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.T ).get( row ).toString() );
+			int timePoint = Integer.parseInt( imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.T ).get( row ).toString() );
+			if ( isOneBasedTimePoint ) timePoint -= 1;
+			return timePoint;
 		}
 		else
 		{

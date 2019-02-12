@@ -4,6 +4,8 @@ import java.util.LinkedHashMap;
 
 public interface TableRow
 {
+	// TODO: still not sure what is the best here...
+
 	/**
 	 * Contains feature names and values.
 	 * Keeping it as a {@link LinkedHashMap} ensures that the

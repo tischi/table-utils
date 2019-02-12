@@ -5,14 +5,33 @@ public class PathMapping
 {
 	public static void main( String[] args )
 	{
-		final Path tablePath = Paths.get( "/Volumes/tables/table.txt");
+		test01();
+		test02();
+	}
+
+	private static void test01()
+	{
+		final Path rootPath = Paths.get( "/Volumes/tables/table.txt");
 
 		final String relativeImagePath = "../images/image.tif";
 
-		final Path path = Paths.get( tablePath.toString(), relativeImagePath.toString() );
+		final Path path = Paths.get( rootPath.toString(), relativeImagePath.toString() );
 
 		final Path normalize = path.normalize();
 
-		int a = 1;
+		System.out.println( normalize );
+	}
+
+	private static void test02()
+	{
+		final Path rootPath = Paths.get( "" );
+
+		final String relativeImagePath = "/g/images/image.tif";
+
+		final Path path = Paths.get( rootPath.toString(), relativeImagePath.toString() );
+
+		final Path normalize = path.normalize();
+
+		System.out.println( normalize );
 	}
 }

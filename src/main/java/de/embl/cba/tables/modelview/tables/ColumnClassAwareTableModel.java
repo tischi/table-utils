@@ -39,7 +39,7 @@ public class ColumnClassAwareTableModel extends DefaultTableModel
 
 		for ( int column = 0; column < getColumnCount(); column++ )
 		{
-			final String string = (String) this.getValueAt( 1, column );
+			final String string = (String) this.getValueAt( 0, column );
 
 			try
 			{
@@ -62,7 +62,7 @@ public class ColumnClassAwareTableModel extends DefaultTableModel
 
 		for ( int column = 0; column < getColumnCount(); column++ )
 		{
-			final Object value = this.getValueAt( 1, column );
+			final Object value = this.getValueAt( 0, column );
 			columnClasses.add( value.getClass() );
 		}
 	}

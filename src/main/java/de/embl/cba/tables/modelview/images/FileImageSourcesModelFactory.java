@@ -10,29 +10,34 @@ import java.util.*;
 
 public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 {
-	public static final String PATH = "Path_";
-	public static final String OBJECTS = "Objects_";
+	public static final String PATH_COLUMN_ID = "Path_";
+	public final ArrayList< String > labelMaskColumnIds;
 
 	private final List< T > tableRowImageSegments;
 	private Set< String > columns;
 	private final Map< String, String > imageNameToPathColumnName;
 	private FileImageSourcesModel imageSourcesModel;
-	private final String tablePath;
+	private final String imageRootFolder;
 	private final boolean is2D;
 
 	public FileImageSourcesModelFactory(
 			final List< T > tableRowImageSegments,
-			final String tablePath,
+			final String imageRootFolder,
 			boolean is2D )
 	{
 		this.tableRowImageSegments = tableRowImageSegments;
-		this.tablePath = tablePath;
-
-		columns = tableRowImageSegments.get( 0 ).cells().keySet();
+		this.imageRootFolder = imageRootFolder;
 		this.is2D = is2D;
 
-		imageNameToPathColumnName = getImageNameToPathColumnName();
+		columns = tableRowImageSegments.get( 0 ).cells().keySet();
 
+		// TODO: how to handle this? could be anything...
+		this.labelMaskColumnIds = new ArrayList< >();
+		labelMaskColumnIds.add( "Objects_" );
+		labelMaskColumnIds.add( "labelMasks" );
+		labelMaskColumnIds.add( "LabelMask" );
+
+		imageNameToPathColumnName = getImageNameToPathColumnName();
 		imageSourcesModel = createImageSourcesModel();
 	}
 
@@ -59,7 +64,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 
 				if ( ! imageSourcesModel.sources().containsKey( imageId ) )
 				{
-					final Path absoluteImagePath = TableUtils.getAbsolutePath( tablePath, imagePath );
+					final Path absoluteImagePath = TableUtils.getAbsolutePath( imageRootFolder, imagePath );
 
 					final String imageDisplayName = absoluteImagePath.getFileName().toString();
 
@@ -98,7 +103,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 	{
 		final SourceMetadata.Flavour flavour;
 
-		if ( imageName.contains( OBJECTS ) )
+		if ( stringContainsItemFromList( imageName, labelMaskColumnIds ) )
 		{
 			flavour = SourceMetadata.Flavour.LabelSource;
 		}
@@ -115,13 +120,19 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		final HashMap< String, String > imageNameToPathColumnName = new HashMap<>();
 		for ( String column : columns )
 		{
-			if ( column.contains( PATH ) )
+			if ( column.contains( PATH_COLUMN_ID ) )
 			{
-				final String image = column.split( PATH )[ 1 ];
+				final String image = column.split( PATH_COLUMN_ID )[ 1 ];
 				imageNameToPathColumnName.put( image, column );
 			}
 		}
 		return imageNameToPathColumnName;
 	}
+
+	public static boolean stringContainsItemFromList( String inputStr, ArrayList< String > items)
+	{
+		return items.parallelStream().anyMatch(inputStr::contains);
+	}
+
 
 }

@@ -149,8 +149,9 @@ public class SegmentUtils
 
 
 	public static List< TableRowImageSegment > tableRowImageSegmentsFromColumns(
-			final LinkedHashMap< String, List< Object > > columns,
-			final Map< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn )
+			final LinkedHashMap< String, List< ? > > columns,
+			final Map< ImageSegmentCoordinate, List< Object > > imageSegmentCoordinateToColumn,
+			boolean isOneBasedTimePoint )
 	{
 
 		final List< TableRowImageSegment > columnBasedTableRowImageSegments
@@ -161,7 +162,7 @@ public class SegmentUtils
 		for ( int row = 0; row < numRows; row++ )
 		{
 			final ColumnBasedTableRowImageSegment segment
-					= new ColumnBasedTableRowImageSegment( row, columns, imageSegmentCoordinateToColumn );
+					= new ColumnBasedTableRowImageSegment( row, columns, imageSegmentCoordinateToColumn, isOneBasedTimePoint );
 			columnBasedTableRowImageSegments.add( segment );
 		}
 

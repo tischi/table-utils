@@ -62,7 +62,7 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 
 	private List< TableRowImageSegment > createAnnotatedImageSegments( File tableFile )
 	{
-		columns = TableColumns.columnsFromTableFile( tableFile, null );
+		columns = TableColumns.stringColumnsFromTableFile( tableFile, null );
 
 		final List< String > pathColumnNames = replaceFolderAndFileColumnsByPathColumn();
 
@@ -70,7 +70,7 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 				= getImageSegmentCoordinateToColumn( pathColumnNames );
 
 		final List< TableRowImageSegment > segments
-				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, imageSegmentCoordinateToColumn );
+				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, imageSegmentCoordinateToColumn, false );
 
 		return segments;
 	}

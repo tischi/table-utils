@@ -1,4 +1,4 @@
-package de.embl.cba.tables.objects.attributes;
+package de.embl.cba.tables.modelview.views;
 
 import de.embl.cba.tables.SwingUtils;
 import de.embl.cba.tables.modelview.segments.TableRow;

@@ -10,7 +10,6 @@ import de.embl.cba.tables.modelview.combined.TableRowsModel;
 import de.embl.cba.tables.modelview.segments.TableRow;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
-import de.embl.cba.tables.objects.attributes.AssignValuesToTableRowsUI;
 import net.imglib2.type.numeric.ARGBType;
 
 import javax.swing.*;
@@ -55,7 +54,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		registerAsColoringListener( selectionColoringModel );
 
 		createTable();
-		createMenusAndTableAndShow();
+		createTableUIAndShow();
 
 		registerAsListSelectionListener();
 		configureTableRowColoring();
@@ -277,7 +276,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
-    public void createMenusAndTableAndShow()
+    public void createTableUIAndShow()
 	{
 		try
 		{

@@ -67,43 +67,86 @@ public class TableColumns
 		return table.getLastColumn() == (table.getHeadings().length-2);
 	}
 
-	public static LinkedHashMap< String, List< Object > > columnsFromTableFile( final File file )
+	public static LinkedHashMap< String, List< String > > stringColumnsFromTableFile( final File file )
 	{
-		return columnsFromTableFile( file, null );
+		return stringColumnsFromTableFile( file, null );
 	}
 
-	public static LinkedHashMap< String, List< Object > > columnsFromTableFile(
+	public static LinkedHashMap< String, List< String > > stringColumnsFromTableFile(
 			final File file,
 			String delim )
 	{
-		final List< String > rowsInTable = TableUtils.readRows( file );
+		final List< String > rowsInTableIncludingHeader = TableUtils.readRows( file );
 
-		delim = TableUtils.autoDelim( delim, rowsInTable );
+		delim = TableUtils.autoDelim( delim, rowsInTableIncludingHeader );
 
-		List< String > columns = TableUtils.getColumnNames( rowsInTable, delim );
+		List< String > columnNames = TableUtils.getColumnNames( rowsInTableIncludingHeader, delim );
 
-		final LinkedHashMap< String, List< Object > > columnToValues
-				= new LinkedHashMap<>();
+		final LinkedHashMap< String, List< String > > columnToStringValues = new LinkedHashMap<>();
 
-		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
+		for ( int columnIndex = 0; columnIndex < columnNames.size(); columnIndex++ )
 		{
-			final String columnName = columns.get( columnIndex );
-			columnToValues.put( columnName, new ArrayList<>( ) );
+			final String columnName = columnNames.get( columnIndex );
+			columnToStringValues.put( columnName, new ArrayList<>( ) );
 		}
 
-		for ( int row = 1; row < rowsInTable.size(); ++row )
-		{
-			StringTokenizer st = new StringTokenizer( rowsInTable.get( row ), delim );
+		final int numRows = rowsInTableIncludingHeader.size() - 1;
 
-			for ( String column : columns )
+		for ( int row = 0; row < numRows; ++row )
+		{
+			StringTokenizer st = new StringTokenizer( rowsInTableIncludingHeader.get( row + 1 ), delim );
+
+			for ( String column : columnNames )
 			{
 				String string = st.nextToken();
 				string = string.replace( "\"", "" );
-				columnToValues.get( column ).add( string );
+				columnToStringValues.get( column ).add( string );
+			}
+		}
+
+		return columnToStringValues;
+	}
+
+	public static LinkedHashMap< String, List< ? > > asTypedColumns( LinkedHashMap< String, List< String > > columnToStringValues )
+	{
+		final LinkedHashMap< String, List< ? > > columnToValues = new LinkedHashMap<>();
+		final Set< String > columnNames = columnToValues.keySet();
+		final int numRows = columnToValues.get( columnNames.iterator().next() ).size();
+
+		for ( String columnName : columnNames )
+		{
+			final List< String > strings = columnToStringValues.get( columnName );
+			final Class columnType = getColumnType( strings.get( 0 ) );
+
+			if ( columnType == Double.class )
+			{
+				final ArrayList< Double > doubles = new ArrayList<>( numRows );
+				for ( int row = 0; row < numRows; ++row )
+				{
+					doubles.add( Double.parseDouble( strings.get( 0 ) ) );
+				}
+				columnToValues.put( columnName, doubles );
+			}
+			else if ( columnType == String.class )
+			{
+				columnToValues.put( columnName, strings );
 			}
 		}
 
 		return columnToValues;
+	}
+
+	private static Class getColumnType( String string )
+	{
+		try
+		{
+			Double.parseDouble( string );
+			return Double.class;
+		}
+		catch ( Exception e )
+		{
+			return String.class;
+		}
 	}
 
 	public static LinkedHashMap< String, List< Object > > addLabelImageIdColumn(
