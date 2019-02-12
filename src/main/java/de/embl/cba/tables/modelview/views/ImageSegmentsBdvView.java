@@ -1,10 +1,7 @@
 package de.embl.cba.tables.modelview.views;
 
 import bdv.tools.brightness.ConverterSetup;
-import bdv.util.BdvFunctions;
-import bdv.util.BdvHandle;
-import bdv.util.BdvOptions;
-import bdv.util.BdvStackSource;
+import bdv.util.*;
 import bdv.viewer.Source;
 import bdv.viewer.state.SourceState;
 import bdv.viewer.state.ViewerState;
@@ -20,6 +17,10 @@ import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentId;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
+import ij.IJ;
+import ij.ImagePlus;
+import net.imglib2.img.Img;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.realtransform.AffineTransform3D;
 import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
@@ -262,12 +263,14 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			currentLabelSource = sourceAndMetadata; // Currently, there can be only one.
 		}
 
-		if ( metadata.numSpatialDimensions == 2 )
-			bdvOptions = bdvOptions.is2D();
-
 		bdvOptions = bdvOptions.sourceTransform( metadata.sourceTransform );
 
-		final BdvStackSource bdvStackSource = BdvFunctions.show( source, bdvOptions );
+		int numTimePoints = getNumTimePoints( source );
+
+		final BdvStackSource bdvStackSource = BdvFunctions.show(
+				source,
+				numTimePoints,
+				bdvOptions );
 
 		bdvStackSource.setDisplayRange( metadata.displayRangeMin, metadata.displayRangeMax );
 
@@ -280,6 +283,13 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		currentSources.add( sourceAndMetadata );
 
 		return bdvStackSource;
+	}
+
+	public int getNumTimePoints( Source< ? > source )
+	{
+		int numTimePoints = 0;
+		while ( source.isPresent( numTimePoints++ ) ){}
+		return numTimePoints - 1;
 	}
 
 	public void removeSource( BdvStackSource bdvStackSource )
@@ -329,7 +339,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		bdvOptions = BdvOptions.options();
 
 		if ( imageSourcesModel.is2D() )
+		{
 			bdvOptions = bdvOptions.is2D();
+		}
+
 	}
 
 	private void installBdvBehaviours()
@@ -363,10 +376,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void installSelectNoneBehaviour( )
 	{
-		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
-		{
+		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) -> {
 			selectNone();
-
 		}, name + "-select-none", selectNoneTrigger );
 	}
 
