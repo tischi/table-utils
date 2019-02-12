@@ -54,7 +54,7 @@ public class ExploreLabelImageCommand< R extends RealType< R > & NativeType< R >
 				new DefaultSelectionModel< ImageSegment >();
 
 		final LazyCategoryColoringModel< ImageSegment > coloringModel =
-				new LazyCategoryColoringModel< ImageSegment >( new GlasbeyARGBLut(), 50 );
+				new LazyCategoryColoringModel< ImageSegment >( new GlasbeyARGBLut() );
 
 		final SelectionColoringModel< ImageSegment > selectionColoringModel
 				= new SelectionColoringModel< ImageSegment >( coloringModel, selectionModel );

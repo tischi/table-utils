@@ -28,6 +28,7 @@ public class LazyCategoryColoringModel< T > extends AbstractColoringModel< T > i
 		super();
 		this.argbLut = argbLut;
 		this.inputToColorMap = new HashMap<>(  );
+		this.randomSeed = 50;
 	}
 
 	@Override
