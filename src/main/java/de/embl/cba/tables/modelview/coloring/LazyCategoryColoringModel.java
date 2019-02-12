@@ -57,11 +57,4 @@ public class LazyCategoryColoringModel< T > extends AbstractColoringModel< T >
 		notifyColoringListeners();
 	}
 
-	private void notifyColoringListeners()
-	{
-		for ( ColoringListener listener : listeners.list )
-		{
-			listener.coloringChanged();
-		}
-	}
 }

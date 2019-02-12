@@ -143,15 +143,6 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 	}
 
-	private void notifyColoringListeners()
-	{
-		for ( ColoringListener listener : listeners.list )
-		{
-			new Thread( () -> listener.coloringChanged() ).start();
-
-		}
-	}
-
 	public ColoringModel< T > getWrappedColoringModel()
 	{
 		return wrappedColoringModel;

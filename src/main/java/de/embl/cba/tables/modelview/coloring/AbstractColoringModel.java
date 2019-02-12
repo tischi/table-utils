@@ -4,6 +4,8 @@ import de.embl.cba.tables.modelview.selection.Listeners;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.volatiles.VolatileARGBType;
 
+import javax.swing.*;
+
 public abstract class AbstractColoringModel< T > implements ColoringModel< T >
 {
 	protected final Listeners.SynchronizedList< ColoringListener > listeners
@@ -19,5 +21,13 @@ public abstract class AbstractColoringModel< T > implements ColoringModel< T >
 	public void convert( T input, ARGBType output )
 	{
 		output.set( 0 );
+	}
+
+	protected void notifyColoringListeners()
+	{
+		for ( ColoringListener listener : listeners.list )
+		{
+			SwingUtilities.invokeLater( () -> listener.coloringChanged() );
+		}
 	}
 }

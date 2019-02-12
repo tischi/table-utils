@@ -444,13 +444,14 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 			selectionColoringModel.setWrappedColoringModel( coloringModel );
 
-			new Thread( () -> new NumericColoringModelDialog( columnName, coloringModel ) ).start();
+			SwingUtilities.invokeLater( () -> new NumericColoringModelDialog( columnName, coloringModel ) );
 		}
 		else
 		{
-			final LazyCategoryColoringModel< T > coloringModel
-					= new LazyCategoryColoringModel< >( new GlasbeyARGBLut(), 50
-			);
+			final CategoryTableRowColumnColoringModel< T > coloringModel
+					= new CategoryTableRowColumnColoringModel< >(
+							columnName,
+							new GlasbeyARGBLut() );
 
 			selectionColoringModel.setWrappedColoringModel( coloringModel );
 		}

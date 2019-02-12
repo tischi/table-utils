@@ -114,12 +114,4 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 		return normalisedValue;
 	}
 
-
-	private void notifyColoringListeners()
-	{
-		for ( ColoringListener listener : listeners.list )
-		{
-			new Thread( () -> listener.coloringChanged() ).start();
-		}
-	}
 }
