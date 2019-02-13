@@ -17,10 +17,6 @@ import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentId;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
-import ij.IJ;
-import ij.ImagePlus;
-import net.imglib2.img.Img;
-import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.realtransform.AffineTransform3D;
 import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
@@ -53,7 +49,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private ViewerState recentViewerState;
 	private List< ConverterSetup > recentConverterSetups;
 	private double voxelSpacing3DView;
-	private Set< SourceAndMetadata > currentSources;
+	private Set< SourceAndMetadata< ? > > currentSources;
 
 	public ImageSegmentsBdvView(
 			final ImageSourcesModel imageSourcesModel,
@@ -95,14 +91,14 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		{
 			if ( sourceAndMetadata.metadata().showInitially )
 			{
-				showSourceSet( sourceAndMetadata );
+				showSourceSet( sourceAndMetadata, false );
 				isShownNone = false;
 			}
 		}
 
 		if ( isShownNone )
 		{
-			showSourceSet( imageSourcesModel.sources().values().iterator().next() );
+			showSourceSet( imageSourcesModel.sources().values().iterator().next(), false );
 		}
 
 	}
@@ -167,7 +163,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		final SourceAndMetadata sourceAndMetadata
 				= imageSourcesModel.sources().get( imageId );
 
-		showSourceSet( sourceAndMetadata );
+		showSourceSet( sourceAndMetadata, true );
 	}
 
 	public void setVoxelSpacing3DView( double voxelSpacing3DView )
@@ -179,12 +175,13 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	 * ...will show more sources if required by metadata...
 	 *
 	 * @param sourceAndMetadata
+	 * @param removeOtherSources
 	 */
-	public void showSourceSet( SourceAndMetadata sourceAndMetadata )
+	public void showSourceSet( SourceAndMetadata sourceAndMetadata, boolean removeOtherSources )
 	{
 		final List< String > imageSetIDs = sourceAndMetadata.metadata().imageSetIDs;
 
-		if ( bdv != null  ) removeAllSources();
+		if ( bdv != null && removeOtherSources ) removeAllSources();
 
 		for ( int sourceIndex = 0; sourceIndex < imageSetIDs.size(); sourceIndex++ )
 		{
@@ -298,7 +295,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		BdvUtils.removeSource( bdv, bdvStackSource );
 	}
 
-	public Set< SourceAndMetadata > getCurrentSources()
+	public Set< SourceAndMetadata< ? > > getCurrentSources()
 	{
 		return Collections.unmodifiableSet( currentSources );
 	}
@@ -329,9 +326,9 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 						sourceAndMetadata.metadata().imageId,
 						selectionColoringModel );
 
-		return new ARGBConvertedRealSource(
-				sourceAndMetadata.source(),
-				labelSourcesARGBConverter );
+		bdv.getViewerPanel().addTimePointListener( labelSourcesARGBConverter );
+
+		return new ARGBConvertedRealSource( sourceAndMetadata.source(), labelSourcesARGBConverter );
 	}
 
 	private void initBdvOptions( )
@@ -342,7 +339,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		{
 			bdvOptions = bdvOptions.is2D();
 		}
-
 	}
 
 	private void installBdvBehaviours()

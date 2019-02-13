@@ -56,12 +56,14 @@ public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
 
 		if ( imageSegment == null )
 		{
-			System.out.println( "ImageSegment NULL");
-			int a = 1;
+//			System.out.println( "ImageSegment not found in model!");
+			color.set( 0 );
+			color.setValid( true );
+		} else {
+			coloringModel.convert( imageSegment, color.get() );
+			color.setValid( true );
 		}
 
-		coloringModel.convert( imageSegment, color.get() );
-		color.setValid( true );
 	}
 
 	@Override
