@@ -37,6 +37,7 @@ public class ExploreSegmentsTableWithImagePathsCommand
 	File imageRootFolder;
 
 	private LinkedHashMap< String, List< ? > > columns;
+	private Map< ImageSegmentCoordinate, String > coordinateToColumnName;
 
 	@Override
 	public void run()
@@ -52,7 +53,11 @@ public class ExploreSegmentsTableWithImagePathsCommand
 						imageRootFolder.toString(),
 						is2D ).getImageSourcesModel();
 
-		new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel );
+		final DefaultTableAndBdvViews views =
+				new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel );
+
+		views.getTableRowsTableView().categoricalColumnNames().add(
+				coordinateToColumnName.get( ImageSegmentCoordinate.LabelId ) );
 	}
 
 	private List< TableRowImageSegment > createSegments(
@@ -75,7 +80,7 @@ public class ExploreSegmentsTableWithImagePathsCommand
 		final ImageSegmentCoordinateColumnsSelectionDialog selectionDialog
 				= new ImageSegmentCoordinateColumnsSelectionDialog( columns.keySet() );
 
-		final Map< ImageSegmentCoordinate, String > coordinateToColumnName = selectionDialog.fetchUserInput();
+		coordinateToColumnName = selectionDialog.fetchUserInput();
 
 		final LinkedHashMap< ImageSegmentCoordinate, List< ? > > coordinateToColumn = new LinkedHashMap<>();
 

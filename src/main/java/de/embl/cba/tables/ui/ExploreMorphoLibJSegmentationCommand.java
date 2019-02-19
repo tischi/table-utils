@@ -66,7 +66,7 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 
 		final DefaultTableAndBdvViews views = new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel );
 
-		views.getTableRowsTableView().categoricalColumns().add( LABEL );
+		views.getTableRowsTableView().categoricalColumnNames().add( LABEL );
 	}
 
 	private DefaultImageSourcesModel createImageSourcesModel()

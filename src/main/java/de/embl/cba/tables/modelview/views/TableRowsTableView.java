@@ -30,7 +30,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
     private JScrollPane scrollPane;
     private JMenuBar menuBar;
 	private Map< String, double[] > columnsMinMaxMap;
-	private Set< String > categoricalColumns;
+	private Set< String > categoricalColumnNames;
 	private JTable table;
 	private int recentlySelectedRowInView;
 	private AssignValuesToTableRowsUI assignObjectAttributesUI;
@@ -47,7 +47,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		this.selectionColoringModel = selectionColoringModel;
 		this.selectionModel = selectionModel;
 
-		this.categoricalColumns = new HashSet<>(  );
+		this.categoricalColumnNames = new HashSet<>(  );
 		this.customColumns = new HashSet<>(  );
 
 		registerAsSelectionListener( selectionModel );
@@ -60,9 +60,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		configureTableRowColoring();
 	}
 
-	public Set< String > categoricalColumns( )
+	public Set< String > categoricalColumnNames( )
 	{
-		return categoricalColumns;
+		return categoricalColumnNames;
 	}
 
 	private void configureTableRowColoring()
@@ -354,13 +354,19 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			{
 				if ( e.getValueIsAdjusting() ) return;
 
-				if ( table.getSelectedRow() == -1 ) return;
+				final int selectedRow = table.getSelectedRow();
 
-				recentlySelectedRowInView = table.getSelectedRow();
+				if ( selectedRow == -1 ) return;
+
+				recentlySelectedRowInView = selectedRow;
 
 				final int row = table.convertRowIndexToModel( recentlySelectedRowInView );
 
-				selectionModel.focus( tableRowsModel.getTableRows().get( row ) );
+				final T object = tableRowsModel.getTableRows().get( row );
+
+				selectionModel.toggle( object );
+				if ( selectionModel.isSelected( object ) )
+					selectionModel.focus( object );
 
 				table.repaint();
 			});
@@ -430,7 +436,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		final int columnIndex = table.getColumnModel().getColumnIndex( columnName );
 
 		if ( Number.class.isAssignableFrom( table.getColumnClass( columnIndex ) )
-				&& ! categoricalColumns.contains( columnName ) )
+				&& ! categoricalColumnNames.contains( columnName ) )
 		{
 			final double[] minMaxValues = getMinMaxValues( columnName );
 
@@ -444,7 +450,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 			selectionColoringModel.setWrappedColoringModel( coloringModel );
 
-			SwingUtilities.invokeLater( () -> new NumericColoringModelDialog( columnName, coloringModel ) );
+			SwingUtilities.invokeLater( () ->
+					new NumericColoringModelDialog( columnName, coloringModel ) );
 		}
 		else
 		{
