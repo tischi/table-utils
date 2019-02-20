@@ -31,6 +31,7 @@ public class SourceMetadata
 	public enum Flavour
 	{
 		LabelSource,
+		LabelSourceWithoutAnnotations,
 		IntensitySource
 	}
 

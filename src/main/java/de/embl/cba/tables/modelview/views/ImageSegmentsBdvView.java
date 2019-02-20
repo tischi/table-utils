@@ -44,7 +44,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private BdvHandle bdv;
 	private String name = "TODO";
 	private BdvOptions bdvOptions;
-	private SourceAndMetadata currentLabelSource;
+	private SourceAndMetadata currentSegmentsModelLabelSource;
 	private T recentFocus;
 	private ViewerState recentViewerState;
 	private List< ConverterSetup > recentConverterSetups;
@@ -158,7 +158,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		final String imageId = imageSegment.imageId();
 
-		if ( currentLabelSource.metadata().imageId.equals( imageId ) ) return;
+		if ( currentSegmentsModelLabelSource.metadata().imageId.equals( imageId ) ) return;
 
 		final SourceAndMetadata sourceAndMetadata
 				= imageSourcesModel.sources().get( imageId );
@@ -257,7 +257,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		if ( metadata.flavour == Flavour.LabelSource )
 		{
 			source = asLabelSource( sourceAndMetadata );
-			currentLabelSource = sourceAndMetadata; // Currently, there can be only one.
 		}
 
 		bdvOptions = bdvOptions.sourceTransform( metadata.sourceTransform );
@@ -320,15 +319,24 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private Source asLabelSource( SourceAndMetadata sourceAndMetadata )
 	{
-		ImageSegmentLabelsARGBConverter labelSourcesARGBConverter =
-				new ImageSegmentLabelsARGBConverter(
-						imageSegmentsModel,
-						sourceAndMetadata.metadata().imageId,
-						selectionColoringModel );
+		if ( sourceAndMetadata.metadata().flavour.equals( Flavour.LabelSourceWithoutAnnotations ) )
+		{
+			final LazyLabelsARGBConverter lazyLabelsARGBConverter = new LazyLabelsARGBConverter();
+			bdv.getViewerPanel().addTimePointListener( lazyLabelsARGBConverter );
+			return new ARGBConvertedRealSource( sourceAndMetadata.source(), lazyLabelsARGBConverter );
+		}
+		else
+		{
+			currentSegmentsModelLabelSource = sourceAndMetadata;
 
-		bdv.getViewerPanel().addTimePointListener( labelSourcesARGBConverter );
-
-		return new ARGBConvertedRealSource( sourceAndMetadata.source(), labelSourcesARGBConverter );
+			ImageSegmentLabelsARGBConverter labelSourcesARGBConverter =
+					new ImageSegmentLabelsARGBConverter(
+							imageSegmentsModel,
+							sourceAndMetadata.metadata().imageId,
+							selectionColoringModel );
+			bdv.getViewerPanel().addTimePointListener( labelSourcesARGBConverter );
+			return new ARGBConvertedRealSource( sourceAndMetadata.source(), labelSourcesARGBConverter );
+		}
 	}
 
 	private void initBdvOptions( )
@@ -394,13 +402,13 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void toggleSelectionAtMousePosition()
 	{
-		if ( currentLabelSource == null ) return;
+		if ( currentSegmentsModelLabelSource == null ) return;
 
 		final double labelId = getLabelIdAtCurrentMouseCoordinates();
 
 		if ( labelId == BACKGROUND ) return;
 
-		final String imageId = currentLabelSource.metadata().imageId;
+		final String imageId = currentSegmentsModelLabelSource.metadata().imageId;
 
 		final ImageSegmentId imageSegmentId = new ImageSegmentId( imageId, labelId, getCurrentTimePoint() );
 
@@ -418,7 +426,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private double getLabelIdAtCurrentMouseCoordinates()
 	{
 		return BdvUtils.getValueAtGlobalCoordinates(
-					currentLabelSource.source(),
+					currentSegmentsModelLabelSource.source(),
 					BdvUtils.getGlobalMouseCoordinates( bdv ),
 					getCurrentTimePoint() );
 	}
@@ -445,7 +453,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void viewObjectAtCurrentMouseCoordinatesIn3D()
 	{
-		new Thread( () -> new ConnectedComponentExtractorAnd3DViewer( currentLabelSource.source() )
+		new Thread( () -> new ConnectedComponentExtractorAnd3DViewer( currentSegmentsModelLabelSource.source() )
 				.extractAndShowIn3D(
 						BdvUtils.getGlobalMouseCoordinates( bdv ),
 						voxelSpacing3DView ) ).start();
