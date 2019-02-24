@@ -254,7 +254,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		final SourceMetadata metadata = sourceAndMetadata.metadata();
 		Source< ? > source = sourceAndMetadata.source();
 
-		if ( metadata.flavour == Flavour.LabelSource )
+		if ( metadata.flavour == Flavour.LabelSource || metadata.flavour == Flavour.LabelSourceWithoutAnnotations )
 		{
 			source = asLabelSource( sourceAndMetadata );
 		}
@@ -367,11 +367,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
 		{
-			final ColoringModel< T > wrappedColoringModel = selectionColoringModel.getWrappedColoringModel();
+			final ColoringModel< T > coloringModel = selectionColoringModel.getWrappedColoringModel();
 
-			if ( wrappedColoringModel instanceof CategoryColoringModel )
+			if ( coloringModel instanceof CategoryColoringModel )
 			{
-				( ( CategoryColoringModel ) wrappedColoringModel ).incRandomSeed();
+				( ( CategoryColoringModel ) coloringModel ).incRandomSeed();
 				BdvUtils.repaint( bdv );
 			}
 		}, name + "-change-coloring-random-seed", incrementCategoricalLutRandomSeedTrigger );

@@ -51,13 +51,13 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	@Override
 	public String imageId()
 	{
-		return imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.ImageId ).get( row ).toString();
+		return imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.LabelImage ).get( row ).toString();
 	}
 
 	@Override
 	public double labelId()
 	{
-		return Double.parseDouble( imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.LabelId ).get( row ).toString() );
+		return Double.parseDouble( imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.ObjectLabel ).get( row ).toString() );
 	}
 
 	@Override

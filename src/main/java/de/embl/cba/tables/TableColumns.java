@@ -67,12 +67,14 @@ public class TableColumns
 		return table.getLastColumn() == (table.getHeadings().length-2);
 	}
 
-	public static LinkedHashMap< String, List< String > > stringColumnsFromTableFile( final File file )
+	public static LinkedHashMap< String, List< String > >
+	stringColumnsFromTableFile( final File file )
 	{
 		return stringColumnsFromTableFile( file, null );
 	}
 
-	public static LinkedHashMap< String, List< String > > stringColumnsFromTableFile(
+	public static LinkedHashMap< String, List< String > >
+	stringColumnsFromTableFile(
 			final File file,
 			String delim )
 	{

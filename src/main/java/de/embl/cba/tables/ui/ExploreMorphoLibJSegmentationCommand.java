@@ -33,7 +33,7 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 		extends DynamicCommand
 {
 	public static final String LABEL = "Label";
-	private static final String COLUMN_NAME_LABEL_IMAGE_ID = "LabelImageId";
+	private static final String COLUMN_NAME_LABEL_IMAGE_ID = "LabelImage";
 
 	@Parameter ( label = "Label mask image" )
 	public ImagePlus labelMaskImagePlus;
@@ -152,11 +152,11 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 				= new HashMap<>();
 
 		coordinateToColumn.put(
-				ImageSegmentCoordinate.ImageId,
+				ImageSegmentCoordinate.LabelImage,
 				columns.get( COLUMN_NAME_LABEL_IMAGE_ID ));
 
 		coordinateToColumn.put(
-				ImageSegmentCoordinate.LabelId,
+				ImageSegmentCoordinate.ObjectLabel,
 				columns.get( LABEL ) );
 
 		coordinateToColumn.put(

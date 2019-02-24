@@ -33,7 +33,8 @@ public class ImageSegmentCoordinateColumnsSelectionDialog
 	{
 		for ( ImageSegmentCoordinate coordinate : ImageSegmentCoordinate.values() )
 		{
-			final String previousChoice = Prefs.get( getKey( coordinate ), columnChoices[ 0 ] );
+			final String previousChoice =
+					Prefs.get( getKey( coordinate ), columnChoices[ 0 ] );
 			gd.addChoice( coordinate.toString(), columnChoices, previousChoice );
 		}
 	}

@@ -70,7 +70,7 @@ public class DefaultImageSegmentBuilder
 
 	public static String getDefaultImageIdName()
 	{
-		return "ImageId";
+		return "LabelImage";
 	}
 
 	public static double getDefaultLabel()

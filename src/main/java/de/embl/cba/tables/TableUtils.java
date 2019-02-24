@@ -112,6 +112,32 @@ public class TableUtils
 		return rows;
 	}
 
+	public static List< String > readRows( File file, int numRows )
+	{
+		List< String > rows = new ArrayList<>();
+
+		try
+		{
+			FileInputStream fin = new FileInputStream( file );
+			BufferedReader br = new BufferedReader( new InputStreamReader( fin ) );
+
+			int rowIdx = 0;
+			String aRow;
+			while ( ( aRow = br.readLine() ) != null && rowIdx++ < numRows )
+			{
+				rows.add( aRow );
+			}
+
+			br.close();
+		}
+		catch ( Exception e )
+		{
+			e.printStackTrace();
+		}
+
+		return rows;
+	}
+
 
 	public static List< String > getColumnNames( List< String > strings, String delim )
 	{

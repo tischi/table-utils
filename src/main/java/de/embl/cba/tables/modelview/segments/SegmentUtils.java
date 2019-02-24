@@ -45,10 +45,10 @@ public class SegmentUtils
 				case T:
 					segmentBuilder.setTimePoint( ( int ) columnValueMap.get( colName ) );
 					break;
-				case LabelId:
+				case ObjectLabel:
 					segmentBuilder.setLabel( ( double ) columnValueMap.get( colName ) );
 					break;
-				case ImageId:
+				case LabelImage:
 					segmentBuilder.setImageId( columnValueMap.get( colName ).toString() );
 					break;
 
@@ -85,10 +85,10 @@ public class SegmentUtils
 				case T:
 					segmentBuilder.setTimePoint( Integer.parseInt( (String) tableRowMap.get( colName ) ));
 					break;
-				case LabelId:
+				case ObjectLabel:
 					segmentBuilder.setLabel(  Double.parseDouble((String)  tableRowMap.get( colName ) ));
 					break;
-				case ImageId:
+				case LabelImage:
 					segmentBuilder.setImageId( tableRowMap.get( colName ).toString() );
 
 					break;
@@ -132,12 +132,12 @@ public class SegmentUtils
 							Integer.parseInt(
 									rowEntries[ col ] ) );
 					break;
-				case LabelId:
+				case ObjectLabel:
 					segmentBuilder.setLabel(
 							Double.parseDouble(
 									rowEntries[ col ] ) );
 					break;
-				case ImageId:
+				case LabelImage:
 					segmentBuilder.setImageId( rowEntries[ col ] );
 					break;
 

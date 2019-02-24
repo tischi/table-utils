@@ -84,11 +84,11 @@ public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends Rea
 		String labelImagePathColumnName = getLabelImagePathColumnName( pathColumnNames );
 
 		imageSegmentCoordinateToColumn.put(
-				ImageSegmentCoordinate.ImageId,
+				ImageSegmentCoordinate.LabelImage,
 				columns.get( labelImagePathColumnName ));
 
 		imageSegmentCoordinateToColumn.put(
-				ImageSegmentCoordinate.LabelId,
+				ImageSegmentCoordinate.ObjectLabel,
 				columns.get( COLUMN_NAME_OBJECT_LABEL ) );
 
 		imageSegmentCoordinateToColumn.put(
