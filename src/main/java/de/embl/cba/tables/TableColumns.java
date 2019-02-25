@@ -126,7 +126,16 @@ public class TableColumns
 				final ArrayList< Double > doubles = new ArrayList<>( numRows );
 				for ( int row = 0; row < numRows; ++row )
 				{
-					doubles.add( Double.parseDouble( strings.get( row ) ) );
+
+					final String s = strings.get( row );
+					if ( isNaN( s ) )
+					{
+						doubles.add( Double.NaN );
+					}
+					else
+					{
+						doubles.add( Double.parseDouble( s ) );
+					}
 				}
 				columnToValues.put( columnName, doubles );
 			}
@@ -146,6 +155,11 @@ public class TableColumns
 		}
 
 		return columnToValues;
+	}
+
+	public static boolean isNaN( String s )
+	{
+		return s.equals( "NA" );
 	}
 
 	private static Class getColumnType( String string )

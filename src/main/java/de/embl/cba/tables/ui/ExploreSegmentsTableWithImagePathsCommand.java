@@ -1,7 +1,6 @@
 package de.embl.cba.tables.ui;
 
 import de.embl.cba.tables.TableColumns;
-import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModelFactory;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
@@ -15,47 +14,51 @@ import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-
 @Plugin(type = Command.class, menuPath =
-		"Plugins>Segmentation>Explore>Explore Segments Table with Image Paths" )
+		"Plugins>Segmentation>Explore>Explore Objects Table" )
 public class ExploreSegmentsTableWithImagePathsCommand implements Command
 {
-
 	@Parameter
 	LogService logService;
 
 	@Parameter ( label = "Table" )
-	File table;
+	File tableFile;
 
-	@Parameter ( label = "Log Table Head", callback = "printTableHead")
-	Button printTableHeadButton;
+	@Parameter ( label = "Image Path Columns Id" )
+	String imagePathColumnId = "Path_";
 
-	@Parameter ( label = "Images are 2D" )
+	@Parameter ( label = "Log Image Paths", callback = "logImagePaths")
+	Button logImagePathsButton;
+
+	@Parameter ( label = "All Images are 2D" )
 	boolean is2D;
 
-	@Parameter ( label = "Time-points in table are one-based" )
+	@Parameter ( label = "Timepoints in table are one-based" )
 	boolean isOneBasedTimePoint;
 
 	@Parameter ( label = "Paths to images in table are relative" )
 	boolean isRelativeImagePath;
 
-	@Parameter ( label = "Parent folder (for relative image paths)", required = false, style = "directory")
+	@Parameter ( label = "Parent folder (for relative image paths)",
+			required = false, style = "directory")
 	File imageRootFolder;
 
 
 	private LinkedHashMap< String, List< ? > > columns;
 	private Map< ImageSegmentCoordinate, String > coordinateToColumnName;
 
+
 	public void run()
 	{
 		if ( ! isRelativeImagePath ) imageRootFolder = new File("" );
 
 		final List< TableRowImageSegment > tableRowImageSegments
-				= createSegments( table );
+				= createSegments( tableFile );
 
 		final FileImageSourcesModel imageSourcesModel =
 				new FileImageSourcesModelFactory(
@@ -107,10 +110,22 @@ public class ExploreSegmentsTableWithImagePathsCommand implements Command
 		return coordinateToColumn;
 	}
 
-	private void printTableHead()
+	private void logImagePaths()
 	{
-		final List< String > rows = TableUtils.readRows( table, 5 );
-		rows.stream().forEach( s -> logService.info( s ) );
+		final LinkedHashMap< String, List< String > > columns =
+				TableColumns.stringColumnsFromTableFile( tableFile );
+
+		for ( String column : columns.keySet() )
+		{
+			imagePathColumnId = "Path_";
+			if ( column.contains( imagePathColumnId ) )
+			{
+				final HashSet< String > paths = new HashSet<>( columns.get( column ) );
+				paths.forEach( s -> logService.info( s ) );
+			}
+		}
+
+
 	}
 
 }

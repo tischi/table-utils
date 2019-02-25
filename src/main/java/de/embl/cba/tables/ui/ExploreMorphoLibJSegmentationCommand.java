@@ -41,7 +41,7 @@ public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & Nat
 	@Parameter ( label = "Intensity image", required = false )
 	public ImagePlus intensityImagePlus;
 
-	@Parameter ( label = "Results table" )
+	@Parameter ( label = "Results tableFile" )
 	public String resultsTableTitle;
 
 	private ij.measure.ResultsTable resultsTable;
