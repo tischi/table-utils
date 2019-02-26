@@ -7,6 +7,7 @@ import bdv.viewer.state.SourceState;
 import bdv.viewer.state.ViewerState;
 import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.objects3d.ConnectedComponentExtractorAnd3DViewer;
+import de.embl.cba.bdv.utils.overlays.BdvGrayValuesOverlay;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.*;
 import de.embl.cba.tables.modelview.combined.ImageSegmentsModel;
@@ -50,6 +51,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private List< ConverterSetup > recentConverterSetups;
 	private double voxelSpacing3DView;
 	private Set< SourceAndMetadata< ? > > currentSources;
+	private BdvOverlaySource< BdvGrayValuesOverlay > bdvGrayValueOverlaySource;
 
 	public ImageSegmentsBdvView(
 			final ImageSourcesModel imageSourcesModel,
@@ -69,13 +71,20 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		showInitialSources();
 
-		//new BdvGrayValuesOverlay( bdv, 20 ); // TODO: makes problems when removing sources
+		addGrayValueOverlay();
 
 		registerAsSelectionListener( selectionModel );
 
 		registerAsColoringListener( selectionColoringModel );
 
 		installBdvBehaviours();
+	}
+
+	public void addGrayValueOverlay()
+	{
+		final BdvGrayValuesOverlay bdvGrayValuesOverlay
+				= new BdvGrayValuesOverlay( bdv, 20 );
+		bdvGrayValueOverlaySource = bdvGrayValuesOverlay.getBdvOverlaySource();
 	}
 
 	public ImageSourcesModel getImageSourcesModel()
@@ -230,7 +239,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		bdv.getViewerPanel().setCurrentViewerTransform( transform3D );
 	}
 
-	private void applyRecentDisplaySettings( int i, SourceAndMetadata associatedSourceAndMetadata )
+	private void applyRecentDisplaySettings(
+			int i, SourceAndMetadata associatedSourceAndMetadata )
 	{
 		if ( recentConverterSetups != null )
 		{
@@ -254,7 +264,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		final SourceMetadata metadata = sourceAndMetadata.metadata();
 		Source< ? > source = sourceAndMetadata.source();
 
-		if ( metadata.flavour == Flavour.LabelSource || metadata.flavour == Flavour.LabelSourceWithoutAnnotations )
+		if ( metadata.flavour == Flavour.LabelSource
+				|| metadata.flavour == Flavour.LabelSourceWithoutAnnotations )
 		{
 			source = asLabelSource( sourceAndMetadata );
 		}
@@ -267,6 +278,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 				source,
 				numTimePoints,
 				bdvOptions );
+
+		bdvStackSource.setActive( true );
 
 		bdvStackSource.setDisplayRange( metadata.displayRangeMin, metadata.displayRangeMax );
 
@@ -302,28 +315,38 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private void removeAllSources()
 	{
 		recentViewerState = bdv.getViewerPanel().getState();
-		recentConverterSetups = new ArrayList<>( bdv.getSetupAssignments().getConverterSetups() );
+		recentConverterSetups = new ArrayList<>(
+				bdv.getSetupAssignments().getConverterSetups() );
 
 		final List< SourceState< ? > > sources = recentViewerState.getSources();
 		final int numSources = sources.size();
 
-		for ( int i = numSources - 1; i >= 0; --i )
+		for ( int i = 0; i < numSources; ++i )
 		{
 			final Source< ? > source = sources.get( i ).getSpimSource();
-			bdv.getViewerPanel().removeSource( source );
-
-			final ConverterSetup converterSetup = recentConverterSetups.get( i );
-			bdv.getSetupAssignments().removeSetup( converterSetup );
+			if ( source instanceof PlaceHolderSource )
+			{
+				int a = 1; // GrayValueOverlaySource
+			}
+			else
+			{
+				bdv.getViewerPanel().removeSource( source );
+				final ConverterSetup converterSetup = recentConverterSetups.get( i );
+				bdv.getSetupAssignments().removeSetup( converterSetup );
+			}
 		}
 	}
 
 	private Source asLabelSource( SourceAndMetadata sourceAndMetadata )
 	{
-		if ( sourceAndMetadata.metadata().flavour.equals( Flavour.LabelSourceWithoutAnnotations ) )
+		if ( sourceAndMetadata.metadata().flavour.equals(
+				Flavour.LabelSourceWithoutAnnotations ) )
 		{
-			final LazyLabelsARGBConverter lazyLabelsARGBConverter = new LazyLabelsARGBConverter();
+			final LazyLabelsARGBConverter lazyLabelsARGBConverter =
+					new LazyLabelsARGBConverter();
 			bdv.getViewerPanel().addTimePointListener( lazyLabelsARGBConverter );
-			return new ARGBConvertedRealSource( sourceAndMetadata.source(), lazyLabelsARGBConverter );
+			return new ARGBConvertedRealSource(
+					sourceAndMetadata.source(), lazyLabelsARGBConverter );
 		}
 		else
 		{
@@ -334,8 +357,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 							imageSegmentsModel,
 							sourceAndMetadata.metadata().imageId,
 							selectionColoringModel );
+
 			bdv.getViewerPanel().addTimePointListener( labelSourcesARGBConverter );
-			return new ARGBConvertedRealSource( sourceAndMetadata.source(), labelSourcesARGBConverter );
+			return new ARGBConvertedRealSource(
+					sourceAndMetadata.source(), labelSourcesARGBConverter );
 		}
 	}
 
@@ -367,14 +392,17 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
 		{
-			final ColoringModel< T > coloringModel = selectionColoringModel.getWrappedColoringModel();
+			final ColoringModel< T > coloringModel =
+					selectionColoringModel.getWrappedColoringModel();
 
 			if ( coloringModel instanceof CategoryColoringModel )
 			{
 				( ( CategoryColoringModel ) coloringModel ).incRandomSeed();
 				BdvUtils.repaint( bdv );
 			}
-		}, name + "-change-coloring-random-seed", incrementCategoricalLutRandomSeedTrigger );
+		}, name +
+				"-change-coloring-random-seed",
+				incrementCategoricalLutRandomSeedTrigger );
 	}
 
 
@@ -410,7 +438,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		final String imageId = currentSegmentsModelLabelSource.metadata().imageId;
 
-		final ImageSegmentId imageSegmentId = new ImageSegmentId( imageId, labelId, getCurrentTimePoint() );
+		final ImageSegmentId imageSegmentId =
+				new ImageSegmentId( imageId, labelId, getCurrentTimePoint() );
 
 		final T segment = imageSegmentsModel.getImageSegment( imageSegmentId );
 

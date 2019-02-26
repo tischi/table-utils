@@ -1,5 +1,4 @@
-import de.embl.cba.tables.ui.ExploreLabelImageCommand;
-import de.embl.cba.tables.ui.ExploreSegmentsTableWithImagePathsCommand;
+import de.embl.cba.tables.ui.ExploreObjectsTableCommand;
 import net.imagej.ImageJ;
 
 public class RunExploreSegmentsTableWithImagePathsCommand
@@ -9,7 +8,7 @@ public class RunExploreSegmentsTableWithImagePathsCommand
 		final ImageJ ij = new ImageJ();
 		ij.ui().showUI();
 
-		ij.command().run( ExploreSegmentsTableWithImagePathsCommand.class, true );
+		ij.command().run( ExploreObjectsTableCommand.class, true );
 	}
 }
 

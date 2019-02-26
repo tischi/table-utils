@@ -40,7 +40,8 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 		{
 			// TODO: replace by other type of LUT ( not 0..1 )
 			final double random = createRandom( inputToColorMap.size() + 1 );
-			inputToColorMap.put( featureValue, new ARGBType( argbLut.getARGB( random ) ) );
+			inputToColorMap.put( featureValue,
+					new ARGBType( argbLut.getARGB( random ) ) );
 		}
 
 		final int colorIndex = inputToColorMap.get( featureValue ).get();

@@ -6,7 +6,8 @@ import java.util.*;
 
 public class TableColumns
 {
-	public static LinkedHashMap< String, List< ? > > columnsFromImageJ1ResultsTable(
+	public static LinkedHashMap< String, List< ? > >
+			columnsFromImageJ1ResultsTable(
 			ResultsTable resultsTable )
 	{
 

@@ -1,8 +1,6 @@
-import de.embl.cba.tables.ui.ExploreMorphoLibJSegmentationCommand;
+import de.embl.cba.tables.ui.ExploreMorphoLibJCommand;
 import ij.IJ;
-import ij.ImagePlus;
 import ij.measure.ResultsTable;
-import ij.process.ShortProcessor;
 import net.imagej.ImageJ;
 
 public class RunExploreMorphoLibJSegmentationCommand
@@ -29,7 +27,7 @@ public class RunExploreMorphoLibJSegmentationCommand
 
 		createResultsTable( "test" );
 
-		ij.command().run( ExploreMorphoLibJSegmentationCommand.class, true );
+		ij.command().run( ExploreMorphoLibJCommand.class, true );
 	}
 
 	private static ResultsTable createResultsTable( String title )

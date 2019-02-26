@@ -50,13 +50,13 @@ public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
 			return;
 		}
 
-		final ImageSegmentId imageSegmentId = new ImageSegmentId( imageId, label.getRealDouble(), timePointIndex );
+		final ImageSegmentId imageSegmentId =
+				new ImageSegmentId( imageId, label.getRealDouble(), timePointIndex );
 
 		final T imageSegment = imageSegmentsModel.getImageSegment( imageSegmentId );
 
 		if ( imageSegment == null )
 		{
-//			System.out.println( "ImageSegment not found in model!");
 			color.set( 0 );
 			color.setValid( true );
 		} else {

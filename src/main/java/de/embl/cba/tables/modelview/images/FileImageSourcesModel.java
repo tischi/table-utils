@@ -4,6 +4,7 @@ import bdv.util.RandomAccessibleIntervalSource4D;
 import bdv.viewer.Interpolation;
 import bdv.viewer.Source;
 import de.embl.cba.bdv.utils.wrap.Wraps;
+import de.embl.cba.tables.Logger;
 import ij.IJ;
 import ij.ImagePlus;
 import mpicbg.spim.data.sequence.VoxelDimensions;
@@ -97,8 +98,7 @@ public class FileImageSourcesModel implements ImageSourcesModel
 
 		private void loadAndCreateSource()
 		{
-			imagePlus = IJ.openImage( file.toString() );
-			imagePlus.setTitle( metadata.displayName );
+			openImage();
 
 			metadata.numSpatialDimensions = imagePlus.getNSlices() > 1 ? 3 : 2;
 
@@ -114,6 +114,16 @@ public class FileImageSourcesModel implements ImageSourcesModel
 			}
 
 			source = Wraps.imagePlusAsSource4DChannelList( imagePlus ).get( 0 );
+		}
+
+		private void openImage()
+		{
+			imagePlus = IJ.openImage( file.toString() );
+			if ( imagePlus == null )
+			{
+				Logger.error("Could not open image: " + file.toString());
+			}
+			imagePlus.setTitle( metadata.displayName );
 		}
 
 		@Override

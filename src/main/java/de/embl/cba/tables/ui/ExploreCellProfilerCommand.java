@@ -18,7 +18,7 @@ import java.util.*;
 
 
 @Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Explore CellProfiler Objects Table" )
-public class ExploreCellProfilerObjectsTableWithImagePathsCommand< R extends RealType< R > & NativeType< R > >
+public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {
 	public static final String CELLPROFILER_FOLDER_COLUMN_PREFIX = "PathName_";

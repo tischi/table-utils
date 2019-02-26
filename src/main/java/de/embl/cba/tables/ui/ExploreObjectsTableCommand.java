@@ -21,7 +21,7 @@ import java.util.Map;
 
 @Plugin(type = Command.class, menuPath =
 		"Plugins>Segmentation>Explore>Explore Objects Table" )
-public class ExploreSegmentsTableWithImagePathsCommand implements Command
+public class ExploreObjectsTableCommand implements Command
 {
 	@Parameter
 	LogService logService;
@@ -35,7 +35,7 @@ public class ExploreSegmentsTableWithImagePathsCommand implements Command
 	@Parameter ( label = "Log Image Paths", callback = "logImagePaths")
 	Button logImagePathsButton;
 
-	@Parameter ( label = "All Images are 2D" )
+	@Parameter ( label = "All images are 2D" )
 	boolean is2D;
 
 	@Parameter ( label = "Timepoints in table are one-based" )
@@ -92,8 +92,8 @@ public class ExploreSegmentsTableWithImagePathsCommand implements Command
 
 	private LinkedHashMap< ImageSegmentCoordinate, List< ? > > createCoordinateToColumnMap( )
 	{
-		final ImageSegmentCoordinateColumnsSelectionDialog selectionDialog
-				= new ImageSegmentCoordinateColumnsSelectionDialog( columns.keySet() );
+		final CoordinateColumnsSelectionDialog selectionDialog
+				= new CoordinateColumnsSelectionDialog( columns.keySet() );
 
 		coordinateToColumnName = selectionDialog.fetchUserInput();
 

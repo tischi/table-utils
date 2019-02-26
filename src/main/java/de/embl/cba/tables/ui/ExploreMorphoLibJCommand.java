@@ -29,7 +29,7 @@ import java.util.List;
 
 
 @Plugin(type = Command.class, initializer = "init", menuPath = "Plugins>Segmentation>Explore>Explore MorphoLibJ Segmentation" )
-public class ExploreMorphoLibJSegmentationCommand< R extends RealType< R > & NativeType< R > >
+public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R > >
 		extends DynamicCommand
 {
 	public static final String LABEL = "Label";

@@ -18,7 +18,8 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 	private ARGBType selectionColor;
 	private double brightnessNotSelected;
 
-	public static final ARGBType YELLOW = new ARGBType( ARGBType.rgba( 255, 255, 0, 255 ) );
+	public static final ARGBType YELLOW =
+			new ARGBType( ARGBType.rgba( 255, 255, 0, 255 ) );
 	private final List< SelectionMode > selectionModes;
 
 	public enum SelectionMode
@@ -48,7 +49,10 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 	{
 		wrappedColoringModel.convert( input, output );
 
-		if ( selectionModel.isEmpty() ) return;
+		if ( selectionModel.isEmpty() )
+		{
+			return;
+		}
 
 		final boolean isSelected = selectionModel.isSelected( input );
 

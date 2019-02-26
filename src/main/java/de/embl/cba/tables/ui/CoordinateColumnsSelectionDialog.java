@@ -12,7 +12,7 @@ import java.util.Map;
 import static de.embl.cba.tables.SwingUtils.horizontalLayoutPanel;
 
 
-public class ImageSegmentCoordinateColumnsSelectionDialog
+public class CoordinateColumnsSelectionDialog
 {
 	private static final String NO_COLUMN_SELECTED = "None";
 	public static final String IMAGE_SEGMENT_COORDINATE_COLUMN_PREFIX = "ImageSegmentCoordinateColumn.";
@@ -20,7 +20,7 @@ public class ImageSegmentCoordinateColumnsSelectionDialog
 	private String[] columnChoices;
 	private final GenericDialog gd;
 
-	public ImageSegmentCoordinateColumnsSelectionDialog( Collection< String > columns )
+	public CoordinateColumnsSelectionDialog( Collection< String > columns )
 	{
 		setColumnChoices( columns );
 

@@ -36,6 +36,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private AssignValuesToTableRowsUI assignObjectAttributesUI;
 	private HelpDialog helpDialog;
 	private Set< String > customColumns;
+	private int recentlyMovedToRowInView;
 
 	public TableRowsTableView(
 			final TableRowsModel< T > tableRowsModel,
@@ -338,6 +339,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	public void moveToRowInView( int rowInView )
 	{
+		recentlyMovedToRowInView = rowInView;
 		table.getSelectionModel().setSelectionInterval( rowInView, rowInView );
 		final Rectangle visibleRect = table.getVisibleRect();
 		final Rectangle cellRect = table.getCellRect( rowInView, 0, true );
@@ -354,11 +356,13 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			{
 				if ( e.getValueIsAdjusting() ) return;
 
-				final int selectedRow = table.getSelectedRow();
+				final int selectedRowInView = table.getSelectedRow();
 
-				if ( selectedRow == -1 ) return;
+				if ( selectedRowInView == -1 ) return;
 
-				recentlySelectedRowInView = selectedRow;
+				if ( selectedRowInView == recentlyMovedToRowInView ) return;
+
+				recentlySelectedRowInView = selectedRowInView;
 
 				final int row = table.convertRowIndexToModel( recentlySelectedRowInView );
 
@@ -385,7 +389,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			}
 
 			@Override
-			public void focusEvent( T selection )
+			public synchronized void focusEvent( T selection )
 			{
 				SwingUtilities.invokeLater( () -> moveToSelectedTableRow( selection ) );
 			}

@@ -1,4 +1,4 @@
-import de.embl.cba.tables.ui.ExploreCellProfilerObjectsTableWithImagePathsCommand;
+import de.embl.cba.tables.ui.ExploreCellProfilerCommand;
 import net.imagej.ImageJ;
 
 
@@ -9,7 +9,7 @@ public class RunExploreCellProfilerOutputCommand
 		final ImageJ ij = new ImageJ();
 		ij.ui().showUI();
 
-		ij.command().run( ExploreCellProfilerObjectsTableWithImagePathsCommand.class, true );
+		ij.command().run( ExploreCellProfilerCommand.class, true );
 	}
 }
 
