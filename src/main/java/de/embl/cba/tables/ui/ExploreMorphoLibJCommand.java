@@ -31,8 +31,7 @@ import java.util.List;
 
 @Plugin(type = Command.class, initializer = "init",
 		menuPath = "Plugins>Segmentation>Explore>Explore MorphoLibJ Segmentation" )
-public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R > >
-		extends DynamicCommand
+public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R > > implements Command
 {
 	public static final String LABEL = "Label";
 	private static final String COLUMN_NAME_LABEL_IMAGE_ID = "LabelImage";
@@ -43,7 +42,7 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 	@Parameter ( label = "Intensity image", required = false )
 	public ImagePlus intensityImage;
 
-	@Parameter ( label = "Results table" )
+	@Parameter ( label = "Results table title" )
 	public String resultsTableTitle;
 
 	private ij.measure.ResultsTable resultsTable;
@@ -60,6 +59,19 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 		labelMaskId = labelMask.getTitle();
 
 		resultsTable = titleToResultsTable.get( resultsTableTitle );
+
+		if ( resultsTable == null )
+		{
+			String error = "Results table not found: " + resultsTableTitle + "\n";
+			error += "\n";
+			error += "Please choose from:\n";
+			for ( String title : titleToResultsTable.keySet() )
+			{
+				error += "- " + title + "\n";
+			}
+			Logger.error( error  );
+			return;
+		}
 
 		final List< TableRowImageSegment > tableRowImageSegments
 				= createTableRowImageSegments( resultsTable );
@@ -113,8 +125,8 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 	private void init()
 	{
 		fetchResultsTables();
-		MutableModuleItem<String> input = getInfo().getMutableInput("resultsTableTitle", String.class );
-		input.setChoices( new ArrayList<>( titleToResultsTable.keySet() ));
+//		MutableModuleItem<String> input = getInfo().getMutableInput("resultsTableTitle", String.class );
+//		input.setChoices( new ArrayList<>( titleToResultsTable.keySet() ));
 	}
 
 	private void fetchResultsTables()
