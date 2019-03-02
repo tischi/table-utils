@@ -13,4 +13,9 @@ public class Logger
 	{
 		IJ.showMessage( s );
 	}
+
+	public static void info( String s )
+	{
+		IJ.log( s );
+	}
 }

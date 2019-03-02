@@ -2,6 +2,7 @@ package de.embl.cba.tables.ui;
 
 import de.embl.cba.bdv.utils.wrap.Wraps;
 import de.embl.cba.tables.Calibrations;
+import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableColumns;
 import de.embl.cba.tables.modelview.images.DefaultImageSourcesModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
@@ -28,7 +29,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 
-@Plugin(type = Command.class, initializer = "init", menuPath = "Plugins>Segmentation>Explore>Explore MorphoLibJ Segmentation" )
+@Plugin(type = Command.class, initializer = "init",
+		menuPath = "Plugins>Segmentation>Explore>Explore MorphoLibJ Segmentation" )
 public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R > >
 		extends DynamicCommand
 {
@@ -36,12 +38,12 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 	private static final String COLUMN_NAME_LABEL_IMAGE_ID = "LabelImage";
 
 	@Parameter ( label = "Label mask image" )
-	public ImagePlus labelMaskImagePlus;
+	public ImagePlus labelMask;
 
 	@Parameter ( label = "Intensity image", required = false )
-	public ImagePlus intensityImagePlus;
+	public ImagePlus intensityImage;
 
-	@Parameter ( label = "Results tableFile" )
+	@Parameter ( label = "Results table" )
 	public String resultsTableTitle;
 
 	private ij.measure.ResultsTable resultsTable;
@@ -53,9 +55,9 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 	@Override
 	public void run()
 	{
-		numSpatialDimensions = labelMaskImagePlus.getNSlices() > 1 ? 3 : 2;
+		numSpatialDimensions = labelMask.getNSlices() > 1 ? 3 : 2;
 
-		labelMaskId = labelMaskImagePlus.getTitle();
+		labelMaskId = labelMask.getTitle();
 
 		resultsTable = titleToResultsTable.get( resultsTableTitle );
 
@@ -64,37 +66,45 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 
 		final ImageSourcesModel imageSourcesModel = createImageSourcesModel();
 
-		final DefaultTableAndBdvViews views = new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel );
+		final DefaultTableAndBdvViews views =
+				new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel );
 
 		views.getTableRowsTableView().categoricalColumnNames().add( LABEL );
 	}
 
 	private DefaultImageSourcesModel createImageSourcesModel()
 	{
-		final DefaultImageSourcesModel imageSourcesModel = new DefaultImageSourcesModel();
+		final DefaultImageSourcesModel imageSourcesModel =
+				new DefaultImageSourcesModel( numSpatialDimensions == 2 );
+
+		Logger.info( "Adding to image sources: " + labelMaskId );
 
 		imageSourcesModel.addSource(
-				Wraps.imagePlusAsSource4DChannelList( labelMaskImagePlus ).get( 0 ),
+				Wraps.imagePlusAsSource4DChannelList( labelMask ).get( 0 ),
 				labelMaskId,
 				SourceMetadata.Flavour.LabelSource,
 				numSpatialDimensions,
-				Calibrations.getScalingTransform( labelMaskImagePlus )
+				Calibrations.getScalingTransform( labelMask )
 				);
 
-		if ( intensityImagePlus != labelMaskImagePlus )
+		imageSourcesModel.sources().get( labelMaskId ).metadata().showInitially = true;
+
+		if ( intensityImage != labelMask )
 		{
-			final String intensityImageId = intensityImagePlus.getTitle();
+			final String intensityImageId = intensityImage.getTitle();
+
+			Logger.info( "Adding to image sources: " + intensityImageId );
 
 			imageSourcesModel.addSource(
-					Wraps.imagePlusAsSource4DChannelList( intensityImagePlus ).get( 0 ),
+					Wraps.imagePlusAsSource4DChannelList( intensityImage ).get( 0 ),
 					intensityImageId,
 					SourceMetadata.Flavour.IntensitySource,
 					numSpatialDimensions,
-					Calibrations.getScalingTransform( intensityImagePlus )
+					Calibrations.getScalingTransform( intensityImage )
 			);
 
-			imageSourcesModel.sources().get( labelMaskId ).metadata().imageSetIDs.add( intensityImageId );
-			imageSourcesModel.sources().get( intensityImageId ).metadata().imageSetIDs.add( labelMaskId );
+			imageSourcesModel.sources().get( labelMaskId )
+					.metadata().imageSetIDs.add( intensityImageId );
 		}
 
 		return imageSourcesModel;

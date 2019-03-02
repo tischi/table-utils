@@ -16,6 +16,7 @@ import de.embl.cba.tables.modelview.images.SourceMetadata;
 import de.embl.cba.tables.modelview.images.SourceAndMetadata;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentId;
+import de.embl.cba.tables.modelview.selection.Listeners;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import net.imglib2.realtransform.AffineTransform3D;
@@ -52,6 +53,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private double voxelSpacing3DView;
 	private Set< SourceAndMetadata< ? > > currentSources;
 	private BdvOverlaySource< BdvGrayValuesOverlay > bdvGrayValueOverlaySource;
+	private Set< LabelsARGBConverter > labelsARGBConverters;
 
 	public ImageSegmentsBdvView(
 			final ImageSourcesModel imageSourcesModel,
@@ -66,6 +68,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		this.voxelSpacing3DView = 0.2;
 		this.currentSources = new HashSet<>( );
+		this.labelsARGBConverters = new HashSet<>(  );
 
 		initBdvOptions();
 
@@ -107,7 +110,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		if ( isShownNone )
 		{
-			showSourceSet( imageSourcesModel.sources().values().iterator().next(), false );
+			showSourceSet(
+					imageSourcesModel.sources().values().iterator().next(), false );
 		}
 
 	}
@@ -192,12 +196,14 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		if ( bdv != null && removeOtherSources ) removeAllSources();
 
-		for ( int sourceIndex = 0; sourceIndex < imageSetIDs.size(); sourceIndex++ )
+		for ( int associatedSourceIndex = 0;
+			  associatedSourceIndex < imageSetIDs.size();
+			  associatedSourceIndex++ )
 		{
 			final SourceAndMetadata associatedSourceAndMetadata =
-					imageSourcesModel.sources().get( imageSetIDs.get( sourceIndex ) );
+					imageSourcesModel.sources().get( imageSetIDs.get( associatedSourceIndex ) );
 
-			applyRecentDisplaySettings( sourceIndex, associatedSourceAndMetadata );
+			applyRecentDisplaySettings( associatedSourceIndex, associatedSourceAndMetadata );
 
 			showSource( associatedSourceAndMetadata );
 		}
@@ -285,6 +291,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		bdv = bdvStackSource.getBdvHandle();
 
+		updateBdvTimePointListeners();
+
 		bdvOptions = bdvOptions.addTo( bdv );
 
 		metadata.bdvStackSource = bdvStackSource;
@@ -292,6 +300,14 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		currentSources.add( sourceAndMetadata );
 
 		return bdvStackSource;
+	}
+
+	public void updateBdvTimePointListeners()
+	{
+		for ( LabelsARGBConverter converter : labelsARGBConverters )
+		{
+			bdv.getViewerPanel().addTimePointListener( converter );
+		}
 	}
 
 	public int getNumTimePoints( Source< ? > source )
@@ -339,29 +355,26 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private Source asLabelSource( SourceAndMetadata sourceAndMetadata )
 	{
-		if ( sourceAndMetadata.metadata().flavour.equals(
-				Flavour.LabelSourceWithoutAnnotations ) )
+		LabelsARGBConverter labelsARGBConverter;
+
+		if ( sourceAndMetadata.metadata().flavour.equals( Flavour.LabelSourceWithoutAnnotations ) )
 		{
-			final LazyLabelsARGBConverter lazyLabelsARGBConverter =
-					new LazyLabelsARGBConverter();
-			bdv.getViewerPanel().addTimePointListener( lazyLabelsARGBConverter );
-			return new ARGBConvertedRealSource(
-					sourceAndMetadata.source(), lazyLabelsARGBConverter );
+			labelsARGBConverter = new LazyLabelsARGBConverter();
 		}
 		else
 		{
 			currentSegmentsModelLabelSource = sourceAndMetadata;
 
-			ImageSegmentLabelsARGBConverter labelSourcesARGBConverter =
+			labelsARGBConverter =
 					new ImageSegmentLabelsARGBConverter(
 							imageSegmentsModel,
 							sourceAndMetadata.metadata().imageId,
 							selectionColoringModel );
-
-			bdv.getViewerPanel().addTimePointListener( labelSourcesARGBConverter );
-			return new ARGBConvertedRealSource(
-					sourceAndMetadata.source(), labelSourcesARGBConverter );
 		}
+
+		labelsARGBConverters.add( labelsARGBConverter );
+
+		return new ARGBConvertedRealSource( sourceAndMetadata.source(), labelsARGBConverter );
 	}
 
 	private void initBdvOptions( )
@@ -422,10 +435,9 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void installSelectionBehaviour()
 	{
-		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
-		{
-			toggleSelectionAtMousePosition();
-		}, name + "-toggle-selection", selectTrigger ) ;
+		behaviours.behaviour(
+				( ClickBehaviour ) ( x, y ) ->
+				toggleSelectionAtMousePosition(), name + "-toggle-selection", selectTrigger ) ;
 	}
 
 	private void toggleSelectionAtMousePosition()

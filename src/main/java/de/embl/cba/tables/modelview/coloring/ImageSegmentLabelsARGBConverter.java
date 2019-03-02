@@ -1,17 +1,14 @@
 package de.embl.cba.tables.modelview.coloring;
 
-import bdv.viewer.TimePointListener;
-import de.embl.cba.tables.modelview.coloring.ColoringModel;
 import de.embl.cba.tables.modelview.combined.ImageSegmentsModel;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentId;
 import net.imglib2.Volatile;
-import net.imglib2.converter.Converter;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.volatiles.VolatileARGBType;
 
 public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
-		implements Converter< RealType, VolatileARGBType >, TimePointListener
+		implements LabelsARGBConverter
 {
 	private final ImageSegmentsModel< T > imageSegmentsModel;
 	private final String imageId;

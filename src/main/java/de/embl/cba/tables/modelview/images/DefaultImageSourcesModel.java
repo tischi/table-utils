@@ -12,9 +12,11 @@ import static de.embl.cba.tables.modelview.images.SourceMetadata.*;
 public class DefaultImageSourcesModel implements ImageSourcesModel
 {
 	private final Map< String, SourceAndMetadata > nameToSourceAndMetadata;
+	private boolean is2D;
 
-	public DefaultImageSourcesModel( )
+	public DefaultImageSourcesModel( boolean is2D )
 	{
+		this.is2D = is2D;
 		nameToSourceAndMetadata = new HashMap<>();
 	}
 
@@ -27,7 +29,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 	@Override
 	public boolean is2D()
 	{
-		return false;
+		return is2D;
 	}
 
 	public void addSource( Source< ? > source,

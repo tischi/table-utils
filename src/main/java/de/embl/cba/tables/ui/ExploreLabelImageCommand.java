@@ -31,13 +31,15 @@ public class ExploreLabelImageCommand< R extends RealType< R > & NativeType< R >
 	@Parameter ( label = "Intensities (optional)", required = false )
 	public File inputIntensitiesFile;
 
+	private boolean is2D = false; // TODO
+
 	@Override
 	public void run()
 	{
 
 		final SourceLoader labelSourceLoader = new SourceLoader( inputLabelMasksFile );
 
-		final DefaultImageSourcesModel imageSourcesModel = new DefaultImageSourcesModel();
+		final DefaultImageSourcesModel imageSourcesModel = new DefaultImageSourcesModel( is2D );
 
 		imageSourcesModel.addSource(
 				labelSourceLoader.getRandomAccessibleIntervalSource4D(),

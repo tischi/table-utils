@@ -64,7 +64,8 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 
 				if ( ! imageSourcesModel.sources().containsKey( imageId ) )
 				{
-					final Path absoluteImagePath = TableUtils.getAbsolutePath( imageRootFolder, imagePath );
+					final Path absoluteImagePath =
+							TableUtils.getAbsolutePath( imageRootFolder, imagePath );
 
 					final String imageDisplayName = absoluteImagePath.getFileName().toString();
 

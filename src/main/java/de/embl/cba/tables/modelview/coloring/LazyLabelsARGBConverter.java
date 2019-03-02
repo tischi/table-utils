@@ -1,21 +1,15 @@
 package de.embl.cba.tables.modelview.coloring;
 
-import bdv.viewer.TimePointListener;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
-import de.embl.cba.tables.modelview.combined.ImageSegmentsModel;
-import de.embl.cba.tables.modelview.segments.ImageSegment;
-import de.embl.cba.tables.modelview.segments.ImageSegmentId;
 import net.imglib2.Volatile;
-import net.imglib2.converter.Converter;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.volatiles.VolatileARGBType;
 
-public class LazyLabelsARGBConverter
-		implements Converter< RealType, VolatileARGBType >, TimePointListener
+public class LazyLabelsARGBConverter implements LabelsARGBConverter
 {
 	private final ColoringModel< Double > coloringModel;
 
-	private int timePointIndex;
+	private int timePointIndex; // TODO: ??
 
 	public LazyLabelsARGBConverter()
 	{
