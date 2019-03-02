@@ -17,7 +17,8 @@ import java.io.File;
 import java.util.*;
 
 
-@Plugin(type = Command.class, menuPath = "Plugins>Segmentation>Explore>Explore CellProfiler Objects Table" )
+@Plugin(type = Command.class,
+		menuPath = "Plugins>Segmentation>Explore>Explore CellProfiler Objects Table" )
 public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {

@@ -1,19 +1,20 @@
 package de.embl.cba.tables.modelview.images;
 
 import bdv.viewer.Source;
+import net.imglib2.type.numeric.RealType;
 
-public class SourceAndMetadata< T >
+public class SourceAndMetadata< R extends RealType< R > >
 {
-	private final Source< T > source;
+	private final Source< R > source;
 	private final SourceMetadata metadata;
 
-	public SourceAndMetadata( Source< T > source, SourceMetadata metadata )
+	public SourceAndMetadata( Source< R > source, SourceMetadata metadata )
 	{
 		this.source = source;
 		this.metadata = metadata;
 	}
 
-	public Source< T > source()
+	public Source< R > source()
 	{
 		return source;
 	}

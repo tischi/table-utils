@@ -132,7 +132,7 @@
 		<dependency>
 			<groupId>de.embl.cba</groupId>
 			<artifactId>bdv-utils</artifactId>
-			<version>0.2.02</version>
+			<version>0.2.05</version>
 		</dependency>
 
 	</dependencies>

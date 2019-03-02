@@ -16,10 +16,10 @@ import de.embl.cba.tables.modelview.images.SourceMetadata;
 import de.embl.cba.tables.modelview.images.SourceAndMetadata;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentId;
-import de.embl.cba.tables.modelview.selection.Listeners;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import net.imglib2.realtransform.AffineTransform3D;
+import net.imglib2.type.numeric.RealType;
 import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
 import org.scijava.ui.behaviour.util.Behaviours;
@@ -29,7 +29,7 @@ import java.util.*;
 import static de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter.BACKGROUND;
 import static de.embl.cba.tables.modelview.images.SourceMetadata.*;
 
-public class ImageSegmentsBdvView < T extends ImageSegment >
+public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< R > >
 {
 	private String selectTrigger = "ctrl button1";
 	private String selectNoneTrigger = "ctrl N";
@@ -51,8 +51,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private ViewerState recentViewerState;
 	private List< ConverterSetup > recentConverterSetups;
 	private double voxelSpacing3DView;
-	private Set< SourceAndMetadata< ? > > currentSources;
-	private BdvOverlaySource< BdvGrayValuesOverlay > bdvGrayValueOverlaySource;
+	private Set< SourceAndMetadata< R > > currentSources;
 	private Set< LabelsARGBConverter > labelsARGBConverters;
 
 	public ImageSegmentsBdvView(
@@ -66,7 +65,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		this.selectionModel = selectionModel;
 		this.selectionColoringModel = selectionColoringModel;
 
-		this.voxelSpacing3DView = 0.2;
+		this.voxelSpacing3DView = 0.2; // TODO
 		this.currentSources = new HashSet<>( );
 		this.labelsARGBConverters = new HashSet<>(  );
 
@@ -85,9 +84,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	public void addGrayValueOverlay()
 	{
-		final BdvGrayValuesOverlay bdvGrayValuesOverlay
-				= new BdvGrayValuesOverlay( bdv, 20 );
-		bdvGrayValueOverlaySource = bdvGrayValuesOverlay.getBdvOverlaySource();
+		new BdvGrayValuesOverlay( bdv, 20 );
 	}
 
 	public ImageSourcesModel getImageSourcesModel()
@@ -99,7 +96,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		boolean isShownNone = true;
 
-		for ( SourceAndMetadata sourceAndMetadata : imageSourcesModel.sources().values() )
+		for ( SourceAndMetadata< ? > sourceAndMetadata : imageSourcesModel.sources().values() )
 		{
 			if ( sourceAndMetadata.metadata().showInitially )
 			{
@@ -108,10 +105,12 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 			}
 		}
 
+
 		if ( isShownNone )
 		{
 			showSourceSet(
-					imageSourcesModel.sources().values().iterator().next(), false );
+					imageSourcesModel.sources().values().iterator().next(), // TODO: how get an entry of map values?
+					false );
 		}
 
 	}
@@ -258,13 +257,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		}
 	}
 
-
-	/**
-	 * Shows a single source
-	 * @param sourceAndMetadata
-	 * @param displayRangeMin
-	 * @param displayRangeMax
-	 */
 	public BdvStackSource showSource( SourceAndMetadata sourceAndMetadata )
 	{
 		final SourceMetadata metadata = sourceAndMetadata.metadata();
@@ -323,7 +315,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		BdvUtils.removeSource( bdv, bdvStackSource );
 	}
 
-	public Set< SourceAndMetadata< ? > > getCurrentSources()
+	public Set< SourceAndMetadata > getCurrentSources()
 	{
 		return Collections.unmodifiableSet( currentSources );
 	}
@@ -353,7 +345,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		}
 	}
 
-	private Source asLabelSource( SourceAndMetadata sourceAndMetadata )
+	private Source asLabelSource( SourceAndMetadata< R > sourceAndMetadata )
 	{
 		LabelsARGBConverter labelsARGBConverter;
 

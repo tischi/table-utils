@@ -1,17 +1,13 @@
 package de.embl.cba.tables.modelview.images;
 
+import net.imglib2.type.numeric.RealType;
+
 import java.util.Map;
 
-
-// TODO: make it implement map? or just use a map?
-// the point of putting a sources() into it was to be able to make it lazy...
+// TODO: make it rather implement a map?
 public interface ImageSourcesModel
 {
-	/**
-	 *
-	 */
-	Map< String, SourceAndMetadata > sources();
+	Map< String, SourceAndMetadata< ? > > sources();
 
 	boolean is2D();
-
 }

@@ -17,13 +17,10 @@ import ij.text.TextWindow;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
-import org.scijava.command.DynamicCommand;
-import org.scijava.module.MutableModuleItem;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,7 +34,7 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 	private static final String COLUMN_NAME_LABEL_IMAGE_ID = "LabelImage";
 
 	@Parameter ( label = "Label mask image" )
-	public ImagePlus labelMask;
+	public ImagePlus labelImage;
 
 	@Parameter ( label = "Intensity image", required = false )
 	public ImagePlus intensityImage;
@@ -48,15 +45,15 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 	private ij.measure.ResultsTable resultsTable;
 	private LinkedHashMap< String, List< ? > > columns;
 	private int numSpatialDimensions;
-	private String labelMaskId;
+	private String labelImageId;
 	private HashMap< String, ij.measure.ResultsTable > titleToResultsTable;
 
 	@Override
 	public void run()
 	{
-		numSpatialDimensions = labelMask.getNSlices() > 1 ? 3 : 2;
+		numSpatialDimensions = labelImage.getNSlices() > 1 ? 3 : 2;
 
-		labelMaskId = labelMask.getTitle();
+		labelImageId = labelImage.getTitle();
 
 		resultsTable = titleToResultsTable.get( resultsTableTitle );
 
@@ -89,19 +86,19 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 		final DefaultImageSourcesModel imageSourcesModel =
 				new DefaultImageSourcesModel( numSpatialDimensions == 2 );
 
-		Logger.info( "Adding to image sources: " + labelMaskId );
+		Logger.info( "Adding to image sources: " + labelImageId );
 
 		imageSourcesModel.addSource(
-				Wraps.imagePlusAsSource4DChannelList( labelMask ).get( 0 ),
-				labelMaskId,
+				Wraps.imagePlusAsSource4DChannelList( labelImage ).get( 0 ),
+				labelImageId,
 				SourceMetadata.Flavour.LabelSource,
 				numSpatialDimensions,
-				Calibrations.getScalingTransform( labelMask )
+				Calibrations.getScalingTransform( labelImage )
 				);
 
-		imageSourcesModel.sources().get( labelMaskId ).metadata().showInitially = true;
+		imageSourcesModel.sources().get( labelImageId ).metadata().showInitially = true;
 
-		if ( intensityImage != labelMask )
+		if ( intensityImage != labelImage )
 		{
 			final String intensityImageId = intensityImage.getTitle();
 
@@ -115,7 +112,7 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 					Calibrations.getScalingTransform( intensityImage )
 			);
 
-			imageSourcesModel.sources().get( labelMaskId )
+			imageSourcesModel.sources().get( labelImageId )
 					.metadata().imageSetIDs.add( intensityImageId );
 		}
 
@@ -157,7 +154,7 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 		columns = TableColumns.addLabelImageIdColumn(
 				columns,
 				COLUMN_NAME_LABEL_IMAGE_ID,
-				labelMaskId );
+				labelImageId );
 
 		final HashMap< ImageSegmentCoordinate, List< ? > > imageSegmentCoordinateToColumn
 				= createSegmentCoordinateToColumnMap();

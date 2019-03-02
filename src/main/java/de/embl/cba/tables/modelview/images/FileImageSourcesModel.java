@@ -21,7 +21,7 @@ import static de.embl.cba.tables.modelview.images.SourceMetadata.*;
 
 public class FileImageSourcesModel implements ImageSourcesModel
 {
-	private final Map< String, SourceAndMetadata > nameToSourceAndMetadata;
+	private final Map< String, SourceAndMetadata< ? > > nameToSourceAndMetadata;
 	private final boolean is2D;
 
 	public FileImageSourcesModel( boolean is2D )
@@ -31,7 +31,7 @@ public class FileImageSourcesModel implements ImageSourcesModel
 	}
 
 	@Override
-	public Map< String, SourceAndMetadata > sources()
+	public Map< String, SourceAndMetadata< ? > > sources()
 	{
 		return nameToSourceAndMetadata;
 	}

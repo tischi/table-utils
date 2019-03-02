@@ -6,12 +6,12 @@ import de.embl.cba.tables.modelview.segments.ImageSegmentId;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GeneratingNoPositionImageSegmentsModel
+public class LazyImageSegmentsModel
 		implements ImageSegmentsModel< DefaultImageSegment >
 {
 	private final Map< ImageSegmentId, DefaultImageSegment > keyToSegment;
 
-	public GeneratingNoPositionImageSegmentsModel( )
+	public LazyImageSegmentsModel( )
 	{
 		keyToSegment = new HashMap<>(  );
 	}
