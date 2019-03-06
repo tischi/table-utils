@@ -53,6 +53,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 	private double voxelSpacing3DView;
 	private Set< SourceAndMetadata< R > > currentSources;
 	private Set< LabelsARGBConverter > labelsARGBConverters;
+	private boolean grayValueOverlayWasFirstSource;
 
 	public ImageSegmentsBdvView(
 			final ImageSourcesModel imageSourcesModel,
@@ -84,7 +85,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 
 	public void addGrayValueOverlay()
 	{
-		new BdvGrayValuesOverlay( bdv, 20 );
+		new BdvGrayValuesOverlay( bdv, 20 ).getBdvOverlaySource();
+		grayValueOverlayWasFirstSource = false;
 	}
 
 	public ImageSourcesModel getImageSourcesModel()
@@ -109,7 +111,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 		if ( isShownNone )
 		{
 			showSourceSet(
-					imageSourcesModel.sources().values().iterator().next(), // TODO: how get an entry of map values?
+					// TODO: how get an entry of map values?
+					imageSourcesModel.sources().values().iterator().next(),
 					false );
 		}
 
@@ -193,7 +196,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 	{
 		final List< String > imageSetIDs = sourceAndMetadata.metadata().imageSetIDs;
 
-		if ( bdv != null && removeOtherSources ) removeAllSources();
+		if ( bdv != null && removeOtherSources )
+		{
+			removeSources();
+		}
 
 		for ( int associatedSourceIndex = 0;
 			  associatedSourceIndex < imageSetIDs.size();
@@ -203,7 +209,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 					imageSourcesModel.sources().get( imageSetIDs.get( associatedSourceIndex ) );
 
 			applyRecentDisplaySettings( associatedSourceIndex, associatedSourceAndMetadata );
-
 			showSource( associatedSourceAndMetadata );
 		}
 
@@ -220,19 +225,22 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 		}
 	}
 
-	public void applyViewerStateVisibility( ViewerState viewerState )
+	public void applyViewerStateVisibility( ViewerState recentViewerState )
 	{
 		final int numSources = bdv.getViewerPanel().getVisibilityAndGrouping().numSources();
-		for ( int i = 0; i < numSources; i++ )
+		final List< Integer > visibleSourceIndices = recentViewerState.getVisibleSourceIndices();
+
+		for ( int i = 1; i < numSources; i++ )
 		{
-			if ( viewerState.getVisibleSourceIndices().contains( i ) )
-			{
-				bdv.getViewerPanel().getVisibilityAndGrouping().setSourceActive( i, true );
-			}
-			else
-			{
-				bdv.getViewerPanel().getVisibilityAndGrouping().setSourceActive( i, false );
-			}
+			int recentSourceIndex = i;
+
+			if ( ! grayValueOverlayWasFirstSource )
+				recentSourceIndex--;
+
+			bdv.getViewerPanel().getVisibilityAndGrouping().
+					setSourceActive(
+							i,
+							visibleSourceIndices.contains( recentSourceIndex ) );
 		}
 	}
 
@@ -244,16 +252,21 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 		bdv.getViewerPanel().setCurrentViewerTransform( transform3D );
 	}
 
-	private void applyRecentDisplaySettings(
-			int i, SourceAndMetadata associatedSourceAndMetadata )
+	private void applyRecentDisplaySettings( int associatedSourceIndex,
+											 SourceAndMetadata associatedSourceAndMetadata )
 	{
 		if ( recentConverterSetups != null )
 		{
+			int recentConverterSetupIndex = associatedSourceIndex;
+
+			if ( grayValueOverlayWasFirstSource )
+				recentConverterSetupIndex++;
+
 			associatedSourceAndMetadata.metadata().displayRangeMin =
-					recentConverterSetups.get( i ).getDisplayRangeMin();
+					recentConverterSetups.get( recentConverterSetupIndex ).getDisplayRangeMin();
 
 			associatedSourceAndMetadata.metadata().displayRangeMax =
-					recentConverterSetups.get( i ).getDisplayRangeMax();
+					recentConverterSetups.get( recentConverterSetupIndex ).getDisplayRangeMax();
 		}
 	}
 
@@ -320,11 +333,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 		return Collections.unmodifiableSet( currentSources );
 	}
 
-	private void removeAllSources()
+	private void removeSources()
 	{
 		recentViewerState = bdv.getViewerPanel().getState();
-		recentConverterSetups = new ArrayList<>(
-				bdv.getSetupAssignments().getConverterSetups() );
+		recentConverterSetups = new ArrayList<>( bdv.getSetupAssignments().getConverterSetups() );
 
 		final List< SourceState< ? > > sources = recentViewerState.getSources();
 		final int numSources = sources.size();
@@ -334,13 +346,13 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 			final Source< ? > source = sources.get( i ).getSpimSource();
 			if ( source instanceof PlaceHolderSource )
 			{
-				int a = 1; // GrayValueOverlaySource
+				if ( i == 0 )
+					grayValueOverlayWasFirstSource = true;
 			}
 			else
 			{
 				bdv.getViewerPanel().removeSource( source );
-				final ConverterSetup converterSetup = recentConverterSetups.get( i );
-				bdv.getSetupAssignments().removeSetup( converterSetup );
+				bdv.getSetupAssignments().removeSetup( recentConverterSetups.get( i ) );
 			}
 		}
 	}

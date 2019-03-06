@@ -1,7 +1,7 @@
 import de.embl.cba.tables.ui.ExploreObjectsTableCommand;
 import net.imagej.ImageJ;
 
-public class RunExploreSegmentsTableWithImagePathsCommand
+public class RunExploreObjectsTableCommand
 {
 	public static void main( String[] args )
 	{
