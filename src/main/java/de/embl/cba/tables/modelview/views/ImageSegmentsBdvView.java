@@ -18,12 +18,14 @@ import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentId;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
+import net.imglib2.RealPoint;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
 import org.scijava.ui.behaviour.util.Behaviours;
 
+import javax.swing.*;
 import java.util.*;
 
 import static de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter.BACKGROUND;
@@ -54,6 +56,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 	private Set< SourceAndMetadata< R > > currentSources;
 	private Set< LabelsARGBConverter > labelsARGBConverters;
 	private boolean grayValueOverlayWasFirstSource;
+	//private boolean hasGrayValueOverlay;
 
 	public ImageSegmentsBdvView(
 			final ImageSourcesModel imageSourcesModel,
@@ -74,7 +77,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 
 		showInitialSources();
 
-		addGrayValueOverlay();
+		// addGrayValueOverlay();
 
 		registerAsSelectionListener( selectionModel );
 
@@ -87,6 +90,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 	{
 		new BdvGrayValuesOverlay( bdv, 20 ).getBdvOverlaySource();
 		grayValueOverlayWasFirstSource = false;
+		//hasGrayValueOverlay = true;
 	}
 
 	public ImageSourcesModel getImageSourcesModel()
@@ -361,7 +365,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 	{
 		LabelsARGBConverter labelsARGBConverter;
 
-		if ( sourceAndMetadata.metadata().flavour.equals( Flavour.LabelSourceWithoutAnnotations ) )
+		if ( sourceAndMetadata.metadata().flavour.equals(
+				Flavour.LabelSourceWithoutAnnotations ) )
 		{
 			labelsARGBConverter = new LazyLabelsARGBConverter();
 		}
@@ -408,29 +413,32 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 	private void installRandomColorShufflingBehaviour()
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
-		{
-			final ColoringModel< T > coloringModel =
-					selectionColoringModel.getWrappedColoringModel();
-
-			if ( coloringModel instanceof CategoryColoringModel )
-			{
-				( ( CategoryColoringModel ) coloringModel ).incRandomSeed();
-				BdvUtils.repaint( bdv );
-			}
-		}, name +
-				"-change-coloring-random-seed",
+						new Thread( () -> shuffleRandomColors() ).start(),
+				name + "-change-coloring-random-seed",
 				incrementCategoricalLutRandomSeedTrigger );
+	}
+
+	private synchronized void shuffleRandomColors()
+	{
+		final ColoringModel< T > coloringModel =
+				selectionColoringModel.getWrappedColoringModel();
+
+		if ( coloringModel instanceof CategoryColoringModel )
+		{
+			( ( CategoryColoringModel ) coloringModel ).incRandomSeed();
+			BdvUtils.repaint( bdv );
+		}
 	}
 
 
 	private void installSelectNoneBehaviour( )
 	{
-		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) -> {
-			selectNone();
-		}, name + "-select-none", selectNoneTrigger );
+		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
+				new Thread( () -> selectNone() ).start(),
+				name + "-select-none", selectNoneTrigger );
 	}
 
-	public void selectNone()
+	public synchronized void selectNone()
 	{
 		selectionModel.clearSelection( );
 
@@ -441,10 +449,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 	{
 		behaviours.behaviour(
 				( ClickBehaviour ) ( x, y ) ->
-				toggleSelectionAtMousePosition(), name + "-toggle-selection", selectTrigger ) ;
+						new Thread( () -> toggleSelectionAtMousePosition() ).start(),
+				name + "-toggle-selection", selectTrigger ) ;
 	}
 
-	private void toggleSelectionAtMousePosition()
+	private synchronized void toggleSelectionAtMousePosition()
 	{
 		if ( currentSegmentsModelLabelSource == null ) return;
 
@@ -470,38 +479,55 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 
 	private double getLabelIdAtCurrentMouseCoordinates()
 	{
-		return BdvUtils.getValueAtGlobalCoordinates(
-					currentSegmentsModelLabelSource.source(),
-					BdvUtils.getGlobalMouseCoordinates( bdv ),
-					getCurrentTimePoint() );
+		final RealPoint globalMouseCoordinates =
+				BdvUtils.getGlobalMouseCoordinates( bdv );
+
+		System.out.println( "Finding pixel value at " + globalMouseCoordinates );
+
+		final Double value = BdvUtils.getValueAtGlobalCoordinates(
+				currentSegmentsModelLabelSource.source(),
+				globalMouseCoordinates,
+				getCurrentTimePoint() );
+
+		if ( value == null )
+		{
+			System.out.println( "Could not find pixel value at position " + globalMouseCoordinates);
+		}
+		else
+		{
+			System.out.println( "Pixel value is " + value );
+		}
+
+		return value;
 	}
 
 	private void installSelectionColoringModeBehaviour( )
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
-		{
-			selectionColoringModel.iterateSelectionMode();
-			BdvUtils.repaint( bdv );
-		}, name + "-iterate-selection", iterateSelectionModeTrigger );
+				new Thread( () ->
+				{
+					selectionColoringModel.iterateSelectionMode();
+					BdvUtils.repaint( bdv );
+				} ).start(),
+				name + "-iterate-selection", iterateSelectionModeTrigger );
 	}
 
 	private void install3DViewBehaviour( )
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
-		{
-			if ( getLabelIdAtCurrentMouseCoordinates() != BACKGROUND )
-			{
-				viewObjectAtCurrentMouseCoordinatesIn3D();
-			}
-		}, name + "-view-3d", viewIn3DTrigger );
+				new Thread( () -> {
+					if ( getLabelIdAtCurrentMouseCoordinates() != BACKGROUND )
+						viewObjectAtCurrentMouseCoordinatesIn3D();
+					}).start(),
+				name + "-view-3d", viewIn3DTrigger );
 	}
 
-	private void viewObjectAtCurrentMouseCoordinatesIn3D()
+	private synchronized void viewObjectAtCurrentMouseCoordinatesIn3D()
 	{
-		new Thread( () -> new ConnectedComponentExtractorAnd3DViewer( currentSegmentsModelLabelSource.source() )
+		new ConnectedComponentExtractorAnd3DViewer( currentSegmentsModelLabelSource.source() )
 				.extractAndShowIn3D(
 						BdvUtils.getGlobalMouseCoordinates( bdv ),
-						voxelSpacing3DView ) ).start();
+						voxelSpacing3DView );
 	}
 
 	private int getCurrentTimePoint()
