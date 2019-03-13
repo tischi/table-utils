@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class NumericColoringModelDialog extends JFrame implements ColoringListener
 {
-	private static Point minMaxDialogLocation;
+	private static Point dialogLocation;
 
 	public NumericColoringModelDialog(
 			final String coloringFeature,
@@ -58,14 +58,14 @@ public class NumericColoringModelDialog extends JFrame implements ColoringListen
 				120, 10);
 		frame.pack();
 		frame.setVisible( true );
-		if ( minMaxDialogLocation != null )
-			frame.setLocation( minMaxDialogLocation );
+		if ( dialogLocation != null )
+			frame.setLocation( dialogLocation );
 
 	}
 
 	public void close()
 	{
-		minMaxDialogLocation = getLocation();
+		dialogLocation = getLocation();
 		dispose();
 	}
 

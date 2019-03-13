@@ -71,7 +71,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		table.setDefaultRenderer( Double.class, new DefaultTableCellRenderer()
 		{
 			@Override
-			public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			public Component getTableCellRendererComponent(
+					JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column) {
 
 				Component c = super.getTableCellRendererComponent(
 						table,
@@ -90,7 +92,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		table.setDefaultRenderer( String.class, new DefaultTableCellRenderer()
 		{
 			@Override
-			public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			public Component getTableCellRendererComponent(
+					JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column) {
 
 				Component c = super.getTableCellRendererComponent(
 						table,
@@ -109,7 +113,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		table.setDefaultRenderer( Integer.class, new DefaultTableCellRenderer()
 		{
 			@Override
-			public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
+			public Component getTableCellRendererComponent(
+					JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column)
 			{
 				Component c = super.getTableCellRendererComponent(
 						table,
@@ -127,9 +133,10 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		table.setDefaultRenderer( Object.class, new DefaultTableCellRenderer()
 		{
 			@Override
-			public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column )
+			public Component getTableCellRendererComponent(
+					JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column )
 			{
-
 				Component c = super.getTableCellRendererComponent(
 						table,
 						value,
@@ -149,21 +156,18 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		final int row = table.convertRowIndexToModel( rowInView );
 
-		if ( selectionModel.isFocused( tableRowsModel.getTableRows().get( row ) ) )
-		{
-			return Color.BLUE;
-		}
+//		if ( selectionModel.isFocused( tableRowsModel.getTableRows().get( row ) ) )
+//		{
+//			return Color.BLUE;
+//		}
 
-		if ( selectionModel.isSelected( tableRowsModel.getTableRows().get( row ) ) )
-		{
-			final ARGBType argbType = new ARGBType();
-			selectionColoringModel.convert( tableRowsModel.getTableRows().get( row ), argbType );
-			final int colorIndex = argbType.get();
-			final Color color = new Color( ARGBType.red( colorIndex ), ARGBType.green( colorIndex ), ARGBType.blue( colorIndex ) );
-			return color;
-		}
+		final ARGBType argbType = new ARGBType();
+		selectionColoringModel.convert( tableRowsModel.getTableRows().get( row ), argbType );
 
-		return Color.WHITE;
+		if ( argbType.get() == 0 )
+			return Color.WHITE;
+		else
+			return ColorUtils.getColor( argbType );
 	}
 
 	public void registerAsColoringListener( SelectionColoringModel< T > selectionColoringModel )
@@ -470,7 +474,10 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	public void initHelpDialog()
 	{
-		helpDialog = new HelpDialog( frame, TableUtils.class.getResource( "/TableUtilsHelp.html" ) );
+		helpDialog =
+				new HelpDialog(
+						frame,
+						TableUtils.class.getResource( "/TableUtilsHelp.html" ) );
 	}
 
 
