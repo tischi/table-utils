@@ -10,6 +10,7 @@ import de.embl.cba.tables.modelview.combined.TableRowsModel;
 import de.embl.cba.tables.modelview.segments.TableRow;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
+import mpicbg.imglib.cursor.special.Utils;
 import net.imglib2.type.numeric.ARGBType;
 
 import javax.swing.*;
@@ -37,6 +38,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private HelpDialog helpDialog;
 	private Set< String > customColumns;
 	private int recentlyMovedToRowInView;
+	private HashMap< String, double[] > columnColoringRangeSettings;
 
 	public TableRowsTableView(
 			final TableRowsModel< T > tableRowsModel,
@@ -50,6 +52,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		this.categoricalColumnNames = new HashSet<>(  );
 		this.customColumns = new HashSet<>(  );
+		this.columnColoringRangeSettings = new HashMap<>();
 
 		registerAsSelectionListener( selectionModel );
 		registerAsColoringListener( selectionColoringModel );
@@ -170,7 +173,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			return ColorUtils.getColor( argbType );
 	}
 
-	public void registerAsColoringListener( SelectionColoringModel< T > selectionColoringModel )
+	public void registerAsColoringListener(
+			SelectionColoringModel< T > selectionColoringModel )
 	{
 		selectionColoringModel.listeners().add( () -> table.repaint( ) );
 	}
@@ -330,7 +334,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	}
 
 
-	public double[] getMinMaxValues( String column )
+	public double[] getValueRange( String column )
 	{
 		if ( ! columnsMinMaxMap.containsKey( column ) )
 		{
@@ -446,20 +450,24 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		if ( Number.class.isAssignableFrom( table.getColumnClass( columnIndex ) )
 				&& ! categoricalColumnNames.contains( columnName ) )
 		{
-			final double[] minMaxValues = getMinMaxValues( columnName );
+
+			final double[] valueRange = getValueRange( columnName );
+
+			double[] valueSettings = getValueSettings( columnName, valueRange );
+
 
 			final NumericTableRowColumnColoringModel< T > coloringModel
 					= new NumericTableRowColumnColoringModel< >(
 							columnName,
 							new BlueWhiteRedARGBLut( 1000 ),
-							minMaxValues[ 0 ],
-							minMaxValues[ 1 ]
+							valueSettings,
+							valueRange
 			);
 
 			selectionColoringModel.setWrappedColoringModel( coloringModel );
 
 			SwingUtilities.invokeLater( () ->
-					new NumericColoringModelDialog( columnName, coloringModel ) );
+					new NumericColoringModelDialog( columnName, coloringModel, valueRange ) );
 		}
 		else
 		{
@@ -470,6 +478,20 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 			selectionColoringModel.setWrappedColoringModel( coloringModel );
 		}
+	}
+
+	public double[] getValueSettings( String columnName, double[] valueRange )
+	{
+		double[] valueSettings;
+
+		if ( columnColoringRangeSettings.containsKey( columnName ) )
+			valueSettings = columnColoringRangeSettings.get( columnName );
+		else
+			valueSettings = valueRange.clone();
+
+		columnColoringRangeSettings.put( columnName, valueSettings );
+
+		return valueSettings;
 	}
 
 	public void initHelpDialog()

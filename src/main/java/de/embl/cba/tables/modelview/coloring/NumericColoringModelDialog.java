@@ -12,7 +12,8 @@ public class NumericColoringModelDialog extends JFrame implements ColoringListen
 
 	public NumericColoringModelDialog(
 			final String coloringFeature,
-			final NumericColoringModel< ? > coloringModel  )
+			final NumericColoringModel< ? > coloringModel,
+			double[] valueRange )
 	{
 
 		final JFrame frame = new JFrame( coloringFeature );
@@ -20,13 +21,13 @@ public class NumericColoringModelDialog extends JFrame implements ColoringListen
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 
 		final BoundedValueDouble min = new BoundedValueDouble(
-				coloringModel.getMin(),
-				coloringModel.getMax(),
+				valueRange[ 0 ],
+				valueRange[ 1 ],
 				coloringModel.getMin() );
 
 		final BoundedValueDouble max = new BoundedValueDouble(
-				coloringModel.getMin(),
-				coloringModel.getMax(),
+				valueRange[ 0 ],
+				valueRange[ 1 ],
 				coloringModel.getMax() );
 
 		JPanel panel = new JPanel();
@@ -41,6 +42,8 @@ public class NumericColoringModelDialog extends JFrame implements ColoringListen
 			{
 				coloringModel.setMin( min.getCurrentValue() );
 				coloringModel.setMax( max.getCurrentValue() );
+				minSlider.update();
+				maxSlider.update();
 			}
 		}
 

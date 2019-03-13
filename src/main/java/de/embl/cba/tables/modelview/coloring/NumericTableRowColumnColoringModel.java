@@ -15,23 +15,19 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 {
 	private String column;
 	private ARGBLut lut;
-	private double min;
-	private double max;
-	private double rangeMin;
-	private double rangeMax;
+	private double[] values;
+	private double[] range;
 
 	public NumericTableRowColumnColoringModel(
 			String column,
 			ARGBLut lut,
-			double rangeMin,
-			double rangeMax )
+			double[] values,
+			double[] range )
 	{
 		this.column = column;
 		this.lut = lut;
-		this.min = rangeMin;
-		this.max = rangeMax;
-		this.rangeMin = rangeMin;
-		this.rangeMax = rangeMax;
+		this.values = values;
+		this.range = range;
 	}
 
 	@Override
@@ -45,28 +41,28 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	@Override
 	public double getMin()
 	{
-		return min;
+		return values[ 0 ];
 	}
 
 
 	@Override
 	public double getMax()
 	{
-		return max;
+		return values[ 1 ];
 	}
 
 
 	@Override
 	public void setMin( double min )
 	{
-		this.min = min;
+		this.values[ 0 ] = min;
 		notifyColoringListeners();
 	}
 
 	@Override
 	public void setMax( double max )
 	{
-		this.max = max;
+		this.values[ 1 ] = max;
 		notifyColoringListeners();
 	}
 
@@ -92,13 +88,13 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	public double computeLinearNormalisedValue( double value )
 	{
 		double normalisedValue = 0;
-		if ( max == min )
+		if ( values[ 1 ] == values[ 0 ] )
 		{
-			if ( max == rangeMin )
+			if ( values[ 1 ] == range[ 0 ] )
 			{
 				normalisedValue = 1.0;
 			}
-			else if ( max == rangeMax )
+			else if ( values[ 1 ] == range[ 1 ] )
 			{
 				normalisedValue = 0.0;
 			}
@@ -108,8 +104,8 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 			normalisedValue =
 					Math.max(
 							Math.min(
-									( value - min )
-											/ ( max - min ), 1.0 ), 0.0 );
+									( value - values[ 0 ] )
+											/ ( values[ 1 ] - values[ 0 ] ), 1.0 ), 0.0 );
 		}
 		return normalisedValue;
 	}

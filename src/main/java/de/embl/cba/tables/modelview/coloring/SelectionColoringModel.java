@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static de.embl.cba.tables.modelview.coloring.SelectionColoringModel.SelectionMode.DimNotSelected;
+import static de.embl.cba.tables.modelview.coloring.SelectionColoringModel.SelectionMode.OnlyShowSelected;
 
 public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 {
@@ -24,10 +25,10 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 	public enum SelectionMode
 	{
-		DimNotSelected,
 		OnlyShowSelected,
 		SelectionColor,
-		SelectionColorAndDimNotSelected;
+		SelectionColorAndDimNotSelected,
+		DimNotSelected
 	}
 
 	public SelectionColoringModel(
@@ -40,7 +41,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 		this.selectionColor = YELLOW;
 		this.brightnessNotSelected = 0.1;
-		this.selectionMode = DimNotSelected;
+		this.selectionMode = OnlyShowSelected;
 	}
 
 
