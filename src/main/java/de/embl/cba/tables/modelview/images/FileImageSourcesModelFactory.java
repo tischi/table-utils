@@ -1,5 +1,6 @@
 package de.embl.cba.tables.modelview.images;
 
+import de.embl.cba.tables.FileUtils;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
 import de.embl.cba.tables.modelview.segments.TableRow;
@@ -11,7 +12,7 @@ import java.util.*;
 public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 {
 	public static final String PATH_COLUMN_ID = "Path_";
-	public final ArrayList< String > labelMaskColumnIds;
+	public ArrayList< String > labelMaskColumnIds;
 
 	private final List< T > tableRowImageSegments;
 	private Set< String > columns;
@@ -31,14 +32,19 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 
 		columns = tableRowImageSegments.get( 0 ).cells().keySet();
 
-		// TODO: how to handle this? could be anything...
-		this.labelMaskColumnIds = new ArrayList< >();
-		labelMaskColumnIds.add( "Objects_" );
-		labelMaskColumnIds.add( "labelMasks" );
-		labelMaskColumnIds.add( "LabelMask" );
+		createLabelMaskIds(); // TODO: how to handle this? could be anything...
 
 		imageNameToPathColumnName = getImageNameToPathColumnName();
 		imageSourcesModel = createImageSourcesModel();
+	}
+
+	public void createLabelMaskIds()
+	{
+		labelMaskColumnIds = new ArrayList< >();
+		labelMaskColumnIds.add( "Objects_" );
+		labelMaskColumnIds.add( "labelMasks" );
+		labelMaskColumnIds.add( "LabelMask" );
+		labelMaskColumnIds.add( "LabelImage" );
 	}
 
 	public FileImageSourcesModel getImageSourcesModel()
@@ -104,7 +110,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 	{
 		final SourceMetadata.Flavour flavour;
 
-		if ( stringContainsItemFromList( imageName, labelMaskColumnIds ) )
+		if ( FileUtils.stringContainsItemFromList( imageName, labelMaskColumnIds ) )
 		{
 			flavour = SourceMetadata.Flavour.LabelSource;
 		}
@@ -128,11 +134,6 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 			}
 		}
 		return imageNameToPathColumnName;
-	}
-
-	public static boolean stringContainsItemFromList( String inputStr, ArrayList< String > items)
-	{
-		return items.parallelStream().anyMatch(inputStr::contains);
 	}
 
 

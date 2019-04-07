@@ -1,5 +1,6 @@
 package de.embl.cba.tables;
 
+import de.embl.cba.tables.measure.SummaryStatistics;
 import de.embl.cba.tables.modelview.tables.ColumnClassAwareTableModel;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
 import de.embl.cba.tables.modelview.segments.*;
@@ -382,7 +383,10 @@ public class TableUtils
 //		}
 	}
 
-	public static void setColumnIndex( Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap, int columnIndex, String columnName )
+	public static void setColumnIndex(
+			Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
+			int columnIndex,
+			String columnName )
 	{
 		for ( ImageSegmentCoordinate coordinate : coordinateColumnMap.keySet() )
 		{
@@ -425,7 +429,7 @@ public class TableUtils
 		return Double.parseDouble( rowEntries[ columnIndex ] );
 	}
 
-	public static JTable jTableFromSegmentList( List< ? extends TableRow > tableRows )
+	public static JTable jTableFromTableRows( List< ? extends TableRow > tableRows )
 	{
 
 		/**
@@ -467,6 +471,18 @@ public class TableUtils
 		for ( int columnIndex = 0; columnIndex < jTable.getColumnCount(); columnIndex++ )
 		{
 			columnNames.add( jTable.getColumnName( columnIndex ) );
+		}
+		return columnNames;
+	}
+
+
+	public static String[] getColumnNamesAsArray( JTable jTable )
+	{
+		final String[] columnNames = new String[ jTable.getColumnCount() ];
+
+		for ( int columnIndex = 0; columnIndex < jTable.getColumnCount(); columnIndex++ )
+		{
+			columnNames[ columnIndex ] = jTable.getColumnName( columnIndex );
 		}
 		return columnNames;
 	}
@@ -539,14 +555,14 @@ public class TableUtils
 	{
 		if ( model instanceof ColumnClassAwareTableModel )
 		{
-			((ColumnClassAwareTableModel ) model ).addColumnClass( defaultValue );
+			( (ColumnClassAwareTableModel) model ).addColumnClass( defaultValue );
 		}
 
 		if ( model instanceof DefaultTableModel )
 		{
 			final Object[] rows = new Object[ model.getRowCount() ];
 			Arrays.fill( rows, defaultValue );
-			((DefaultTableModel) model ).addColumn( column, rows );
+			( (DefaultTableModel) model ).addColumn( column, rows );
 		}
 	}
 
@@ -598,7 +614,7 @@ public class TableUtils
 		return value;
 	}
 
-	public static double[] determineMinMaxValues( String column, JTable table )
+	public static double[] minMax( String column, JTable table )
 	{
 		final int columnIndex = table.getColumnModel().getColumnIndex( column );
 
@@ -616,4 +632,39 @@ public class TableUtils
 		return new double[]{ min, max };
 	}
 
+	public static double[] meanSigma( String column, JTable table )
+	{
+		final int columnIndex = table.getColumnModel().getColumnIndex( column );
+		final int rowCount = table.getRowCount();
+
+		double mean = 0.0;
+		for ( int row = 0; row < rowCount; row++ )
+		{
+			final double value = ( Double ) table.getValueAt( row, columnIndex );
+			mean += value;
+		}
+
+		mean /= rowCount;
+
+		double sigma = 0.0;
+		for ( int row = 0; row < rowCount; row++ )
+		{
+			final double value = ( Double ) table.getValueAt( row, columnIndex );
+			sigma += Math.pow( value - mean, 2 );
+		}
+
+		sigma /= rowCount;
+
+		return new double[]{ mean, sigma };
+	}
+
+
+	public static boolean isNumeric( JTable table, String columnName )
+	{
+		final TableModel model = table.getModel();
+		final int columnIndex = table.getColumnModel().getColumnIndex( columnName );
+
+		final Class< ? > columnClass = model.getColumnClass( columnIndex );
+		return Number.class.isAssignableFrom( columnClass );
+	}
 }

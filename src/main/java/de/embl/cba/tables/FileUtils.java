@@ -55,4 +55,9 @@ public class FileUtils
 			}
 		}
 	}
+
+	public static boolean stringContainsItemFromList( String inputStr, ArrayList< String > items)
+	{
+		return items.parallelStream().anyMatch( inputStr::contains );
+	}
 }

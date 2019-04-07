@@ -34,7 +34,7 @@ public class DefaultTableAndBdvViews
 				= new DefaultSelectionModel<>();
 
 		final LazyCategoryColoringModel< TableRowImageSegment > coloringModel
-				= new LazyCategoryColoringModel<>( new GlasbeyARGBLut() );
+				= new LazyCategoryColoringModel<>( new GlasbeyARGBLut( 255 ) );
 
 		final SelectionColoringModel< TableRowImageSegment > selectionColoringModel
 				= new SelectionColoringModel<>(

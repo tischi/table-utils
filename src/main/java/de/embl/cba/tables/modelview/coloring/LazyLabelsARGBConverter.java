@@ -13,7 +13,7 @@ public class LazyLabelsARGBConverter implements LabelsARGBConverter
 
 	public LazyLabelsARGBConverter()
 	{
-		this.coloringModel = new LazyCategoryColoringModel< >( new GlasbeyARGBLut() );
+		this.coloringModel = new LazyCategoryColoringModel< >( new GlasbeyARGBLut( 100 ) );
 		timePointIndex = 0;
 	}
 

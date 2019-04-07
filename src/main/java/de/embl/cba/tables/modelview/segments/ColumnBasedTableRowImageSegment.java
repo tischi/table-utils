@@ -1,5 +1,6 @@
 package de.embl.cba.tables.modelview.segments;
 
+import de.embl.cba.tables.ui.CoordinateColumnsSelectionDialog;
 import net.imglib2.FinalInterval;
 
 import java.util.LinkedHashMap;
@@ -63,16 +64,12 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	@Override
 	public int timePoint()
 	{
-		if ( imageSegmentCoordinateToColumn.containsKey( ImageSegmentCoordinate.T ) )
-		{
-			int timePoint = ( ( Double ) imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.T ).get( row )).intValue();
-			if ( isOneBasedTimePoint ) timePoint -= 1;
-			return timePoint;
-		}
-		else
-		{
+		if ( imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.T ) == null )
 			return 0;
-		}
+
+		int timePoint = ( ( Double ) imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.T ).get( row )).intValue();
+		if ( isOneBasedTimePoint ) timePoint -= 1;
+		return timePoint;
 	}
 
 	@Override

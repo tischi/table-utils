@@ -1,8 +1,6 @@
 package de.embl.cba.tables.modelview.views;
 
 import bdv.tools.HelpDialog;
-import de.embl.cba.bdv.utils.lut.BlueWhiteRedARGBLut;
-import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.coloring.*;
@@ -10,7 +8,9 @@ import de.embl.cba.tables.modelview.combined.TableRowsModel;
 import de.embl.cba.tables.modelview.segments.TableRow;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
-import mpicbg.imglib.cursor.special.Utils;
+import de.embl.cba.tables.ui.ColorByColumnDialog;
+import de.embl.cba.tables.ui.MeasureSimilarityDialog;
+import ij.IJ;
 import net.imglib2.type.numeric.ARGBType;
 
 import javax.swing.*;
@@ -30,15 +30,16 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private JFrame frame;
     private JScrollPane scrollPane;
     private JMenuBar menuBar;
-	private Map< String, double[] > columnsMinMaxMap;
+
 	private Set< String > categoricalColumnNames;
 	private JTable table;
 	private int recentlySelectedRowInView;
-	private AssignValuesToTableRowsUI assignObjectAttributesUI;
+	private AssignValuesToTableRowsDialog assignObjectAttributesUI;
 	private HelpDialog helpDialog;
 	private Set< String > customColumns;
 	private int recentlyMovedToRowInView;
-	private HashMap< String, double[] > columnColoringRangeSettings;
+	private ColorByColumnDialog< T > colorByColumnDialog;
+	private MeasureSimilarityDialog< T > measureSimilarityDialog;
 
 	public TableRowsTableView(
 			final TableRowsModel< T > tableRowsModel,
@@ -52,7 +53,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		this.categoricalColumnNames = new HashSet<>(  );
 		this.customColumns = new HashSet<>(  );
-		this.columnColoringRangeSettings = new HashMap<>();
 
 		registerAsSelectionListener( selectionModel );
 		registerAsColoringListener( selectionColoringModel );
@@ -86,7 +86,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 						row,
 						column);
 
-				c.setBackground( getColour(row, column) );
+				c.setBackground( getColor(row, column) );
 
 				return c;
 			}
@@ -107,7 +107,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 						row,
 						column);
 
-				c.setBackground( getColour(row, column) );
+				c.setBackground( getColor(row, column) );
 
 				return c;
 			}
@@ -128,7 +128,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 						row,
 						column);
 
-				c.setBackground( getColour(row, column) );
+				c.setBackground( getColor(row, column) );
 
 				return c;
 			}
@@ -148,14 +148,14 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 						row,
 						column );
 
-				c.setBackground( getColour( row, column ) );
+				c.setBackground( getColor( row, column ) );
 
 				return c;
 			}
 		});
 	}
 
-	private Color getColour( int rowInView, int columnInView )
+	private Color getColor( int rowInView, int columnInView )
 	{
 		final int row = table.convertRowIndexToModel( rowInView );
 
@@ -181,7 +181,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private void createTable()
     {
-		table = TableUtils.jTableFromSegmentList( tableRowsModel.getTableRows() );
+		table = TableUtils.jTableFromTableRows( tableRowsModel.getTableRows() );
 
 		table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
         table.setFillsViewportHeight( true );
@@ -189,11 +189,14 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
         table.setRowSelectionAllowed( true );
 		table.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
 
-		scrollPane = new JScrollPane( table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane = new JScrollPane(
+				table,
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
         this.add( scrollPane );
         table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 
-		columnsMinMaxMap = new HashMap<>();
     }
 
 	private void createMenuBar()
@@ -204,7 +207,18 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		menuBar.add( createColoringMenu() );
 
+		menuBar.add( createMeasureMenu() );
+
 		menuBar.add( createHelpMenu() );
+	}
+
+	private JMenu createMeasureMenu()
+	{
+		JMenu menu = new JMenu( "Measure" );
+
+		addMeasureSimilarityMenuItem( menu );
+
+		return menu;
 	}
 
 	private JMenu createHelpMenu()
@@ -250,7 +264,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private JMenuItem assignValueMenuItem()
 	{
-		assignObjectAttributesUI = new AssignValuesToTableRowsUI( this );
+		assignObjectAttributesUI = new AssignValuesToTableRowsDialog( this );
 
 		final JMenuItem menuItem = new JMenuItem( "Assign Value to Selected Objects..." );
 
@@ -334,17 +348,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	}
 
 
-	public double[] getValueRange( String column )
-	{
-		if ( ! columnsMinMaxMap.containsKey( column ) )
-		{
-			final double[] minMaxValues = TableUtils.determineMinMaxValues( column, table );
-			columnsMinMaxMap.put( column, minMaxValues );
-		}
-
-		return columnsMinMaxMap.get( column );
-	}
-
 	public void moveToRowInView( int rowInView )
 	{
 		recentlyMovedToRowInView = rowInView;
@@ -414,85 +417,56 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		moveToRowInView( rowInView );
 	}
 
+
+
 	private JMenu createColoringMenu()
 	{
-		JMenu coloringMenu = new JMenu( "Color by" );
+		JMenu coloringMenu = new JMenu( "Color" );
 
-		for ( int col = 0; col < table.getColumnCount(); col++ )
-		{
-			coloringMenu.add( createColorByColumnMenuItem( table.getColumnName( col ) ) );
-		}
+		addColorByColumnMenuItem( coloringMenu );
 
 		return coloringMenu;
 	}
 
-	private JMenuItem createColorByColumnMenuItem( final String column )
+	private void addColorByColumnMenuItem( JMenu coloringMenu )
 	{
-		final JMenuItem colorByColumnMenuItem = new JMenuItem( column );
+		final JMenuItem menuItem = new JMenuItem( "Color by Column..." );
 
-		colorByColumnMenuItem.addActionListener( e -> {
-			new Thread( () -> colorBy( column ) ).start();
-		} );
+		this.colorByColumnDialog = new ColorByColumnDialog();
 
-		return colorByColumnMenuItem;
+		menuItem.addActionListener( e ->
+				new Thread( () ->
+						colorByColumnDialog.showDialog(
+								table,
+								selectionColoringModel ) ).start() );
+
+		coloringMenu.add( menuItem );
 	}
 
-	public void colorBy( String columnName )
+	private void addMeasureSimilarityMenuItem( JMenu menu )
 	{
-		// TODO: clean this up
-		// this suffers from the fact that I do not know
-		// the column classes...
-		// and even if, some are numeric but should be treated
-		// categorical
+		final JMenuItem menuItem = new JMenuItem( "Measure Similarity..." );
 
-		final int columnIndex = table.getColumnModel().getColumnIndex( columnName );
+		this.measureSimilarityDialog = new MeasureSimilarityDialog();
 
-		if ( Number.class.isAssignableFrom( table.getColumnClass( columnIndex ) )
-				&& ! categoricalColumnNames.contains( columnName ) )
-		{
+		menuItem.addActionListener( e ->
+				new Thread( () ->
+				{
+					if ( selectionModel.isEmpty() )
+					{
+						IJ.showMessage( "Please select one or more objects." );
+						return;
+					}
+					else
+					{
+						measureSimilarityDialog.showDialog( table, selectionModel.getSelected() );
+					}
+				}
+ 				).start() );
 
-			final double[] valueRange = getValueRange( columnName );
-
-			double[] valueSettings = getValueSettings( columnName, valueRange );
-
-
-			final NumericTableRowColumnColoringModel< T > coloringModel
-					= new NumericTableRowColumnColoringModel< >(
-							columnName,
-							new BlueWhiteRedARGBLut( 1000 ),
-							valueSettings,
-							valueRange
-			);
-
-			selectionColoringModel.setWrappedColoringModel( coloringModel );
-
-			SwingUtilities.invokeLater( () ->
-					new NumericColoringModelDialog( columnName, coloringModel, valueRange ) );
-		}
-		else
-		{
-			final CategoryTableRowColumnColoringModel< T > coloringModel
-					= new CategoryTableRowColumnColoringModel< >(
-							columnName,
-							new GlasbeyARGBLut() );
-
-			selectionColoringModel.setWrappedColoringModel( coloringModel );
-		}
+		menu.add( menuItem );
 	}
 
-	public double[] getValueSettings( String columnName, double[] valueRange )
-	{
-		double[] valueSettings;
-
-		if ( columnColoringRangeSettings.containsKey( columnName ) )
-			valueSettings = columnColoringRangeSettings.get( columnName );
-		else
-			valueSettings = valueRange.clone();
-
-		columnColoringRangeSettings.put( columnName, valueSettings );
-
-		return valueSettings;
-	}
 
 	public void initHelpDialog()
 	{

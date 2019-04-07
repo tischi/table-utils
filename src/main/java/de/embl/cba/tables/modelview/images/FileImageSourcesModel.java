@@ -3,6 +3,7 @@ package de.embl.cba.tables.modelview.images;
 import bdv.util.RandomAccessibleIntervalSource4D;
 import bdv.viewer.Interpolation;
 import bdv.viewer.Source;
+import de.embl.cba.bdv.utils.sources.LazySpimSource;
 import de.embl.cba.bdv.utils.wrap.Wraps;
 import de.embl.cba.tables.Logger;
 import ij.IJ;
@@ -56,19 +57,29 @@ public class FileImageSourcesModel implements ImageSourcesModel
 		metadata.imageSetIDs = imageSetIDs;
 		metadata.displayName = imageDisplayName;
 
-		final FileSource fileSource = new FileSource( metadata, file );
+		if ( file.toString().endsWith( ".xml" ) )
+		{
+			final LazySpimSource lazySpimSource = new LazySpimSource( imageId, file );
+			nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( lazySpimSource, metadata ) );
+		}
+		else
+		{
+			final DefaultImageFileSource defaultImageFileSource = new DefaultImageFileSource( metadata, file );
+			nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( defaultImageFileSource, metadata ) );
+		}
 
-		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( fileSource, metadata ) );
 	}
 
-	class FileSource< R extends RealType< R > & NativeType< R > > implements Source< R >
+
+	// TODO: put somewhere else...maybe bdv-utils?
+	class DefaultImageFileSource< R extends RealType< R > & NativeType< R > > implements Source< R >
 	{
 		private final SourceMetadata metadata;
 		private final File file;
 		private RandomAccessibleIntervalSource4D source;
 		private ImagePlus imagePlus;
 
-		public FileSource( SourceMetadata metadata, File file )
+		public DefaultImageFileSource( SourceMetadata metadata, File file )
 		{
 			this.metadata = metadata;
 			this.file = file;
@@ -98,7 +109,7 @@ public class FileImageSourcesModel implements ImageSourcesModel
 
 		private void loadAndCreateSource()
 		{
-			openImage();
+			openImagePlus();
 
 			metadata.numSpatialDimensions = imagePlus.getNSlices() > 1 ? 3 : 2;
 
@@ -116,7 +127,7 @@ public class FileImageSourcesModel implements ImageSourcesModel
 			source = Wraps.imagePlusAsSource4DChannelList( imagePlus ).get( 0 );
 		}
 
-		private void openImage()
+		private void openImagePlus()
 		{
 			imagePlus = IJ.openImage( file.toString() );
 			if ( imagePlus == null )

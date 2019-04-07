@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
+public class AssignValuesToTableRowsDialog< T extends TableRow > extends JPanel
 {
 	public static final String NEW_ATTRIBUTE = "None";
 	final TableRowsTableView< T > tableView;
@@ -28,7 +28,7 @@ public class AssignValuesToTableRowsUI< T extends TableRow > extends JPanel
 
 	// TODO: make this only work on TableRows (sources rid of TableView dependency)
 
-	public AssignValuesToTableRowsUI( TableRowsTableView tableView )
+	public AssignValuesToTableRowsDialog( TableRowsTableView tableView )
 	{
 		this.tableView = tableView;
 		this.selectedAttributes = new HashSet<>();

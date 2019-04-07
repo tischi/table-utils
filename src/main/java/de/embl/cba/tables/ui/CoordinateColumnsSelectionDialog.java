@@ -14,7 +14,7 @@ import static de.embl.cba.tables.SwingUtils.horizontalLayoutPanel;
 
 public class CoordinateColumnsSelectionDialog
 {
-	private static final String NO_COLUMN_SELECTED = "None";
+	public static final String NO_COLUMN_SELECTED = "None";
 	public static final String IMAGE_SEGMENT_COORDINATE_COLUMN_PREFIX = "ImageSegmentCoordinateColumn.";
 
 	private String[] columnChoices;

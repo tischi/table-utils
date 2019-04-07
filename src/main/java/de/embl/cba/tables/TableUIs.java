@@ -19,11 +19,9 @@ public class TableUIs
 		if( gd.wasCanceled() ) return;
 
 		final String columnName = gd.getNextString();
-
 		final String defaultValueString = gd.getNextString();
 
 		Object defaultValue;
-
 		try	{
 			defaultValue = Double.parseDouble( defaultValueString );
 		}

@@ -69,7 +69,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 		this.selectionModel = selectionModel;
 		this.selectionColoringModel = selectionColoringModel;
 
-		this.voxelSpacing3DView = 0.2; // TODO
+		this.voxelSpacing3DView = 0.1; // TODO
 		this.currentSources = new HashSet<>( );
 		this.labelsARGBConverters = new HashSet<>(  );
 
@@ -467,6 +467,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 				new ImageSegmentId( imageId, labelId, getCurrentTimePoint() );
 
 		final T segment = imageSegmentsModel.getImageSegment( imageSegmentId );
+
+		// TODO
+		// Here one could select several objects based on the clicked object
+		// For example, all objects that have the same numerical or categorical value
+		// final ColoringModel< T > wrappedColoringModel = selectionColoringModel.getWrappedColoringModel();
 
 		selectionModel.toggle( segment );
 
