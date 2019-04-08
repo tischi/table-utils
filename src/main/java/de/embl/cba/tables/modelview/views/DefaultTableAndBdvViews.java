@@ -18,8 +18,8 @@ public class DefaultTableAndBdvViews
 {
 	private final List< TableRowImageSegment > tableRowImageSegments;
 	private final ImageSourcesModel imageSourcesModel;
-	private ImageSegmentsBdvView imageSegmentsBdvView;
-	private TableRowsTableView tableRowsTableView;
+	private ImageSegmentsBdvView< TableRowImageSegment > imageSegmentsBdvView;
+	private TableRowsTableView< TableRowImageSegment > tableRowsTableView;
 
 	public DefaultTableAndBdvViews(
 			List< TableRowImageSegment > tableRowImageSegments,
@@ -57,25 +57,25 @@ public class DefaultTableAndBdvViews
 		final DefaultTableRowsModel< TableRowImageSegment > tableRowsModel
 				= new DefaultTableRowsModel<>( tableRowImageSegments );
 
-		imageSegmentsBdvView = new ImageSegmentsBdvView(
+		imageSegmentsBdvView = new ImageSegmentsBdvView< TableRowImageSegment >(
 				imageSourcesModel,
 				imageSegmentsModel,
 				selectionModel,
 				selectionColoringModel,
 				bdv );
 
-		tableRowsTableView = new TableRowsTableView(
+		tableRowsTableView = new TableRowsTableView< TableRowImageSegment >(
 				tableRowsModel,
 				selectionModel,
 				selectionColoringModel );
 	}
 
-	public ImageSegmentsBdvView getImageSegmentsBdvView()
+	public ImageSegmentsBdvView< TableRowImageSegment > getImageSegmentsBdvView()
 	{
 		return imageSegmentsBdvView;
 	}
 
-	public TableRowsTableView getTableRowsTableView()
+	public TableRowsTableView< TableRowImageSegment > getTableRowsTableView()
 	{
 		return tableRowsTableView;
 	}

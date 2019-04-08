@@ -32,7 +32,7 @@ import java.util.*;
 import static de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter.BACKGROUND;
 import static de.embl.cba.tables.modelview.images.SourceMetadata.*;
 
-public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< R > >
+public class ImageSegmentsBdvView < T extends ImageSegment >
 {
 	private String selectTrigger = "ctrl button1";
 	private String selectNoneTrigger = "ctrl N";
@@ -54,7 +54,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 	private ViewerState recentViewerState;
 	private List< ConverterSetup > recentConverterSetups;
 	private double voxelSpacing3DView;
-	private Set< SourceAndMetadata< R > > currentSources;
+	private Set< SourceAndMetadata< ? extends RealType< ? > > > currentSources;
 	private Set< LabelsARGBConverter > labelsARGBConverters;
 	private boolean grayValueOverlayWasFirstSource;
 	//private boolean hasGrayValueOverlay;
@@ -357,9 +357,9 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 		BdvUtils.removeSource( bdv, bdvStackSource );
 	}
 
-	public Set< SourceAndMetadata > getCurrentSources()
+	public ArrayList< SourceAndMetadata< ? extends RealType< ? > > > getCurrentSources()
 	{
-		return Collections.unmodifiableSet( currentSources );
+		return new ArrayList<>( currentSources );
 	}
 
 	private void removeSources()
@@ -386,7 +386,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 		}
 	}
 
-	private Source asLabelSource( SourceAndMetadata< R > sourceAndMetadata )
+	private Source asLabelSource( SourceAndMetadata< ? extends RealType< ? > > sourceAndMetadata )
 	{
 		LabelsARGBConverter labelsARGBConverter;
 
