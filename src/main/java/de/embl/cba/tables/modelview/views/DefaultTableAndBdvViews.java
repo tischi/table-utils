@@ -1,5 +1,7 @@
 package de.embl.cba.tables.modelview.views;
 
+import bdv.util.Bdv;
+import bdv.util.BdvHandle;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.modelview.coloring.LazyCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
@@ -23,12 +25,20 @@ public class DefaultTableAndBdvViews
 			List< TableRowImageSegment > tableRowImageSegments,
 			ImageSourcesModel imageSourcesModel )
 	{
-		this.tableRowImageSegments = tableRowImageSegments;
-		this.imageSourcesModel = imageSourcesModel;
-		show();
+		this( tableRowImageSegments, imageSourcesModel, null );
 	}
 
-	private void show( )
+	public DefaultTableAndBdvViews(
+			List< TableRowImageSegment > tableRowImageSegments,
+			ImageSourcesModel imageSourcesModel,
+			BdvHandle bdv )
+	{
+		this.tableRowImageSegments = tableRowImageSegments;
+		this.imageSourcesModel = imageSourcesModel;
+		show( bdv );
+	}
+
+	private void show( BdvHandle bdv )
 	{
 		final SelectionModel< TableRowImageSegment > selectionModel
 				= new DefaultSelectionModel<>();
@@ -51,7 +61,8 @@ public class DefaultTableAndBdvViews
 				imageSourcesModel,
 				imageSegmentsModel,
 				selectionModel,
-				selectionColoringModel );
+				selectionColoringModel,
+				bdv );
 
 		tableRowsTableView = new TableRowsTableView(
 				tableRowsModel,

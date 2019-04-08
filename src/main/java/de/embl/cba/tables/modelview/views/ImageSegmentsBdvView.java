@@ -10,12 +10,14 @@ import de.embl.cba.bdv.utils.objects3d.ConnectedComponentExtractorAnd3DViewer;
 import de.embl.cba.bdv.utils.overlays.BdvGrayValuesOverlay;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.*;
+import de.embl.cba.tables.modelview.combined.DefaultImageSegmentsModel;
 import de.embl.cba.tables.modelview.combined.ImageSegmentsModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
 import de.embl.cba.tables.modelview.images.SourceMetadata;
 import de.embl.cba.tables.modelview.images.SourceAndMetadata;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentId;
+import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import net.imglib2.RealPoint;
@@ -25,7 +27,6 @@ import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
 import org.scijava.ui.behaviour.util.Behaviours;
 
-import javax.swing.*;
 import java.util.*;
 
 import static de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter.BACKGROUND;
@@ -48,7 +49,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 	private BdvHandle bdv;
 	private String name = "TODO";
 	private BdvOptions bdvOptions;
-	private SourceAndMetadata currentSegmentsModelLabelSource;
+	private SourceAndMetadata activeLabelSource;
 	private T recentFocus;
 	private ViewerState recentViewerState;
 	private List< ConverterSetup > recentConverterSetups;
@@ -64,10 +65,27 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 			final SelectionModel< T > selectionModel,
 			final SelectionColoringModel< T > selectionColoringModel)
 	{
+
+		this(	imageSourcesModel,
+				imageSegmentsModel,
+				selectionModel,
+				selectionColoringModel,
+				null );
+	}
+
+
+	public ImageSegmentsBdvView(
+			final ImageSourcesModel imageSourcesModel,
+			final ImageSegmentsModel< T > imageSegmentsModel,
+			final SelectionModel< T > selectionModel,
+			final SelectionColoringModel< T > selectionColoringModel,
+			BdvHandle bdv )
+	{
 		this.imageSourcesModel = imageSourcesModel;
 		this.imageSegmentsModel = imageSegmentsModel;
 		this.selectionModel = selectionModel;
 		this.selectionColoringModel = selectionColoringModel;
+		this.bdv = bdv;
 
 		this.voxelSpacing3DView = 0.1; // TODO
 		this.currentSources = new HashSet<>( );
@@ -77,13 +95,14 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 
 		showInitialSources();
 
-		// addGrayValueOverlay();
+		addGrayValueOverlay();
 
 		registerAsSelectionListener( selectionModel );
 
 		registerAsColoringListener( selectionColoringModel );
 
 		installBdvBehaviours();
+
 	}
 
 	public void addGrayValueOverlay()
@@ -160,7 +179,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 
 	public synchronized void centerBdvOnSegment( ImageSegment imageSegment )
 	{
-		showSegmentImage( imageSegment );
+		showSegmentImageSet( imageSegment );
 
 		bdv.getBdvHandle().getViewerPanel().setTimepoint( imageSegment.timePoint() );
 
@@ -173,16 +192,25 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 				500 );
 	}
 
-	private void showSegmentImage( ImageSegment imageSegment )
+	private void showSegmentImageSet( ImageSegment imageSegment )
 	{
 		final String imageId = imageSegment.imageId();
 
-		if ( currentSegmentsModelLabelSource.metadata().imageId.equals( imageId ) ) return;
+		if ( activeLabelSource.metadata().imageId.equals( imageId ) )
+		{
+			return;
+		}
+		else
+		{
+			// Replace sources, because the selected image segment
+			// belongs to another image set of the same data set
+			//
 
-		final SourceAndMetadata sourceAndMetadata
-				= imageSourcesModel.sources().get( imageId );
+			final SourceAndMetadata sourceAndMetadata
+					= imageSourcesModel.sources().get( imageId );
 
-		showSourceSet( sourceAndMetadata, true );
+			showSourceSet( sourceAndMetadata, true );
+		}
 	}
 
 	public void setVoxelSpacing3DView( double voxelSpacing3DView )
@@ -279,11 +307,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 		final SourceMetadata metadata = sourceAndMetadata.metadata();
 		Source< ? > source = sourceAndMetadata.source();
 
-		if ( metadata.flavour == Flavour.LabelSource
-				|| metadata.flavour == Flavour.LabelSourceWithoutAnnotations )
-		{
+		if ( metadata.flavour == Flavour.LabelSource )
 			source = asLabelSource( sourceAndMetadata );
-		}
 
 		bdvOptions = bdvOptions.sourceTransform( metadata.sourceTransform );
 
@@ -365,20 +390,21 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 	{
 		LabelsARGBConverter labelsARGBConverter;
 
-		if ( sourceAndMetadata.metadata().flavour.equals(
-				Flavour.LabelSourceWithoutAnnotations ) )
+		if ( sourceAndMetadata.metadata().segmentsTable == null )
 		{
 			labelsARGBConverter = new LazyLabelsARGBConverter();
 		}
 		else
 		{
-			currentSegmentsModelLabelSource = sourceAndMetadata;
+			// TODO: implement different logic of what is the active label source
+			activeLabelSource = sourceAndMetadata;
 
 			labelsARGBConverter =
 					new ImageSegmentLabelsARGBConverter(
 							imageSegmentsModel,
 							sourceAndMetadata.metadata().imageId,
 							selectionColoringModel );
+
 		}
 
 		labelsARGBConverters.add( labelsARGBConverter );
@@ -391,9 +417,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 		bdvOptions = BdvOptions.options();
 
 		if ( imageSourcesModel.is2D() )
-		{
 			bdvOptions = bdvOptions.is2D();
-		}
+
+		if ( bdv != null )
+			bdvOptions = bdvOptions.addTo( bdv );
 	}
 
 	private void installBdvBehaviours()
@@ -455,13 +482,13 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 
 	private synchronized void toggleSelectionAtMousePosition()
 	{
-		if ( currentSegmentsModelLabelSource == null ) return;
+		if ( activeLabelSource == null ) return;
 
-		final double labelId = getLabelIdAtCurrentMouseCoordinates();
+		final double labelId = getLabelIdAtCurrentMouseCoordinates( activeLabelSource );
 
 		if ( labelId == BACKGROUND ) return;
 
-		final String imageId = currentSegmentsModelLabelSource.metadata().imageId;
+		final String imageId = activeLabelSource.metadata().imageId;
 
 		final ImageSegmentId imageSegmentId =
 				new ImageSegmentId( imageId, labelId, getCurrentTimePoint() );
@@ -482,7 +509,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 		}
 	}
 
-	private double getLabelIdAtCurrentMouseCoordinates()
+	private double getLabelIdAtCurrentMouseCoordinates( SourceAndMetadata activeLabelSource )
 	{
 		final RealPoint globalMouseCoordinates =
 				BdvUtils.getGlobalMouseCoordinates( bdv );
@@ -490,7 +517,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 		System.out.println( "Finding pixel value at " + globalMouseCoordinates );
 
 		final Double value = BdvUtils.getValueAtGlobalCoordinates(
-				currentSegmentsModelLabelSource.source(),
+				activeLabelSource.source(),
 				globalMouseCoordinates,
 				getCurrentTimePoint() );
 
@@ -517,19 +544,29 @@ public class ImageSegmentsBdvView < T extends ImageSegment, R extends RealType< 
 				name + "-iterate-selection", iterateSelectionModeTrigger );
 	}
 
-	private void install3DViewBehaviour( )
+	private void install3DViewBehaviour()
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
+
 				new Thread( () -> {
-					if ( getLabelIdAtCurrentMouseCoordinates() != BACKGROUND )
-						viewObjectAtCurrentMouseCoordinatesIn3D();
-					}).start(),
+
+					if ( this.activeLabelSource == null ) return;
+
+					final SourceAndMetadata labelSource = this.activeLabelSource;
+
+					if ( getLabelIdAtCurrentMouseCoordinates( labelSource ) != BACKGROUND )
+					{
+						viewObjectAtCurrentMouseCoordinatesIn3D( labelSource );
+					}
+
+				}).start(),
 				name + "-view-3d", viewIn3DTrigger );
 	}
 
-	private synchronized void viewObjectAtCurrentMouseCoordinatesIn3D()
+	private synchronized void viewObjectAtCurrentMouseCoordinatesIn3D(
+			SourceAndMetadata activeLabelSource )
 	{
-		new ConnectedComponentExtractorAnd3DViewer( currentSegmentsModelLabelSource.source() )
+		new ConnectedComponentExtractorAnd3DViewer( activeLabelSource.source() )
 				.extractAndShowIn3D(
 						BdvUtils.getGlobalMouseCoordinates( bdv ),
 						voxelSpacing3DView );

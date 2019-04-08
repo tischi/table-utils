@@ -3,6 +3,7 @@ import bdv.util.BdvStackSource;
 import net.imglib2.realtransform.AffineTransform3D;
 
 import java.awt.Color;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,11 +28,11 @@ public class SourceMetadata
 	public Color displayColor = Color.white;
 	public BdvStackSource bdvStackSource = null;
 	public AffineTransform3D sourceTransform = new AffineTransform3D();
+	public File segmentsTable = null;
 
 	public enum Flavour
 	{
 		LabelSource,
-		LabelSourceWithoutAnnotations,
 		IntensitySource
 	}
 

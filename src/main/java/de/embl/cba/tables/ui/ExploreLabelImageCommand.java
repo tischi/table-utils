@@ -14,7 +14,6 @@ import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.modelview.views.ImageSegmentsBdvView;
 import ij.ImagePlus;
-import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
@@ -81,7 +80,7 @@ public class ExploreLabelImageCommand < R extends RealType< R > > implements Com
 
 		Logger.info( "Adding to image sources: " + labelImageId );
 
-		imageSourcesModel.addSource(
+		imageSourcesModel.addSourceAndMetadata(
 				Wraps.imagePlusAsSource4DChannelList( labelImage ).get( 0 ),
 				labelImageId,
 				SourceMetadata.Flavour.LabelSource,
@@ -97,7 +96,7 @@ public class ExploreLabelImageCommand < R extends RealType< R > > implements Com
 
 			Logger.info( "Adding to image sources: " + intensityImageId );
 
-			imageSourcesModel.addSource(
+			imageSourcesModel.addSourceAndMetadata(
 					Wraps.imagePlusAsSource4DChannelList( intensityImage ).get( 0 ),
 					intensityImageId,
 					SourceMetadata.Flavour.IntensitySource,

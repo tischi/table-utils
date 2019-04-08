@@ -88,7 +88,7 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 
 		Logger.info( "Adding to image sources: " + labelImageId );
 
-		imageSourcesModel.addSource(
+		imageSourcesModel.addSourceAndMetadata(
 				Wraps.imagePlusAsSource4DChannelList( labelImage ).get( 0 ),
 				labelImageId,
 				SourceMetadata.Flavour.LabelSource,
@@ -104,7 +104,7 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 
 			Logger.info( "Adding to image sources: " + intensityImageId );
 
-			imageSourcesModel.addSource(
+			imageSourcesModel.addSourceAndMetadata(
 					Wraps.imagePlusAsSource4DChannelList( intensityImage ).get( 0 ),
 					intensityImageId,
 					SourceMetadata.Flavour.IntensitySource,
