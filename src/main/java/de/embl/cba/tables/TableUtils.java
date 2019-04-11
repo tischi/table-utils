@@ -635,6 +635,11 @@ public class TableUtils
 	public static double[] meanSigma( String column, JTable table )
 	{
 		final int columnIndex = table.getColumnModel().getColumnIndex( column );
+		return meanSigma( columnIndex, table );
+	}
+
+	public static double[] meanSigma( int columnIndex, JTable table )
+	{
 		final int rowCount = table.getRowCount();
 
 		double mean = 0.0;

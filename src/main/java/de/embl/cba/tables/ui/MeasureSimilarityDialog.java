@@ -17,10 +17,20 @@ public class MeasureSimilarityDialog< T extends TableRow >
 
 	public static final String L1_NORM = "L1 Norm";
 	public static final String L2_NORM = "L2 Norm";
+	private static final String Z_SCORE = "Column-wise Z-Score";
 
 
+	JTable table;
 	private Map< String, SummaryStatistics > columnNameToSummaryStatistics;
 	private String selectedMetric;
+	private String selectedNorm;
+	private double[] selectedColumnMeans;
+	private double[] selectedColumnSigmas;
+	private int[] selectedColumnIndices;
+	private ArrayList< String > selectedColumnNames;
+	private String newColumnName;
+	private String columnSelectionRegExp;
+	private Double[] distances;
 
 	public MeasureSimilarityDialog( )
 	{
@@ -30,69 +40,104 @@ public class MeasureSimilarityDialog< T extends TableRow >
 
 	public void showDialog( JTable table, Set< T > selectedRows )
 	{
+		this.table = table;
+
+		if ( initChoicesFromDialog( ) ) return;
+
+		configSelectedColumns( );
+
+		if ( selectedNorm.equals( Z_SCORE ))
+			computeSelectedColumnMeansAndSigmas( );
+
+		final double[] referenceVector = computeReferenceVector( selectedRows );
+
+		if ( selectedMetric.equals( L2_NORM ) )
+			distances = distances( referenceVector );
+
+		( ( DefaultTableModel ) table.getModel() ).addColumn( newColumnName, distances );
+
+	}
+
+	private boolean initChoicesFromDialog()
+	{
+		final String[] norms = new String[]
+				{
+						Z_SCORE
+				};
+
 
 		final String[] metrics = new String[]
 				{
 						L2_NORM
 				};
 
+
 		final GenericDialog gd = new GenericDialog( "Measure Similarity" );
 		gd.addStringField( "Column RegExp", ".*", 20 );
+
 		if ( selectedMetric == null ) selectedMetric = metrics[ 0 ];
 		gd.addChoice( "Metric", metrics, selectedMetric );
+
+		if ( selectedNorm == null ) selectedNorm = norms[ 0 ];
+		gd.addChoice( "Normalisation", norms, selectedMetric );
+
 		gd.addStringField( "New Column Name", "Similarity", 20 );
 
 		gd.showDialog();
-		if ( gd.wasCanceled() ) return;
+		if ( gd.wasCanceled() ) return true;
 
-		final String columnNameRegExp = gd.getNextString();
+		columnSelectionRegExp = gd.getNextString();
 		selectedMetric = gd.getNextChoice();
-		final String newColumnName = gd.getNextString();
+		newColumnName = gd.getNextString();
+		return false;
+	}
 
-		final ArrayList< String > selectedColumnNames =
-				getSelectedColumnNames( table, columnNameRegExp );
+	private void computeSelectedColumnMeansAndSigmas( )
+	{
+		final int n = selectedColumnIndices.length;
+		selectedColumnMeans = new double[ n ];
+		selectedColumnSigmas = new double[ n ];
+
+		for ( int i = 0; i < n; ++i )
+		{
+			final SummaryStatistics summaryStatistics =
+					getSummaryStatistics( table, selectedColumnNames.get( i ) );
+
+			selectedColumnMeans[ i ] = summaryStatistics.mean;
+			selectedColumnSigmas[ i ] = summaryStatistics.sigma;
+		}
+	}
+
+	private void configSelectedColumns( )
+	{
+		selectedColumnNames = getSelectedColumnNames( table, columnSelectionRegExp );
 
 		final int n = selectedColumnNames.size();
-		final int[] selectedColumnIndices = new int[ n ];
-
-		double[] means = new double[ n ];
-		double[] sigmas = new double[ n ];
+		selectedColumnIndices = new int[ n ];
 
 		for ( int i = 0; i < n; ++i )
 		{
 			selectedColumnIndices[ i ] =
 					table.getColumnModel().getColumnIndex( selectedColumnNames.get( i ) );
-
-			final SummaryStatistics summaryStatistics =
-					getSummaryStatistics( table, selectedColumnNames.get( i ) );
-
-			means[ i ] = summaryStatistics.mean;
-			sigmas[ i ] = summaryStatistics.sigma;
 		}
 
+	}
 
+	private double[] computeReferenceVector( Set< T > selectedRows )
+	{
 		final ArrayList< double[] > normVectors = new ArrayList<>();
 		for ( T tableRow : selectedRows )
 		{
-			final double[] normVector = getNormalisedRowVector(
-					table, tableRow.rowIndex(), selectedColumnIndices, means, sigmas );
+			final double[] normVector = getZScoreNormalisedRowVector(
+					table, tableRow.rowIndex(), selectedColumnIndices, columnMeans, columnSigmas );
 
 			normVectors.add( normVector );
 		}
 
-		final double[] avgNormVector = computeAverageVector( normVectors );
-
-
-		final Double[] distances =
-				computDistances( table, selectedColumnIndices, means, sigmas, avgNormVector );
-
-		( ( DefaultTableModel ) table.getModel() ).addColumn( newColumnName , distances );
-
-
-
+		return computeAverageVector( normVectors );
 	}
 
-	public double[] computeAverageVector( ArrayList< double[] > normVectors )
+	private double[] computeAverageVector( ArrayList< double[] > normVectors )
 	{
 		int n = normVectors.size();
 		final double[] avgNormVector = new double[ n ];
@@ -105,23 +150,26 @@ public class MeasureSimilarityDialog< T extends TableRow >
 		return avgNormVector;
 	}
 
-	public Double[] computDistances( JTable table, int[] selectedColumnIndices, double[] means, double[] sigmas, double[] avgNormVector )
+	private Double[] distances( double[] referenceVector )
 	{
-		final Double[] distances = new Double[ table.getRowCount() ];
+		final int rowCount = table.getRowCount();
 
-		for ( int rowIndex = 0; rowIndex < table.getRowCount(); ++rowIndex )
+		final Double[] distances = new Double[ rowCount ];
+
+		for ( int rowIndex = 0; rowIndex < rowCount; ++rowIndex )
 		{
-			final double[] rowVector = getNormalisedRowVector(
-					table, rowIndex, selectedColumnIndices, means, sigmas );
+			final double[] rowVector = getZScoreNormalisedRowVector(
+					table, rowIndex, selectedColumnIndices, selectedColumnMeans, selectedColumnSigmas );
 
-			double distance = getDistance( rowVector, avgNormVector );
+			double distance = l2Distance( rowVector, referenceVector );
 
 			distances[ rowIndex ] = distance;
 		}
+
 		return distances;
 	}
 
-	public double getDistance( double[] rowVector, double[] avgNormVector )
+	private double l2Distance( double[] rowVector, double[] avgNormVector )
 	{
 		int n = rowVector.length ;
 		double distance = 0.0;
@@ -131,25 +179,36 @@ public class MeasureSimilarityDialog< T extends TableRow >
 		return distance;
 	}
 
-	public double[] getNormalisedRowVector(
+	private double[] getZScoreNormalisedRowVector(
 			final JTable table,
 			final int rowIndex,
 			final int[] selectedColumnIndices,
 			final double[] means,
 			final double[] sigmas )
 	{
-		int n = selectedColumnIndices.length;
+		final double[] rawVector = getRowVector( table, rowIndex, selectedColumnIndices );
 
-		final double[] rawVector = new double[ n ];
-		for ( int i = 0; i < n; ++i )
-			rawVector[ i ] = ( Double ) table
-					.getValueAt( rowIndex, selectedColumnIndices[ i ] );
+		final double[] normVector = zScoreNormalisation( means, sigmas, rawVector );
 
+		return normVector;
+	}
+
+	private double[] zScoreNormalisation( double[] means, double[] sigmas, double[] rawVector )
+	{
+		int n = rawVector.length;
 		final double[] normVector = new double[ n ];
 		for ( int i = 0; i < n; ++i )
 			normVector[ i ] =  ( rawVector[ i ] - means[ i ] ) / sigmas[ i ];
-
 		return normVector;
+	}
+
+	private double[] getRowVector( JTable table, int rowIndex, int[] selectedColumnIndices )
+	{
+		int n = selectedColumnIndices.length;
+		final double[] rawVector = new double[ n ];
+		for ( int i = 0; i < n; ++i )
+			rawVector[ i ] = ( Double ) table.getValueAt( rowIndex, selectedColumnIndices[ i ] );
+		return rawVector;
 	}
 
 	private SummaryStatistics getSummaryStatistics( JTable table, String columnName )
@@ -169,7 +228,7 @@ public class MeasureSimilarityDialog< T extends TableRow >
 		return columnNameToSummaryStatistics.get( columnName );
 	}
 
-	public ArrayList< String > getSelectedColumnNames( JTable table, String columnNameRegExp )
+	private ArrayList< String > getSelectedColumnNames( JTable table, String columnNameRegExp )
 	{
 		final List< String > columnNames = TableUtils.getColumnNames( table );
 
