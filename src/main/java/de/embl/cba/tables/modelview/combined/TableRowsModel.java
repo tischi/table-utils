@@ -8,4 +8,6 @@ import java.util.List;
 public interface TableRowsModel < T extends TableRow >
 {
 	List< T > getTableRows();
+
+	String getName();
 }

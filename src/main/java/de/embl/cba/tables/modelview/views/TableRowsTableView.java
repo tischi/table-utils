@@ -300,34 +300,22 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
     public void createTableUIAndShow()
 	{
-		try
-		{
-			SwingUtilities.invokeAndWait( () ->
-			{
-				frame = new JFrame( "Table" );
+		frame = new JFrame( tableRowsModel.getName() );
 
-				createMenuBar();
+		createMenuBar();
 
-				frame.setJMenuBar( menuBar );
+		frame.setJMenuBar( menuBar );
 
-				//Show the table
-				//frame.add( scrollPane );
+		//Show the table
+		//frame.add( scrollPane );
 
-				//Create and set up the content pane.
-				this.setOpaque( true ); //content panes must be opaque
-				frame.setContentPane( this );
+		//Create and set up the content pane.
+		this.setOpaque( true ); //content panes must be opaque
+		frame.setContentPane( this );
 
-				//Display the window.
-				frame.pack();
-				frame.setVisible( true );
-			});
-		} catch ( InterruptedException e )
-		{
-			e.printStackTrace();
-		} catch ( InvocationTargetException e )
-		{
-			e.printStackTrace();
-		}
+		//Display the window.
+		frame.pack();
+		frame.setVisible( true );
 	}
 
 	public void addColumn( String column, Object defaultValue )
@@ -361,31 +349,28 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	public void registerAsListSelectionListener()
 	{
 		table.getSelectionModel().addListSelectionListener( e ->
-		{
-			SwingUtilities.invokeLater( () ->
-			{
-				if ( e.getValueIsAdjusting() ) return;
+				SwingUtilities.invokeLater( () ->
+				{
+					if ( e.getValueIsAdjusting() ) return;
 
-				final int selectedRowInView = table.getSelectedRow();
+					final int selectedRowInView = table.getSelectedRow();
 
-				if ( selectedRowInView == -1 ) return;
+					if ( selectedRowInView == -1 ) return;
 
-				if ( selectedRowInView == recentlyMovedToRowInView ) return;
+					if ( selectedRowInView == recentlyMovedToRowInView ) return;
 
-				recentlySelectedRowInView = selectedRowInView;
+					recentlySelectedRowInView = selectedRowInView;
 
-				final int row = table.convertRowIndexToModel( recentlySelectedRowInView );
+					final int row = table.convertRowIndexToModel( recentlySelectedRowInView );
 
-				final T object = tableRowsModel.getTableRows().get( row );
+					final T object = tableRowsModel.getTableRows().get( row );
 
-				selectionModel.toggle( object );
-				if ( selectionModel.isSelected( object ) )
-					selectionModel.focus( object );
+					selectionModel.toggle( object );
+					if ( selectionModel.isSelected( object ) )
+						selectionModel.focus( object );
 
-				table.repaint();
-			});
-
-		});
+					table.repaint();
+				}) );
 	}
 
 	public void registerAsSelectionListener( SelectionModel< T > selectionModel )

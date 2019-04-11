@@ -1,6 +1,5 @@
 package de.embl.cba.tables.modelview.views;
 
-import bdv.util.Bdv;
 import bdv.util.BdvHandle;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.modelview.coloring.LazyCategoryColoringModel;
@@ -18,23 +17,27 @@ public class DefaultTableAndBdvViews
 {
 	private final List< TableRowImageSegment > tableRowImageSegments;
 	private final ImageSourcesModel imageSourcesModel;
+	private final String viewName;
 	private ImageSegmentsBdvView< TableRowImageSegment > imageSegmentsBdvView;
 	private TableRowsTableView< TableRowImageSegment > tableRowsTableView;
 
 	public DefaultTableAndBdvViews(
 			List< TableRowImageSegment > tableRowImageSegments,
-			ImageSourcesModel imageSourcesModel )
+			ImageSourcesModel imageSourcesModel,
+			String viewName )
 	{
-		this( tableRowImageSegments, imageSourcesModel, null );
+		this( tableRowImageSegments, imageSourcesModel, viewName, null );
 	}
 
 	public DefaultTableAndBdvViews(
 			List< TableRowImageSegment > tableRowImageSegments,
 			ImageSourcesModel imageSourcesModel,
+			String viewName,
 			BdvHandle bdv )
 	{
 		this.tableRowImageSegments = tableRowImageSegments;
 		this.imageSourcesModel = imageSourcesModel;
+		this.viewName = viewName;
 		show( bdv );
 	}
 
@@ -55,7 +58,7 @@ public class DefaultTableAndBdvViews
 				= new DefaultImageSegmentsModel<>( tableRowImageSegments );
 
 		final DefaultTableRowsModel< TableRowImageSegment > tableRowsModel
-				= new DefaultTableRowsModel<>( tableRowImageSegments );
+				= new DefaultTableRowsModel<>( tableRowImageSegments, viewName );
 
 		imageSegmentsBdvView = new ImageSegmentsBdvView< TableRowImageSegment >(
 				imageSourcesModel,

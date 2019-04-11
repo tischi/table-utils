@@ -58,7 +58,7 @@ public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R
 						tablePath,
 						true ).getImageSourcesModel();
 
-		new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel );
+		new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel, inputTableFile.getName() );
 	}
 
 	private List< TableRowImageSegment > createAnnotatedImageSegments( File tableFile )

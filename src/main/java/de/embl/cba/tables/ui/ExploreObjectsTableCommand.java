@@ -67,7 +67,7 @@ public class ExploreObjectsTableCommand implements Command
 						is2D ).getImageSourcesModel();
 
 		final DefaultTableAndBdvViews views =
-				new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel );
+				new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel, tableFile.getName() );
 
 		views.getTableRowsTableView().categoricalColumnNames().add(
 				coordinateToColumnName.get( ImageSegmentCoordinate.ObjectLabel ) );

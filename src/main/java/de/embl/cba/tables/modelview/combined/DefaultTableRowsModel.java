@@ -10,15 +10,23 @@ public class DefaultTableRowsModel< T extends TableRow > implements TableRowsMod
 	// TODO: add columnTypes here?
 
 	private final List< T > tableRows;
+	private final String tableName;
 
-	public DefaultTableRowsModel( List< T > tableRows )
+	public DefaultTableRowsModel( List< T > tableRows, String tableName )
 	{
 		this.tableRows = tableRows;
+		this.tableName = tableName;
 	}
 
 	@Override
 	public List< T > getTableRows()
 	{
 		return tableRows;
+	}
+
+	@Override
+	public String getName()
+	{
+		return tableName;
 	}
 }

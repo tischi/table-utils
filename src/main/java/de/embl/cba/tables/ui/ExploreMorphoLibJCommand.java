@@ -77,7 +77,7 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 		final ImageSourcesModel imageSourcesModel = createImageSourcesModel();
 
 		final DefaultTableAndBdvViews views =
-				new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel );
+				new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel, resultsTableTitle );
 
 		views.getTableRowsTableView().categoricalColumnNames().add( LABEL );
 	}
