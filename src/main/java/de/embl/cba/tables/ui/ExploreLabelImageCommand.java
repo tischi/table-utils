@@ -19,6 +19,8 @@ import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
+import java.io.File;
+
 
 @Plugin(type = Command.class,
 		menuPath = "Plugins>Segmentation>Explore>Explore Label Image" )
@@ -85,7 +87,8 @@ public class ExploreLabelImageCommand < R extends RealType< R > > implements Com
 				labelImageId,
 				SourceMetadata.Flavour.LabelSource,
 				getNumSpatialDimensions( labelImage.getNSlices() ),
-				Calibrations.getScalingTransform( labelImage )
+				Calibrations.getScalingTransform( labelImage ),
+				null
 		);
 
 		imageSourcesModel.sources().get( labelImageId ).metadata().showInitially = true;
@@ -101,7 +104,8 @@ public class ExploreLabelImageCommand < R extends RealType< R > > implements Com
 					intensityImageId,
 					SourceMetadata.Flavour.IntensitySource,
 					getNumSpatialDimensions( intensityImage.getNSlices() ),
-					Calibrations.getScalingTransform( intensityImage )
+					Calibrations.getScalingTransform( intensityImage ),
+					null
 			);
 
 			imageSourcesModel.sources().get( labelImageId )

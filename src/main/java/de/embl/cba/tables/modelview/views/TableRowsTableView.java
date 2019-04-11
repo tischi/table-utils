@@ -173,8 +173,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			return ColorUtils.getColor( argbType );
 	}
 
-	public void registerAsColoringListener(
-			SelectionColoringModel< T > selectionColoringModel )
+	public void registerAsColoringListener( SelectionColoringModel< T > selectionColoringModel )
 	{
 		selectionColoringModel.listeners().add( () -> table.repaint( ) );
 	}

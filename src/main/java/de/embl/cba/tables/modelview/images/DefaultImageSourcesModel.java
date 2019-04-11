@@ -4,6 +4,7 @@ import bdv.viewer.Source;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.RealType;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,13 +38,16 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 																  String imageId,
 																  Flavour flavor,
 																  int numSpatialDimensions,
-																  AffineTransform3D transform )
+																  AffineTransform3D transform,
+																  File segmentsTable // TODO: what to do here if the table is not from a file?
+	)
 	{
 
 		final SourceMetadata metadata = new SourceMetadata( imageId );
 		metadata.flavour = flavor;
 		metadata.numSpatialDimensions = numSpatialDimensions;
 		metadata.sourceTransform = transform;
+		metadata.segmentsTable = segmentsTable;
 
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( source, metadata ) );
 	}

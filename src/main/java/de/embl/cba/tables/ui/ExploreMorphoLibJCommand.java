@@ -21,6 +21,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 import java.awt.*;
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -93,8 +94,9 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 				labelImageId,
 				SourceMetadata.Flavour.LabelSource,
 				numSpatialDimensions,
-				Calibrations.getScalingTransform( labelImage )
-				);
+				Calibrations.getScalingTransform( labelImage ),
+				new File("") // TODO: If this was null BdvSegmentsView thinks there is no table at all...
+		);
 
 		imageSourcesModel.sources().get( labelImageId ).metadata().showInitially = true;
 
@@ -109,7 +111,8 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 					intensityImageId,
 					SourceMetadata.Flavour.IntensitySource,
 					numSpatialDimensions,
-					Calibrations.getScalingTransform( intensityImage )
+					Calibrations.getScalingTransform( intensityImage ),
+					null
 			);
 
 			imageSourcesModel.sources().get( labelImageId )

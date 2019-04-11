@@ -144,7 +144,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 		notifyColoringListeners();
 
 		// chain event notification
-		wrappedColoringModel.listeners().add( () -> notifyColoringListeners() );
+		wrappedColoringModel.listeners().add( () -> SelectionColoringModel.this.notifyColoringListeners() );
 
 	}
 

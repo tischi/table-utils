@@ -97,9 +97,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		addGrayValueOverlay();
 
-		registerAsSelectionListener( selectionModel );
-
-		registerAsColoringListener( selectionColoringModel );
+		registerAsSelectionListener( this.selectionModel );
+		registerAsColoringListener( this.selectionColoringModel );
 
 		installBdvBehaviours();
 
@@ -229,9 +228,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		final List< String > imageSetIDs = sourceAndMetadata.metadata().imageSetIDs;
 
 		if ( bdv != null && removeOtherSources )
-		{
 			removeSources();
-		}
 
 		for ( int associatedSourceIndex = 0;
 			  associatedSourceIndex < imageSetIDs.size();

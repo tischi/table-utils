@@ -42,7 +42,7 @@ public class MeasureSimilarityDialog< T extends TableRow >
 	{
 		this.table = table;
 
-		if ( initChoicesFromDialog( ) ) return;
+		if ( ! initChoicesFromDialog() ) return;
 
 		configSelectedColumns( );
 
@@ -55,7 +55,6 @@ public class MeasureSimilarityDialog< T extends TableRow >
 			distances = distances( referenceVector );
 
 		( ( DefaultTableModel ) table.getModel() ).addColumn( newColumnName, distances );
-
 	}
 
 	private boolean initChoicesFromDialog()
@@ -84,12 +83,13 @@ public class MeasureSimilarityDialog< T extends TableRow >
 		gd.addStringField( "New Column Name", "Similarity", 20 );
 
 		gd.showDialog();
-		if ( gd.wasCanceled() ) return true;
+		if ( gd.wasCanceled() ) return false;
 
 		columnSelectionRegExp = gd.getNextString();
 		selectedMetric = gd.getNextChoice();
 		newColumnName = gd.getNextString();
-		return false;
+
+		return true;
 	}
 
 	private void computeSelectedColumnMeansAndSigmas( )
@@ -129,7 +129,7 @@ public class MeasureSimilarityDialog< T extends TableRow >
 		for ( T tableRow : selectedRows )
 		{
 			final double[] normVector = getZScoreNormalisedRowVector(
-					table, tableRow.rowIndex(), selectedColumnIndices, columnMeans, columnSigmas );
+					table, tableRow.rowIndex(), selectedColumnIndices, selectedColumnMeans, selectedColumnSigmas );
 
 			normVectors.add( normVector );
 		}
