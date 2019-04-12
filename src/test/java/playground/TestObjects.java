@@ -1,3 +1,5 @@
+package playground;
+
 public class TestObjects
 {
 	public static void main( String[] args )

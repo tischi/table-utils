@@ -1,3 +1,5 @@
+package playground;
+
 import javax.swing.*;
 
 public class TestInteractiveTableBasics

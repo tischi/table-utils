@@ -1,3 +1,5 @@
+package playground;
+
 import de.embl.cba.tables.TableUtils;
 
 import javax.swing.*;

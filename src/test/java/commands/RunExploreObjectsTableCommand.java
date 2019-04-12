@@ -1,3 +1,5 @@
+package commands;
+
 import de.embl.cba.tables.ui.ExploreObjectsTableCommand;
 import net.imagej.ImageJ;
 

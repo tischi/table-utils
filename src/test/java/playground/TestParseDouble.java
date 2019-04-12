@@ -1,3 +1,5 @@
+package playground;
+
 public class TestParseDouble
 {
 	public static void main( String[] args )

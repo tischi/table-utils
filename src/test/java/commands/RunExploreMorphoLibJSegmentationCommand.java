@@ -1,3 +1,5 @@
+package commands;
+
 import de.embl.cba.tables.ui.ExploreMorphoLibJCommand;
 import ij.IJ;
 import ij.measure.ResultsTable;

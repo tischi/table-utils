@@ -50,10 +50,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 	{
 		wrappedColoringModel.convert( input, output );
 
-		if ( selectionModel.isEmpty() )
-		{
-			return;
-		}
+		if ( selectionModel.isEmpty() ) return;
 
 		final boolean isSelected = selectionModel.isSelected( input );
 

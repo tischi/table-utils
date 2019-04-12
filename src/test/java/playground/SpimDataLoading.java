@@ -1,20 +1,17 @@
+package playground;
+
 import bdv.BigDataViewer;
 import bdv.SpimSource;
-import bdv.ViewerImgLoader;
 import bdv.VolatileSpimSource;
-import bdv.img.cache.VolatileGlobalCellCache;
 import bdv.tools.brightness.ConverterSetup;
 import bdv.tools.transformation.TransformedSource;
 import bdv.util.BdvFunctions;
-import bdv.util.BdvOptions;
 import bdv.util.BdvStackSource;
 import bdv.viewer.Source;
 import bdv.viewer.SourceAndConverter;
 import mpicbg.spim.data.SpimData;
 import mpicbg.spim.data.SpimDataException;
 import mpicbg.spim.data.XmlIoSpimData;
-import mpicbg.spim.data.generic.sequence.AbstractSequenceDescription;
-import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.Volatile;
 
 import java.io.File;
