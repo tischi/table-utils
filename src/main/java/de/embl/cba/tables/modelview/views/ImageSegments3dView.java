@@ -3,34 +3,26 @@ package de.embl.cba.tables.modelview.views;
 import bdv.tools.brightness.ConverterSetup;
 import bdv.util.*;
 import bdv.viewer.Source;
-import bdv.viewer.state.SourceState;
 import bdv.viewer.state.ViewerState;
 import customnode.CustomTriangleMesh;
 import de.embl.cba.bdv.utils.BdvUtils;
-import de.embl.cba.bdv.utils.objects3d.ConnectedComponentExtractorAnd3DViewer;
-import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.mesh.MeshExtractor;
 import de.embl.cba.tables.mesh.MeshUtils;
 import de.embl.cba.tables.modelview.coloring.*;
 import de.embl.cba.tables.modelview.combined.ImageSegmentsModel;
 import de.embl.cba.tables.modelview.images.SourceAndMetadata;
-import de.embl.cba.tables.modelview.images.SourceMetadata;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
-import de.embl.cba.tables.modelview.segments.ImageSegmentId;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import ij.IJ;
 import ij3d.Content;
 import ij3d.Image3DUniverse;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.RealPoint;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.Views;
-import org.scijava.ui.behaviour.ClickBehaviour;
-import org.scijava.ui.behaviour.io.InputTriggerConfig;
 import org.scijava.ui.behaviour.util.Behaviours;
 import org.scijava.vecmath.Color3f;
 
@@ -40,8 +32,6 @@ import java.util.List;
 import java.util.Set;
 
 import static de.embl.cba.bdv.utils.BdvUtils.getRAI;
-import static de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter.BACKGROUND;
-import static de.embl.cba.tables.modelview.images.SourceMetadata.Flavour;
 
 public class ImageSegments3dView< T extends ImageSegment, R extends RealType< R > & NativeType< R > >
 {
@@ -130,6 +120,12 @@ public class ImageSegments3dView< T extends ImageSegment, R extends RealType< R 
 
 	private void adaptSegmentColors()
 	{
+		for ( T segment : segmentToContent.keySet() )
+		{
+			final Color3f color3f = getColor3f( segment );
+			final Content content = segmentToContent.get( segment );
+			content.setColor( color3f );
+		}
 	}
 
 	public void registerAsSelectionListener( SelectionModel< T > selectionModel )
@@ -185,7 +181,8 @@ public class ImageSegments3dView< T extends ImageSegment, R extends RealType< R 
 			}
 		}
 
-		setMeshColor( imageSegment, mesh );
+		mesh.setColor( getColor3f( imageSegment ) );
+
 		addMeshToUniverse( imageSegment, mesh );
 	}
 
@@ -196,17 +193,17 @@ public class ImageSegments3dView< T extends ImageSegment, R extends RealType< R 
 		segmentToContent.put( imageSegment, content );
 	}
 
-	private void setMeshColor( T imageSegment, CustomTriangleMesh mesh )
+	private Color3f getColor3f( T imageSegment )
 	{
 		final ARGBType argbType = new ARGBType();
 		selectionColoringModel.convert( imageSegment, argbType );
-		final Color3f color3f = new Color3f( ColorUtils.getColor( argbType ) );
-		mesh.setColor( color3f );
+		return new Color3f( ColorUtils.getColor( argbType ) );
 	}
 
 	private int getLevel()
 	{
 		int level;
+
 		for ( level = 0; level < segmentsSourceCalibrations.size(); level++ )
 			if ( segmentsSourceCalibrations.get( level )[ 0 ] > voxelSpacing3DView ) break;
 
