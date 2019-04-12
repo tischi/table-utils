@@ -55,7 +55,7 @@ public class DefaultTableAndBdvViews
 					selectionModel );
 
 		final DefaultImageSegmentsModel< TableRowImageSegment > imageSegmentsModel
-				= new DefaultImageSegmentsModel<>( tableRowImageSegments );
+				= new DefaultImageSegmentsModel<>( tableRowImageSegments, viewName );
 
 		final DefaultTableRowsModel< TableRowImageSegment > tableRowsModel
 				= new DefaultTableRowsModel<>( tableRowImageSegments, viewName );

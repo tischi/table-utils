@@ -26,7 +26,7 @@ public class SourceMetadata
 	public Double displayRangeMin = 0.0;
 	public Double displayRangeMax = 500.0;
 	public Color displayColor = Color.white;
-	public BdvStackSource bdvStackSource = null;
+	public BdvStackSource< ? > bdvStackSource = null;
 	public AffineTransform3D sourceTransform = new AffineTransform3D();
 	public File segmentsTable = null;
 

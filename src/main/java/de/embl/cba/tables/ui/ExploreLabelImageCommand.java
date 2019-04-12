@@ -19,8 +19,6 @@ import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import java.io.File;
-
 
 @Plugin(type = Command.class,
 		menuPath = "Plugins>Segmentation>Explore>Explore Label Image" )
@@ -39,7 +37,7 @@ public class ExploreLabelImageCommand < R extends RealType< R > > implements Com
 		final DefaultImageSourcesModel imageSourcesModel = createImageSourcesModel();
 
 		final LazyImageSegmentsModel lazyImageSegmentsModel
-				= new LazyImageSegmentsModel();
+				= new LazyImageSegmentsModel( labelImage.getTitle() );
 
 		final SelectionModel< ImageSegment > selectionModel =
 				new DefaultSelectionModel< ImageSegment >();

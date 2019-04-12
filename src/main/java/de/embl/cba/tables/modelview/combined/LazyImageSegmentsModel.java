@@ -10,9 +10,11 @@ public class LazyImageSegmentsModel
 		implements ImageSegmentsModel< DefaultImageSegment >
 {
 	private final Map< ImageSegmentId, DefaultImageSegment > keyToSegment;
+	private String modelName;
 
-	public LazyImageSegmentsModel( )
+	public LazyImageSegmentsModel( String modelName )
 	{
+		this.modelName = modelName;
 		keyToSegment = new HashMap<>(  );
 	}
 
@@ -26,6 +28,12 @@ public class LazyImageSegmentsModel
 
 		return keyToSegment.get( imageSegmentId );
 
+	}
+
+	@Override
+	public String getName()
+	{
+		return modelName;
 	}
 
 	private synchronized void addSegment( ImageSegmentId imageSegmentId )

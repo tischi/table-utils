@@ -6,4 +6,6 @@ import de.embl.cba.tables.modelview.segments.ImageSegmentId;
 public interface ImageSegmentsModel < T extends ImageSegment >
 {
 	T getImageSegment( ImageSegmentId imageSegmentId );
+
+	String getName();
 }

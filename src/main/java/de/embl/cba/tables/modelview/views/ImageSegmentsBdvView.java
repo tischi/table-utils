@@ -10,14 +10,12 @@ import de.embl.cba.bdv.utils.objects3d.ConnectedComponentExtractorAnd3DViewer;
 import de.embl.cba.bdv.utils.overlays.BdvGrayValuesOverlay;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.*;
-import de.embl.cba.tables.modelview.combined.DefaultImageSegmentsModel;
 import de.embl.cba.tables.modelview.combined.ImageSegmentsModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
 import de.embl.cba.tables.modelview.images.SourceMetadata;
 import de.embl.cba.tables.modelview.images.SourceAndMetadata;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.segments.ImageSegmentId;
-import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import net.imglib2.RealPoint;
@@ -47,9 +45,9 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private Behaviours behaviours;
 
 	private BdvHandle bdv;
-	private String name = "TODO";
+	private String labelSourceName;
 	private BdvOptions bdvOptions;
-	private SourceAndMetadata activeLabelSource;
+	private SourceAndMetadata currentLabelSource;
 	private T recentFocus;
 	private ViewerState recentViewerState;
 	private List< ConverterSetup > recentConverterSetups;
@@ -57,7 +55,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private Set< SourceAndMetadata< ? extends RealType< ? > > > currentSources;
 	private Set< LabelsARGBConverter > labelsARGBConverters;
 	private boolean grayValueOverlayWasFirstSource;
-	//private boolean hasGrayValueOverlay;
 
 	public ImageSegmentsBdvView(
 			final ImageSourcesModel imageSourcesModel,
@@ -178,12 +175,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	public synchronized void centerBdvOnSegment( ImageSegment imageSegment )
 	{
-		showSegmentImageSet( imageSegment );
-
-		bdv.getBdvHandle().getViewerPanel().setTimepoint( imageSegment.timePoint() );
+		ensureVisibilityOfImageSetOfImageSegment( imageSegment );
 
 		final double[] position = new double[ 3 ];
 		imageSegment.localize( position );
+
 		BdvUtils.moveToPosition(
 				bdv,
 				position,
@@ -191,19 +187,20 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 				500 );
 	}
 
-	private void showSegmentImageSet( ImageSegment imageSegment )
+	private void ensureVisibilityOfImageSetOfImageSegment( ImageSegment imageSegment )
 	{
 		final String imageId = imageSegment.imageId();
 
-		if ( activeLabelSource.metadata().imageId.equals( imageId ) )
+		if ( currentLabelSource.metadata().imageId.equals( imageId ) )
 		{
+			// Nothing to be done, the imageSegment belongs to the
+			// currently shown image set.
 			return;
 		}
 		else
 		{
-			// Replace sources, because the selected image segment
-			// belongs to another image set of the same data set
-			//
+			// Replace sources, because selected image segment
+			// belongs to another image set of displayed data set
 
 			final SourceAndMetadata sourceAndMetadata
 					= imageSourcesModel.sources().get( imageId );
@@ -394,7 +391,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		else
 		{
 			// TODO: implement different logic of what is the active label source
-			activeLabelSource = sourceAndMetadata;
+			currentLabelSource = sourceAndMetadata;
+			labelSourceName = sourceAndMetadata.metadata().imageId;
 
 			labelsARGBConverter =
 					new ImageSegmentLabelsARGBConverter(
@@ -425,7 +423,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		behaviours = new Behaviours( new InputTriggerConfig() );
 		behaviours.install(
 				bdv.getBdvHandle().getTriggerbindings(),
-				name + "-bdv-selection-handler" );
+				labelSourceName + "-bdv-selection-handler" );
 
 		installSelectionBehaviour( );
 		installSelectNoneBehaviour( );
@@ -438,7 +436,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
 						new Thread( () -> shuffleRandomColors() ).start(),
-				name + "-change-coloring-random-seed",
+				labelSourceName + "-change-coloring-random-seed",
 				incrementCategoricalLutRandomSeedTrigger );
 	}
 
@@ -459,7 +457,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
 				new Thread( () -> selectNone() ).start(),
-				name + "-select-none", selectNoneTrigger );
+				labelSourceName + "-select-none", selectNoneTrigger );
 	}
 
 	public synchronized void selectNone()
@@ -474,21 +472,23 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		behaviours.behaviour(
 				( ClickBehaviour ) ( x, y ) ->
 						new Thread( () -> toggleSelectionAtMousePosition() ).start(),
-				name + "-toggle-selection", selectTrigger ) ;
+				labelSourceName + "-toggle-selection", selectTrigger ) ;
 	}
 
 	private synchronized void toggleSelectionAtMousePosition()
 	{
-		if ( activeLabelSource == null ) return;
+		if ( currentLabelSource == null ) return;
 
-		final double labelId = getLabelIdAtCurrentMouseCoordinates( activeLabelSource );
+		if ( ! isCurrentLabelSourceActive() ) return;
+
+		final double labelId = getLabelIdAtCurrentMouseCoordinates( currentLabelSource );
 
 		if ( labelId == BACKGROUND ) return;
 
-		final String imageId = activeLabelSource.metadata().imageId;
+		final String labelImageId = currentLabelSource.metadata().imageId;
 
 		final ImageSegmentId imageSegmentId =
-				new ImageSegmentId( imageId, labelId, getCurrentTimePoint() );
+				new ImageSegmentId( labelImageId, labelId, getCurrentTimePoint() );
 
 		final T segment = imageSegmentsModel.getImageSegment( imageSegmentId );
 
@@ -506,6 +506,17 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		}
 	}
 
+	private boolean isCurrentLabelSourceActive()
+	{
+		final Source< ? > source
+				= currentLabelSource.metadata()
+				.bdvStackSource.getSources().get( 0 ).getSpimSource();
+
+		final boolean active = BdvUtils.isActive( bdv, source );
+
+		return active;
+	}
+
 	private double getLabelIdAtCurrentMouseCoordinates( SourceAndMetadata activeLabelSource )
 	{
 		final RealPoint globalMouseCoordinates =
@@ -519,13 +530,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 				getCurrentTimePoint() );
 
 		if ( value == null )
-		{
-			System.out.println( "Could not find pixel value at position " + globalMouseCoordinates);
-		}
+			System.out.println(
+					"Could not find pixel value at position " + globalMouseCoordinates);
 		else
-		{
 			System.out.println( "Pixel value is " + value );
-		}
 
 		return value;
 	}
@@ -538,7 +546,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 					selectionColoringModel.iterateSelectionMode();
 					BdvUtils.repaint( bdv );
 				} ).start(),
-				name + "-iterate-selection", iterateSelectionModeTrigger );
+				labelSourceName + "-iterate-selection", iterateSelectionModeTrigger );
 	}
 
 	private void install3DViewBehaviour()
@@ -547,9 +555,9 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 				new Thread( () -> {
 
-					if ( this.activeLabelSource == null ) return;
+					if ( this.currentLabelSource == null ) return;
 
-					final SourceAndMetadata labelSource = this.activeLabelSource;
+					final SourceAndMetadata labelSource = this.currentLabelSource;
 
 					if ( getLabelIdAtCurrentMouseCoordinates( labelSource ) != BACKGROUND )
 					{
@@ -557,7 +565,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 					}
 
 				}).start(),
-				name + "-view-3d", viewIn3DTrigger );
+				labelSourceName + "-view-3d", viewIn3DTrigger );
 	}
 
 	private synchronized void viewObjectAtCurrentMouseCoordinatesIn3D(
