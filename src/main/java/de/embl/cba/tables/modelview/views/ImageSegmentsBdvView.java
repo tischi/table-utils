@@ -412,8 +412,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void initBdvOptions( )
 	{
-		Prefs.showScaleBar( true );
-
 		bdvOptions = BdvOptions.options();
 
 		if ( imageSourcesModel.is2D() )
