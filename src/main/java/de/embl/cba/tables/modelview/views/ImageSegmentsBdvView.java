@@ -2,7 +2,9 @@ package de.embl.cba.tables.modelview.views;
 
 import bdv.tools.brightness.ConverterSetup;
 import bdv.util.*;
+import bdv.util.Prefs;
 import bdv.viewer.Source;
+import bdv.viewer.overlay.ScaleBarOverlayRenderer;
 import bdv.viewer.state.SourceState;
 import bdv.viewer.state.ViewerState;
 import de.embl.cba.bdv.utils.BdvUtils;
@@ -92,7 +94,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		showInitialSources();
 
-		addGrayValueOverlay();
+//		addGrayValueOverlay();
 
 		registerAsSelectionListener( this.selectionModel );
 		registerAsColoringListener( this.selectionColoringModel );
@@ -103,6 +105,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	public void addGrayValueOverlay()
 	{
+		// TODO: put this to lower right corner not to interfere with the scale bar
 		new BdvGrayValuesOverlay( bdv, 20 ).getBdvOverlaySource();
 		grayValueOverlayWasFirstSource = false;
 		//hasGrayValueOverlay = true;
@@ -409,6 +412,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void initBdvOptions( )
 	{
+		Prefs.showScaleBar( true );
+
 		bdvOptions = BdvOptions.options();
 
 		if ( imageSourcesModel.is2D() )
