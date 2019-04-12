@@ -442,6 +442,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private synchronized void shuffleRandomColors()
 	{
+		if ( ! isCurrentLabelSourceActive() ) return;
+
 		final ColoringModel< T > coloringModel =
 				selectionColoringModel.getWrappedColoringModel();
 
@@ -462,6 +464,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	public synchronized void selectNone()
 	{
+		if ( ! isCurrentLabelSourceActive() ) return;
+
 		selectionModel.clearSelection( );
 
 		BdvUtils.repaint( bdv );
@@ -543,6 +547,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
 				new Thread( () ->
 				{
+					if ( ! isCurrentLabelSourceActive() ) return;
 					selectionColoringModel.iterateSelectionMode();
 					BdvUtils.repaint( bdv );
 				} ).start(),
@@ -555,14 +560,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 				new Thread( () -> {
 
-					if ( this.currentLabelSource == null ) return;
+					if ( currentLabelSource == null ) return;
+					if ( ! isCurrentLabelSourceActive() ) return;
+					if ( getLabelIdAtCurrentMouseCoordinates( currentLabelSource ) == BACKGROUND ) return;
 
-					final SourceAndMetadata labelSource = this.currentLabelSource;
-
-					if ( getLabelIdAtCurrentMouseCoordinates( labelSource ) != BACKGROUND )
-					{
-						viewObjectAtCurrentMouseCoordinatesIn3D( labelSource );
-					}
+					viewObjectAtCurrentMouseCoordinatesIn3D( currentLabelSource );
 
 				}).start(),
 				labelSourceName + "-view-3d", viewIn3DTrigger );
