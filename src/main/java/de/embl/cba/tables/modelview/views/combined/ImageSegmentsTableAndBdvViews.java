@@ -1,27 +1,28 @@
-package de.embl.cba.tables.modelview.views;
+package de.embl.cba.tables.modelview.views.combined;
 
 import bdv.util.BdvHandle;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.modelview.coloring.LazyCategoryColoringModel;
 import de.embl.cba.tables.modelview.coloring.SelectionColoringModel;
 import de.embl.cba.tables.modelview.combined.DefaultImageSegmentsModel;
-import de.embl.cba.tables.modelview.combined.DefaultTableRowsModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
 import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
+import de.embl.cba.tables.modelview.views.SegmentsBdvView;
+import de.embl.cba.tables.modelview.views.TableRowsTableView;
 
 import java.util.List;
 
-public class ImageSegmentsTableAndBdvAnd3dViews
+public class ImageSegmentsTableAndBdvViews
 {
 	private final List< TableRowImageSegment > tableRowImageSegments;
 	private final ImageSourcesModel imageSourcesModel;
 	private final String viewName;
-	private ImageSegmentsBdvView< TableRowImageSegment > imageSegmentsBdvView;
+	private SegmentsBdvView< TableRowImageSegment > segmentsBdvView;
 	private TableRowsTableView< TableRowImageSegment > tableRowsTableView;
 
-	public ImageSegmentsTableAndBdvAnd3dViews(
+	public ImageSegmentsTableAndBdvViews(
 			List< TableRowImageSegment > tableRowImageSegments,
 			ImageSourcesModel imageSourcesModel,
 			String viewName )
@@ -29,7 +30,7 @@ public class ImageSegmentsTableAndBdvAnd3dViews
 		this( tableRowImageSegments, imageSourcesModel, viewName, null );
 	}
 
-	public ImageSegmentsTableAndBdvAnd3dViews(
+	public ImageSegmentsTableAndBdvViews(
 			List< TableRowImageSegment > tableRowImageSegments,
 			ImageSourcesModel imageSourcesModel,
 			String viewName,
@@ -57,25 +58,22 @@ public class ImageSegmentsTableAndBdvAnd3dViews
 		final DefaultImageSegmentsModel< TableRowImageSegment > imageSegmentsModel
 				= new DefaultImageSegmentsModel<>( tableRowImageSegments, viewName );
 
-		final DefaultTableRowsModel< TableRowImageSegment > tableRowsModel
-				= new DefaultTableRowsModel<>( tableRowImageSegments, viewName );
-
-		imageSegmentsBdvView = new ImageSegmentsBdvView< TableRowImageSegment >(
-				imageSourcesModel,
-				imageSegmentsModel,
+		segmentsBdvView = new SegmentsBdvView< TableRowImageSegment >(
+				tableRowImageSegments,
 				selectionModel,
 				selectionColoringModel,
+				imageSourcesModel,
 				bdv );
 
 		tableRowsTableView = new TableRowsTableView< TableRowImageSegment >(
-				tableRowsModel,
+				tableRowImageSegments,
 				selectionModel,
 				selectionColoringModel );
 	}
 
-	public ImageSegmentsBdvView< TableRowImageSegment > getImageSegmentsBdvView()
+	public SegmentsBdvView< TableRowImageSegment > getSegmentsBdvView()
 	{
-		return imageSegmentsBdvView;
+		return segmentsBdvView;
 	}
 
 	public TableRowsTableView< TableRowImageSegment > getTableRowsTableView()

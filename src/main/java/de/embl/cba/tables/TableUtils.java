@@ -1,10 +1,9 @@
 package de.embl.cba.tables;
 
-import de.embl.cba.tables.measure.SummaryStatistics;
 import de.embl.cba.tables.modelview.tables.ColumnClassAwareTableModel;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
 import de.embl.cba.tables.modelview.segments.*;
-import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
+import de.embl.cba.tables.modelview.segments.SegmentProperty;
 import net.imglib2.util.ValuePair;
 import org.scijava.table.GenericTable;
 
@@ -233,7 +232,7 @@ public class TableUtils
 	public static List< TableRowImageSegment > segmentsFromTableFile(
 			final File file,
 			String delim,
-			final Map< ImageSegmentCoordinate, String > coordinateColumnMap,
+			final Map< SegmentProperty, String > coordinateColumnMap,
 			final DefaultImageSegmentBuilder segmentBuilder )
 	{
 
@@ -276,7 +275,7 @@ public class TableUtils
 	public static List< DefaultTableRowImageSegment > segmentsFromTableFileColumnWise(
 			final File file,
 			String delim,
-			final Map< ImageSegmentCoordinate, String > coordinateColumnMap,
+			final Map< SegmentProperty, String > coordinateColumnMap,
 			final DefaultImageSegmentBuilder segmentBuilder
 	)
 	{
@@ -384,11 +383,11 @@ public class TableUtils
 	}
 
 	public static void setColumnIndex(
-			Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
+			Map< SegmentProperty, ValuePair< String, Integer > > coordinateColumnMap,
 			int columnIndex,
 			String columnName )
 	{
-		for ( ImageSegmentCoordinate coordinate : coordinateColumnMap.keySet() )
+		for ( SegmentProperty coordinate : coordinateColumnMap.keySet() )
 		{
 			if ( coordinateColumnMap.get( coordinate ).getA().equals( columnName ) )
 			{

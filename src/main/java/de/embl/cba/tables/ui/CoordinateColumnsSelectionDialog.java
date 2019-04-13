@@ -1,21 +1,18 @@
 package de.embl.cba.tables.ui;
 
-import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
+import de.embl.cba.tables.modelview.segments.SegmentProperty;
 import ij.Prefs;
 import ij.gui.GenericDialog;
 
-import javax.swing.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import static de.embl.cba.tables.SwingUtils.horizontalLayoutPanel;
 
 
 public class CoordinateColumnsSelectionDialog
 {
 	public static final String NO_COLUMN_SELECTED = "None";
-	public static final String IMAGE_SEGMENT_COORDINATE_COLUMN_PREFIX = "ImageSegmentCoordinateColumn.";
+	public static final String IMAGE_SEGMENT_COORDINATE_COLUMN_PREFIX = "SegmentPropertyColumn.";
 
 	private String[] columnChoices;
 	private final GenericDialog gd;
@@ -31,7 +28,7 @@ public class CoordinateColumnsSelectionDialog
 
 	private void addColumnSelectionUIs()
 	{
-		for ( ImageSegmentCoordinate coordinate : ImageSegmentCoordinate.values() )
+		for ( SegmentProperty coordinate : SegmentProperty.values() )
 		{
 			final String previousChoice =
 					Prefs.get( getKey( coordinate ), columnChoices[ 0 ] );
@@ -39,11 +36,11 @@ public class CoordinateColumnsSelectionDialog
 		}
 	}
 
-	private Map< ImageSegmentCoordinate, String > collectChoices()
+	private Map< SegmentProperty, String > collectChoices()
 	{
-		final HashMap< ImageSegmentCoordinate, String > coordinateToColumnName = new HashMap<>();
+		final HashMap< SegmentProperty, String > coordinateToColumnName = new HashMap<>();
 
-		for ( ImageSegmentCoordinate coordinate : ImageSegmentCoordinate.values() )
+		for ( SegmentProperty coordinate : SegmentProperty.values() )
 		{
 			final String columnName = gd.getNextChoice();
 			coordinateToColumnName.put( coordinate, columnName );
@@ -55,7 +52,7 @@ public class CoordinateColumnsSelectionDialog
 		return coordinateToColumnName;
 	}
 
-	private String getKey( ImageSegmentCoordinate coordinate )
+	private String getKey( SegmentProperty coordinate )
 	{
 		return IMAGE_SEGMENT_COORDINATE_COLUMN_PREFIX + coordinate.toString();
 	}
@@ -76,13 +73,13 @@ public class CoordinateColumnsSelectionDialog
 	}
 
 
-	public Map< ImageSegmentCoordinate, String > fetchUserInput()
+	public Map< SegmentProperty, String > fetchUserInput()
 	{
 		gd.showDialog();
 
 		if ( gd.wasCanceled() ) return null;
 
-		final Map< ImageSegmentCoordinate, String > coordinateToColumn = collectChoices();
+		final Map< SegmentProperty, String > coordinateToColumn = collectChoices();
 
 		return coordinateToColumn;
 	}

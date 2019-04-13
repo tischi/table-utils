@@ -4,10 +4,10 @@ import bdv.tools.HelpDialog;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.TableUtils;
 import de.embl.cba.tables.modelview.coloring.*;
-import de.embl.cba.tables.modelview.combined.TableRowsModel;
 import de.embl.cba.tables.modelview.segments.TableRow;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
+import de.embl.cba.tables.ui.AssignValuesToTableRowsDialog;
 import de.embl.cba.tables.ui.ColorByColumnDialog;
 import de.embl.cba.tables.ui.MeasureSimilarityDialog;
 import ij.IJ;
@@ -16,16 +16,16 @@ import net.imglib2.type.numeric.ARGBType;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
 
 
 public class TableRowsTableView < T extends TableRow > extends JPanel
 {
+	private final List< T > tableRows;
 	private final SelectionModel< T > selectionModel;
-	private final TableRowsModel< T > tableRowsModel;
 	private final SelectionColoringModel< T > selectionColoringModel;
+	private final String tableName;
 
 	private JFrame frame;
     private JScrollPane scrollPane;
@@ -40,15 +40,26 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private ColorByColumnDialog< T > colorByColumnDialog;
 	private MeasureSimilarityDialog< T > measureSimilarityDialog;
 
+
 	public TableRowsTableView(
-			final TableRowsModel< T > tableRowsModel,
+			final List< T > tableRows,
 			final SelectionModel< T > selectionModel,
 			final SelectionColoringModel< T > selectionColoringModel )
 	{
+		this( tableRows, selectionModel, selectionColoringModel, "Table" );
+	}
+	
+	public TableRowsTableView(
+			final List< T > tableRows,
+			final SelectionModel< T > selectionModel,
+			final SelectionColoringModel< T > selectionColoringModel,
+			String tableName )
+	{
 		super( new GridLayout(1, 0 ) );
-		this.tableRowsModel = tableRowsModel;
+		this.tableRows = tableRows;
 		this.selectionColoringModel = selectionColoringModel;
 		this.selectionModel = selectionModel;
+		this.tableName = tableName;
 
 		this.categoricalColumnNames = new HashSet<>(  );
 		this.customColumns = new HashSet<>(  );
@@ -160,13 +171,13 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		final int row = table.convertRowIndexToModel( rowInView );
 
-//		if ( selectionModel.isFocused( tableRowsModel.getTableRows().get( row ) ) )
+//		if ( selectionModel.isFocused( tableRows.getTableRows().get( row ) ) )
 //		{
 //			return Color.BLUE;
 //		}
 
 		final ARGBType argbType = new ARGBType();
-		selectionColoringModel.convert( tableRowsModel.getTableRows().get( row ), argbType );
+		selectionColoringModel.convert( tableRows.get( row ), argbType );
 
 		if ( argbType.get() == 0 )
 			return Color.WHITE;
@@ -181,7 +192,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private void createTable()
     {
-		table = TableUtils.jTableFromTableRows( tableRowsModel.getTableRows() );
+		table = TableUtils.jTableFromTableRows( tableRows );
 
 		table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
         table.setFillsViewportHeight( true );
@@ -299,9 +310,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
-    public void createTableUIAndShow()
+    private void createTableUIAndShow()
 	{
-		frame = new JFrame( tableRowsModel.getName() );
+		frame = new JFrame( tableName );
 
 		createMenuBar();
 
@@ -364,7 +375,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 					final int row = table.convertRowIndexToModel( recentlySelectedRowInView );
 
-					final T object = tableRowsModel.getTableRows().get( row );
+					final T object = tableRows.get( row );
 
 					selectionModel.toggle( object );
 					if ( selectionModel.isSelected( object ) )

@@ -7,6 +7,13 @@ import java.util.*;
 public class SegmentUtils
 {
 
+	public static final String BB_MIN_X = "bb_min_x";
+	public static final String BB_MIN_Y = "bb_min_y";
+	public static final String BB_MIN_Z = "bb_min_z";
+	public static final String BB_MAX_X = "bb_max_x";
+	public static final String BB_MAX_Y = "bb_max_y";
+	public static final String BB_MAX_Z = "bb_max_z";
+
 	@Deprecated
 	public static String getKey( Double label )
 	{
@@ -20,12 +27,12 @@ public class SegmentUtils
 	}
 
 	public static DefaultImageSegment segmentFromFeatures(
-			Map< ImageSegmentCoordinate, String > coordinateColumnMap,
+			Map< SegmentProperty, String > coordinateColumnMap,
 			HashMap< String, Object > columnValueMap,
 			DefaultImageSegmentBuilder segmentBuilder )
 	{
 
-		for( ImageSegmentCoordinate coordinate : coordinateColumnMap.keySet() )
+		for( SegmentProperty coordinate : coordinateColumnMap.keySet() )
 		{
 			final String colName = coordinateColumnMap.get( coordinate );
 
@@ -60,12 +67,12 @@ public class SegmentUtils
 
 
 	public static DefaultImageSegment segmentFromTableRowMap(
-			final Map< ImageSegmentCoordinate, String > coordinateColumnMap,
+			final Map< SegmentProperty, String > coordinateColumnMap,
 			final TableRowMap tableRowMap,
 			final DefaultImageSegmentBuilder segmentBuilder )
 	{
 
-		for( ImageSegmentCoordinate coordinate : coordinateColumnMap.keySet() )
+		for( SegmentProperty coordinate : coordinateColumnMap.keySet() )
 		{
 			final String colName = coordinateColumnMap.get( coordinate );
 
@@ -101,12 +108,12 @@ public class SegmentUtils
 
 
 	public static DefaultImageSegment segmentFromFeaturesIndexBased(
-			Map< ImageSegmentCoordinate, ValuePair< String, Integer > > coordinateColumnMap,
+			Map< SegmentProperty, ValuePair< String, Integer > > coordinateColumnMap,
 			String[] rowEntries )
 	{
 		final DefaultImageSegmentBuilder segmentBuilder = new DefaultImageSegmentBuilder();
 
-		for( ImageSegmentCoordinate coordinate : coordinateColumnMap.keySet() )
+		for( SegmentProperty coordinate : coordinateColumnMap.keySet() )
 		{
 			final Integer col = coordinateColumnMap.get( coordinate ).getB();
 
@@ -150,7 +157,7 @@ public class SegmentUtils
 
 	public static List< TableRowImageSegment > tableRowImageSegmentsFromColumns(
 			final LinkedHashMap< String, List< ? > > columns,
-			final Map< ImageSegmentCoordinate, List< ? > > imageSegmentCoordinateToColumn,
+			final Map< SegmentProperty, List< ? > > segmentPropertiesToColumn,
 			boolean isOneBasedTimePoint )
 	{
 
@@ -162,7 +169,11 @@ public class SegmentUtils
 		for ( int row = 0; row < numRows; row++ )
 		{
 			final ColumnBasedTableRowImageSegment segment
-					= new ColumnBasedTableRowImageSegment( row, columns, imageSegmentCoordinateToColumn, isOneBasedTimePoint );
+					= new ColumnBasedTableRowImageSegment(
+							row,
+							columns,
+							segmentPropertiesToColumn,
+							isOneBasedTimePoint );
 			columnBasedTableRowImageSegments.add( segment );
 		}
 
@@ -170,4 +181,44 @@ public class SegmentUtils
 
 	}
 
+	public static < T extends ImageSegment >
+	HashMap< LabelFrameAndImage, T > createSegmentMap( List< T > segments )
+	{
+		final HashMap< LabelFrameAndImage, T > labelFrameAndImageToSegment
+				= new HashMap<>();
+
+		for ( T segment : segments )
+			labelFrameAndImageToSegment.put( new LabelFrameAndImage( segment ), segment );
+
+		return labelFrameAndImageToSegment;
+	}
+
+	public static void putDefaultBoundingBoxMapping(
+			HashMap< SegmentProperty, List< ? > > segmentPropertyToColumn,
+			LinkedHashMap< String, List< ? > > columns )
+	{
+		segmentPropertyToColumn.put(
+				SegmentProperty.BoundingBoxXMin,
+				columns.get( BB_MIN_X ) );
+
+		segmentPropertyToColumn.put(
+				SegmentProperty.BoundingBoxYMin,
+				columns.get( BB_MIN_Y ) );
+
+		segmentPropertyToColumn.put(
+				SegmentProperty.BoundingBoxZMin,
+				columns.get( BB_MIN_Z ) );
+
+		segmentPropertyToColumn.put(
+				SegmentProperty.BoundingBoxXMax,
+				columns.get( BB_MAX_X ) );
+
+		segmentPropertyToColumn.put(
+				SegmentProperty.BoundingBoxYMax,
+				columns.get( BB_MAX_Y ) );
+
+		segmentPropertyToColumn.put(
+				SegmentProperty.BoundingBoxZMax,
+				columns.get( BB_MAX_Z ) );
+	}
 }

@@ -2,9 +2,7 @@ package de.embl.cba.tables.modelview.views;
 
 import bdv.tools.brightness.ConverterSetup;
 import bdv.util.*;
-import bdv.util.Prefs;
 import bdv.viewer.Source;
-import bdv.viewer.overlay.ScaleBarOverlayRenderer;
 import bdv.viewer.state.SourceState;
 import bdv.viewer.state.ViewerState;
 import de.embl.cba.bdv.utils.BdvUtils;
@@ -12,12 +10,12 @@ import de.embl.cba.bdv.utils.objects3d.ConnectedComponentExtractorAnd3DViewer;
 import de.embl.cba.bdv.utils.overlays.BdvGrayValuesOverlay;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.modelview.coloring.*;
-import de.embl.cba.tables.modelview.combined.ImageSegmentsModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
 import de.embl.cba.tables.modelview.images.SourceMetadata;
 import de.embl.cba.tables.modelview.images.SourceAndMetadata;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
-import de.embl.cba.tables.modelview.segments.ImageSegmentId;
+import de.embl.cba.tables.modelview.segments.LabelFrameAndImage;
+import de.embl.cba.tables.modelview.segments.SegmentUtils;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import net.imglib2.RealPoint;
@@ -32,7 +30,8 @@ import java.util.*;
 import static de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter.BACKGROUND;
 import static de.embl.cba.tables.modelview.images.SourceMetadata.*;
 
-public class ImageSegmentsBdvView < T extends ImageSegment >
+// TODO: reconsider what a "segment" needs to be here
+public class SegmentsBdvView< T extends ImageSegment >
 {
 	private String selectTrigger = "ctrl button1";
 	private String selectNoneTrigger = "ctrl N";
@@ -40,14 +39,14 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private String iterateSelectionModeTrigger = "ctrl S";
 	private String viewIn3DTrigger = "ctrl shift button1";
 
-	private final ImageSegmentsModel< T > imageSegmentsModel;
-	private final ImageSourcesModel imageSourcesModel;
 	private final SelectionModel< T > selectionModel;
 	private final SelectionColoringModel< T > selectionColoringModel;
+
+	private final ImageSourcesModel imageSourcesModel;
 	private Behaviours behaviours;
 
 	private BdvHandle bdv;
-	private String labelSourceName;
+	private String segmentsName;
 	private BdvOptions bdvOptions;
 	private SourceAndMetadata currentLabelSource;
 	private T recentFocus;
@@ -57,38 +56,37 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	private Set< SourceAndMetadata< ? extends RealType< ? > > > currentSources;
 	private Set< LabelsARGBConverter > labelsARGBConverters;
 	private boolean grayValueOverlayWasFirstSource;
+	private HashMap< LabelFrameAndImage, T > labelFrameAndImageToSegment;
+	private List< T > segments;
 
-	public ImageSegmentsBdvView(
-			final ImageSourcesModel imageSourcesModel,
-			final ImageSegmentsModel< T > imageSegmentsModel,
-			final SelectionModel< T > selectionModel,
-			final SelectionColoringModel< T > selectionColoringModel)
-	{
-
-		this(	imageSourcesModel,
-				imageSegmentsModel,
-				selectionModel,
-				selectionColoringModel,
-				null );
-	}
-
-
-	public ImageSegmentsBdvView(
-			final ImageSourcesModel imageSourcesModel,
-			final ImageSegmentsModel< T > imageSegmentsModel,
+	public SegmentsBdvView(
+			final List< T > segments,
 			final SelectionModel< T > selectionModel,
 			final SelectionColoringModel< T > selectionColoringModel,
+			final ImageSourcesModel imageSourcesModel )
+	{
+
+		this( segments, selectionModel, selectionColoringModel, imageSourcesModel, null );
+	}
+
+	public SegmentsBdvView(
+			final List< T > segments,
+			final SelectionModel< T > selectionModel,
+			final SelectionColoringModel< T > selectionColoringModel,
+			final ImageSourcesModel imageSourcesModel,
 			BdvHandle bdv )
 	{
-		this.imageSourcesModel = imageSourcesModel;
-		this.imageSegmentsModel = imageSegmentsModel;
 		this.selectionModel = selectionModel;
 		this.selectionColoringModel = selectionColoringModel;
+		this.imageSourcesModel = imageSourcesModel;
 		this.bdv = bdv;
 
 		this.voxelSpacing3DView = 0.1; // TODO
 		this.currentSources = new HashSet<>( );
 		this.labelsARGBConverters = new HashSet<>(  );
+
+		this.segments = segments;
+		this.labelFrameAndImageToSegment = SegmentUtils.createSegmentMap( this.segments );
 
 		initBdvOptions();
 
@@ -100,7 +98,6 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		registerAsColoringListener( this.selectionColoringModel );
 
 		installBdvBehaviours();
-
 	}
 
 	public void addGrayValueOverlay()
@@ -115,6 +112,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		return imageSourcesModel;
 	}
+
 
 	private void showInitialSources()
 	{
@@ -383,7 +381,8 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		}
 	}
 
-	private Source asLabelSource( SourceAndMetadata< ? extends RealType< ? > > sourceAndMetadata )
+	private Source asLabelSource(
+			SourceAndMetadata< ? extends RealType< ? > > sourceAndMetadata )
 	{
 		LabelsARGBConverter labelsARGBConverter;
 
@@ -395,12 +394,11 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		{
 			// TODO: implement different logic of what is the active label source
 			currentLabelSource = sourceAndMetadata;
-			labelSourceName = sourceAndMetadata.metadata().imageId;
 
 			labelsARGBConverter =
-					new ImageSegmentLabelsARGBConverter(
-							imageSegmentsModel,
-							sourceAndMetadata.metadata().imageId,
+					new SegmentsARGBConverter(
+							labelFrameAndImageToSegment,
+							currentLabelSource.metadata().imageId,
 							selectionColoringModel );
 
 		}
@@ -423,10 +421,12 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 	private void installBdvBehaviours()
 	{
+		segmentsName = segments.toString();
+
 		behaviours = new Behaviours( new InputTriggerConfig() );
 		behaviours.install(
 				bdv.getBdvHandle().getTriggerbindings(),
-				labelSourceName + "-bdv-selection-handler" );
+				segmentsName + "-bdv-selection-handler" );
 
 		installSelectionBehaviour( );
 		installSelectNoneBehaviour( );
@@ -439,7 +439,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
 						new Thread( () -> shuffleRandomColors() ).start(),
-				labelSourceName + "-change-coloring-random-seed",
+				segmentsName + "-change-coloring-random-seed",
 				incrementCategoricalLutRandomSeedTrigger );
 	}
 
@@ -462,7 +462,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
 				new Thread( () -> selectNone() ).start(),
-				labelSourceName + "-select-none", selectNoneTrigger );
+				segmentsName + "-select-none", selectNoneTrigger );
 	}
 
 	public synchronized void selectNone()
@@ -479,7 +479,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 		behaviours.behaviour(
 				( ClickBehaviour ) ( x, y ) ->
 						new Thread( () -> toggleSelectionAtMousePosition() ).start(),
-				labelSourceName + "-toggle-selection", selectTrigger ) ;
+				segmentsName + "-toggle-selection", selectTrigger ) ;
 	}
 
 	private synchronized void toggleSelectionAtMousePosition()
@@ -494,15 +494,10 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 
 		final String labelImageId = currentLabelSource.metadata().imageId;
 
-		final ImageSegmentId imageSegmentId =
-				new ImageSegmentId( labelImageId, labelId, getCurrentTimePoint() );
+		final LabelFrameAndImage labelFrameAndImage =
+				new LabelFrameAndImage( labelId, getCurrentTimePoint(),labelImageId );
 
-		final T segment = imageSegmentsModel.getImageSegment( imageSegmentId );
-
-		// TODO
-		// Here one could select several objects based on the clicked object
-		// For example, all objects that have the same numerical or categorical value
-		// final ColoringModel< T > wrappedColoringModel = selectionColoringModel.getWrappedColoringModel();
+		final T segment = labelFrameAndImageToSegment.get( labelFrameAndImage );
 
 		selectionModel.toggle( segment );
 
@@ -554,7 +549,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 					selectionColoringModel.iterateSelectionMode();
 					BdvUtils.repaint( bdv );
 				} ).start(),
-				labelSourceName + "-iterate-selection", iterateSelectionModeTrigger );
+				segmentsName + "-iterate-selection", iterateSelectionModeTrigger );
 	}
 
 	private void install3DViewBehaviour()
@@ -570,7 +565,7 @@ public class ImageSegmentsBdvView < T extends ImageSegment >
 					viewObjectAtCurrentMouseCoordinatesIn3D( currentLabelSource );
 
 				}).start(),
-				labelSourceName + "-view-3d", viewIn3DTrigger );
+				segmentsName + "-view-3d", viewIn3DTrigger );
 	}
 
 	private synchronized void viewObjectAtCurrentMouseCoordinatesIn3D(

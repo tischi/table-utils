@@ -3,10 +3,10 @@ package de.embl.cba.tables.ui;
 import de.embl.cba.tables.TableColumns;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModelFactory;
-import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
+import de.embl.cba.tables.modelview.segments.SegmentProperty;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
 import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
-import de.embl.cba.tables.modelview.views.ImageSegmentsTableAndBdvViews;
+import de.embl.cba.tables.modelview.views.combined.ImageSegmentsTableAndBdvViews;
 import org.scijava.command.Command;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
@@ -50,7 +50,7 @@ public class ExploreObjectsTableCommand implements Command
 
 
 	private LinkedHashMap< String, List< ? > > columns;
-	private Map< ImageSegmentCoordinate, String > coordinateToColumnName;
+	private Map< SegmentProperty, String > coordinateToColumnName;
 
 
 	public void run()
@@ -70,7 +70,7 @@ public class ExploreObjectsTableCommand implements Command
 				new ImageSegmentsTableAndBdvViews( tableRowImageSegments, imageSourcesModel, tableFile.getName() );
 
 		views.getTableRowsTableView().categoricalColumnNames().add(
-				coordinateToColumnName.get( ImageSegmentCoordinate.ObjectLabel ) );
+				coordinateToColumnName.get( SegmentProperty.ObjectLabel ) );
 
 	}
 
@@ -80,7 +80,7 @@ public class ExploreObjectsTableCommand implements Command
 		columns = TableColumns.asTypedColumns(
 				       TableColumns.stringColumnsFromTableFile( tableFile ) );
 
-		final Map< ImageSegmentCoordinate, List< ? > > coordinateToColumn
+		final Map< SegmentProperty, List< ? > > coordinateToColumn
 				= createCoordinateToColumnMap();
 
 		final List< TableRowImageSegment > segments
@@ -90,17 +90,17 @@ public class ExploreObjectsTableCommand implements Command
 		return segments;
 	}
 
-	private LinkedHashMap< ImageSegmentCoordinate, List< ? > > createCoordinateToColumnMap( )
+	private LinkedHashMap< SegmentProperty, List< ? > > createCoordinateToColumnMap( )
 	{
 		final CoordinateColumnsSelectionDialog selectionDialog
 				= new CoordinateColumnsSelectionDialog( columns.keySet() );
 
 		coordinateToColumnName = selectionDialog.fetchUserInput();
 
-		final LinkedHashMap< ImageSegmentCoordinate, List< ? > > coordinateToColumn
+		final LinkedHashMap< SegmentProperty, List< ? > > coordinateToColumn
 				= new LinkedHashMap<>();
 
-		for( ImageSegmentCoordinate coordinate : coordinateToColumnName.keySet() )
+		for( SegmentProperty coordinate : coordinateToColumnName.keySet() )
 		{
 			coordinateToColumn.put(
 					coordinate,

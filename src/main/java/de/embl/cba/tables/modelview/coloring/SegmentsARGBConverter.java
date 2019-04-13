@@ -1,30 +1,31 @@
 package de.embl.cba.tables.modelview.coloring;
 
-import de.embl.cba.tables.modelview.combined.ImageSegmentsModel;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
-import de.embl.cba.tables.modelview.segments.ImageSegmentId;
+import de.embl.cba.tables.modelview.segments.LabelFrameAndImage;
 import net.imglib2.Volatile;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.volatiles.VolatileARGBType;
 
-public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
+import java.util.Map;
+
+public class SegmentsARGBConverter< T extends ImageSegment >
 		implements LabelsARGBConverter
 {
-	private final ImageSegmentsModel< T > imageSegmentsModel;
+	private final Map< LabelFrameAndImage, T > labelFrameAndImageToSegment;
 	private final String imageId;
 	private final ColoringModel< T > coloringModel;
 
-	private int timePointIndex;
+	private int frame;
 
-	public ImageSegmentLabelsARGBConverter(
-			ImageSegmentsModel< T > imageSegmentsModel,
+	public SegmentsARGBConverter(
+			Map< LabelFrameAndImage, T > labelFrameAndImageToSegment,
 			String imageId,
 			ColoringModel coloringModel )
 	{
-		this.imageSegmentsModel = imageSegmentsModel;
+		this.labelFrameAndImageToSegment = labelFrameAndImageToSegment;
 		this.imageId = imageId;
 		this.coloringModel = coloringModel;
-		timePointIndex = 0;
+		this.frame = 0;
 	}
 
 	@Override
@@ -47,10 +48,10 @@ public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
 			return;
 		}
 
-		final ImageSegmentId imageSegmentId =
-				new ImageSegmentId( imageId, label.getRealDouble(), timePointIndex );
+		final LabelFrameAndImage labelFrameAndImage =
+				new LabelFrameAndImage( label.getRealDouble(), frame, imageId  );
 
-		final T imageSegment = imageSegmentsModel.getImageSegment( imageSegmentId );
+		final T imageSegment = labelFrameAndImageToSegment.get( labelFrameAndImage );
 
 		if ( imageSegment == null )
 		{
@@ -66,6 +67,6 @@ public class ImageSegmentLabelsARGBConverter< T extends ImageSegment >
 	@Override
 	public void timePointChanged( int timePointIndex )
 	{
-		this.timePointIndex = timePointIndex;
+		this.frame = timePointIndex;
 	}
 }

@@ -12,4 +12,8 @@ public interface ImageSegment extends RealLocalizable
 	int timePoint();
 
 	FinalInterval boundingBox();
+
+
+
+
 }

@@ -1,6 +1,5 @@
 package de.embl.cba.tables.modelview.segments;
 
-import de.embl.cba.tables.ui.CoordinateColumnsSelectionDialog;
 import net.imglib2.FinalInterval;
 
 import java.util.LinkedHashMap;
@@ -17,58 +16,76 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 {
 	private final int row;
 	private final LinkedHashMap< String, List< ? > > columns;
-	private final Map< ImageSegmentCoordinate, List< ? > > imageSegmentCoordinateToColumn;
+	private final Map< SegmentProperty, List< ? > > segmentPropertyToColumn;
 	private double[] position;
 	private LinkedHashMap< String, Object > cells;
 	private boolean isOneBasedTimePoint;
 
-
 	public ColumnBasedTableRowImageSegment(
 			int row,
 			LinkedHashMap< String, List< ? > > columns,
-			Map< ImageSegmentCoordinate, List< ? > > imageSegmentCoordinateToColumn,
+			Map< SegmentProperty, List< ? > > segmentPropertyToColumn,
 			boolean isOneBasedTimePoint )
 	{
 		this.row = row;
 		this.columns = columns;
-		this.imageSegmentCoordinateToColumn = imageSegmentCoordinateToColumn;
+		this.segmentPropertyToColumn = segmentPropertyToColumn;
 		this.isOneBasedTimePoint = isOneBasedTimePoint;
 	}
 
 	private synchronized void setPositionFromColumns()
 	{
+		if ( position != null ) return;
+
 		position = new double[ 3 ];
 
-		if ( imageSegmentCoordinateToColumn.containsKey( ImageSegmentCoordinate.X ) )
-			position[ 0 ] = Double.parseDouble( imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.X ).get( row ).toString() );
+		if ( segmentPropertyToColumn.containsKey( SegmentProperty.X ) )
+			position[ 0 ] = Double.parseDouble(
+					segmentPropertyToColumn
+							.get( SegmentProperty.X )
+							.get( row ).toString() );
 
-		if ( imageSegmentCoordinateToColumn.containsKey( ImageSegmentCoordinate.Y ) )
-			position[ 1 ] = Double.parseDouble( imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.Y ).get( row ).toString() );
+		if ( segmentPropertyToColumn.containsKey( SegmentProperty.Y ) )
+			position[ 1 ] = Double.parseDouble(
+					segmentPropertyToColumn
+							.get( SegmentProperty.Y )
+							.get( row ).toString() );
 
-		if ( imageSegmentCoordinateToColumn.containsKey( ImageSegmentCoordinate.Z ) )
-			position[ 2 ] = Double.parseDouble( imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.Z ).get( row ).toString() );
+		if ( segmentPropertyToColumn.containsKey( SegmentProperty.Z ) )
+			position[ 2 ] = Double.parseDouble(
+					segmentPropertyToColumn
+							.get( SegmentProperty.Z )
+							.get( row ).toString() );
 	}
 
 	@Override
 	public String imageId()
 	{
-		return imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.LabelImage ).get( row ).toString();
+		return segmentPropertyToColumn
+				.get( SegmentProperty.LabelImage )
+				.get( row ).toString();
 	}
 
 	@Override
 	public double labelId()
 	{
-		return Double.parseDouble( imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.ObjectLabel ).get( row ).toString() );
+		return Double.parseDouble( segmentPropertyToColumn
+				.get( SegmentProperty.ObjectLabel )
+				.get( row ).toString() );
 	}
 
 	@Override
 	public int timePoint()
 	{
-		if ( imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.T ) == null )
+		if ( segmentPropertyToColumn.get( SegmentProperty.T ) == null )
 			return 0;
 
-		int timePoint = ( ( Double ) imageSegmentCoordinateToColumn.get( ImageSegmentCoordinate.T ).get( row )).intValue();
+		int timePoint = ( ( Double ) segmentPropertyToColumn
+				.get( SegmentProperty.T )
+				.get( row )).intValue();
+
 		if ( isOneBasedTimePoint ) timePoint -= 1;
+
 		return timePoint;
 	}
 
@@ -109,9 +126,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 		setPositionFromColumns();
 
 		for ( int d = 0; d < 3; d++ )
-		{
 			position[ d ] = (float) this.position[ d ];
-		}
 	}
 
 	@Override
@@ -120,9 +135,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 		setPositionFromColumns();
 
 		for ( int d = 0; d < 3; d++ )
-		{
 			position[ d ] = this.position[ d ];
-		}
 	}
 
 	@Override

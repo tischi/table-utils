@@ -6,7 +6,7 @@ import de.embl.cba.tables.cellprofiler.FolderAndFileColumn;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModelFactory;
 import de.embl.cba.tables.modelview.segments.*;
-import de.embl.cba.tables.modelview.views.ImageSegmentsTableAndBdvViews;
+import de.embl.cba.tables.modelview.views.combined.ImageSegmentsTableAndBdvViews;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
@@ -68,39 +68,39 @@ public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R
 
 		final List< String > pathColumnNames = replaceFolderAndFileColumnsByPathColumn();
 
-		final Map< ImageSegmentCoordinate, List< ? > > imageSegmentCoordinateToColumn
-				= getImageSegmentCoordinateToColumn( pathColumnNames );
+		final Map< SegmentProperty, List< ? > > segmentPropertyToColumn
+				= getSegmentPropertyToColumn( pathColumnNames );
 
 		final List< TableRowImageSegment > segments
-				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, imageSegmentCoordinateToColumn, false );
+				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, segmentPropertyToColumn, false );
 
 		return segments;
 	}
 
-	private HashMap< ImageSegmentCoordinate, List< ? > > getImageSegmentCoordinateToColumn( List< String > pathColumnNames )
+	private HashMap< SegmentProperty, List< ? > > getSegmentPropertyToColumn( List< String > pathColumnNames )
 	{
-		final HashMap< ImageSegmentCoordinate, List< ? > > imageSegmentCoordinateToColumn
+		final HashMap< SegmentProperty, List< ? > > segmentPropertyToColumn
 				= new HashMap<>();
 
 		String labelImagePathColumnName = getLabelImagePathColumnName( pathColumnNames );
 
-		imageSegmentCoordinateToColumn.put(
-				ImageSegmentCoordinate.LabelImage,
+		segmentPropertyToColumn.put(
+				SegmentProperty.LabelImage,
 				columns.get( labelImagePathColumnName ));
 
-		imageSegmentCoordinateToColumn.put(
-				ImageSegmentCoordinate.ObjectLabel,
+		segmentPropertyToColumn.put(
+				SegmentProperty.ObjectLabel,
 				columns.get( COLUMN_NAME_OBJECT_LABEL ) );
 
-		imageSegmentCoordinateToColumn.put(
-				ImageSegmentCoordinate.X,
+		segmentPropertyToColumn.put(
+				SegmentProperty.X,
 				columns.get( COLUMN_NAME_OBJECT_LOCATION_CENTER_X ) );
 
-		imageSegmentCoordinateToColumn.put(
-				ImageSegmentCoordinate.Y,
+		segmentPropertyToColumn.put(
+				SegmentProperty.Y,
 				columns.get( COLUMN_NAME_OBJECT_LOCATION_CENTER_Y ) );
 
-		return imageSegmentCoordinateToColumn;
+		return segmentPropertyToColumn;
 	}
 
 	private String getLabelImagePathColumnName( List< String > pathColumnNames )

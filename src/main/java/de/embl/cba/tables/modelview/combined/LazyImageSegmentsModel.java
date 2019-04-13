@@ -1,7 +1,7 @@
 package de.embl.cba.tables.modelview.combined;
 
 import de.embl.cba.tables.modelview.segments.DefaultImageSegment;
-import de.embl.cba.tables.modelview.segments.ImageSegmentId;
+import de.embl.cba.tables.modelview.segments.LabelFrameAndImage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.Map;
 public class LazyImageSegmentsModel
 		implements ImageSegmentsModel< DefaultImageSegment >
 {
-	private final Map< ImageSegmentId, DefaultImageSegment > keyToSegment;
+	private final Map< LabelFrameAndImage, DefaultImageSegment > keyToSegment;
 	private String modelName;
 
 	public LazyImageSegmentsModel( String modelName )
@@ -19,14 +19,14 @@ public class LazyImageSegmentsModel
 	}
 
 	@Override
-	public DefaultImageSegment getImageSegment( ImageSegmentId imageSegmentId )
+	public DefaultImageSegment getImageSegment( LabelFrameAndImage labelFrameAndImage )
 	{
-		if ( ! keyToSegment.keySet().contains( imageSegmentId ) )
+		if ( ! keyToSegment.keySet().contains( labelFrameAndImage ) )
 		{
-			addSegment( imageSegmentId );
+			addSegment( labelFrameAndImage );
 		}
 
-		return keyToSegment.get( imageSegmentId );
+		return keyToSegment.get( labelFrameAndImage );
 
 	}
 
@@ -36,16 +36,16 @@ public class LazyImageSegmentsModel
 		return modelName;
 	}
 
-	private synchronized void addSegment( ImageSegmentId imageSegmentId )
+	private synchronized void addSegment( LabelFrameAndImage labelFrameAndImage )
 	{
 		final DefaultImageSegment imageSegment = new DefaultImageSegment(
-				imageSegmentId.getImageId(),
-				imageSegmentId.getLabelId(),
-				imageSegmentId.getTimePoint(),
+				labelFrameAndImage.getImage(),
+				labelFrameAndImage.getLabel(),
+				labelFrameAndImage.getFrame(),
 				0,0,0,
 				null );
 
-		keyToSegment.put( imageSegmentId, imageSegment );
+		keyToSegment.put( labelFrameAndImage, imageSegment );
 	}
 
 }

@@ -7,10 +7,10 @@ import de.embl.cba.tables.TableColumns;
 import de.embl.cba.tables.modelview.images.DefaultImageSourcesModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
 import de.embl.cba.tables.modelview.images.SourceMetadata;
-import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
+import de.embl.cba.tables.modelview.segments.SegmentProperty;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
 import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
-import de.embl.cba.tables.modelview.views.ImageSegmentsTableAndBdvViews;
+import de.embl.cba.tables.modelview.views.combined.ImageSegmentsTableAndBdvViews;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.text.TextWindow;
@@ -22,9 +22,12 @@ import org.scijava.plugin.Plugin;
 
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import static de.embl.cba.tables.modelview.segments.SegmentUtils.*;
 
 
 @Plugin(type = Command.class, initializer = "init",
@@ -33,6 +36,10 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 {
 	public static final String LABEL = "Label";
 	private static final String COLUMN_NAME_LABEL_IMAGE_ID = "LabelImage";
+	public static final String CENTROID_X = "Centroid.X";
+	public static final String CENTROID_Y = "Centroid.Y";
+	public static final String CENTROID_Z = "Centroid.Z";
+	public static final String MEAN_BREADTH = "Mean_Breadth";
 
 	@Parameter ( label = "Intensity image", required = false )
 	public ImagePlus intensityImage;
@@ -60,26 +67,32 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 
 		if ( resultsTable == null )
 		{
-			String error = "Results table not found: " + resultsTableTitle + "\n";
-			error += "\n";
-			error += "Please choose from:\n";
-			for ( String title : titleToResultsTable.keySet() )
-			{
-				error += "- " + title + "\n";
-			}
-			Logger.error( error  );
+			throwResultsTableNotFoundError();
 			return;
 		}
 
+
 		final List< TableRowImageSegment > tableRowImageSegments
-				= createTableRowImageSegments( resultsTable );
+				= createMLJTableRowImageSegments( resultsTable );
 
 		final ImageSourcesModel imageSourcesModel = createImageSourcesModel();
 
-		final ImageSegmentsTableAndBdvViews views =
-				new ImageSegmentsTableAndBdvViews( tableRowImageSegments, imageSourcesModel, resultsTableTitle );
+		new ImageSegmentsTableAndBdvViews(
+					tableRowImageSegments,
+					imageSourcesModel,
+					resultsTableTitle );
+	}
 
-		views.getTableRowsTableView().categoricalColumnNames().add( LABEL );
+	public void throwResultsTableNotFoundError()
+	{
+		String error = "Results table not found: " + resultsTableTitle + "\n";
+		error += "\n";
+		error += "Please choose from:\n";
+		for ( String title : titleToResultsTable.keySet() )
+		{
+			error += "- " + title + "\n";
+		}
+		Logger.error( error  );
 	}
 
 	private DefaultImageSourcesModel createImageSourcesModel()
@@ -149,7 +162,7 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 		}
 	}
 
-	private List< TableRowImageSegment > createTableRowImageSegments(
+	private List< TableRowImageSegment > createMLJTableRowImageSegments(
 			ij.measure.ResultsTable resultsTable )
 	{
 		columns = TableColumns.columnsFromImageJ1ResultsTable( resultsTable );
@@ -159,44 +172,89 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 				COLUMN_NAME_LABEL_IMAGE_ID,
 				labelImageId );
 
-		final HashMap< ImageSegmentCoordinate, List< ? > > imageSegmentCoordinateToColumn
-				= createSegmentCoordinateToColumnMap();
+		if ( numSpatialDimensions == 3 )
+		{
+			columns = addBoundingBoxColumn( CENTROID_X, BB_MIN_X, true );
+			columns = addBoundingBoxColumn( CENTROID_Y, BB_MIN_Y, true );
+			columns = addBoundingBoxColumn( CENTROID_Z, BB_MIN_Z, true );
+			columns = addBoundingBoxColumn( CENTROID_X, BB_MAX_X, false );
+			columns = addBoundingBoxColumn( CENTROID_Y, BB_MAX_Y, false );
+			columns = addBoundingBoxColumn( CENTROID_Z, BB_MAX_Z, false );
+		}
+
+		final HashMap< SegmentProperty, List< ? > > segmentPropertyToColumn
+				= createSegmentPropertyToColumnMap();
 
 		final List< TableRowImageSegment > segments
-				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, imageSegmentCoordinateToColumn, true );
+				= SegmentUtils.tableRowImageSegmentsFromColumns(
+						columns,
+						segmentPropertyToColumn,
+						true );
 
 		return segments;
 	}
 
-	private HashMap< ImageSegmentCoordinate, List< ? > > createSegmentCoordinateToColumnMap( )
+	private LinkedHashMap< String, List<?>> addBoundingBoxColumn(
+			String centroid,
+			String bb,
+			boolean min
+			)
 	{
-		final HashMap< ImageSegmentCoordinate, List< ? > > coordinateToColumn
+		final int numRows = columns.values().iterator().next().size();
+
+		final List< Object > column = new ArrayList<>();
+		for ( int row = 0; row < numRows; row++ )
+		{
+			final double centroid = Double.parseDouble(
+					columns.get( centroid ).get( row ).toString() );
+
+			final double meanBreadth = Double.parseDouble(
+					columns.get( MEAN_BREADTH ).get( row ).toString() );
+
+			if ( min )
+				column.add( centroid - meanBreadth );
+			else
+				column.add( centroid + meanBreadth );
+		}
+
+		columns.put( bb, column );
+
+		return columns;
+
+	}
+
+
+	private HashMap< SegmentProperty, List< ? > > createSegmentPropertyToColumnMap( )
+	{
+		final HashMap< SegmentProperty, List< ? > > segmentPropertyToColumn
 				= new HashMap<>();
 
-		coordinateToColumn.put(
-				ImageSegmentCoordinate.LabelImage,
+		segmentPropertyToColumn.put(
+				SegmentProperty.LabelImage,
 				columns.get( COLUMN_NAME_LABEL_IMAGE_ID ));
 
-		coordinateToColumn.put(
-				ImageSegmentCoordinate.ObjectLabel,
+		segmentPropertyToColumn.put(
+				SegmentProperty.ObjectLabel,
 				columns.get( LABEL ) );
 
-		coordinateToColumn.put(
-				ImageSegmentCoordinate.X,
-				columns.get( "Centroid.X" ) );
+		segmentPropertyToColumn.put(
+				SegmentProperty.X,
+				columns.get( CENTROID_X ) );
 
-		coordinateToColumn.put(
-				ImageSegmentCoordinate.Y,
-				columns.get( "Centroid.Y" ) );
+		segmentPropertyToColumn.put(
+				SegmentProperty.Y,
+				columns.get( CENTROID_Y ) );
 
 		if ( numSpatialDimensions == 3 )
 		{
-			coordinateToColumn.put(
-					ImageSegmentCoordinate.Z,
-					columns.get( "Centroid.Z" ) );
+			segmentPropertyToColumn.put(
+					SegmentProperty.Z,
+					columns.get( CENTROID_Z ) );
+
+			SegmentUtils.putDefaultBoundingBoxMapping( segmentPropertyToColumn, columns );
 		}
 
-		return coordinateToColumn;
+		return segmentPropertyToColumn;
 	}
 
 

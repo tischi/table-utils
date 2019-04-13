@@ -1,4 +1,4 @@
-package de.embl.cba.tables.modelview.views;
+package de.embl.cba.tables.ui;
 
 import de.embl.cba.tables.SwingUtils;
 import de.embl.cba.tables.modelview.segments.TableRow;

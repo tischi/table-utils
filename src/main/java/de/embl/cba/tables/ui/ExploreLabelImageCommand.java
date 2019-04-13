@@ -12,7 +12,7 @@ import de.embl.cba.tables.modelview.images.SourceMetadata;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
-import de.embl.cba.tables.modelview.views.ImageSegmentsBdvView;
+import de.embl.cba.tables.modelview.views.SegmentsBdvView;
 import ij.ImagePlus;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
@@ -48,7 +48,7 @@ public class ExploreLabelImageCommand < R extends RealType< R > > implements Com
 		final SelectionColoringModel< ImageSegment > selectionColoringModel
 				= new SelectionColoringModel< ImageSegment >( coloringModel, selectionModel );
 
-		new ImageSegmentsBdvView(
+		new SegmentsBdvView(
 				imageSourcesModel,
 				lazyImageSegmentsModel,
 				selectionModel,

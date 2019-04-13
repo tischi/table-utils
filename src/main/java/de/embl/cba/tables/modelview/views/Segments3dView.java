@@ -25,17 +25,17 @@ import org.scijava.vecmath.Color3f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static de.embl.cba.bdv.utils.BdvUtils.getRAI;
 
-public class ImageSegments3dView
+public class Segments3dView
 		< T extends ImageSegment,
 				R extends RealType< R > & NativeType< R > >
 {
-	private final ImageSegmentsModel< T > imageSegmentsModel;
+	private final final List< T > segments;
 	private final SelectionModel< T > selectionModel;
 	private final SelectionColoringModel< T > selectionColoringModel;
-	private final ImageSourcesModel imageSourcesModel;
 	private ArrayList< double[] > segmentsSourceCalibrations;
 
 	private Image3DUniverse universe;
@@ -44,29 +44,25 @@ public class ImageSegments3dView
 	private HashMap< T, CustomTriangleMesh > segmentToMesh;
 	private HashMap< T, Content > segmentToContent;
 
-	public ImageSegments3dView(
-			final ImageSourcesModel imageSourcesModel,
-			final ImageSegmentsModel< T > imageSegmentsModel,
+	public Segments3dView(
+			final List< T > segments,
 			final SelectionModel< T > selectionModel,
 			final SelectionColoringModel< T > selectionColoringModel )
 	{
 
-		this( imageSourcesModel,
-				imageSegmentsModel,
+		this( segments,
 				selectionModel,
 				selectionColoringModel,
 				null );
 	}
 
-	public ImageSegments3dView(
-			final ImageSourcesModel imageSourcesModel,
-			final ImageSegmentsModel< T > imageSegmentsModel,
+	public Segments3dView(
+			final List< T > segments,
 			final SelectionModel< T > selectionModel,
 			final SelectionColoringModel< T > selectionColoringModel,
 			Image3DUniverse universe )
 	{
-		this.imageSourcesModel = imageSourcesModel;
-		this.imageSegmentsModel = imageSegmentsModel;
+		this.segments = segments;
 		this.selectionModel = selectionModel;
 		this.selectionColoringModel = selectionColoringModel;
 		this.universe = universe;
@@ -186,7 +182,7 @@ public class ImageSegments3dView
 	private RandomAccessibleInterval< R > getLabelsRAI( ImageSegment segment )
 	{
 		final Source< ? > labelsSource
-				= imageSourcesModel.sources().get( segment.imageId() ).source();
+				= segments.sources().get( segment.imageId() ).source();
 
 		final ArrayList< double[] > calibrations = getCalibrations( labelsSource );
 		final int level = getLevel( calibrations );
