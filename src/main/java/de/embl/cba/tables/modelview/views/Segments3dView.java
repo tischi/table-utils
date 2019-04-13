@@ -13,18 +13,17 @@ import de.embl.cba.tables.modelview.selection.SelectionModel;
 import ij.IJ;
 import ij3d.Content;
 import ij3d.Image3DUniverse;
+import ij3d.UniverseListener;
 import net.imglib2.FinalInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.realtransform.AffineTransform3D;
-import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.Views;
+import org.scijava.java3d.View;
 import org.scijava.vecmath.Color3f;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static de.embl.cba.bdv.utils.BdvUtils.getRAI;
 
@@ -41,6 +40,8 @@ public class Segments3dView < T extends ImageSegment >
 	private double voxelSpacing3DView;
 	private HashMap< T, CustomTriangleMesh > segmentToMesh;
 	private HashMap< T, Content > segmentToContent;
+	private HashMap< Content, T > contentToSegment;
+	private double transparency;
 
 	public Segments3dView(
 			final List< T > segments,
@@ -69,9 +70,12 @@ public class Segments3dView < T extends ImageSegment >
 		this.imageSourcesModel = imageSourcesModel;
 		this.universe = universe;
 
+		this.transparency = 0.5;
 		this.voxelSpacing3DView = 0.1;
+
 		this.segmentToMesh = new HashMap<>();
 		this.segmentToContent = new HashMap<>();
+		this.contentToSegment = new HashMap<>();
 
 		registerAsSelectionListener( this.selectionModel );
 		registerAsColoringListener( this.selectionColoringModel );
@@ -80,6 +84,11 @@ public class Segments3dView < T extends ImageSegment >
 	public void setVoxelSpacing3DView( double voxelSpacing3DView )
 	{
 		this.voxelSpacing3DView = voxelSpacing3DView;
+	}
+
+	public void setTransparency( double transparency )
+	{
+		this.transparency = transparency;
 	}
 
 	public Image3DUniverse getUniverse()
@@ -118,25 +127,71 @@ public class Segments3dView < T extends ImageSegment >
 		selectionModel.listeners().add( new SelectionListener< T >()
 		{
 			@Override
-			public void selectionChanged()
+			public synchronized void selectionChanged()
 			{
+				final Set< T > selected = selectionModel.getSelected();
+
+				addSelectedSegments( selected );
+				removeUnselectedSegments( selected );
 			}
 
 			@Override
-			public void focusEvent( T selection )
+			public synchronized void focusEvent( T selection )
 			{
 				if ( recentFocus != null && selection == recentFocus ) return;
-
 				recentFocus = selection;
-				showSegment( selection );
+				if ( segmentToContent.containsKey( selection ) )
+				{
+
+					// TODO: make a smooth animation
+//					final TransformGroup translateTG = universe.getTranslateTG();
+//					final Transform3D transform3D = new Transform3D();
+//					translateTG.getTransform( transform3D );
+//					//transform3D.setTranslation(  );
+//
+//					final Content c = segmentToContent.get( selection );
+//
+//					//universe.setGlobalTransform(  );
+//					universe.startAnimation();
+//					final TransformGroup animationTG = universe.getAnimationTG();
+//					//animationTG.
+					universe.adjustView( segmentToContent.get( selection ) );
+
+				}
 			}
 		} );
 	}
 
-	private synchronized void showSegment( T segment )
+	public void removeUnselectedSegments( Set< T > selectedSegments )
+	{
+		final Set< T > currentSegments = segmentToContent.keySet();
+		final Set< T > remove = new HashSet<>();
+		for ( T segment : currentSegments )
+			if ( ! selectedSegments.contains( segment ) )
+				remove.add( segment );
+
+		for( T segment : remove )
+			removeSegmentFrom3DView( segment );
+	}
+
+	public void addSelectedSegments( Set< T > segments )
+	{
+		for ( T segment : segments )
+			if ( ! segmentToContent.containsKey( segment ) )
+				addSegmentTo3DView( segment );
+	}
+
+	private synchronized void removeSegmentFrom3DView( T segment )
+	{
+		final Content content = segmentToContent.get( segment );
+		universe.removeContent( content.getName() );
+		segmentToContent.remove( segment );
+		contentToSegment.remove( content );
+	}
+
+	private synchronized void addSegmentTo3DView( T segment )
 	{
 		CustomTriangleMesh triangleMesh = getTriangleMesh( segment );
-
 		addMeshToUniverse( segment, triangleMesh );
 	}
 
@@ -190,18 +245,93 @@ public class Segments3dView < T extends ImageSegment >
 	}
 
 
-	private void addMeshToUniverse( T imageSegment, CustomTriangleMesh mesh )
+	private void addMeshToUniverse( T segment, CustomTriangleMesh mesh )
 	{
 		if ( universe == null )
-		{
-			universe = new Image3DUniverse();
-			universe.show();
-		}
+			initUniverseAndListener();
 
 		final Content content =
-				universe.addCustomMesh( mesh, "" + imageSegment.labelId() );
+				universe.addCustomMesh( mesh, "" + segment.labelId() );
 
-		segmentToContent.put( imageSegment, content );
+		content.setTransparency( (float) transparency );
+
+		content.setLocked( true );
+		//universe.adjustView( content );
+
+		segmentToContent.put( segment, content );
+		contentToSegment.put( content, segment );
+	}
+
+	private void initUniverseAndListener()
+	{
+		universe = new Image3DUniverse();
+		universe.show();
+
+
+		universe.addUniverseListener( new UniverseListener()
+		{
+			@Override
+			public void transformationStarted( View view )
+			{
+
+			}
+
+			@Override
+			public void transformationUpdated( View view )
+			{
+
+			}
+
+			@Override
+			public void transformationFinished( View view )
+			{
+
+			}
+
+			@Override
+			public void contentAdded( Content c )
+			{
+
+			}
+
+			@Override
+			public void contentRemoved( Content c )
+			{
+
+			}
+
+			@Override
+			public void contentChanged( Content c )
+			{
+
+			}
+
+			@Override
+			public void contentSelected( Content c )
+			{
+				if ( ! contentToSegment.containsKey( c ) )
+					return;
+
+				final T segment = contentToSegment.get( c );
+
+				if ( selectionModel.isFocused( segment ) )
+					return;
+				else
+					selectionModel.focus( segment );
+			}
+
+			@Override
+			public void canvasResized()
+			{
+
+			}
+
+			@Override
+			public void universeClosed()
+			{
+
+			}
+		} );
 	}
 
 	private Color3f getColor3f( T imageSegment )

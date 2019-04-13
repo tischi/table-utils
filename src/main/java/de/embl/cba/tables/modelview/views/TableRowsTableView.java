@@ -125,6 +125,28 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			}
 
 		} );
+
+		table.setDefaultRenderer( Long.class, new DefaultTableCellRenderer()
+		{
+			@Override
+			public Component getTableCellRendererComponent(
+					JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column )
+			{
+				Component c = super.getTableCellRendererComponent(
+						table,
+						value,
+						isSelected,
+						hasFocus,
+						row,
+						column );
+
+				c.setBackground( getColor( row, column ) );
+
+				return c;
+			}
+		});
+
 		table.setDefaultRenderer( Integer.class, new DefaultTableCellRenderer()
 		{
 			@Override
@@ -145,6 +167,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 				return c;
 			}
 		} );
+
 		table.setDefaultRenderer( Object.class, new DefaultTableCellRenderer()
 		{
 			@Override
@@ -350,7 +373,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	public void moveToRowInView( int rowInView )
 	{
 		recentlySelectedRowInView = rowInView;
-		table.getSelectionModel().setSelectionInterval( rowInView, rowInView );
+		//table.getSelectionModel().setSelectionInterval( rowInView, rowInView );
 		final Rectangle visibleRect = table.getVisibleRect();
 		final Rectangle cellRect = table.getCellRect( rowInView, 0, true );
 		visibleRect.y = cellRect.y;
