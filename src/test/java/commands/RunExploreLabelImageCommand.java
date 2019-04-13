@@ -11,10 +11,10 @@ public class RunExploreLabelImageCommand
 		final ImageJ ij = new ImageJ();
 		ij.ui().showUI();
 
-		IJ.open( RunExploreMorphoLibJSegmentationCommand.class.getResource(
+		IJ.open( RunExploreMorphoLibJ2DSegmentationCommand.class.getResource(
 				"blobs.zip" ).getFile() );
 
-		IJ.open( RunExploreMorphoLibJSegmentationCommand.class.getResource(
+		IJ.open( RunExploreMorphoLibJ2DSegmentationCommand.class.getResource(
 				"mask-lbl.zip" ).getFile() );
 
 		ij.command().run( ExploreLabelImageCommand.class, true );

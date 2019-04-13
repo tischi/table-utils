@@ -10,7 +10,7 @@ import de.embl.cba.tables.modelview.images.SourceMetadata;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
 import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
-import de.embl.cba.tables.modelview.views.DefaultTableAndBdvViews;
+import de.embl.cba.tables.modelview.views.ImageSegmentsTableAndBdvViews;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.text.TextWindow;
@@ -34,11 +34,11 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 	public static final String LABEL = "Label";
 	private static final String COLUMN_NAME_LABEL_IMAGE_ID = "LabelImage";
 
-	@Parameter ( label = "Label mask image" )
-	public ImagePlus labelImage;
-
 	@Parameter ( label = "Intensity image", required = false )
 	public ImagePlus intensityImage;
+
+	@Parameter ( label = "Label mask image" )
+	public ImagePlus labelImage;
 
 	@Parameter ( label = "Results table title" )
 	public String resultsTableTitle;
@@ -76,8 +76,8 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 
 		final ImageSourcesModel imageSourcesModel = createImageSourcesModel();
 
-		final DefaultTableAndBdvViews views =
-				new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel, resultsTableTitle );
+		final ImageSegmentsTableAndBdvViews views =
+				new ImageSegmentsTableAndBdvViews( tableRowImageSegments, imageSourcesModel, resultsTableTitle );
 
 		views.getTableRowsTableView().categoricalColumnNames().add( LABEL );
 	}

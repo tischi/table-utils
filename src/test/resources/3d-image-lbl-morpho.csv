@@ -1,4 +1,4 @@
-Label,Volume,SurfaceArea,MeanBreadth,Sphericity,EulerNumber,Centroid.X,Centroid.Y,Centroid.Z,Elli.Center.X,Elli.Center.Y,Elli.Center.Z,Elli.R1,Elli.R2,Elli.R3,Elli.Azim,Elli.Elev,Elli.Roll,Elli.R1/R2,Elli.R1/R3,Elli.R2/R3,InscrBall.Center.X,InscrBall.Center.Y,InscrBall.Center.Z,InscrBall.Radius
-1,341,252.489,9.106,0.817,1,22.500,28.500,22.500,22.500,28.500,22.500,5.440,5.440,2.745,-180,0,-0,1.000,1.981,1.981,22,27,22,3.667
-2,1603,1048.437,27.246,0.252,1,65.500,27.500,50.500,65.500,27.500,50.500,31.386,4.530,2.829,-180,0,-0,6.928,11.094,1.601,44,27,50,3.667
-3,1844,975.112,18.551,0.415,1,61.500,69.000,62.500,61.500,69.000,62.500,12.474,11.965,2.984,0,0,-180,1.043,4.180,4.010,60,61,62,3.667
+Label,MeanBreadth,Centroid.X,Centroid.Y,Centroid.Z
+1,21.504,73.406,26.657,44.500
+2,20.771,28.490,31.581,45.018
+3,23.428,72.467,71.947,44.571

@@ -6,7 +6,7 @@ import de.embl.cba.tables.modelview.images.FileImageSourcesModelFactory;
 import de.embl.cba.tables.modelview.segments.ImageSegmentCoordinate;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
 import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
-import de.embl.cba.tables.modelview.views.DefaultTableAndBdvViews;
+import de.embl.cba.tables.modelview.views.ImageSegmentsTableAndBdvViews;
 import org.scijava.command.Command;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
@@ -66,8 +66,8 @@ public class ExploreObjectsTableCommand implements Command
 						imageRootFolder.toString(),
 						is2D ).getImageSourcesModel();
 
-		final DefaultTableAndBdvViews views =
-				new DefaultTableAndBdvViews( tableRowImageSegments, imageSourcesModel, tableFile.getName() );
+		final ImageSegmentsTableAndBdvViews views =
+				new ImageSegmentsTableAndBdvViews( tableRowImageSegments, imageSourcesModel, tableFile.getName() );
 
 		views.getTableRowsTableView().categoricalColumnNames().add(
 				coordinateToColumnName.get( ImageSegmentCoordinate.ObjectLabel ) );

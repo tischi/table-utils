@@ -28,7 +28,9 @@ import java.util.HashMap;
 
 import static de.embl.cba.bdv.utils.BdvUtils.getRAI;
 
-public class ImageSegments3dView< T extends ImageSegment, R extends RealType< R > & NativeType< R > >
+public class ImageSegments3dView
+		< T extends ImageSegment,
+				R extends RealType< R > & NativeType< R > >
 {
 	private final ImageSegmentsModel< T > imageSegmentsModel;
 	private final SelectionModel< T > selectionModel;

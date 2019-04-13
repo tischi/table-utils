@@ -37,7 +37,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private AssignValuesToTableRowsDialog assignObjectAttributesUI;
 	private HelpDialog helpDialog;
 	private Set< String > customColumns;
-	private int recentlyMovedToRowInView;
 	private ColorByColumnDialog< T > colorByColumnDialog;
 	private MeasureSimilarityDialog< T > measureSimilarityDialog;
 
@@ -53,6 +52,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		this.categoricalColumnNames = new HashSet<>(  );
 		this.customColumns = new HashSet<>(  );
+
+		recentlySelectedRowInView = -1;
 
 		registerAsSelectionListener( selectionModel );
 		registerAsColoringListener( selectionColoringModel );
@@ -337,7 +338,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	public void moveToRowInView( int rowInView )
 	{
-		recentlyMovedToRowInView = rowInView;
+		recentlySelectedRowInView = rowInView;
 		table.getSelectionModel().setSelectionInterval( rowInView, rowInView );
 		final Rectangle visibleRect = table.getVisibleRect();
 		final Rectangle cellRect = table.getCellRect( rowInView, 0, true );
@@ -357,7 +358,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 					if ( selectedRowInView == -1 ) return;
 
-					if ( selectedRowInView == recentlyMovedToRowInView ) return;
+					if ( selectedRowInView == recentlySelectedRowInView ) return;
 
 					recentlySelectedRowInView = selectedRowInView;
 
