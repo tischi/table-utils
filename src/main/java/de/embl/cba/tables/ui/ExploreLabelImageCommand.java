@@ -48,12 +48,14 @@ public class ExploreLabelImageCommand < R extends RealType< R > > implements Com
 		final SelectionColoringModel< ImageSegment > selectionColoringModel
 				= new SelectionColoringModel< ImageSegment >( coloringModel, selectionModel );
 
-		new SegmentsBdvView(
-				imageSourcesModel,
-				lazyImageSegmentsModel,
-				selectionModel,
-				selectionColoringModel
-		);
+		// TODO: make this work....
+		//
+//		new SegmentsBdvView(
+//				imageSourcesModel,
+//				lazyImageSegmentsModel,
+//				selectionModel,
+//				selectionColoringModel
+//		);
 
 	}
 

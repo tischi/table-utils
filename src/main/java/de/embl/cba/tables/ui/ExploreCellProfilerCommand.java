@@ -6,7 +6,7 @@ import de.embl.cba.tables.cellprofiler.FolderAndFileColumn;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModelFactory;
 import de.embl.cba.tables.modelview.segments.*;
-import de.embl.cba.tables.modelview.views.combined.ImageSegmentsTableAndBdvViews;
+import de.embl.cba.tables.modelview.views.combined.SegmentsTableAndBdvViews;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
@@ -58,7 +58,7 @@ public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R
 						tablePath,
 						true ).getImageSourcesModel();
 
-		new ImageSegmentsTableAndBdvViews( tableRowImageSegments, imageSourcesModel, inputTableFile.getName() );
+		new SegmentsTableAndBdvViews( tableRowImageSegments, imageSourcesModel, inputTableFile.getName() );
 	}
 
 	private List< TableRowImageSegment > createAnnotatedImageSegments( File tableFile )

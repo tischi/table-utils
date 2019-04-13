@@ -14,7 +14,7 @@ import de.embl.cba.tables.modelview.views.TableRowsTableView;
 
 import java.util.List;
 
-public class ImageSegmentsTableAndBdvViews
+public class SegmentsTableAndBdvViews
 {
 	private final List< TableRowImageSegment > tableRowImageSegments;
 	private final ImageSourcesModel imageSourcesModel;
@@ -22,7 +22,7 @@ public class ImageSegmentsTableAndBdvViews
 	private SegmentsBdvView< TableRowImageSegment > segmentsBdvView;
 	private TableRowsTableView< TableRowImageSegment > tableRowsTableView;
 
-	public ImageSegmentsTableAndBdvViews(
+	public SegmentsTableAndBdvViews(
 			List< TableRowImageSegment > tableRowImageSegments,
 			ImageSourcesModel imageSourcesModel,
 			String viewName )
@@ -30,7 +30,7 @@ public class ImageSegmentsTableAndBdvViews
 		this( tableRowImageSegments, imageSourcesModel, viewName, null );
 	}
 
-	public ImageSegmentsTableAndBdvViews(
+	public SegmentsTableAndBdvViews(
 			List< TableRowImageSegment > tableRowImageSegments,
 			ImageSourcesModel imageSourcesModel,
 			String viewName,

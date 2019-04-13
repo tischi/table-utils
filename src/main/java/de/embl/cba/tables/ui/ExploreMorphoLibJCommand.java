@@ -10,7 +10,8 @@ import de.embl.cba.tables.modelview.images.SourceMetadata;
 import de.embl.cba.tables.modelview.segments.SegmentProperty;
 import de.embl.cba.tables.modelview.segments.SegmentUtils;
 import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
-import de.embl.cba.tables.modelview.views.combined.ImageSegmentsTableAndBdvViews;
+import de.embl.cba.tables.modelview.views.combined.SegmentsTableAndBdvViews;
+import de.embl.cba.tables.modelview.views.combined.SegmentsTableBdvAnd3dViews;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.text.TextWindow;
@@ -39,7 +40,7 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 	public static final String CENTROID_X = "Centroid.X";
 	public static final String CENTROID_Y = "Centroid.Y";
 	public static final String CENTROID_Z = "Centroid.Z";
-	public static final String MEAN_BREADTH = "Mean_Breadth";
+	public static final String MEAN_BREADTH = "MeanBreadth";
 
 	@Parameter ( label = "Intensity image", required = false )
 	public ImagePlus intensityImage;
@@ -76,10 +77,20 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 
 		final ImageSourcesModel imageSourcesModel = createImageSourcesModel();
 
-		new ImageSegmentsTableAndBdvViews(
+		if ( numSpatialDimensions == 2 )
+		{
+			new SegmentsTableAndBdvViews(
 					tableRowImageSegments,
 					imageSourcesModel,
 					resultsTableTitle );
+		}
+		else
+		{
+			new SegmentsTableBdvAnd3dViews(
+					tableRowImageSegments,
+					imageSourcesModel,
+					resultsTableTitle );
+		}
 	}
 
 	public void throwResultsTableNotFoundError()
@@ -197,7 +208,7 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 			String centroid,
 			String bb,
 			boolean min
-			)
+	)
 	{
 		final int numRows = columns.values().iterator().next().size();
 
@@ -211,9 +222,9 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 					columns.get( MEAN_BREADTH ).get( row ).toString() );
 
 			if ( min )
-				column.add( centre - 0.5 * meanBreadth );
+				column.add( (long) ( centre - 0.5 * meanBreadth ) );
 			else
-				column.add( centre + 0.5 * meanBreadth );
+				column.add( (long) ( centre + 0.5 * meanBreadth ) );
 		}
 
 		columns.put( bb, column );

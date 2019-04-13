@@ -192,8 +192,15 @@ public class Segments3dView < T extends ImageSegment >
 
 	private void addMeshToUniverse( T imageSegment, CustomTriangleMesh mesh )
 	{
-		if ( universe == null ) universe = new Image3DUniverse();
-		final Content content = universe.addCustomMesh( mesh, "" + imageSegment.labelId() );
+		if ( universe == null )
+		{
+			universe = new Image3DUniverse();
+			universe.show();
+		}
+
+		final Content content =
+				universe.addCustomMesh( mesh, "" + imageSegment.labelId() );
+
 		segmentToContent.put( imageSegment, content );
 	}
 

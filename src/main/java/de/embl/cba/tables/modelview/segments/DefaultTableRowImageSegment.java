@@ -42,6 +42,18 @@ public class DefaultTableRowImageSegment implements TableRowImageSegment
 	}
 
 	@Override
+	public float[] getMesh()
+	{
+		return imageSegment.getMesh();
+	}
+
+	@Override
+	public void setMesh( float[] mesh )
+	{
+		imageSegment.setMesh( mesh );
+	}
+
+	@Override
 	public LinkedHashMap< String, Object > cells()
 	{
 		return tableRow.cells();
