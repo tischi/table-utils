@@ -18,8 +18,10 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	private final LinkedHashMap< String, List< ? > > columns;
 	private final Map< SegmentProperty, List< ? > > segmentPropertyToColumn;
 	private double[] position;
+	FinalInterval boundingBox;
 	private LinkedHashMap< String, Object > cells;
 	private boolean isOneBasedTimePoint;
+	private float[] mesh;
 
 	public ColumnBasedTableRowImageSegment(
 			int row,
@@ -33,7 +35,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 		this.isOneBasedTimePoint = isOneBasedTimePoint;
 	}
 
-	private synchronized void setPositionFromColumns()
+	private synchronized void setPosition()
 	{
 		if ( position != null ) return;
 
@@ -41,21 +43,21 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.X ) )
 			position[ 0 ] = Double.parseDouble(
-					segmentPropertyToColumn
-							.get( SegmentProperty.X )
-							.get( row ).toString() );
+								segmentPropertyToColumn
+								.get( SegmentProperty.X )
+								.get( row ).toString() );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.Y ) )
 			position[ 1 ] = Double.parseDouble(
-					segmentPropertyToColumn
-							.get( SegmentProperty.Y )
-							.get( row ).toString() );
+								segmentPropertyToColumn
+								.get( SegmentProperty.Y )
+								.get( row ).toString() );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.Z ) )
 			position[ 2 ] = Double.parseDouble(
-					segmentPropertyToColumn
-							.get( SegmentProperty.Z )
-							.get( row ).toString() );
+								segmentPropertyToColumn
+								.get( SegmentProperty.Z )
+								.get( row ).toString() );
 	}
 
 	@Override
@@ -92,7 +94,83 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	@Override
 	public FinalInterval boundingBox()
 	{
-		return null;
+		setBoundingBox();
+		return boundingBox;
+	}
+
+	@Override
+	public float[] getMesh()
+	{
+		return mesh;
+	}
+
+	@Override
+	public void setMesh( float[] mesh )
+	{
+		this.mesh = mesh;
+	}
+
+	private void setBoundingBox()
+	{
+		// TODO: this checking needs improvement...
+		if ( ! segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxXMin ) )
+		{
+			boundingBox = null;
+			return;
+		}
+
+		final long[] min = getBoundingBoxMin();
+		final long[] max = getBoundingBoxMax();
+
+		boundingBox = new FinalInterval( min, max );
+	}
+
+	private long[] getBoundingBoxMax()
+	{
+		final long[] max = new long[ numDimensions() ];
+
+		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxXMax ) )
+			max[ 0 ] = Long.parseLong(
+					segmentPropertyToColumn
+							.get( SegmentProperty.BoundingBoxXMax )
+							.get( row ).toString() );
+
+		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxYMax ) )
+			max[ 1 ] = Long.parseLong(
+					segmentPropertyToColumn
+							.get( SegmentProperty.BoundingBoxYMax )
+							.get( row ).toString() );
+
+		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxZMax ) )
+			max[ 2 ] = Long.parseLong(
+					segmentPropertyToColumn
+							.get( SegmentProperty.BoundingBoxZMax )
+							.get( row ).toString() );
+		return max;
+	}
+
+	private long[] getBoundingBoxMin()
+	{
+		final long[] min = new long[ numDimensions() ];
+
+		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxXMin ) )
+			min[ 0 ] = Long.parseLong(
+							segmentPropertyToColumn
+								.get( SegmentProperty.BoundingBoxXMin )
+								.get( row ).toString() );
+
+		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxYMin ) )
+			min[ 1 ] = Long.parseLong(
+					segmentPropertyToColumn
+							.get( SegmentProperty.BoundingBoxYMin )
+							.get( row ).toString() );
+
+		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxZMin ) )
+			min[ 2 ] = Long.parseLong(
+					segmentPropertyToColumn
+							.get( SegmentProperty.BoundingBoxZMin )
+							.get( row ).toString() );
+		return min;
 	}
 
 	@Override
@@ -123,7 +201,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	@Override
 	public synchronized void localize( float[] position )
 	{
-		setPositionFromColumns();
+		setPosition();
 
 		for ( int d = 0; d < 3; d++ )
 			position[ d ] = (float) this.position[ d ];
@@ -132,7 +210,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	@Override
 	public synchronized void localize( double[] position )
 	{
-		setPositionFromColumns();
+		setPosition();
 
 		for ( int d = 0; d < 3; d++ )
 			position[ d ] = this.position[ d ];
@@ -141,21 +219,21 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	@Override
 	public synchronized float getFloatPosition( int d )
 	{
-		setPositionFromColumns();
+		setPosition();
 		return (float) position[ d ];
 	}
 
 	@Override
 	public synchronized double getDoublePosition( int d )
 	{
-		setPositionFromColumns();
+		setPosition();
 		return position[ d ];
 	}
 
 	@Override
 	public int numDimensions()
 	{
-		setPositionFromColumns();
+		setPosition();
 		return position.length;
 	}
 }

@@ -71,7 +71,6 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 			return;
 		}
 
-
 		final List< TableRowImageSegment > tableRowImageSegments
 				= createMLJTableRowImageSegments( resultsTable );
 
@@ -205,16 +204,16 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 		final List< Object > column = new ArrayList<>();
 		for ( int row = 0; row < numRows; row++ )
 		{
-			final double centroid = Double.parseDouble(
+			final double centre = Double.parseDouble(
 					columns.get( centroid ).get( row ).toString() );
 
 			final double meanBreadth = Double.parseDouble(
 					columns.get( MEAN_BREADTH ).get( row ).toString() );
 
 			if ( min )
-				column.add( centroid - meanBreadth );
+				column.add( centre - 0.5 * meanBreadth );
 			else
-				column.add( centroid + meanBreadth );
+				column.add( centre + 0.5 * meanBreadth );
 		}
 
 		columns.put( bb, column );

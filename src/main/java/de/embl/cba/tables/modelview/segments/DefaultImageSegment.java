@@ -9,6 +9,7 @@ public class DefaultImageSegment implements ImageSegment
 	private final String imageId;
 	private final double labelId;
 	private final int timePoint;
+	private float[] mesh;
 
 	public DefaultImageSegment(
 			String imageId,
@@ -22,8 +23,8 @@ public class DefaultImageSegment implements ImageSegment
 		this.imageId = imageId;
 		this.labelId = labelId;
 		this.timePoint = timePoint;
-		this.boundingBox = boundingBox;
 		this.position = new double[]{ x, y, z };
+		this.boundingBox = boundingBox;
 	}
 
 	@Override
@@ -48,6 +49,18 @@ public class DefaultImageSegment implements ImageSegment
 	public FinalInterval boundingBox()
 	{
 		return boundingBox;
+	}
+
+	@Override
+	public float[] getMesh()
+	{
+		return mesh;
+	}
+
+	@Override
+	public void setMesh( float[] mesh )
+	{
+		this.mesh = mesh;
 	}
 
 	@Override

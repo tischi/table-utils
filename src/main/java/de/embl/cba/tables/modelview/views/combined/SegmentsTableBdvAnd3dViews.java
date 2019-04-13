@@ -8,6 +8,7 @@ import de.embl.cba.tables.modelview.images.ImageSourcesModel;
 import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
 import de.embl.cba.tables.modelview.selection.DefaultSelectionModel;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
+import de.embl.cba.tables.modelview.views.Segments3dView;
 import de.embl.cba.tables.modelview.views.SegmentsBdvView;
 import de.embl.cba.tables.modelview.views.TableRowsTableView;
 
@@ -55,7 +56,10 @@ public class SegmentsTableBdvAnd3dViews
 					selectionModel );
 
 		segmentsBdvView = new SegmentsBdvView< TableRowImageSegment >(
-				tableRowImageSegments, selectionModel, selectionColoringModel, imageSourcesModel,
+				tableRowImageSegments,
+				selectionModel,
+				selectionColoringModel,
+				imageSourcesModel,
 				bdv );
 
 		tableRowsTableView = new TableRowsTableView< TableRowImageSegment >(
@@ -63,6 +67,13 @@ public class SegmentsTableBdvAnd3dViews
 				selectionModel,
 				selectionColoringModel,
 				viewName );
+
+		new Segments3dView< TableRowImageSegment >(
+				tableRowImageSegments,
+				selectionModel,
+				selectionColoringModel,
+				imageSourcesModel
+		);
 
 
 	}

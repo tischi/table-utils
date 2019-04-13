@@ -6,7 +6,6 @@ import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.tables.mesh.MeshExtractor;
 import de.embl.cba.tables.mesh.MeshUtils;
 import de.embl.cba.tables.modelview.coloring.*;
-import de.embl.cba.tables.modelview.combined.ImageSegmentsModel;
 import de.embl.cba.tables.modelview.images.ImageSourcesModel;
 import de.embl.cba.tables.modelview.segments.ImageSegment;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
@@ -29,13 +28,12 @@ import java.util.List;
 
 import static de.embl.cba.bdv.utils.BdvUtils.getRAI;
 
-public class Segments3dView
-		< T extends ImageSegment,
-				R extends RealType< R > & NativeType< R > >
+public class Segments3dView < T extends ImageSegment >
 {
-	private final final List< T > segments;
+	private final List< T > segments;
 	private final SelectionModel< T > selectionModel;
 	private final SelectionColoringModel< T > selectionColoringModel;
+	private final ImageSourcesModel imageSourcesModel;
 	private ArrayList< double[] > segmentsSourceCalibrations;
 
 	private Image3DUniverse universe;
@@ -47,12 +45,14 @@ public class Segments3dView
 	public Segments3dView(
 			final List< T > segments,
 			final SelectionModel< T > selectionModel,
-			final SelectionColoringModel< T > selectionColoringModel )
+			final SelectionColoringModel< T > selectionColoringModel,
+			ImageSourcesModel imageSourcesModel )
 	{
 
 		this( segments,
 				selectionModel,
 				selectionColoringModel,
+				imageSourcesModel,
 				null );
 	}
 
@@ -60,11 +60,13 @@ public class Segments3dView
 			final List< T > segments,
 			final SelectionModel< T > selectionModel,
 			final SelectionColoringModel< T > selectionColoringModel,
+			ImageSourcesModel imageSourcesModel,
 			Image3DUniverse universe )
 	{
 		this.segments = segments;
 		this.selectionModel = selectionModel;
 		this.selectionColoringModel = selectionColoringModel;
+		this.imageSourcesModel = imageSourcesModel;
 		this.universe = universe;
 
 		this.voxelSpacing3DView = 0.1;
@@ -133,62 +135,56 @@ public class Segments3dView
 
 	private synchronized void showSegment( T segment )
 	{
-		CustomTriangleMesh mesh;
+		CustomTriangleMesh triangleMesh = getTriangleMesh( segment );
 
-		if ( segmentToMesh.containsKey( segment ) )
-		{
-			mesh = segmentToMesh.get( segment );
-		}
-		else
-		{
-			if ( segment.boundingBox() != null )
-			{
-				mesh = createMesh( segment );
-				segmentToMesh.put( segment, mesh );
-			}
-			else
-			{
-				// TODO: Create mesh with FloodFill
-				IJ.showMessage( "ImageSegments without bounding box " +
-						"are currently not supported." );
-				return;
-			}
-		}
-
-		mesh.setColor( getColor3f( segment ) );
-
-		addMeshToUniverse( segment, mesh );
+		addMeshToUniverse( segment, triangleMesh );
 	}
 
-	private CustomTriangleMesh createMesh( ImageSegment segment )
+	private CustomTriangleMesh getTriangleMesh( T segment )
 	{
-		CustomTriangleMesh mesh;
-		final FinalInterval interval = segment.boundingBox();
-		final RandomAccessibleInterval< R > rai = getLabelsRAI( segment );
+		if ( segment.getMesh() == null )
+			if ( segment.boundingBox() != null )
+				addMesh( segment );
+			else // TODO: Create mesh with FloodFill
+				IJ.showMessage( "ImageSegments without bounding box " +
+						"are currently not supported." );
 
+		CustomTriangleMesh triangleMesh = MeshUtils.asCustomTriangleMesh( segment.getMesh() );
+		triangleMesh.setColor( getColor3f( segment ) );
+		return triangleMesh;
+	}
+
+	private void addMesh( ImageSegment segment )
+	{
+		final FinalInterval interval = segment.boundingBox();
+		final RandomAccessibleInterval< ? extends RealType< ? > > rai =
+				getLabelsRAI( segment );
+
+		// TODO: get rid of raw cast, somehow....
 		final MeshExtractor meshExtractor = new MeshExtractor(
-				Views.extendZero( rai ),
+				Views.extendZero( ( RandomAccessibleInterval ) rai ),
 				interval,
 				new AffineTransform3D(),
 				new int[]{ 1, 1, 1 },
 				() -> false );
 
-		mesh = MeshUtils.asCustomTriangleMesh(
-				meshExtractor.generateMesh( segment.labelId() ) );
+		final float[] meshCoordinates = meshExtractor.generateMesh( segment.labelId() );
 
-		return mesh;
+		segment.setMesh( meshCoordinates );
 	}
 
-	private RandomAccessibleInterval< R > getLabelsRAI( ImageSegment segment )
+	private RandomAccessibleInterval< ? extends RealType< ? > >
+	getLabelsRAI( ImageSegment segment )
 	{
 		final Source< ? > labelsSource
-				= segments.sources().get( segment.imageId() ).source();
+				= imageSourcesModel.sources().get( segment.imageId() ).source();
 
 		final ArrayList< double[] > calibrations = getCalibrations( labelsSource );
 		final int level = getLevel( calibrations );
 
 		// TODO: is below rai really nonVolatile???
-		final RandomAccessibleInterval< R > rai = getRAI( labelsSource, 0, level );
+		final RandomAccessibleInterval< ? extends RealType< ? > > rai
+				= getRAI( labelsSource, 0, level );
 
 		return rai;
 	}
