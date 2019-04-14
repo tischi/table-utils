@@ -31,7 +31,7 @@ public class ColumnClassAwareTableModel extends DefaultTableModel
 	}
 
 	/**
-	 * Determines getColumn classes from entries in 1st row.
+	 * Determines getColumnName classes from entries in 1st row.
 	 */
 	public void refreshColumnClassesFromStringColumns()
 	{
@@ -54,7 +54,7 @@ public class ColumnClassAwareTableModel extends DefaultTableModel
 	}
 
 	/**
-	 * Determines getColumn classes from entries in 1st row.
+	 * Determines getColumnName classes from entries in 1st row.
 	 */
 	public void refreshColumnClassesFromObjectColumns()
 	{

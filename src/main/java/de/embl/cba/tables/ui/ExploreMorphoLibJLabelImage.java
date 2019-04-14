@@ -46,6 +46,8 @@ public class ExploreMorphoLibJLabelImage
 	private LinkedHashMap< String, List< ? > > columns;
 	private int numSpatialDimensions;
 	private String labelImageId;
+	private SegmentsTableBdvAnd3dViews tableBdvAnd3dViews;
+	private SegmentsTableAndBdvViews tableAndBdvViews;
 
 	public ExploreMorphoLibJLabelImage(
 			ImagePlus intensityImage,
@@ -81,18 +83,28 @@ public class ExploreMorphoLibJLabelImage
 
 		if ( numSpatialDimensions == 2 )
 		{
-			new SegmentsTableAndBdvViews(
+			tableAndBdvViews = new SegmentsTableAndBdvViews(
 					tableRowImageSegments,
 					imageSourcesModel,
 					resultsTableTitle );
 		}
 		else
 		{
-			new SegmentsTableBdvAnd3dViews(
+			tableBdvAnd3dViews = new SegmentsTableBdvAnd3dViews(
 					tableRowImageSegments,
 					imageSourcesModel,
 					resultsTableTitle );
 		}
+	}
+
+	public SegmentsTableBdvAnd3dViews getTableBdvAnd3dViews()
+	{
+		return tableBdvAnd3dViews;
+	}
+
+	public SegmentsTableAndBdvViews getTableAndBdvViews()
+	{
+		return tableAndBdvViews;
 	}
 
 	private void fetchResultsTables()

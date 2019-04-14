@@ -35,6 +35,11 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 		this.isOneBasedTimePoint = isOneBasedTimePoint;
 	}
 
+	public LinkedHashMap< String, List< ? > > getColumns()
+	{
+		return columns;
+	}
+
 	private synchronized void setPosition()
 	{
 		if ( position != null ) return;

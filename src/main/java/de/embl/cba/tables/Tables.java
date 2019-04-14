@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class TableUtils
+public class Tables
 {
 	public static JTable asJTable( GenericTable genericTable )
 	{
@@ -48,7 +48,7 @@ public class TableUtils
 	{
 		try
 		{
-			TableUtils.saveTableWithIOException( table, tableOutputFile );
+			Tables.saveTableWithIOException( table, tableOutputFile );
 		}
 		catch ( IOException e )
 		{
@@ -565,6 +565,21 @@ public class TableUtils
 		}
 	}
 
+
+	public static void addColumn( JTable table, String column, Object[] values )
+	{
+		addColumn( table.getModel(), column, values );
+	}
+
+	public static void addColumn( TableModel model, String column, Object[] values )
+	{
+		if ( model instanceof ColumnClassAwareTableModel )
+			( (ColumnClassAwareTableModel) model ).addColumnClass( values[ 0 ] );
+
+		if ( model instanceof DefaultTableModel )
+			( (DefaultTableModel) model ).addColumn( column, values );
+	}
+
 	public static void addRelativeImagePathColumn(
 			JTable table,
 			File tableFile,
@@ -573,7 +588,7 @@ public class TableUtils
 	{
 		if ( imageFile == null ) return;
 		final Path relativeImagePath = getRelativePath( tableFile, imageFile );
-		TableUtils.addColumn( table, "RelativeImagePath_" + imageName, relativeImagePath );
+		Tables.addColumn( table, "RelativeImagePath_" + imageName, relativeImagePath );
 	}
 
 	public static Path getRelativePath( File tableFile, File imageFile )
@@ -601,16 +616,10 @@ public class TableUtils
 
 	public static double asDouble( Object featureValue )
 	{
-		double value;
 		if ( featureValue instanceof Number )
-		{
-			value = (( Number ) featureValue).doubleValue();
-		}
+			return (( Number ) featureValue).doubleValue();
 		else
-		{
-			value = Double.parseDouble( ( String ) featureValue );
-		}
-		return value;
+			return Double.parseDouble( featureValue.toString() );
 	}
 
 	public static double[] minMax( String column, JTable table )
@@ -639,6 +648,32 @@ public class TableUtils
 
 	public static double[] meanSigma( int columnIndex, JTable table )
 	{
+
+		double mean = computeMean( columnIndex, table );
+		double sigma = computeSigma( columnIndex, table, mean );
+
+		return new double[]{ mean, sigma };
+	}
+
+	public static double computeSigma( int columnIndex, JTable table, double mean )
+	{
+		final int rowCount = table.getRowCount();
+
+		double sigma = 0.0;
+		double value;
+		for ( int row = 0; row < rowCount; row++ )
+		{
+			value = ( Double ) table.getValueAt( row, columnIndex );
+			sigma += Math.pow( value - mean, 2 );
+		}
+
+		sigma /= rowCount; // variance
+		sigma = Math.sqrt( sigma ); // sigma
+		return sigma;
+	}
+
+	public static double computeMean( int columnIndex, JTable table )
+	{
 		final int rowCount = table.getRowCount();
 
 		double mean = 0.0;
@@ -647,19 +682,8 @@ public class TableUtils
 			final double value = ( Double ) table.getValueAt( row, columnIndex );
 			mean += value;
 		}
-
 		mean /= rowCount;
-
-		double sigma = 0.0;
-		for ( int row = 0; row < rowCount; row++ )
-		{
-			final double value = ( Double ) table.getValueAt( row, columnIndex );
-			sigma += Math.pow( value - mean, 2 );
-		}
-
-		sigma /= rowCount;
-
-		return new double[]{ mean, sigma };
+		return mean;
 	}
 
 

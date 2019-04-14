@@ -2,14 +2,14 @@ package de.embl.cba.tables.modelview.views;
 
 import bdv.tools.HelpDialog;
 import de.embl.cba.tables.TableUIs;
-import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.modelview.coloring.*;
 import de.embl.cba.tables.modelview.segments.TableRow;
 import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.ui.AssignValuesToTableRowsDialog;
-import de.embl.cba.tables.ui.ColorByColumnDialog;
-import de.embl.cba.tables.ui.MeasureSimilarityDialog;
+import de.embl.cba.tables.ui.ColorByColumn;
+import de.embl.cba.tables.ui.MeasureDistance;
 import ij.IJ;
 import net.imglib2.type.numeric.ARGBType;
 
@@ -37,9 +37,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private AssignValuesToTableRowsDialog assignObjectAttributesUI;
 	private HelpDialog helpDialog;
 	private Set< String > customColumns;
-	private ColorByColumnDialog< T > colorByColumnDialog;
-	private MeasureSimilarityDialog< T > measureSimilarityDialog;
-
+	private ColorByColumn< T > colorByColumn;
+	private MeasureDistance< T > measureDistance;
 
 	public TableRowsTableView(
 			final List< T > tableRows,
@@ -215,7 +214,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private void createTable()
     {
-		table = TableUtils.jTableFromTableRows( tableRows );
+		table = Tables.jTableFromTableRows( tableRows );
 
 		table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
         table.setFillsViewportHeight( true );
@@ -356,12 +355,12 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	public void addColumn( String column, Object defaultValue )
 	{
 		customColumns.add( column );
-		TableUtils.addColumn( table.getModel(), column, defaultValue );
+		Tables.addColumn( table.getModel(), column, defaultValue );
 	}
 
 	public List< String > getColumnNames()
 	{
-		return TableUtils.getColumnNames( table );
+		return Tables.getColumnNames( table );
 	}
 
 	public JTable getTable()
@@ -415,6 +414,11 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			@Override
 			public synchronized void selectionChanged()
 			{
+				if ( selectionModel.isEmpty() )
+				{
+					recentlySelectedRowInView = -1;
+					table.getSelectionModel().clearSelection();
+				}
 				SwingUtilities.invokeLater( () -> table.repaint() );
 			}
 
@@ -451,22 +455,20 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		final JMenuItem menuItem = new JMenuItem( "Color by Column..." );
 
-		this.colorByColumnDialog = new ColorByColumnDialog();
+		this.colorByColumn = new ColorByColumn( table, selectionColoringModel );
 
 		menuItem.addActionListener( e ->
 				new Thread( () ->
-						colorByColumnDialog.showDialog(
-								table,
-								selectionColoringModel ) ).start() );
+						colorByColumn.showDialog() ).start() );
 
 		coloringMenu.add( menuItem );
 	}
 
 	private void addMeasureSimilarityMenuItem( JMenu menu )
 	{
-		final JMenuItem menuItem = new JMenuItem( "Measure Similarity..." );
+		final JMenuItem menuItem = new JMenuItem( "Measure Distance to Selected Rows..." );
 
-		this.measureSimilarityDialog = new MeasureSimilarityDialog();
+		this.measureDistance = new MeasureDistance( table, tableRows );
 
 		menuItem.addActionListener( e ->
 				new Thread( () ->
@@ -478,7 +480,12 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 					}
 					else
 					{
-						measureSimilarityDialog.showDialog( table, selectionModel.getSelected() );
+						if ( measureDistance.showDialog( selectionModel.getSelected() ) )
+						{
+							colorByColumn.colorByColumn(
+									measureDistance.getNewColumnName(),
+									ColorByColumn.LINEAR_BLUE_WHITE_RED );
+						}
 					}
 				}
  				).start() );
@@ -486,13 +493,17 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		menu.add( menuItem );
 	}
 
+	public MeasureDistance< T > getMeasureDistance()
+	{
+		return measureDistance;
+	}
 
 	public void initHelpDialog()
 	{
 		helpDialog =
 				new HelpDialog(
 						frame,
-						TableUtils.class.getResource( "/TableUtilsHelp.html" ) );
+						Tables.class.getResource( "/TableUtilsHelp.html" ) );
 	}
 
 

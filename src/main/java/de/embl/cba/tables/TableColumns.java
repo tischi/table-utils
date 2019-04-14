@@ -79,11 +79,11 @@ public class TableColumns
 			final File file,
 			String delim )
 	{
-		final List< String > rowsInTableIncludingHeader = TableUtils.readRows( file );
+		final List< String > rowsInTableIncludingHeader = Tables.readRows( file );
 
-		delim = TableUtils.autoDelim( delim, rowsInTableIncludingHeader );
+		delim = Tables.autoDelim( delim, rowsInTableIncludingHeader );
 
-		List< String > columnNames = TableUtils.getColumnNames( rowsInTableIncludingHeader, delim );
+		List< String > columnNames = Tables.getColumnNames( rowsInTableIncludingHeader, delim );
 
 		final LinkedHashMap< String, List< String > > columnToStringValues = new LinkedHashMap<>();
 

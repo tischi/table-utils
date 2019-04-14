@@ -320,6 +320,8 @@ public class Segments3dView < T extends ImageSegment >
 					return;
 				else
 					selectionModel.focus( segment );
+
+
 			}
 
 			@Override

@@ -41,7 +41,7 @@ public class TableUIs
 		{
 			final File selectedFile = jFileChooser.getSelectedFile();
 
-			TableUtils.saveTable( table, selectedFile );
+			Tables.saveTable( table, selectedFile );
 		}
 	}
 

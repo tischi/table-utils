@@ -2,7 +2,7 @@ package de.embl.cba.tables.ui;
 
 import de.embl.cba.bdv.utils.lut.BlueWhiteRedARGBLut;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
-import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.modelview.coloring.CategoryTableRowColumnColoringModel;
 import de.embl.cba.tables.modelview.coloring.NumericColoringModelDialog;
 import de.embl.cba.tables.modelview.coloring.NumericTableRowColumnColoringModel;
@@ -14,11 +14,15 @@ import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ColorByColumnDialog< T extends TableRow >
+public class ColorByColumn< T extends TableRow >
 {
 
 	public static final String LINEAR_BLUE_WHITE_RED = "Linear - Blue White Red";
 	public static final String RANDOM_GLASBEY = "Random - Glasbey";
+
+	private final JTable table;
+	private final SelectionColoringModel< T > selectionColoringModel;
+
 	private String selectedColumnName;
 	private String selectedColoringMode;
 
@@ -26,17 +30,19 @@ public class ColorByColumnDialog< T extends TableRow >
 	private HashMap< String, double[] > columnNameToRangeSettings;
 
 
-	public ColorByColumnDialog( )
+	public ColorByColumn( JTable table, SelectionColoringModel< T > selectionColoringModel )
 	{
+		this.table = table;
+		this.selectionColoringModel = selectionColoringModel;
+
 		this.columnNameToMinMax = new HashMap<>();
 		this.columnNameToRangeSettings = new HashMap<>();
-
 	}
 
 
-	public void showDialog( JTable table, SelectionColoringModel< T > selectionColoringModel )
+	public void showDialog()
 	{
-		final String[] columnNames = TableUtils.getColumnNamesAsArray( table );
+		final String[] columnNames = Tables.getColumnNamesAsArray( table );
 		final String[] coloringModes = new String[]
 				{
 						LINEAR_BLUE_WHITE_RED,
@@ -57,6 +63,13 @@ public class ColorByColumnDialog< T extends TableRow >
 		selectedColumnName = gd.getNextChoice();
 		selectedColoringMode = gd.getNextChoice();
 
+		colorByColumn( selectedColumnName, selectedColoringMode );
+
+	}
+
+	public void colorByColumn( String selectedColumnName,
+							   String selectedColoringMode )
+	{
 		final double[] valueRange = getValueRange( table, selectedColumnName );
 
 		double[] valueSettings = getValueSettings( selectedColumnName, valueRange );
@@ -64,16 +77,17 @@ public class ColorByColumnDialog< T extends TableRow >
 		switch ( selectedColoringMode )
 		{
 			case LINEAR_BLUE_WHITE_RED:
-				colorLinear( selectionColoringModel, valueRange, valueSettings );
+				colorLinear( selectionColoringModel, valueRange, valueSettings, selectedColumnName );
 				break;
 			case RANDOM_GLASBEY:
-				colorCategorical( selectionColoringModel );
+				colorCategorical( selectionColoringModel, selectedColumnName );
 				break;
 		}
-
 	}
 
-	private void colorCategorical( SelectionColoringModel< T > selectionColoringModel )
+	private void colorCategorical(
+			SelectionColoringModel< T > selectionColoringModel,
+			String selectedColumnName )
 	{
 		final CategoryTableRowColumnColoringModel< T > coloringModel
 				= new CategoryTableRowColumnColoringModel< >(
@@ -86,14 +100,15 @@ public class ColorByColumnDialog< T extends TableRow >
 	private void colorLinear(
 			SelectionColoringModel< T > selectionColoringModel,
 			double[] valueRange,
-			double[] valueSettings )
+			double[] valueSettings,
+			String selectedColumnName )
 	{
 		final NumericTableRowColumnColoringModel< T > coloringModel
 				= new NumericTableRowColumnColoringModel< >(
-				selectedColumnName,
-				new BlueWhiteRedARGBLut( 1000 ),
-				valueSettings,
-				valueRange
+						selectedColumnName,
+						new BlueWhiteRedARGBLut( 1000 ),
+						valueSettings,
+						valueRange
 		);
 
 		selectionColoringModel.setWrappedColoringModel( coloringModel );
@@ -121,7 +136,7 @@ public class ColorByColumnDialog< T extends TableRow >
 	{
 		if ( ! columnNameToMinMax.containsKey( column ) )
 		{
-			final double[] minMaxValues = TableUtils.minMax( column, table );
+			final double[] minMaxValues = Tables.minMax( column, table );
 			columnNameToMinMax.put( column, minMaxValues );
 		}
 

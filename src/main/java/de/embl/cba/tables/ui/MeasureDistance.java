@@ -1,18 +1,18 @@
 package de.embl.cba.tables.ui;
 
-import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.TableRows;
+import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.measure.SummaryStatistics;
 import de.embl.cba.tables.modelview.segments.TableRow;
 import ij.IJ;
 import ij.gui.GenericDialog;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MeasureSimilarityDialog< T extends TableRow >
+public class MeasureDistance< T extends TableRow >
 {
 
 	public static final String L1_NORM = "L1 Norm";
@@ -20,7 +20,9 @@ public class MeasureSimilarityDialog< T extends TableRow >
 	private static final String Z_SCORE = "Per Column Z-Score";
 
 
-	JTable table;
+	final JTable table;
+	final List< T > tableRows;
+
 	private Map< String, SummaryStatistics > columnNameToSummaryStatistics;
 	private String selectedMetric;
 	private String selectedNorm;
@@ -32,18 +34,29 @@ public class MeasureSimilarityDialog< T extends TableRow >
 	private String columnSelectionRegExp;
 	private Double[] distances;
 
-	public MeasureSimilarityDialog( )
+	public MeasureDistance( JTable table, List< T > tableRows )
 	{
+		this.table = table;
+		this.tableRows = tableRows;
 		this.columnNameToSummaryStatistics = new LinkedHashMap<>();
 	}
 
-
-	public void showDialog( JTable table, Set< T > selectedRows )
+	public boolean showDialog( Set< T > selectedRows )
 	{
-		this.table = table;
+		if ( ! initChoicesFromDialog() ) return false;
 
-		if ( ! initChoicesFromDialog() ) return;
+		measureDistanceToSelectedRows( selectedRows );
 
+		return true;
+	}
+
+	public String getNewColumnName()
+	{
+		return newColumnName;
+	}
+
+	public void measureDistanceToSelectedRows( Set< T > selectedRows )
+	{
 		configSelectedColumns( );
 
 		if ( selectedNorm.equals( Z_SCORE ))
@@ -54,7 +67,8 @@ public class MeasureSimilarityDialog< T extends TableRow >
 		if ( selectedMetric.equals( L2_NORM ) )
 			distances = distances( referenceVector );
 
-		( ( DefaultTableModel ) table.getModel() ).addColumn( newColumnName, distances );
+		Tables.addColumn( table, newColumnName, distances );
+		TableRows.addColumn( tableRows, newColumnName, distances );
 	}
 
 	private boolean initChoicesFromDialog()
@@ -80,7 +94,7 @@ public class MeasureSimilarityDialog< T extends TableRow >
 		if ( selectedNorm == null ) selectedNorm = norms[ 0 ];
 		gd.addChoice( "Normalisation", norms, selectedMetric );
 
-		gd.addStringField( "New Column Name", "Similarity", 20 );
+		gd.addStringField( "New Column Name", "Distance", 20 );
 
 		gd.showDialog();
 		if ( gd.wasCanceled() ) return false;
@@ -129,7 +143,11 @@ public class MeasureSimilarityDialog< T extends TableRow >
 		for ( T tableRow : selectedRows )
 		{
 			final double[] normVector = getZScoreNormalisedRowVector(
-					table, tableRow.rowIndex(), selectedColumnIndices, selectedColumnMeans, selectedColumnSigmas );
+					table,
+					tableRow.rowIndex(),
+					selectedColumnIndices,
+					selectedColumnMeans,
+					selectedColumnSigmas );
 
 			normVectors.add( normVector );
 		}
@@ -137,17 +155,23 @@ public class MeasureSimilarityDialog< T extends TableRow >
 		return computeAverageVector( normVectors );
 	}
 
-	private double[] computeAverageVector( ArrayList< double[] > normVectors )
+	private double[] computeAverageVector( ArrayList< double[] > vectors )
 	{
-		int n = normVectors.size();
-		final double[] avgNormVector = new double[ n ];
-		for( double[] v : normVectors )
-			for ( int i = 0; i < n; ++i )
-				avgNormVector[ i ] += v[ i ];
+		int numDimensions = vectors.get( 0 ).length;
+		int numVectors = vectors.size();
 
-		for ( int i = 0; i < n; ++i )
-			avgNormVector[ i ] /= n;
-		return avgNormVector;
+		final double[] avgVector = new double[ numDimensions ];
+
+		// add
+		for( double[] vector : vectors )
+			for ( int d = 0; d < numDimensions; ++d )
+				avgVector[ d ] += vector[ d ];
+
+		// divide by N
+		for ( int d = 0; d < numDimensions; ++d )
+			avgVector[ d ] /= numVectors;
+
+		return avgVector;
 	}
 
 	private Double[] distances( double[] referenceVector )
@@ -169,13 +193,15 @@ public class MeasureSimilarityDialog< T extends TableRow >
 		return distances;
 	}
 
-	private double l2Distance( double[] rowVector, double[] avgNormVector )
+	private double l2Distance( double[] rowVector, double[] referenceVector )
 	{
-		int n = rowVector.length ;
+		int numDimensions = rowVector.length ;
+
 		double distance = 0.0;
-		for ( int i = 0; i < n; ++i )
-			distance += Math.pow( rowVector[ i ] - avgNormVector[ i ], 2 );
+		for ( int d = 0; d < numDimensions; ++d )
+			distance += Math.pow( rowVector[ d ] - referenceVector[ d ], 2 );
 		distance = Math.sqrt( distance );
+
 		return distance;
 	}
 
@@ -193,12 +219,17 @@ public class MeasureSimilarityDialog< T extends TableRow >
 		return normVector;
 	}
 
-	private double[] zScoreNormalisation( double[] means, double[] sigmas, double[] rawVector )
+	private double[] zScoreNormalisation(
+			final double[] means,
+			final double[] sigmas,
+			final double[] rawVector )
 	{
-		int n = rawVector.length;
-		final double[] normVector = new double[ n ];
-		for ( int i = 0; i < n; ++i )
-			normVector[ i ] =  ( rawVector[ i ] - means[ i ] ) / sigmas[ i ];
+		int numDimension = rawVector.length;
+
+		final double[] normVector = new double[ numDimension ];
+		for ( int d = 0; d < numDimension; ++d )
+			normVector[ d ] =  ( rawVector[ d ] - means[ d ] ) / sigmas[ d ];
+
 		return normVector;
 	}
 
@@ -215,7 +246,7 @@ public class MeasureSimilarityDialog< T extends TableRow >
 	{
 		if ( ! columnNameToSummaryStatistics.containsKey( columnName ) )
 		{
-			final double[] meanSigma = TableUtils.meanSigma( columnName, table );
+			final double[] meanSigma = Tables.meanSigma( columnName, table );
 			final SummaryStatistics summaryStatistics = new SummaryStatistics(
 					meanSigma[ 0 ], meanSigma[ 1 ]
 			);
@@ -230,12 +261,12 @@ public class MeasureSimilarityDialog< T extends TableRow >
 
 	private ArrayList< String > getSelectedColumnNames( JTable table, String columnNameRegExp )
 	{
-		final List< String > columnNames = TableUtils.getColumnNames( table );
+		final List< String > columnNames = Tables.getColumnNames( table );
 
 		final ArrayList< String > selectedColumnNames = new ArrayList<>();
 		for ( String columnName : columnNames )
 		{
-			if ( TableUtils.isNumeric( table, columnName ) )
+			if ( Tables.isNumeric( table, columnName ) )
 			{
 				final Matcher matcher = Pattern.compile( columnNameRegExp ).matcher( columnName );
 

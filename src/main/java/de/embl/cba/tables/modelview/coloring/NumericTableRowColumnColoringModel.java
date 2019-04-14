@@ -1,39 +1,36 @@
 package de.embl.cba.tables.modelview.coloring;
 
 import de.embl.cba.bdv.utils.lut.ARGBLut;
-import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.modelview.segments.TableRow;
 import net.imglib2.type.numeric.ARGBType;
-import net.imglib2.type.volatiles.VolatileARGBType;
-
-import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 
 
 // TODO: extract abstract class NumericFeatureColoringModel
 public class NumericTableRowColumnColoringModel< T extends TableRow >
 		extends AbstractColoringModel< T > implements NumericColoringModel< T >
 {
-	private String column;
+	private String columnName;
 	private ARGBLut lut;
-	private double[] values;
-	private double[] range;
+	private double[] lutMinMax;
+	private double[] lutRange;
 
 	public NumericTableRowColumnColoringModel(
-			String column,
+			String columnName,
 			ARGBLut lut,
-			double[] values,
-			double[] range )
+			double[] lutMinMax,
+			double[] lutRange )
 	{
-		this.column = column;
+		this.columnName = columnName;
 		this.lut = lut;
-		this.values = values;
-		this.range = range;
+		this.lutMinMax = lutMinMax;
+		this.lutRange = lutRange;
 	}
 
 	@Override
-	public void convert( T input, ARGBType output )
+	public void convert( T tableRow, ARGBType output )
 	{
-		final Object featureValue = input.cells().get( column );
+		final Object featureValue = tableRow.cells().get( columnName );
 		setColorLinearly( featureValue, output );
 	}
 
@@ -41,45 +38,45 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	@Override
 	public double getMin()
 	{
-		return values[ 0 ];
+		return lutMinMax[ 0 ];
 	}
 
 
 	@Override
 	public double getMax()
 	{
-		return values[ 1 ];
+		return lutMinMax[ 1 ];
 	}
 
 
 	@Override
 	public void setMin( double min )
 	{
-		this.values[ 0 ] = min;
+		this.lutMinMax[ 0 ] = min;
 		notifyColoringListeners();
 	}
 
 	@Override
 	public void setMax( double max )
 	{
-		this.values[ 1 ] = max;
+		this.lutMinMax[ 1 ] = max;
 		notifyColoringListeners();
 	}
 
-	public void setColumn( String column )
+	public void setColumnName( String columnName )
 	{
-		this.column = column;
+		this.columnName = columnName;
 	}
 
-	public String getColumn()
+	public String getColumnName()
 	{
-		return column;
+		return columnName;
 	}
 
 
 	public void setColorLinearly( Object featureValue, ARGBType output )
 	{
-		final double value = TableUtils.asDouble( featureValue );
+		final double value = Tables.asDouble( featureValue );
 		double normalisedValue = computeLinearNormalisedValue( value );
 		final int colorIndex = lut.getARGB( normalisedValue );
 		output.set( colorIndex );
@@ -88,13 +85,13 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	public double computeLinearNormalisedValue( double value )
 	{
 		double normalisedValue = 0;
-		if ( values[ 1 ] == values[ 0 ] )
+		if ( lutMinMax[ 1 ] == lutMinMax[ 0 ] )
 		{
-			if ( values[ 1 ] == range[ 0 ] )
+			if ( lutMinMax[ 1 ] == lutRange[ 0 ] )
 			{
 				normalisedValue = 1.0;
 			}
-			else if ( values[ 1 ] == range[ 1 ] )
+			else if ( lutMinMax[ 1 ] == lutRange[ 1 ] )
 			{
 				normalisedValue = 0.0;
 			}
@@ -104,8 +101,8 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 			normalisedValue =
 					Math.max(
 							Math.min(
-									( value - values[ 0 ] )
-											/ ( values[ 1 ] - values[ 0 ] ), 1.0 ), 0.0 );
+									( value - lutMinMax[ 0 ] )
+											/ ( lutMinMax[ 1 ] - lutMinMax[ 0 ] ), 1.0 ), 0.0 );
 		}
 		return normalisedValue;
 	}

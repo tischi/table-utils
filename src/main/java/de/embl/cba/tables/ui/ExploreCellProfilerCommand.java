@@ -1,7 +1,7 @@
 package de.embl.cba.tables.ui;
 
 import de.embl.cba.tables.TableColumns;
-import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.cellprofiler.FolderAndFileColumn;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModel;
 import de.embl.cba.tables.modelview.images.FileImageSourcesModelFactory;
@@ -144,7 +144,7 @@ public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R
 					imagePath = getMappedPath( imagePath );
 				}
 
-				imagePath = TableUtils.getRelativePath( tableFile, imagePath ).toString();
+				imagePath = Tables.getRelativePath( tableFile, imagePath ).toString();
 
 				pathColumn.add( imagePath );
 			}

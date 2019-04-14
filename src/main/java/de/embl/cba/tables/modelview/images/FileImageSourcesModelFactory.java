@@ -1,7 +1,7 @@
 package de.embl.cba.tables.modelview.images;
 
 import de.embl.cba.tables.FileUtils;
-import de.embl.cba.tables.TableUtils;
+import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.modelview.segments.TableRowImageSegment;
 import de.embl.cba.tables.modelview.segments.TableRow;
 
@@ -71,7 +71,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 				if ( ! imageSourcesModel.sources().containsKey( imageId ) )
 				{
 					final Path absoluteImagePath =
-							TableUtils.getAbsolutePath( imageRootFolder, imagePath );
+							Tables.getAbsolutePath( imageRootFolder, imagePath );
 
 					final String imageDisplayName = absoluteImagePath.getFileName().toString();
 
