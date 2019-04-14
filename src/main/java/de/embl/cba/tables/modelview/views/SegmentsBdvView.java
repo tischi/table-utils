@@ -113,7 +113,6 @@ public class SegmentsBdvView< T extends ImageSegment >
 		return imageSourcesModel;
 	}
 
-
 	private void showInitialSources()
 	{
 		boolean isShownNone = true;
@@ -428,6 +427,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 				bdv.getBdvHandle().getTriggerbindings(),
 				segmentsName + "-bdv-selection-handler" );
 
+
 		installSelectionBehaviour( );
 		installSelectNoneBehaviour( );
 		installSelectionColoringModeBehaviour( );
@@ -583,4 +583,8 @@ public class SegmentsBdvView< T extends ImageSegment >
 	}
 
 
+	public void close()
+	{
+		// TODO
+	}
 }

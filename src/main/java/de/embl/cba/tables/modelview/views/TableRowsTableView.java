@@ -496,4 +496,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	}
 
 
+	public void close()
+	{
+		// TODO
+	}
 }

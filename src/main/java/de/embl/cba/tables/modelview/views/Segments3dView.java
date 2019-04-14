@@ -160,6 +160,8 @@ public class Segments3dView < T extends ImageSegment >
 				}
 			}
 		} );
+
+
 	}
 
 	public void removeUnselectedSegments( Set< T > selectedSegments )
@@ -352,4 +354,8 @@ public class Segments3dView < T extends ImageSegment >
 	}
 
 
+	public void close()
+	{
+		// TODO
+	}
 }

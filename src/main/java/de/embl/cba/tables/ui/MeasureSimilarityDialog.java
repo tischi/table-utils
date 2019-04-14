@@ -17,7 +17,7 @@ public class MeasureSimilarityDialog< T extends TableRow >
 
 	public static final String L1_NORM = "L1 Norm";
 	public static final String L2_NORM = "L2 Norm";
-	private static final String Z_SCORE = "Column-wise Z-Score";
+	private static final String Z_SCORE = "Per Column Z-Score";
 
 
 	JTable table;

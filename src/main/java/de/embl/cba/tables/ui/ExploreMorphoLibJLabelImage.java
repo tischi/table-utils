@@ -15,11 +15,6 @@ import de.embl.cba.tables.modelview.views.combined.SegmentsTableBdvAnd3dViews;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.text.TextWindow;
-import net.imglib2.type.NativeType;
-import net.imglib2.type.numeric.RealType;
-import org.scijava.command.Command;
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 
 import java.awt.*;
 import java.io.File;
@@ -31,38 +26,45 @@ import java.util.List;
 import static de.embl.cba.tables.modelview.segments.SegmentUtils.*;
 
 
-@Plugin(type = Command.class, initializer = "init",
-		menuPath = "Plugins>Segmentation>Explore>Explore MorphoLibJ Segmentation" )
-public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R > > implements Command
+
+public class ExploreMorphoLibJLabelImage
 {
 	public static final String LABEL = "Label";
-	private static final String COLUMN_NAME_LABEL_IMAGE_ID = "LabelImage";
+	public static final String COLUMN_NAME_LABEL_IMAGE_ID = "LabelImage";
 	public static final String CENTROID_X = "Centroid.X";
 	public static final String CENTROID_Y = "Centroid.Y";
 	public static final String CENTROID_Z = "Centroid.Z";
 	public static final String MEAN_BREADTH = "MeanBreadth";
 
-	@Parameter ( label = "Intensity image", required = false )
-	public ImagePlus intensityImage;
 
-	@Parameter ( label = "Label mask image" )
-	public ImagePlus labelImage;
+	private final ImagePlus intensityImage;
+	private final ImagePlus labelImage;
+	private final String resultsTableTitle;
 
-	@Parameter ( label = "Results table title" )
-	public String resultsTableTitle;
-
+	private HashMap< String, ij.measure.ResultsTable > titleToResultsTable;
 	private ij.measure.ResultsTable resultsTable;
 	private LinkedHashMap< String, List< ? > > columns;
 	private int numSpatialDimensions;
 	private String labelImageId;
-	private HashMap< String, ij.measure.ResultsTable > titleToResultsTable;
 
-	@Override
-	public void run()
+	public ExploreMorphoLibJLabelImage(
+			ImagePlus intensityImage,
+			ImagePlus labelImage,
+			String resultsTableTitle )
+	{
+		this.intensityImage = intensityImage;
+		this.labelImage = labelImage;
+		this.resultsTableTitle = resultsTableTitle;
+		run();
+	}
+
+	private void run()
 	{
 		numSpatialDimensions = labelImage.getNSlices() > 1 ? 3 : 2;
 
 		labelImageId = labelImage.getTitle();
+
+		fetchResultsTables();
 
 		resultsTable = titleToResultsTable.get( resultsTableTitle );
 
@@ -93,7 +95,27 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 		}
 	}
 
-	public void throwResultsTableNotFoundError()
+	private void fetchResultsTables()
+	{
+		titleToResultsTable = new HashMap<>();
+		final Frame[] nonImageWindows = WindowManager.getNonImageWindows();
+		for ( Frame nonImageWindow : nonImageWindows )
+		{
+			if ( nonImageWindow instanceof TextWindow )
+			{
+				final TextWindow textWindow = ( TextWindow ) nonImageWindow;
+
+				final ij.measure.ResultsTable resultsTable = textWindow.getResultsTable();
+
+				if ( resultsTable != null )
+				{
+					titleToResultsTable.put( resultsTable.getTitle(), resultsTable );
+				}
+			}
+		}
+	}
+
+	private void throwResultsTableNotFoundError()
 	{
 		String error = "Results table not found: " + resultsTableTitle + "\n";
 		error += "\n";
@@ -143,33 +165,6 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 		}
 
 		return imageSourcesModel;
-	}
-
-	private void init()
-	{
-		fetchResultsTables();
-//		MutableModuleItem<String> input = getInfo().getMutableInput("resultsTableTitle", String.class );
-//		input.setChoices( new ArrayList<>( titleToResultsTable.keySet() ));
-	}
-
-	private void fetchResultsTables()
-	{
-		titleToResultsTable = new HashMap<>();
-		final Frame[] nonImageWindows = WindowManager.getNonImageWindows();
-		for ( Frame nonImageWindow : nonImageWindows )
-		{
-			if ( nonImageWindow instanceof TextWindow )
-			{
-				final TextWindow textWindow = ( TextWindow ) nonImageWindow;
-
-				final ij.measure.ResultsTable resultsTable = textWindow.getResultsTable();
-
-				if ( resultsTable != null )
-				{
-					titleToResultsTable.put( resultsTable.getTitle(), resultsTable );
-				}
-			}
-		}
 	}
 
 	private List< TableRowImageSegment > createMLJTableRowImageSegments(
@@ -232,7 +227,6 @@ public class ExploreMorphoLibJCommand< R extends RealType< R > & NativeType< R >
 		return columns;
 
 	}
-
 
 	private HashMap< SegmentProperty, List< ? > > createSegmentPropertyToColumnMap( )
 	{

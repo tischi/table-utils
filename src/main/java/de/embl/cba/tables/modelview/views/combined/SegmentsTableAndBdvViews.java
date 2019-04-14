@@ -80,4 +80,15 @@ public class SegmentsTableAndBdvViews
 	{
 		return tableRowsTableView;
 	}
+
+	public void close()
+	{
+		segmentsBdvView.close();
+		tableRowsTableView.close();
+
+		segmentsBdvView = null;
+		tableRowsTableView = null;
+
+		System.gc();
+	}
 }

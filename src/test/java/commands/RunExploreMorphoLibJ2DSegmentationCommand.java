@@ -1,8 +1,7 @@
 package commands;
 
-import de.embl.cba.tables.ui.ExploreMorphoLibJCommand;
+import de.embl.cba.tables.ui.ExploreMorphoLibJLabelImageCommand;
 import ij.IJ;
-import ij.measure.ResultsTable;
 import net.imagej.ImageJ;
 
 public class RunExploreMorphoLibJ2DSegmentationCommand
@@ -21,7 +20,7 @@ public class RunExploreMorphoLibJ2DSegmentationCommand
 		IJ.open( RunExploreMorphoLibJ2DSegmentationCommand.class.getResource(
 				"../blobs-lbl-Morphometry.csv" ).getFile() );
 
-		ij.command().run( ExploreMorphoLibJCommand.class, true );
+		ij.command().run( ExploreMorphoLibJLabelImageCommand.class, true );
 	}
 
 }

@@ -21,6 +21,7 @@ public class SegmentsTableBdvAnd3dViews
 	private final String viewName;
 	private SegmentsBdvView< TableRowImageSegment > segmentsBdvView;
 	private TableRowsTableView< TableRowImageSegment > tableRowsTableView;
+	private Segments3dView< TableRowImageSegment > segments3dView;
 
 	public SegmentsTableBdvAnd3dViews(
 			List< TableRowImageSegment > tableRowImageSegments,
@@ -55,20 +56,20 @@ public class SegmentsTableBdvAnd3dViews
 					coloringModel,
 					selectionModel );
 
-		segmentsBdvView = new SegmentsBdvView< TableRowImageSegment >(
+		segmentsBdvView = new SegmentsBdvView<>(
 				tableRowImageSegments,
 				selectionModel,
 				selectionColoringModel,
 				imageSourcesModel,
 				bdv );
 
-		tableRowsTableView = new TableRowsTableView< TableRowImageSegment >(
+		tableRowsTableView = new TableRowsTableView<>(
 				tableRowImageSegments,
 				selectionModel,
 				selectionColoringModel,
 				viewName );
 
-		new Segments3dView< TableRowImageSegment >(
+		segments3dView = new Segments3dView<>(
 				tableRowImageSegments,
 				selectionModel,
 				selectionColoringModel,
@@ -86,5 +87,23 @@ public class SegmentsTableBdvAnd3dViews
 	public TableRowsTableView< TableRowImageSegment > getTableRowsTableView()
 	{
 		return tableRowsTableView;
+	}
+
+	/**
+	 * TODO
+	 * - I am not sure this is useful or necessary.
+	 * - All the views implement listeners
+	 */
+	public void close()
+	{
+		segmentsBdvView.close();
+		tableRowsTableView.close();
+		segments3dView.close();
+
+		segmentsBdvView = null;
+		tableRowsTableView = null;
+		segments3dView = null;
+
+		System.gc();
 	}
 }
