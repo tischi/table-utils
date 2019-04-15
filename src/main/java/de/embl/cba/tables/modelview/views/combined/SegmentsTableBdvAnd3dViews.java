@@ -92,6 +92,11 @@ public class SegmentsTableBdvAnd3dViews
 		return tableRowsTableView;
 	}
 
+	public Segments3dView< TableRowImageSegment > getSegments3dView()
+	{
+		return segments3dView;
+	}
+
 	/**
 	 * TODO
 	 * - I am not sure this is useful or necessary.

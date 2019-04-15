@@ -15,6 +15,8 @@ import ij.IJ;
 import ij3d.Content;
 import ij3d.Image3DUniverse;
 import ij3d.UniverseListener;
+import isosurface.MeshEditor;
+import isosurface.SmoothControl;
 import net.imglib2.FinalInterval;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.RandomAccessibleInterval;
@@ -24,6 +26,7 @@ import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.Views;
 import org.scijava.java3d.View;
 import org.scijava.vecmath.Color3f;
+import org.scijava.vecmath.Point3f;
 
 import java.util.*;
 
@@ -45,6 +48,7 @@ public class Segments3dView < T extends ImageSegment >
 	private HashMap< Content, T > contentToSegment;
 	private double transparency;
 	private boolean isListeningToUniverse;
+	private int meshSmoothingIterations;
 
 	public Segments3dView(
 			final List< T > segments,
@@ -75,6 +79,7 @@ public class Segments3dView < T extends ImageSegment >
 
 		this.transparency = 0.5;
 		this.voxelSpacing3DView = 0.1;
+		this.meshSmoothingIterations = 5;
 
 		this.segmentToMesh = new HashMap<>();
 		this.segmentToContent = new HashMap<>();
@@ -92,6 +97,11 @@ public class Segments3dView < T extends ImageSegment >
 	public void setTransparency( double transparency )
 	{
 		this.transparency = transparency;
+	}
+
+	public void setMeshSmoothingIterations( int meshSmoothingIterations )
+	{
+		this.meshSmoothingIterations = meshSmoothingIterations;
 	}
 
 	public Image3DUniverse getUniverse()
@@ -197,6 +207,10 @@ public class Segments3dView < T extends ImageSegment >
 	private synchronized void addSegmentTo3DView( T segment )
 	{
 		CustomTriangleMesh triangleMesh = getTriangleMesh( segment );
+
+
+		MeshEditor.smooth2(triangleMesh, meshSmoothingIterations );
+
 		addMeshToUniverse( segment, triangleMesh );
 	}
 

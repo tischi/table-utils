@@ -17,6 +17,7 @@ public class MeshUtils
 					meshCoordinates[ i++ ],
 					meshCoordinates[ i++ ] ) );
 		mesh = new CustomTriangleMesh( points );
+
 		return mesh;
 	}
 }
