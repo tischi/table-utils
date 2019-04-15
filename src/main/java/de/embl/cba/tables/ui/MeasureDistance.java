@@ -85,16 +85,16 @@ public class MeasureDistance< T extends TableRow >
 				};
 
 
-		final GenericDialog gd = new GenericDialog( "Measure Similarity" );
-		gd.addStringField( "Column RegExp", ".*", 20 );
+		final GenericDialog gd = new GenericDialog( "Measure Distance to Selected Rows" );
+		gd.addStringField( "Column selection regular expression", ".*", 20 );
 
 		if ( selectedMetric == null ) selectedMetric = metrics[ 0 ];
-		gd.addChoice( "Metric", metrics, selectedMetric );
+		gd.addChoice( "Distance metric", metrics, selectedMetric );
 
 		if ( selectedNorm == null ) selectedNorm = norms[ 0 ];
-		gd.addChoice( "Normalisation", norms, selectedMetric );
+		gd.addChoice( "Feature normalisation", norms, selectedMetric );
 
-		gd.addStringField( "New Column Name", "Distance", 20 );
+		gd.addStringField( "New distance column name", "Distance", 20 );
 
 		gd.showDialog();
 		if ( gd.wasCanceled() ) return false;

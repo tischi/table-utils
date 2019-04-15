@@ -11,6 +11,7 @@ import de.embl.cba.tables.modelview.selection.SelectionModel;
 import de.embl.cba.tables.modelview.views.Segments3dView;
 import de.embl.cba.tables.modelview.views.SegmentsBdvView;
 import de.embl.cba.tables.modelview.views.TableRowsTableView;
+import ij3d.Image3DUniverse;
 
 import java.util.List;
 
@@ -28,22 +29,23 @@ public class SegmentsTableBdvAnd3dViews
 			ImageSourcesModel imageSourcesModel,
 			String viewName )
 	{
-		this( tableRowImageSegments, imageSourcesModel, viewName, null );
+		this( tableRowImageSegments, imageSourcesModel, viewName, null, null );
 	}
 
 	public SegmentsTableBdvAnd3dViews(
 			List< TableRowImageSegment > tableRowImageSegments,
 			ImageSourcesModel imageSourcesModel,
 			String viewName,
-			BdvHandle bdv )
+			BdvHandle bdv,
+			Image3DUniverse universe )
 	{
 		this.tableRowImageSegments = tableRowImageSegments;
 		this.imageSourcesModel = imageSourcesModel;
 		this.viewName = viewName;
-		show( bdv );
+		show( bdv, universe );
 	}
 
-	private void show( BdvHandle bdv )
+	private void show( BdvHandle bdv, Image3DUniverse universe )
 	{
 		final SelectionModel< TableRowImageSegment > selectionModel
 				= new DefaultSelectionModel<>();
@@ -73,7 +75,8 @@ public class SegmentsTableBdvAnd3dViews
 				tableRowImageSegments,
 				selectionModel,
 				selectionColoringModel,
-				imageSourcesModel
+				imageSourcesModel,
+				universe
 		);
 
 

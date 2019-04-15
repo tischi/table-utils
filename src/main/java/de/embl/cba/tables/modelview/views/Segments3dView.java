@@ -1,5 +1,6 @@
 package de.embl.cba.tables.modelview.views;
 
+import bdv.img.cache.VolatileCachedCellImg;
 import bdv.viewer.Source;
 import customnode.CustomTriangleMesh;
 import de.embl.cba.bdv.utils.BdvUtils;
@@ -43,6 +44,7 @@ public class Segments3dView < T extends ImageSegment >
 	private HashMap< T, Content > segmentToContent;
 	private HashMap< Content, T > contentToSegment;
 	private double transparency;
+	private boolean isListeningToUniverse;
 
 	public Segments3dView(
 			final List< T > segments,
@@ -219,6 +221,8 @@ public class Segments3dView < T extends ImageSegment >
 		ArrayList< double[] > labelsSourceCalibrations = getCalibrations( labelsSource );
 		final int level = getLevel( labelsSourceCalibrations, voxelSpacing3DView );
 		final RandomAccessibleInterval< ? extends RealType< ? > > rai = getLabelsRAI( segment, level );
+
+
 		final FinalInterval interval = getVoxelSpaceInterval( labelsSourceCalibrations, level, segment.boundingBox() );
 
 		final MeshExtractor meshExtractor = new MeshExtractor(
@@ -252,7 +256,8 @@ public class Segments3dView < T extends ImageSegment >
 				= imageSourcesModel.sources().get( segment.imageId() ).source();
 
 		// TODO: is below rai really nonVolatile???
-		final RandomAccessibleInterval< ? extends RealType< ? > > rai = getRAI( labelsSource, 0, level );
+		final RandomAccessibleInterval< ? extends RealType< ? > > rai =
+				BdvUtils.getRealTypeNonVolatileRandomAccessibleInterval( labelsSource, 0, level );
 
 		return rai;
 	}
@@ -260,8 +265,7 @@ public class Segments3dView < T extends ImageSegment >
 
 	private void addMeshToUniverse( T segment, CustomTriangleMesh mesh )
 	{
-		if ( universe == null )
-			initUniverseAndListener();
+		initUniverseAndListener();
 
 		final Content content =
 				universe.addCustomMesh( mesh, "" + segment.labelId() );
@@ -277,10 +281,16 @@ public class Segments3dView < T extends ImageSegment >
 
 	private void initUniverseAndListener()
 	{
-		universe = new Image3DUniverse();
-		universe.show();
+		if ( universe == null ) universe = new Image3DUniverse();
 
+		if ( universe.getWindow() == null ) universe.show();
 
+		if ( ! isListeningToUniverse )
+			isListeningToUniverse = addUniverseListener();
+	}
+
+	private boolean addUniverseListener()
+	{
 		universe.addUniverseListener( new UniverseListener()
 		{
 			@Override
@@ -347,6 +357,8 @@ public class Segments3dView < T extends ImageSegment >
 
 			}
 		} );
+
+		return true;
 	}
 
 	private Color3f getColor3f( T imageSegment )
