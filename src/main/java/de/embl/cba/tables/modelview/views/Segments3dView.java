@@ -15,6 +15,7 @@ import ij3d.Content;
 import ij3d.Image3DUniverse;
 import ij3d.UniverseListener;
 import net.imglib2.FinalInterval;
+import net.imglib2.FinalRealInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
@@ -33,7 +34,7 @@ public class Segments3dView < T extends ImageSegment >
 	private final SelectionModel< T > selectionModel;
 	private final SelectionColoringModel< T > selectionColoringModel;
 	private final ImageSourcesModel imageSourcesModel;
-	private ArrayList< double[] > segmentsSourceCalibrations;
+
 
 	private Image3DUniverse universe;
 	private T recentFocus;
@@ -213,13 +214,15 @@ public class Segments3dView < T extends ImageSegment >
 
 	private void addMesh( ImageSegment segment )
 	{
-		final FinalInterval interval = segment.boundingBox();
-		final RandomAccessibleInterval< ? extends RealType< ? > > rai =
-				getLabelsRAI( segment );
 
-		// TODO: get rid of raw cast, somehow....
+		final Source< ? > labelsSource = imageSourcesModel.sources().get( segment.imageId() ).source();
+		ArrayList< double[] > labelsSourceCalibrations = getCalibrations( labelsSource );
+		final int level = getLevel( labelsSourceCalibrations, voxelSpacing3DView );
+		final RandomAccessibleInterval< ? extends RealType< ? > > rai = getLabelsRAI( segment, level );
+		final FinalInterval interval = getVoxelSpaceInterval( labelsSourceCalibrations, level, segment.boundingBox() );
+
 		final MeshExtractor meshExtractor = new MeshExtractor(
-				Views.extendZero( ( RandomAccessibleInterval ) rai ),
+				Views.extendZero( ( RandomAccessibleInterval ) rai ), // TODO: get rid of raw cast, somehow....
 				interval,
 				new AffineTransform3D(),
 				new int[]{ 1, 1, 1 },
@@ -230,18 +233,26 @@ public class Segments3dView < T extends ImageSegment >
 		segment.setMesh( meshCoordinates );
 	}
 
+	private FinalInterval getVoxelSpaceInterval( ArrayList< double[] > labelsSourceCalibrations, int level, FinalRealInterval realInterval )
+	{
+		final long[] min = new long[ 3 ];
+		final long[] max = new long[ 3 ];
+		for ( int d = 0; d < 3; d++ )
+		{
+			min[ d ] = (long) ( realInterval.realMin( d ) / labelsSourceCalibrations.get( level )[ d ] );
+			max[ d ] = (long) ( realInterval.realMax( d ) / labelsSourceCalibrations.get( level )[ d ] );
+		}
+		return new FinalInterval( min, max );
+	}
+
 	private RandomAccessibleInterval< ? extends RealType< ? > >
-	getLabelsRAI( ImageSegment segment )
+	getLabelsRAI( ImageSegment segment, int level )
 	{
 		final Source< ? > labelsSource
 				= imageSourcesModel.sources().get( segment.imageId() ).source();
 
-		final ArrayList< double[] > calibrations = getCalibrations( labelsSource );
-		final int level = getLevel( calibrations );
-
 		// TODO: is below rai really nonVolatile???
-		final RandomAccessibleInterval< ? extends RealType< ? > > rai
-				= getRAI( labelsSource, 0, level );
+		final RandomAccessibleInterval< ? extends RealType< ? > > rai = getRAI( labelsSource, 0, level );
 
 		return rai;
 	}
@@ -345,7 +356,7 @@ public class Segments3dView < T extends ImageSegment >
 		return new Color3f( ColorUtils.getColor( argbType ) );
 	}
 
-	private int getLevel( ArrayList< double[] > calibrations )
+	private int getLevel( ArrayList< double[] > calibrations, double voxelSpacing3DView )
 	{
 		int level;
 

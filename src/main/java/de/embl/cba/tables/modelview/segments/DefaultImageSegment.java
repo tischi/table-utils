@@ -1,10 +1,11 @@
 package de.embl.cba.tables.modelview.segments;
 
 import net.imglib2.FinalInterval;
+import net.imglib2.FinalRealInterval;
 
 public class DefaultImageSegment implements ImageSegment
 {
-	private final FinalInterval boundingBox;
+	private final FinalRealInterval boundingBox;
 	private final double[] position;
 	private final String imageId;
 	private final double labelId;
@@ -18,7 +19,7 @@ public class DefaultImageSegment implements ImageSegment
 			double x,
 			double y,
 			double z,
-			FinalInterval boundingBox )
+			FinalRealInterval boundingBox )
 	{
 		this.imageId = imageId;
 		this.labelId = labelId;
@@ -46,7 +47,7 @@ public class DefaultImageSegment implements ImageSegment
 	}
 
 	@Override
-	public FinalInterval boundingBox()
+	public FinalRealInterval boundingBox()
 	{
 		return boundingBox;
 	}

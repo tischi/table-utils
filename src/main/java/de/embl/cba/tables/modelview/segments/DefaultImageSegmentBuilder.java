@@ -1,6 +1,7 @@
 package de.embl.cba.tables.modelview.segments;
 
 import net.imglib2.FinalInterval;
+import net.imglib2.FinalRealInterval;
 
 public class DefaultImageSegmentBuilder
 {
@@ -10,7 +11,7 @@ public class DefaultImageSegmentBuilder
 	private double x = getDefaultX();
 	private double y = getDefaultY();
 	private double z = getDefaultZ();
-	private FinalInterval boundingBox = getDefaultBoundingBox();
+	private FinalRealInterval boundingBox = getDefaultBoundingBox();
 
 	public DefaultImageSegment build()
 	{
@@ -44,7 +45,7 @@ public class DefaultImageSegmentBuilder
 	}
 
 
-	public DefaultImageSegmentBuilder setBoundingBox( FinalInterval boundingBox )
+	public DefaultImageSegmentBuilder setBoundingBox( FinalRealInterval boundingBox )
 	{
 		this.boundingBox = boundingBox;
 		return this;
@@ -98,7 +99,7 @@ public class DefaultImageSegmentBuilder
 		return 0.0;
 	}
 
-	public static FinalInterval getDefaultBoundingBox()
+	public static FinalRealInterval getDefaultBoundingBox()
 	{
 		return null;
 	}

@@ -1,6 +1,7 @@
 package de.embl.cba.tables.modelview.segments;
 
 import net.imglib2.FinalInterval;
+import net.imglib2.FinalRealInterval;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Map;
 /**
  * All values are dynamically fetched from the columns.
  * This might be slow, but allows changes in columns to be reflected.
- *
+ * // TODO: make interface for ColumnBasedTableRow
  */
 public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 {
@@ -18,7 +19,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	private final LinkedHashMap< String, List< ? > > columns;
 	private final Map< SegmentProperty, List< ? > > segmentPropertyToColumn;
 	private double[] position;
-	FinalInterval boundingBox;
+	FinalRealInterval boundingBox;
 	private LinkedHashMap< String, Object > cells;
 	private boolean isOneBasedTimePoint;
 	private float[] mesh;
@@ -97,7 +98,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	}
 
 	@Override
-	public FinalInterval boundingBox()
+	public FinalRealInterval boundingBox()
 	{
 		setBoundingBox();
 		return boundingBox;
@@ -124,54 +125,54 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 			return;
 		}
 
-		final long[] min = getBoundingBoxMin();
-		final long[] max = getBoundingBoxMax();
+		final double[] min = getBoundingBoxMin();
+		final double[] max = getBoundingBoxMax();
 
-		boundingBox = new FinalInterval( min, max );
+		boundingBox = new FinalRealInterval( min, max );
 	}
 
-	private long[] getBoundingBoxMax()
+	private double[] getBoundingBoxMax()
 	{
-		final long[] max = new long[ numDimensions() ];
+		final double[] max = new double[ numDimensions() ];
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxXMax ) )
-			max[ 0 ] = Long.parseLong(
+			max[ 0 ] = Double.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxXMax )
 							.get( row ).toString() );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxYMax ) )
-			max[ 1 ] = Long.parseLong(
+			max[ 1 ] = Double.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxYMax )
 							.get( row ).toString() );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxZMax ) )
-			max[ 2 ] = Long.parseLong(
+			max[ 2 ] = Double.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxZMax )
 							.get( row ).toString() );
 		return max;
 	}
 
-	private long[] getBoundingBoxMin()
+	private double[] getBoundingBoxMin()
 	{
-		final long[] min = new long[ numDimensions() ];
+		final double[] min = new double[ numDimensions() ];
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxXMin ) )
-			min[ 0 ] = Long.parseLong(
+			min[ 0 ] = Double.parseDouble(
 							segmentPropertyToColumn
 								.get( SegmentProperty.BoundingBoxXMin )
 								.get( row ).toString() );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxYMin ) )
-			min[ 1 ] = Long.parseLong(
+			min[ 1 ] = Double.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxYMin )
 							.get( row ).toString() );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxZMin ) )
-			min[ 2 ] = Long.parseLong(
+			min[ 2 ] = Double.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxZMin )
 							.get( row ).toString() );

@@ -1,6 +1,7 @@
 package de.embl.cba.tables.modelview.segments;
 
 import net.imglib2.FinalInterval;
+import net.imglib2.FinalRealInterval;
 
 import java.util.LinkedHashMap;
 
@@ -36,7 +37,7 @@ public class DefaultTableRowImageSegment implements TableRowImageSegment
 	}
 
 	@Override
-	public FinalInterval boundingBox()
+	public FinalRealInterval boundingBox()
 	{
 		return imageSegment.boundingBox();
 	}

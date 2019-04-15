@@ -1,6 +1,7 @@
 package de.embl.cba.tables.modelview.segments;
 
 import net.imglib2.FinalInterval;
+import net.imglib2.FinalRealInterval;
 import net.imglib2.RealLocalizable;
 
 public interface ImageSegment extends RealLocalizable
@@ -11,7 +12,7 @@ public interface ImageSegment extends RealLocalizable
 
 	int timePoint();
 
-	FinalInterval boundingBox();
+	FinalRealInterval boundingBox();
 
 	float[] getMesh();
 

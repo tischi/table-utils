@@ -29,7 +29,5 @@ public abstract class TableRows
 					"TableRow class not supported yet: " + tableRows.get( 0 ).getClass());
 		}
 
-		int a = 1;
-
 	}
 }
