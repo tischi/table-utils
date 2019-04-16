@@ -19,7 +19,7 @@ public class ColorByColumn< T extends TableRow >
 {
 
 	public static final String LINEAR_BLUE_WHITE_RED = "Linear - Blue White Red";
-	public static final String RANDOM_GLASBEY = "Random - Glasbey";
+	public static final String RANDOM_GLASBEY = "Categorical - Glasbey";
 
 	private final JTable table;
 	private final SelectionColoringModel< T > selectionColoringModel;
@@ -72,16 +72,12 @@ public class ColorByColumn< T extends TableRow >
 	public void colorByColumn( String selectedColumnName,
 							   String selectedColoringMode )
 	{
-		final double[] valueRange = getValueRange( table, selectedColumnName );
 
-		double[] valueSettings = getValueSettings( selectedColumnName, valueRange );
 
 		switch ( selectedColoringMode )
 		{
 			case LINEAR_BLUE_WHITE_RED:
 				colorLinear( selectionColoringModel,
-						valueRange,
-						valueSettings,
 						selectedColumnName );
 				break;
 			case RANDOM_GLASBEY:
@@ -105,17 +101,20 @@ public class ColorByColumn< T extends TableRow >
 
 	private void colorLinear(
 			SelectionColoringModel< T > selectionColoringModel,
-			double[] valueRange,
-			double[] valueSettings,
 			String selectedColumnName )
 	{
 
 		if ( ! Tables.isNumeric( table, selectedColumnName ) )
 		{
 			Logger.error( "Linear coloring mode is only available for numeric columns.\n" +
-					"Column " + selectedColumnName + " appears to be non-numeric.");
+					"The selected " + selectedColumnName + " column however appears to be non-numeric.");
 			return;
 		}
+
+		final double[] valueRange = getValueRange( table, selectedColumnName );
+		double[] valueSettings = getValueSettings( selectedColumnName, valueRange );
+
+
 		final NumericTableRowColumnColoringModel< T > coloringModel
 				= new NumericTableRowColumnColoringModel< >(
 						selectedColumnName,
