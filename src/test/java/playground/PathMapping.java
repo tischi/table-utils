@@ -15,7 +15,7 @@ public class PathMapping
 	{
 		final Path rootPath = Paths.get( "/Volumes/table/table.txt");
 
-		final String relativeImagePath = "../images/image.tif";
+		final String relativeImagePath = "../image/image.tif";
 
 		final Path path = Paths.get( rootPath.toString(), relativeImagePath.toString() );
 
@@ -28,7 +28,7 @@ public class PathMapping
 	{
 		final Path rootPath = Paths.get( "" );
 
-		final String relativeImagePath = "/g/images/image.tif";
+		final String relativeImagePath = "/g/image/image.tif";
 
 		final Path path = Paths.get( rootPath.toString(), relativeImagePath.toString() );
 

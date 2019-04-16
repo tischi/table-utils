@@ -1,6 +1,6 @@
 package de.embl.cba.tables.imagesegment;
 
-import de.embl.cba.tables.images.ImageSourcesModel;
+import de.embl.cba.tables.image.ImageSourcesModel;
 
 public interface ImagesAndSegmentsModel< T extends ImageSegment >
 {

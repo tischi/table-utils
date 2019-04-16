@@ -1,13 +1,13 @@
 package de.embl.cba.tables.command;
 
 import de.embl.cba.tables.TableColumns;
-import de.embl.cba.tables.images.FileImageSourcesModel;
-import de.embl.cba.tables.images.FileImageSourcesModelFactory;
+import de.embl.cba.tables.image.FileImageSourcesModel;
+import de.embl.cba.tables.image.FileImageSourcesModelFactory;
 import de.embl.cba.tables.imagesegment.SegmentProperty;
 import de.embl.cba.tables.imagesegment.SegmentPropertyColumnsSelectionDialog;
 import de.embl.cba.tables.imagesegment.SegmentUtils;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
-import de.embl.cba.tables.views.combined.SegmentsTableAndBdvViews;
+import de.embl.cba.tables.view.combined.SegmentsTableAndBdvViews;
 import org.scijava.command.Command;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
@@ -36,13 +36,13 @@ public class ExploreObjectsTableCommand implements Command
 	@Parameter ( label = "Log Image Paths", callback = "logImagePaths")
 	Button logImagePathsButton;
 
-	@Parameter ( label = "All images are 2D" )
+	@Parameter ( label = "All image are 2D" )
 	boolean is2D;
 
 	@Parameter ( label = "Timepoints in table are one-based" )
 	boolean isOneBasedTimePoint;
 
-	@Parameter ( label = "Paths to images in table are relative" )
+	@Parameter ( label = "Paths to image in table are relative" )
 	boolean isRelativeImagePath;
 
 	@Parameter ( label = "Parent folder (for relative image paths)",

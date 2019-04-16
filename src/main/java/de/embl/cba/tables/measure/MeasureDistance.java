@@ -85,7 +85,7 @@ public class MeasureDistance< T extends TableRow >
 
 
 		final GenericDialog gd = new GenericDialog( "Measure Distance to Selected Rows" );
-		gd.addStringField( "Column selection regular expression", ".*", 20 );
+		gd.addStringField( "Column select regular expression", ".*", 20 );
 
 		if ( selectedMetric == null ) selectedMetric = metrics[ 0 ];
 		gd.addChoice( "Distance metric", metrics, selectedMetric );

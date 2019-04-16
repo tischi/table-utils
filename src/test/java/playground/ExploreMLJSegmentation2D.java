@@ -1,6 +1,6 @@
 package playground;
 
-import de.embl.cba.tables.views.combined.SegmentsTableAndBdvViews;
+import de.embl.cba.tables.view.combined.SegmentsTableAndBdvViews;
 import de.embl.cba.tables.command.ExploreMorphoLibJLabelImage;
 import ij.IJ;
 import ij.ImagePlus;
