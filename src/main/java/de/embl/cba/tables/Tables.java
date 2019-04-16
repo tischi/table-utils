@@ -1,9 +1,10 @@
 package de.embl.cba.tables;
 
-import de.embl.cba.tables.modelview.tables.ColumnClassAwareTableModel;
-import de.embl.cba.tables.modelview.segments.SegmentUtils;
-import de.embl.cba.tables.modelview.segments.*;
-import de.embl.cba.tables.modelview.segments.SegmentProperty;
+import de.embl.cba.tables.table.ColumnClassAwareTableModel;
+import de.embl.cba.tables.imagesegment.SegmentUtils;
+import de.embl.cba.tables.imagesegment.*;
+import de.embl.cba.tables.imagesegment.SegmentProperty;
+import de.embl.cba.tables.tablerow.*;
 import net.imglib2.util.ValuePair;
 import org.scijava.table.GenericTable;
 
@@ -196,7 +197,7 @@ public class Tables
 		int numCols = colNames.size();
 
 		/**
-		 * Add rows entries
+		 * Add tablerow entries
 		 */
 
 		for ( int iString = 1; iString < strings.size(); ++iString )
@@ -325,7 +326,7 @@ public class Tables
 //
 //			tableRowMaps.add( tableRowMap );
 //
-//			segments.add( new DefaultAnnotatedImageSegment( null, tableRow ) );
+//			imagesegment.add( new DefaultAnnotatedImageSegment( null, tableRow ) );
 		}
 
 		return segments;

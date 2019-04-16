@@ -1,10 +1,8 @@
 package de.embl.cba.tables;
 
-import de.embl.cba.tables.modelview.segments.ColumnBasedTableRowImageSegment;
-import de.embl.cba.tables.modelview.segments.TableRow;
-import ij.IJ;
+import de.embl.cba.tables.imagesegment.ColumnBasedTableRowImageSegment;
+import de.embl.cba.tables.tablerow.TableRow;
 
-import javax.activation.UnsupportedDataTypeException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;

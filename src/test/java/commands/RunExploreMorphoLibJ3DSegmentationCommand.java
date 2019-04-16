@@ -1,6 +1,6 @@
 package commands;
 
-import de.embl.cba.tables.ui.ExploreMorphoLibJLabelImageCommand;
+import de.embl.cba.tables.command.ExploreMorphoLibJLabelImageCommand;
 import ij.IJ;
 import net.imagej.ImageJ;
 

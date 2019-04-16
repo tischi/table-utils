@@ -1,6 +1,6 @@
 package commands;
 
-import de.embl.cba.tables.ui.ExploreCellProfilerCommand;
+import de.embl.cba.tables.command.ExploreCellProfilerCommand;
 import net.imagej.ImageJ;
 
 

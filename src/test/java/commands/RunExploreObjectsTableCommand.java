@@ -1,6 +1,6 @@
 package commands;
 
-import de.embl.cba.tables.ui.ExploreObjectsTableCommand;
+import de.embl.cba.tables.command.ExploreObjectsTableCommand;
 import net.imagej.ImageJ;
 
 public class RunExploreObjectsTableCommand

@@ -30,16 +30,16 @@ public class TestInteractiveTableBasics
 
 //		final ObjectTablePanel panel = new ObjectTablePanel( table );
 //
-//		final Object[] newStringRow = new Object[ rows ];
-//		for ( int i = 0; i < rows; i++ )
+//		final Object[] newStringRow = new Object[ tablerow ];
+//		for ( int i = 0; i < tablerow; i++ )
 //		{
 //			newStringRow[ i ] = "aaa";
 //		}
 //
 //		((DefaultTableModel)panel.getTableModel()).addRow( newStringRow );
 //
-//		final Double[] newDoubleRow = new Double[ rows ];
-//		for ( int i = 0; i < rows; i++ )
+//		final Double[] newDoubleRow = new Double[ tablerow ];
+//		for ( int i = 0; i < tablerow; i++ )
 //		{
 //			newDoubleRow[ i ] = 1.0;
 //		}

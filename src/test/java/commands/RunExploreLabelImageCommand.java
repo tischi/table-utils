@@ -1,6 +1,6 @@
 package commands;
 
-import de.embl.cba.tables.ui.ExploreLabelImageCommand;
+import de.embl.cba.tables.command.ExploreLabelImageCommand;
 import ij.IJ;
 import net.imagej.ImageJ;
 
