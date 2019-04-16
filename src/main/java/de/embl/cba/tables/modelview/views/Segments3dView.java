@@ -13,6 +13,7 @@ import de.embl.cba.tables.modelview.selection.SelectionListener;
 import de.embl.cba.tables.modelview.selection.SelectionModel;
 import ij.IJ;
 import ij3d.Content;
+import ij3d.DefaultUniverse;
 import ij3d.Image3DUniverse;
 import ij3d.UniverseListener;
 import isosurface.MeshEditor;
@@ -24,8 +25,11 @@ import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.Views;
+import org.scijava.java3d.Transform3D;
+import org.scijava.java3d.TransformGroup;
 import org.scijava.java3d.View;
 import org.scijava.vecmath.Color3f;
+import org.scijava.vecmath.Point3d;
 import org.scijava.vecmath.Point3f;
 
 import java.util.*;
@@ -307,6 +311,7 @@ public class Segments3dView < T extends ImageSegment >
 	{
 		universe.addUniverseListener( new UniverseListener()
 		{
+
 			@Override
 			public void transformationStarted( View view )
 			{
@@ -317,6 +322,28 @@ public class Segments3dView < T extends ImageSegment >
 			public void transformationUpdated( View view )
 			{
 
+				// TODO maybe try to synch this with the Bdv View
+
+				//				final Transform3D transform3D = new Transform3D();
+//			view.getUserHeadToVworld( transform3D );
+
+//				final Transform3D transform3D = new Transform3D();
+//			universe.getVworldToCamera( transform3D );
+//				System.out.println( transform3D );
+
+//				final Transform3D transform3DInverse = new Transform3D();
+//				universe.getVworldToCameraInverse( transform3DInverse );
+//				System.out.println( transform3DInverse );
+
+//				final TransformGroup transformGroup =
+//						universe.getViewingPlatform()
+//								.getMultiTransformGroup().getTransformGroup(
+//										DefaultUniverse.ZOOM_TG );
+//
+//				final Transform3D transform3D = new Transform3D();
+//				transformGroup.getTransform( transform3D );
+//
+//				System.out.println( transform3D );
 			}
 
 			@Override

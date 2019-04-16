@@ -88,13 +88,9 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 		if ( lutMinMax[ 1 ] == lutMinMax[ 0 ] )
 		{
 			if ( lutMinMax[ 1 ] == lutRange[ 0 ] )
-			{
 				normalisedValue = 1.0;
-			}
 			else if ( lutMinMax[ 1 ] == lutRange[ 1 ] )
-			{
 				normalisedValue = 0.0;
-			}
 		}
 		else
 		{

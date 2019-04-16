@@ -32,8 +32,16 @@ public class NumericColoringModelDialog extends JFrame implements ColoringListen
 
 		JPanel panel = new JPanel();
 		panel.setLayout( new BoxLayout( panel, BoxLayout.PAGE_AXIS ) );
-		final SliderPanelDouble minSlider = new SliderPanelDouble( "Min", min, 1 );
-		final SliderPanelDouble maxSlider = new SliderPanelDouble( "Max", max, 1 );
+
+		final SliderPanelDouble minSlider = new SliderPanelDouble(
+				"Min", min, 1 );
+		minSlider.setNumColummns( 7 );
+		minSlider.setDecimalFormat( "####E0" );
+
+		final SliderPanelDouble maxSlider = new SliderPanelDouble(
+				"Max", max, 1 );
+		maxSlider.setNumColummns( 7 );
+		maxSlider.setDecimalFormat( "####E0" );
 
 		class UpdateListener implements BoundedValueDouble.UpdateListener
 		{

@@ -2,6 +2,7 @@ package de.embl.cba.tables.ui;
 
 import de.embl.cba.bdv.utils.lut.BlueWhiteRedARGBLut;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
+import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.modelview.coloring.CategoryTableRowColumnColoringModel;
 import de.embl.cba.tables.modelview.coloring.NumericColoringModelDialog;
@@ -30,7 +31,8 @@ public class ColorByColumn< T extends TableRow >
 	private HashMap< String, double[] > columnNameToRangeSettings;
 
 
-	public ColorByColumn( JTable table, SelectionColoringModel< T > selectionColoringModel )
+	public ColorByColumn( JTable table,
+						  SelectionColoringModel< T > selectionColoringModel )
 	{
 		this.table = table;
 		this.selectionColoringModel = selectionColoringModel;
@@ -77,10 +79,14 @@ public class ColorByColumn< T extends TableRow >
 		switch ( selectedColoringMode )
 		{
 			case LINEAR_BLUE_WHITE_RED:
-				colorLinear( selectionColoringModel, valueRange, valueSettings, selectedColumnName );
+				colorLinear( selectionColoringModel,
+						valueRange,
+						valueSettings,
+						selectedColumnName );
 				break;
 			case RANDOM_GLASBEY:
-				colorCategorical( selectionColoringModel, selectedColumnName );
+				colorCategorical( selectionColoringModel,
+						selectedColumnName );
 				break;
 		}
 	}
@@ -103,6 +109,13 @@ public class ColorByColumn< T extends TableRow >
 			double[] valueSettings,
 			String selectedColumnName )
 	{
+
+		if ( ! Tables.isNumeric( table, selectedColumnName ) )
+		{
+			Logger.error( "Linear coloring mode is only available for numeric columns.\n" +
+					"Column " + selectedColumnName + " appears to be non-numeric.");
+			return;
+		}
 		final NumericTableRowColumnColoringModel< T > coloringModel
 				= new NumericTableRowColumnColoringModel< >(
 						selectedColumnName,
@@ -116,7 +129,6 @@ public class ColorByColumn< T extends TableRow >
 		SwingUtilities.invokeLater( () ->
 				new NumericColoringModelDialog( selectedColumnName, coloringModel, valueRange ) );
 	}
-
 
 	private double[] getValueSettings( String columnName, double[] valueRange )
 	{

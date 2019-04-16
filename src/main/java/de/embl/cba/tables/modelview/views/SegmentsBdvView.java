@@ -21,6 +21,7 @@ import de.embl.cba.tables.modelview.selection.SelectionModel;
 import net.imglib2.RealPoint;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.ui.TransformListener;
 import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
 import org.scijava.ui.behaviour.util.Behaviours;
@@ -91,6 +92,10 @@ public class SegmentsBdvView< T extends ImageSegment >
 		initBdvOptions();
 
 		showInitialSources();
+
+		this.bdv.getViewerPanel().addTransformListener( affineTransform3D -> {
+			System.out.println( "BDV");
+			System.out.println( affineTransform3D );} );
 
 //		addGrayValueOverlay();
 
