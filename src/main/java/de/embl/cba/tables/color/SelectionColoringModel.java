@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static de.embl.cba.tables.color.SelectionColoringModel.SelectionMode.OnlyShowSelected;
+import static de.embl.cba.tables.color.SelectionColoringModel.SelectionMode.SelectionColor;
 
 public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 {
@@ -39,7 +40,7 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 
 		this.selectionColor = YELLOW;
 		this.brightnessNotSelected = 0.1;
-		this.selectionMode = OnlyShowSelected;
+		this.selectionMode = SelectionColor;
 	}
 
 
@@ -57,37 +58,27 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 			case DimNotSelected:
 
 				if ( ! isSelected )
-				{
 					output.mul( brightnessNotSelected );
-				}
 				break;
 
 			case OnlyShowSelected:
 
 				if ( ! isSelected )
-				{
 					output.mul( 0.0 );
-				}
 				break;
 
 			case SelectionColor:
 
 				if ( isSelected )
-				{
 					output.set( selectionColor );
-				}
 				break;
 
 			case SelectionColorAndDimNotSelected:
 
 				if ( isSelected )
-				{
 					output.set( selectionColor );
-				}
 				else
-				{
 					output.mul( brightnessNotSelected );
-				}
 				break;
 
 			default:

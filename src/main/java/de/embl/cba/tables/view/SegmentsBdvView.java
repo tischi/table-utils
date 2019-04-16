@@ -92,9 +92,9 @@ public class SegmentsBdvView< T extends ImageSegment >
 
 		showInitialSources();
 
-		this.bdv.getViewerPanel().addTransformListener( affineTransform3D -> {
-			System.out.println( "BDV");
-			System.out.println( affineTransform3D );} );
+//		this.bdv.getViewerPanel().addTransformListener( affineTransform3D -> {
+//			System.out.println( "BDV");
+//			System.out.println( affineTransform3D );} );
 
 //		addGrayValueOverlay();
 
@@ -528,7 +528,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 		final RealPoint globalMouseCoordinates =
 				BdvUtils.getGlobalMouseCoordinates( bdv );
 
-		System.out.println( "Finding pixel value at " + globalMouseCoordinates );
+//		System.out.println( "Finding pixel value at " + globalMouseCoordinates );
 
 		final Double value = BdvUtils.getValueAtGlobalCoordinates(
 				activeLabelSource.source(),

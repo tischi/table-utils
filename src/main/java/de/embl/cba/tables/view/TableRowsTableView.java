@@ -485,6 +485,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 							colorByColumn.colorByColumn(
 									measureDistance.getNewColumnName(),
 									ColorByColumn.LINEAR_BLUE_WHITE_RED );
+
+							selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
 						}
 					}
 				}
