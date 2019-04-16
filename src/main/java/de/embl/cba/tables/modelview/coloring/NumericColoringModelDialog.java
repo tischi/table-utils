@@ -33,13 +33,15 @@ public class NumericColoringModelDialog extends JFrame implements ColoringListen
 		JPanel panel = new JPanel();
 		panel.setLayout( new BoxLayout( panel, BoxLayout.PAGE_AXIS ) );
 
+		double spinnerStepSize = ( valueRange[ 1 ] - valueRange[ 0 ] ) / 100.0;
+
 		final SliderPanelDouble minSlider = new SliderPanelDouble(
-				"Min", min, 1 );
+				"Min", min, spinnerStepSize );
 		minSlider.setNumColummns( 7 );
 		minSlider.setDecimalFormat( "####E0" );
 
 		final SliderPanelDouble maxSlider = new SliderPanelDouble(
-				"Max", max, 1 );
+				"Max", max, spinnerStepSize );
 		maxSlider.setNumColummns( 7 );
 		maxSlider.setDecimalFormat( "####E0" );
 
@@ -69,6 +71,7 @@ public class NumericColoringModelDialog extends JFrame implements ColoringListen
 				120, 10);
 		frame.pack();
 		frame.setVisible( true );
+		frame.setResizable( false );
 		if ( dialogLocation != null )
 			frame.setLocation( dialogLocation );
 
