@@ -14,8 +14,9 @@ import java.util.Map;
 public class ColorByColumn< T extends TableRow >
 {
 
-	public static final String LINEAR_BLUE_WHITE_RED = "Linear - Blue White Red";
-	public static final String RANDOM_GLASBEY = "Categorical - Glasbey";
+	public static final String LINEAR_BLUE_WHITE_RED = "Linear: BlueWhiteRed";
+	public static final String LINEAR_ZERO_BLACK_BLUE_WHITE_RED = "Linear: ZeroBlackBlueWhiteRed";
+	public static final String RANDOM_GLASBEY = "Categorical: Glasbey";
 
 	private final JTable table;
 	private final SelectionColoringModel< T > selectionColoringModel;
@@ -44,6 +45,7 @@ public class ColorByColumn< T extends TableRow >
 		final String[] coloringModes = new String[]
 				{
 						LINEAR_BLUE_WHITE_RED,
+						LINEAR_ZERO_BLACK_BLUE_WHITE_RED,
 						RANDOM_GLASBEY
 				};
 
@@ -73,8 +75,16 @@ public class ColorByColumn< T extends TableRow >
 		switch ( selectedColoringMode )
 		{
 			case LINEAR_BLUE_WHITE_RED:
-				colorLinear( selectionColoringModel,
-						selectedColumnName );
+				colorLinear(
+						selectionColoringModel,
+						selectedColumnName,
+						false );
+				break;
+			case LINEAR_ZERO_BLACK_BLUE_WHITE_RED:
+				colorLinear(
+						selectionColoringModel,
+						selectedColumnName,
+						true );
 				break;
 			case RANDOM_GLASBEY:
 				colorCategorical( selectionColoringModel,
@@ -97,7 +107,8 @@ public class ColorByColumn< T extends TableRow >
 
 	private void colorLinear(
 			SelectionColoringModel< T > selectionColoringModel,
-			String selectedColumnName )
+			String selectedColumnName,
+			boolean paintZeroBlack )
 	{
 
 		if ( ! Tables.isNumeric( table, selectedColumnName ) )
@@ -110,14 +121,13 @@ public class ColorByColumn< T extends TableRow >
 		final double[] valueRange = getValueRange( table, selectedColumnName );
 		double[] valueSettings = getValueSettings( selectedColumnName, valueRange );
 
-
 		final NumericTableRowColumnColoringModel< T > coloringModel
 				= new NumericTableRowColumnColoringModel< >(
 						selectedColumnName,
 						new BlueWhiteRedARGBLut( 1000 ),
 						valueSettings,
-						valueRange
-		);
+						valueRange,
+						paintZeroBlack );
 
 		selectionColoringModel.setWrappedColoringModel( coloringModel );
 

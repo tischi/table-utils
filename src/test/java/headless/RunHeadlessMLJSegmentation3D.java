@@ -1,11 +1,11 @@
-package playground;
+package headless;
 
 import de.embl.cba.tables.command.ExploreMorphoLibJLabelImage;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imagej.ImageJ;
 
-public class ExploreMLJSegmentation3D
+public class RunHeadlessMLJSegmentation3D
 {
 	public static void main( String[] args )
 	{
@@ -13,14 +13,14 @@ public class ExploreMLJSegmentation3D
 		ij.ui().showUI();
 
 		final ImagePlus intensities = IJ.openImage(
-				ExploreMLJSegmentation3D.class.getResource(
+				RunHeadlessMLJSegmentation3D.class.getResource(
 				"../3d-image.zip" ).getFile() );
 
 		final ImagePlus labels = IJ.openImage(
-				ExploreMLJSegmentation3D.class.getResource(
+				RunHeadlessMLJSegmentation3D.class.getResource(
 				"../3d-image-lbl.zip" ).getFile() );
 
-		IJ.open( ExploreMLJSegmentation3D.class.getResource(
+		IJ.open( RunHeadlessMLJSegmentation3D.class.getResource(
 				"../3d-image-lbl-morpho.csv" ).getFile() );
 
 		final ExploreMorphoLibJLabelImage explore =

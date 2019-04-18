@@ -1,4 +1,4 @@
-package commands;
+package command;
 
 import de.embl.cba.tables.command.ExploreCellProfilerCommand;
 import net.imagej.ImageJ;

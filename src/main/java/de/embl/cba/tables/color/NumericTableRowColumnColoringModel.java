@@ -10,21 +10,24 @@ import net.imglib2.type.numeric.ARGBType;
 public class NumericTableRowColumnColoringModel< T extends TableRow >
 		extends AbstractColoringModel< T > implements NumericColoringModel< T >
 {
-	private String columnName;
-	private ARGBLut lut;
+	private final String columnName;
+	private final ARGBLut lut;
 	private double[] lutMinMax;
 	private double[] lutRange;
+	private final boolean paintZeroBlack;
 
 	public NumericTableRowColumnColoringModel(
 			String columnName,
 			ARGBLut lut,
 			double[] lutMinMax,
-			double[] lutRange )
+			double[] lutRange,
+			boolean paintZeroBlack )
 	{
 		this.columnName = columnName;
 		this.lut = lut;
 		this.lutMinMax = lutMinMax;
 		this.lutRange = lutRange;
+		this.paintZeroBlack = paintZeroBlack;
 	}
 
 	@Override
@@ -63,26 +66,34 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 		notifyColoringListeners();
 	}
 
-	public void setColumnName( String columnName )
-	{
-		this.columnName = columnName;
-	}
+//	public void setColumnName( String columnName )
+//	{
+//		this.columnName = columnName;
+//	}
+//
+//	public String getColumnName()
+//	{
+//		return columnName;
+//	}
 
-	public String getColumnName()
-	{
-		return columnName;
-	}
 
-
-	public void setColorLinearly( Object featureValue, ARGBType output )
+	private void setColorLinearly( Object featureValue, ARGBType output )
 	{
 		final double value = Tables.asDouble( featureValue );
+
+		if ( paintZeroBlack )
+			if ( value == 0 )
+			{
+				output.set( 0 );
+				return;
+			}
+
 		double normalisedValue = computeLinearNormalisedValue( value );
 		final int colorIndex = lut.getARGB( normalisedValue );
 		output.set( colorIndex );
 	}
 
-	public double computeLinearNormalisedValue( double value )
+	private double computeLinearNormalisedValue( double value )
 	{
 		double normalisedValue = 0;
 		if ( lutMinMax[ 1 ] == lutMinMax[ 0 ] )
