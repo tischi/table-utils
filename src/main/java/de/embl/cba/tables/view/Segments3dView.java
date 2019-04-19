@@ -147,22 +147,18 @@ public class Segments3dView < T extends ImageSegment >
 			@Override
 			public synchronized void focusEvent( T selection )
 			{
-				if ( recentFocus != null && selection == recentFocus ) return;
+				if ( selection == recentFocus ) return;
+
 				recentFocus = selection;
+
 				if ( segmentToContent.containsKey( selection ) )
 				{
-
-
-//					new SimilarityTransformAnimator(  )
-					// TODO: make a smooth animation
-
 					final AnimatedViewAdjuster adjuster =
 							new AnimatedViewAdjuster(
 									universe,
 									AnimatedViewAdjuster.ADJUST_BOTH );
 					adjuster.add( segmentToContent.get( selection )  );
 					adjuster.apply( 100, 10, 0.8 );
-
 				}
 			}
 		} );
