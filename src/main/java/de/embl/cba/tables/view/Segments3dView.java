@@ -3,6 +3,7 @@ package de.embl.cba.tables.view;
 import bdv.viewer.Source;
 import customnode.CustomTriangleMesh;
 import de.embl.cba.bdv.utils.BdvUtils;
+import de.embl.cba.tables.ij3d.AnimatedViewAdjuster;
 import de.embl.cba.tables.mesh.MeshExtractor;
 import de.embl.cba.tables.mesh.MeshUtils;
 import de.embl.cba.tables.color.*;
@@ -151,19 +152,16 @@ public class Segments3dView < T extends ImageSegment >
 				if ( segmentToContent.containsKey( selection ) )
 				{
 
+
+//					new SimilarityTransformAnimator(  )
 					// TODO: make a smooth animation
-//					final TransformGroup translateTG = universe.getTranslateTG();
-//					final Transform3D transform3D = new Transform3D();
-//					translateTG.getTransform( transform3D );
-//					//transform3D.setTranslation(  );
-//
-//					final Content c = segmentToContent.get( select );
-//
-//					//universe.setGlobalTransform(  );
-//					universe.startAnimation();
-//					final TransformGroup animationTG = universe.getAnimationTG();
-//					//animationTG.
-					universe.adjustView( segmentToContent.get( selection ) );
+
+					final AnimatedViewAdjuster adjuster =
+							new AnimatedViewAdjuster(
+									universe,
+									AnimatedViewAdjuster.ADJUST_BOTH );
+					adjuster.add( segmentToContent.get( selection )  );
+					adjuster.apply( 100, 10, 0.8 );
 
 				}
 			}

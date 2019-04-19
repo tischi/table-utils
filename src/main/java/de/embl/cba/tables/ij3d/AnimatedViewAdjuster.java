@@ -173,8 +173,19 @@ public class AnimatedViewAdjuster {
 	/**
 	 * After all points/contents were added, apply() finally adjusts center and
 	 * zoom transformations of the view.
+	 *
+	 * The adjustment is animated.
+	 * Currently, when a new object is added, it is zoomed in on it from an overview perspective.
+	 *
+	 * @param zoomLevel
+	 * 				1.0 is very close, lower numbers are less close
+	 * @param numSteps
+	 * 				The number of steps into which the animation is divided
+	 * @param milliSecondsPerStep
+	 * 	  			The time in milliseconds between steps. The total time the animation takes
+	 * 	  		is numSteps * milliSecondsPerStes.
 	 */
-	public void apply() {
+	public void apply( int numSteps, int milliSecondsPerStep, double zoomLevel ) {
 		/* The camera to vworld transformation is given by
 		 * C * T * R * Z, where
 		 *
@@ -201,28 +212,56 @@ public class AnimatedViewAdjuster {
 		final Transform3D t3d = new Transform3D();
 		final Vector3d transl = new Vector3d();
 
-		// adjust zoom
-		univ.getZoomTG().getTransform(t3d);
-		t3d.get(transl);
-		transl.z += eye.z - oldEye.z;
-		t3d.set(transl);
-		univ.getZoomTG().setTransform(t3d);
 
-		// adjust center
-		final Transform3D tmp = new Transform3D();
-		univ.getCenterTG().getTransform(t3d);
-		univ.getTranslateTG().getTransform(tmp);
-		t3d.mul(tmp);
-		univ.getRotationTG().getTransform(tmp);
-		t3d.mul(tmp);
-		transl.set(eye.x - oldEye.x, eye.y - oldEye.y, 0d);
-		tmp.set(transl);
-		t3d.mul(tmp);
-		univ.getRotationTG().getTransform(tmp);
-		t3d.mulInverse(tmp);
-		univ.getTranslateTG().getTransform(tmp);
-		t3d.mulInverse(tmp);
-		univ.getCenterTG().setTransform(t3d);
+		final double dx = eye.x - oldEye.x;
+		final double dy = eye.y - oldEye.y;
+		final double dz = eye.z - oldEye.z;
+
+		for ( int i = 1; i <= numSteps; i++ )
+		{
+			final double ddx = dx * 1.0 / numSteps;
+			final double ddy = dy * 1.0 / numSteps;
+			final double ddz = dz * zoomLevel / numSteps;
+
+			// adjust zoom
+			univ.getZoomTG().getTransform( t3d );
+			t3d.get( transl );
+			transl.z += ddz;
+			t3d.set( transl );
+			univ.getZoomTG().setTransform( t3d );
+
+			// adjust center
+			final Transform3D tmp = new Transform3D();
+			univ.getCenterTG().getTransform( t3d );
+			univ.getTranslateTG().getTransform( tmp );
+			t3d.mul( tmp );
+			univ.getRotationTG().getTransform( tmp );
+			t3d.mul( tmp );
+			transl.set( ddx, ddy, 0d );
+			tmp.set( transl );
+			t3d.mul( tmp );
+			univ.getRotationTG().getTransform( tmp );
+			t3d.mulInverse( tmp );
+			univ.getTranslateTG().getTransform( tmp );
+			t3d.mulInverse( tmp );
+			univ.getCenterTG().setTransform( t3d );
+
+			sleep( milliSecondsPerStep );
+		}
+
+
+
+	}
+
+	public void sleep( int millis )
+	{
+		try
+		{
+			Thread.sleep( millis );
+		} catch ( InterruptedException ex )
+		{
+			ex.printStackTrace();
+		}
 	}
 
 	/**
