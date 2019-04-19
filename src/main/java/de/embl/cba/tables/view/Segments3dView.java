@@ -45,6 +45,7 @@ public class Segments3dView < T extends ImageSegment >
 	private double transparency;
 	private boolean isListeningToUniverse;
 	private int meshSmoothingIterations;
+	private int segmentFocusAnimationDurationMillis;
 
 	public Segments3dView(
 			final List< T > segments,
@@ -76,6 +77,7 @@ public class Segments3dView < T extends ImageSegment >
 		this.transparency = 0.5;
 		this.voxelSpacing3DView = 0.1;
 		this.meshSmoothingIterations = 5;
+		this.segmentFocusAnimationDurationMillis = 750;
 
 		this.segmentToMesh = new HashMap<>();
 		this.segmentToContent = new HashMap<>();
@@ -95,9 +97,14 @@ public class Segments3dView < T extends ImageSegment >
 		this.transparency = transparency;
 	}
 
-	public void setMeshSmoothingIterations( int meshSmoothingIterations )
+	public void setMeshSmoothingIterations( int iterations )
 	{
-		this.meshSmoothingIterations = meshSmoothingIterations;
+		this.meshSmoothingIterations = iterations;
+	}
+
+	public void setSegmentFocusAnimationDurationMillis( int duration )
+	{
+		this.segmentFocusAnimationDurationMillis = duration;
 	}
 
 	public Image3DUniverse getUniverse()
@@ -158,7 +165,11 @@ public class Segments3dView < T extends ImageSegment >
 									universe,
 									AnimatedViewAdjuster.ADJUST_BOTH );
 					adjuster.add( segmentToContent.get( selection )  );
-					adjuster.apply( 100, 10, 0.8 );
+
+					adjuster.apply(
+							30,
+							segmentFocusAnimationDurationMillis,
+							0.8 );
 				}
 			}
 		} );
@@ -196,10 +207,7 @@ public class Segments3dView < T extends ImageSegment >
 	private synchronized void addSegmentTo3DView( T segment )
 	{
 		CustomTriangleMesh triangleMesh = getTriangleMesh( segment );
-
-
 		MeshEditor.smooth2(triangleMesh, meshSmoothingIterations );
-
 		addMeshToUniverse( segment, triangleMesh );
 	}
 

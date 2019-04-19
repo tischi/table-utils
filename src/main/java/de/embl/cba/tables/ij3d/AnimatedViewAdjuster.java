@@ -105,8 +105,7 @@ public class AnimatedViewAdjuster {
 	private final Adjuster adjuster;
 
 	private interface Adjuster {
-
-		public void add(Point3d p);
+		void add(Point3d p);
 	}
 
 	/**
@@ -177,15 +176,17 @@ public class AnimatedViewAdjuster {
 	 * The adjustment is animated.
 	 * Currently, when a new object is added, it is zoomed in on it from an overview perspective.
 	 *
-	 * @param zoomLevel
-	 * 				1.0 is very close, lower numbers are less close
-	 * @param numSteps
-	 * 				The number of steps into which the animation is divided
-	 * @param milliSecondsPerStep
-	 * 	  			The time in milliseconds between steps. The total time the animation takes
-	 * 	  		is numSteps * milliSecondsPerStes.
+	 * @param fps
+	 * 				The frequency of the animation in frames per seconds (Hz). The animation
+	 * 			frequency of movies in the cinema is around 30 Hz.
+	 * @param durationMillis
+	 * 	  			The total time the animation should take in milliseconds.
+	 *
+	 * 	@param zoomLevel
+	 *  			The zoom level at the end of the animation.
+	 *  			1.0 is quite close, lower numbers are less close.
 	 */
-	public void apply( int numSteps, int milliSecondsPerStep, double zoomLevel ) {
+	public void apply( int fps, int durationMillis, double zoomLevel ) {
 		/* The camera to vworld transformation is given by
 		 * C * T * R * Z, where
 		 *
@@ -212,16 +213,18 @@ public class AnimatedViewAdjuster {
 		final Transform3D t3d = new Transform3D();
 		final Vector3d transl = new Vector3d();
 
-
 		final double dx = eye.x - oldEye.x;
 		final double dy = eye.y - oldEye.y;
 		final double dz = eye.z - oldEye.z;
 
-		for ( int i = 1; i <= numSteps; i++ )
+		final int numFrames = (int) ( durationMillis / 1000.0 * fps );
+		final int intervalBetweenFramesMillis = ( int ) ( 1.0 * 1000.0 / fps );
+
+		for ( int i = 1; i <= numFrames; i++ )
 		{
-			final double ddx = dx * 1.0 / numSteps;
-			final double ddy = dy * 1.0 / numSteps;
-			final double ddz = dz * zoomLevel / numSteps;
+			final double ddx = dx * 1.0 / numFrames;
+			final double ddy = dy * 1.0 / numFrames;
+			final double ddz = dz * zoomLevel / numFrames;
 
 			// adjust zoom
 			univ.getZoomTG().getTransform( t3d );
@@ -246,7 +249,7 @@ public class AnimatedViewAdjuster {
 			t3d.mulInverse( tmp );
 			univ.getCenterTG().setTransform( t3d );
 
-			sleep( milliSecondsPerStep );
+			sleep( intervalBetweenFramesMillis );
 		}
 
 
@@ -298,8 +301,6 @@ public class AnimatedViewAdjuster {
 
 		final Point3d max = new Point3d();
 		c.getContent().getMax(max);
-
-		final Point3d tmp = new Point3d();
 
 		// transform each of the 8 corners to vworld
 		// coordinates and feed it to add(Point3d).

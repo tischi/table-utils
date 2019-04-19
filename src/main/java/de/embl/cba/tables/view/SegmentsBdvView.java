@@ -58,6 +58,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 	private boolean grayValueOverlayWasFirstSource;
 	private HashMap< LabelFrameAndImage, T > labelFrameAndImageToSegment;
 	private List< T > segments;
+	private int segmentFocusAnimationDurationMillis;
 
 	public SegmentsBdvView(
 			final List< T > segments,
@@ -81,7 +82,8 @@ public class SegmentsBdvView< T extends ImageSegment >
 		this.imageSourcesModel = imageSourcesModel;
 		this.bdv = bdv;
 
-		this.voxelSpacing3DView = 0.1; // TODO
+		this.voxelSpacing3DView = 0.1;
+		this.segmentFocusAnimationDurationMillis = 750;
 		this.currentSources = new HashSet<>( );
 		this.labelsARGBConverters = new HashSet<>(  );
 
@@ -188,7 +190,12 @@ public class SegmentsBdvView< T extends ImageSegment >
 				bdv,
 				position,
 				imageSegment.timePoint(),
-				500 );
+				segmentFocusAnimationDurationMillis );
+	}
+
+	public void setSegmentFocusAnimationDurationMillis( int duration )
+	{
+		this.segmentFocusAnimationDurationMillis = duration;
 	}
 
 	private void ensureVisibilityOfImageSetOfImageSegment( ImageSegment imageSegment )
