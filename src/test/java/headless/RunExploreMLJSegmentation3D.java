@@ -5,7 +5,7 @@ import ij.IJ;
 import ij.ImagePlus;
 import net.imagej.ImageJ;
 
-public class RunHeadlessMLJSegmentation3D
+public class RunExploreMLJSegmentation3D
 {
 	public static void main( String[] args )
 	{
@@ -13,14 +13,14 @@ public class RunHeadlessMLJSegmentation3D
 		ij.ui().showUI();
 
 		final ImagePlus intensities = IJ.openImage(
-				RunHeadlessMLJSegmentation3D.class.getResource(
+				RunExploreMLJSegmentation3D.class.getResource(
 				"../3d-image.zip" ).getFile() );
 
 		final ImagePlus labels = IJ.openImage(
-				RunHeadlessMLJSegmentation3D.class.getResource(
+				RunExploreMLJSegmentation3D.class.getResource(
 				"../3d-image-lbl.zip" ).getFile() );
 
-		IJ.open( RunHeadlessMLJSegmentation3D.class.getResource(
+		IJ.open( RunExploreMLJSegmentation3D.class.getResource(
 				"../3d-image-lbl-morpho.csv" ).getFile() );
 
 		final ExploreMorphoLibJLabelImage explore =

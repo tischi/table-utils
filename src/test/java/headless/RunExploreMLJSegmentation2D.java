@@ -6,20 +6,20 @@ import ij.IJ;
 import ij.ImagePlus;
 import net.imagej.ImageJ;
 
-public class RunHeadlessMLJSegmentation2D
+public class RunExploreMLJSegmentation2D
 {
 	public static void main( String[] args )
 	{
 		final ImageJ ij = new ImageJ();
 		ij.ui().showUI();
 
-		final ImagePlus intensities = IJ.openImage( RunHeadlessMLJSegmentation2D.class.getResource(
+		final ImagePlus intensities = IJ.openImage( RunExploreMLJSegmentation2D.class.getResource(
 				"../blobs.zip" ).getFile() );
 
-		final ImagePlus labels = IJ.openImage( RunHeadlessMLJSegmentation2D.class.getResource(
+		final ImagePlus labels = IJ.openImage( RunExploreMLJSegmentation2D.class.getResource(
 				"../mask-lbl.zip" ).getFile() );
 
-		IJ.open( RunHeadlessMLJSegmentation2D.class.getResource(
+		IJ.open( RunExploreMLJSegmentation2D.class.getResource(
 				"../blobs-lbl-Morphometry.csv" ).getFile() );
 
 		final ExploreMorphoLibJLabelImage explore =

@@ -20,7 +20,7 @@ public class SegmentPropertyColumnsSelectionDialog
 	{
 		setColumnChoices( columns );
 
-		gd = new GenericDialog( "Coordinate Columns Selection" );
+		gd = new GenericDialog( "Image Segments Properties Columns Selection" );
 
 		addColumnSelectionUIs();
 	}

@@ -207,6 +207,7 @@ public class Segments3dView < T extends ImageSegment >
 	private synchronized void addSegmentTo3DView( T segment )
 	{
 		CustomTriangleMesh triangleMesh = getTriangleMesh( segment );
+		if ( triangleMesh == null ) return;
 		MeshEditor.smooth2(triangleMesh, meshSmoothingIterations );
 		addMeshToUniverse( segment, triangleMesh );
 	}
@@ -217,8 +218,9 @@ public class Segments3dView < T extends ImageSegment >
 			if ( segment.boundingBox() != null )
 				addMesh( segment );
 			else // TODO: Create mesh with FloodFill
-				IJ.showMessage( "ImageSegments without bounding box " +
-						"are currently not supported." );
+				return null;
+//				IJ.showMessage( "ImageSegments without bounding box " +
+//						"are currently not supported." );
 
 		CustomTriangleMesh triangleMesh = MeshUtils.asCustomTriangleMesh( segment.getMesh() );
 		triangleMesh.setColor( getColor3f( segment ) );
@@ -234,7 +236,8 @@ public class Segments3dView < T extends ImageSegment >
 		final RandomAccessibleInterval< ? extends RealType< ? > > rai = getLabelsRAI( segment, level );
 
 
-		final FinalInterval interval = getVoxelSpaceInterval( labelsSourceCalibrations, level, segment.boundingBox() );
+		final FinalInterval interval =
+				getVoxelSpaceInterval( labelsSourceCalibrations, level, segment.boundingBox() );
 
 		final MeshExtractor meshExtractor = new MeshExtractor(
 				Views.extendZero( ( RandomAccessibleInterval ) rai ), // TODO: get rid of raw cast, somehow....
@@ -248,14 +251,19 @@ public class Segments3dView < T extends ImageSegment >
 		segment.setMesh( meshCoordinates );
 	}
 
-	private FinalInterval getVoxelSpaceInterval( ArrayList< double[] > labelsSourceCalibrations, int level, FinalRealInterval realInterval )
+	private FinalInterval getVoxelSpaceInterval(
+			ArrayList< double[] > labelsSourceCalibrations,
+			int level,
+			FinalRealInterval realInterval )
 	{
 		final long[] min = new long[ 3 ];
 		final long[] max = new long[ 3 ];
 		for ( int d = 0; d < 3; d++ )
 		{
-			min[ d ] = (long) ( realInterval.realMin( d ) / labelsSourceCalibrations.get( level )[ d ] );
-			max[ d ] = (long) ( realInterval.realMax( d ) / labelsSourceCalibrations.get( level )[ d ] );
+			min[ d ] = (long) ( realInterval.realMin( d )
+					/ labelsSourceCalibrations.get( level )[ d ] );
+			max[ d ] = (long) ( realInterval.realMax( d )
+					/ labelsSourceCalibrations.get( level )[ d ] );
 		}
 		return new FinalInterval( min, max );
 	}
@@ -266,7 +274,6 @@ public class Segments3dView < T extends ImageSegment >
 		final Source< ? > labelsSource
 				= imageSourcesModel.sources().get( segment.imageId() ).source();
 
-		// TODO: is below rai really nonVolatile???
 		final RandomAccessibleInterval< ? extends RealType< ? > > rai =
 				BdvUtils.getRealTypeNonVolatileRandomAccessibleInterval( labelsSource, 0, level );
 
@@ -278,11 +285,11 @@ public class Segments3dView < T extends ImageSegment >
 	{
 		initUniverseAndListener();
 
+		// TODO: is the viewer transform altered here?
 		final Content content =
 				universe.addCustomMesh( mesh, "" + segment.labelId() );
 
 		content.setTransparency( (float) transparency );
-
 		content.setLocked( true );
 		//universe.adjustView( content );
 
@@ -292,9 +299,14 @@ public class Segments3dView < T extends ImageSegment >
 
 	private void initUniverseAndListener()
 	{
-		if ( universe == null ) universe = new Image3DUniverse();
+		if ( universe == null )
+			universe = new Image3DUniverse();
 
-		if ( universe.getWindow() == null ) universe.show();
+		if ( universe.getWindow() == null )
+		{
+			universe.show();
+			universe.getWindow().setResizable( false );
+		}
 
 		if ( ! isListeningToUniverse )
 			isListeningToUniverse = addUniverseListener();

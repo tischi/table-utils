@@ -1,0 +1,4 @@
+Label,MeanBreadth,Centroid.X,Centroid.Y,Centroid.Z,Path_Image,Path_LabelImage
+1,21.504,73.406,26.657,44.500,3d-image.zip,3d-image-lbl.zip
+2,20.771,28.490,31.581,45.018,3d-image.zip,3d-image-lbl.zip
+3,23.428,72.467,71.947,44.571,3d-image.zip,3d-image-lbl.zip

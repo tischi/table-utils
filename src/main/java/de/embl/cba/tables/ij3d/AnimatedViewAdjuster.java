@@ -213,19 +213,19 @@ public class AnimatedViewAdjuster {
 		final Transform3D t3d = new Transform3D();
 		final Vector3d transl = new Vector3d();
 
+		final int numFrames = (int) ( durationMillis / 1000.0 * fps );
+		final int intervalBetweenFramesMillis = ( int ) ( 1.0 * 1000.0 / fps );
+
 		final double dx = eye.x - oldEye.x;
 		final double dy = eye.y - oldEye.y;
 		final double dz = eye.z - oldEye.z;
 
-		final int numFrames = (int) ( durationMillis / 1000.0 * fps );
-		final int intervalBetweenFramesMillis = ( int ) ( 1.0 * 1000.0 / fps );
+		final double ddx = dx * 1.0 / numFrames;
+		final double ddy = dy * 1.0 / numFrames;
+		final double ddz = dz * zoomLevel / numFrames;
 
 		for ( int i = 1; i <= numFrames; i++ )
 		{
-			final double ddx = dx * 1.0 / numFrames;
-			final double ddy = dy * 1.0 / numFrames;
-			final double ddz = dz * zoomLevel / numFrames;
-
 			// adjust zoom
 			univ.getZoomTG().getTransform( t3d );
 			t3d.get( transl );
@@ -251,8 +251,6 @@ public class AnimatedViewAdjuster {
 
 			sleep( intervalBetweenFramesMillis );
 		}
-
-
 
 	}
 

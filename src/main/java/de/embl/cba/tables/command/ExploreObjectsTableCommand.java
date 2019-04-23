@@ -8,6 +8,7 @@ import de.embl.cba.tables.imagesegment.SegmentPropertyColumnsSelectionDialog;
 import de.embl.cba.tables.imagesegment.SegmentUtils;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import de.embl.cba.tables.view.combined.SegmentsTableAndBdvViews;
+import de.embl.cba.tables.view.combined.SegmentsTableBdvAnd3dViews;
 import org.scijava.command.Command;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
@@ -20,34 +21,36 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static de.embl.cba.tables.imagesegment.SegmentPropertyColumnsSelectionDialog.NO_COLUMN_SELECTED;
+
 @Plugin(type = Command.class, menuPath =
 		"Plugins>Segmentation>Explore>Explore Objects Table" )
 public class ExploreObjectsTableCommand implements Command
 {
 	@Parameter
-	LogService logService;
+	public LogService logService;
 
 	@Parameter ( label = "Table" )
-	File tableFile;
+	public File tableFile;
 
 	@Parameter ( label = "Image Path Columns Id" )
-	String imagePathColumnId = "Path_";
+	public String imagePathColumnId = "Path_";
 
 	@Parameter ( label = "Log Image Paths", callback = "logImagePaths")
-	Button logImagePathsButton;
+	private Button logImagePathsButton;
 
 	@Parameter ( label = "All image are 2D" )
-	boolean is2D;
+	public boolean is2D;
 
 	@Parameter ( label = "Timepoints in table are one-based" )
-	boolean isOneBasedTimePoint;
+	public boolean isOneBasedTimePoint;
 
 	@Parameter ( label = "Paths to image in table are relative" )
-	boolean isRelativeImagePath;
+	public boolean isRelativeImagePath;
 
 	@Parameter ( label = "Parent folder (for relative image paths)",
 			required = false, style = "directory")
-	File imageRootFolder;
+	public File imageRootFolder;
 
 
 	private LinkedHashMap< String, List< ? > > columns;
@@ -67,11 +70,20 @@ public class ExploreObjectsTableCommand implements Command
 						imageRootFolder.toString(),
 						is2D ).getImageSourcesModel();
 
-		final SegmentsTableAndBdvViews views =
-				new SegmentsTableAndBdvViews( tableRowImageSegments, imageSourcesModel, tableFile.getName() );
-
-		views.getTableRowsTableView().categoricalColumnNames().add(
-				coordinateToColumnName.get( SegmentProperty.ObjectLabel ) );
+		if ( is2D )
+		{
+			new SegmentsTableAndBdvViews(
+					tableRowImageSegments,
+					imageSourcesModel,
+					tableFile.getName() );
+		}
+		else
+		{
+			new SegmentsTableBdvAnd3dViews(
+					tableRowImageSegments,
+					imageSourcesModel,
+					tableFile.getName() );
+		}
 
 	}
 
@@ -103,6 +115,9 @@ public class ExploreObjectsTableCommand implements Command
 
 		for( SegmentProperty coordinate : coordinateToColumnName.keySet() )
 		{
+			if ( coordinateToColumnName.get( coordinate ).equals( NO_COLUMN_SELECTED ) )
+				continue;
+
 			coordinateToColumn.put(
 					coordinate,
 					columns.get( coordinateToColumnName.get( coordinate ) ) );

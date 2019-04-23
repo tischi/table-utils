@@ -45,6 +45,8 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		labelMaskColumnIds.add( "labelMasks" );
 		labelMaskColumnIds.add( "LabelMask" );
 		labelMaskColumnIds.add( "LabelImage" );
+		labelMaskColumnIds.add( "Labels" );
+		labelMaskColumnIds.add( "labels" );
 	}
 
 	public FileImageSourcesModel getImageSourcesModel()
@@ -60,11 +62,13 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		{
 			final Set< String > imageNames = imageNameToPathColumnName.keySet();
 
-			final List< String > imageSetIds = getImageSetIds( tableRowImageSegment, imageNames );
+			final List< String > imageSetIds =
+					getImageSetIds( tableRowImageSegment, imageNames );
 
 			for ( String imageName : imageNames )
 			{
-				final String imagePath = getImagePath( tableRowImageSegment, imageName );
+				final String imagePath =
+						getImagePath( tableRowImageSegment, imageName );
 
 				final String imageId = imagePath;
 
@@ -73,7 +77,8 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 					final Path absoluteImagePath =
 							Tables.getAbsolutePath( imageRootFolder, imagePath );
 
-					final String imageDisplayName = absoluteImagePath.getFileName().toString();
+					final String imageDisplayName =
+							absoluteImagePath.getFileName().toString();
 
 					imageSourcesModel.addSourceAndMetadata(
 							imageId,

@@ -123,6 +123,18 @@
 			<artifactId>ij</artifactId>
 		</dependency>
 
+<!--		<dependency>-->
+<!--			<groupId>nz.ac.waikato.cms.weka</groupId>-->
+<!--			<artifactId>weka-dev</artifactId>-->
+<!--			<version>3.9.2</version>-->
+<!--		</dependency>-->
+
+		<dependency>
+			<groupId>de.embl.cba</groupId>
+			<artifactId>classifiers</artifactId>
+			<version>0.1.02</version>
+		</dependency>
+
 		<dependency>
 			<groupId>sc.fiji</groupId>
 			<artifactId>bigdataviewer-vistools</artifactId>
