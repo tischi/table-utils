@@ -504,7 +504,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
 				new Thread( () -> selectNone() ).start(),
-				segmentsName + "-select-none", nextImageSetTrigger );
+				segmentsName + "-select-none", selectNoneTrigger );
 	}
 
 	public synchronized void selectNone()
@@ -530,13 +530,13 @@ public class SegmentsBdvView< T extends ImageSegment >
 		behaviours.behaviour(
 				( ClickBehaviour ) ( x, y ) ->
 						new Thread( () -> changeImageSet( +1 ) ).start(),
-				segmentsName + "-toggle-select", nextImageSetTrigger ) ;
+				segmentsName + "-next-image-set", nextImageSetTrigger ) ;
 
 
 		behaviours.behaviour(
 				( ClickBehaviour ) ( x, y ) ->
 						new Thread( () -> changeImageSet( -1 ) ).start(),
-				segmentsName + "-toggle-select", previousImageSetTrigger ) ;
+				segmentsName + "-previous-image-set", previousImageSetTrigger ) ;
 
 	}
 

@@ -321,7 +321,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private JMenuItem createAddColumnMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "Add Custom Column..." );
+		final JMenuItem menuItem = new JMenuItem( "New Column..." );
 
 		final TableRowsTableView tableView = this;
 
