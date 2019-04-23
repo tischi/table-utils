@@ -25,7 +25,7 @@ import static de.embl.cba.tables.imagesegment.SegmentPropertyColumnsSelectionDia
 		"Plugins>Segmentation>Explore>Explore Objects Table" )
 public class ExploreObjectsTableCommand implements Command
 {
-	public static final String DEFAULT = "\'Path_\' (Default)";
+	public static final String DEFAULT = "Path_";
 	public static final String IMAGE_PATH_COLUMNS_ID_CELL_PROFILER = "\'FileName_\' and \'PathName_\' (CellProfiler)";
 	public static final String IMAGE_PATH_COLUMNS_ID_DEFAULT = "Path_";
 
@@ -35,7 +35,7 @@ public class ExploreObjectsTableCommand implements Command
 	@Parameter ( label = "Table" )
 	public File tableFile;
 
-	@Parameter ( label = "Image Path Column IDs", choices = { DEFAULT })
+	@Parameter ( label = "Image path column identifier", choices = { DEFAULT })
 	public String imagePathColumnsId;
 
 	@Parameter ( label = "Paths to images are relative" )
@@ -45,22 +45,22 @@ public class ExploreObjectsTableCommand implements Command
 			required = false, style = "directory")
 	public File imageRootFolder;
 
-	@Parameter ( label = "Apply Path Mapping" )
+//	@Parameter ( label = "Apply Path Mapping" )
 	public boolean isPathMapping = false;
 
-	@Parameter ( label = "Root path in table (for path mapping)" )
+//	@Parameter ( label = "Root path in table (for path mapping)" )
 	public String imageRootPathInTable = "/Volumes/";
 
-	@Parameter ( label = "Root path on this computer (for path mapping)" )
+//	@Parameter ( label = "Root path on this computer (for path mapping)" )
 	public String imageRootPathOnThisComputer = "/g/";
 
 	@Parameter ( label = "Log Image Paths", callback = "logImagePaths")
 	private Button logImagePathsButton;
 
-	@Parameter ( label = "All images are 2D" )
+	@Parameter ( label = "Images are 2D" )
 	public boolean is2D;
 
-	@Parameter ( label = "Time points in table are one-based" )
+	@Parameter ( label = "Time points are one-based" )
 	public boolean isOneBasedTimePoint;
 
 
@@ -120,9 +120,8 @@ public class ExploreObjectsTableCommand implements Command
 				TableColumns.stringColumnsFromTableFile( tableFile ) );
 
 		if ( imagePathColumnsId.equals( IMAGE_PATH_COLUMNS_ID_CELL_PROFILER ) )
-		{
 			CellProfilerUtils.replaceFolderAndFileColumnsByPathColumn( columns );
-		}
+
 
 		if ( isPathMapping )
 		{
@@ -166,7 +165,12 @@ public class ExploreObjectsTableCommand implements Command
 			{
 				final HashSet< String > pathColumnNames =
 						new HashSet<>( ( List< String > ) columns.get( column ) );
-				pathColumnNames.forEach( s -> logService.info( s ) );
+
+				if ( isRelativeImagePath )
+					pathColumnNames.forEach( s -> logService.info(
+							imageRootFolder + File.separator + s ) );
+				else
+					pathColumnNames.forEach( s -> logService.info( s ) );
 			}
 		}
 	}
