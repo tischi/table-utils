@@ -26,7 +26,7 @@ import java.util.function.BooleanSupplier;
  *
  * @author Vanessa Leite
  * @author Philipp Hanslovsky
- * @author Christian Tischer (making only minor modifications)
+ * @author Christian Tischer (only very minor modifications)
  */
 public class MeshExtractor< R extends RealType< R > >
 {

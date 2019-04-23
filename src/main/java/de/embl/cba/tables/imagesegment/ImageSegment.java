@@ -13,6 +13,8 @@ public interface ImageSegment extends RealLocalizable
 
 	FinalRealInterval boundingBox();
 
+	void setBoundingBox( FinalRealInterval boundingBox );
+
 	float[] getMesh();
 
 	void setMesh( float[] mesh );

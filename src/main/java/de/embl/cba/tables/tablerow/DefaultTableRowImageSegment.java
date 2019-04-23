@@ -43,6 +43,12 @@ public class DefaultTableRowImageSegment implements TableRowImageSegment
 	}
 
 	@Override
+	public void setBoundingBox( FinalRealInterval boundingBox )
+	{
+		imageSegment.setBoundingBox( boundingBox );
+	}
+
+	@Override
 	public float[] getMesh()
 	{
 		return imageSegment.getMesh();

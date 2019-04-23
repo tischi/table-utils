@@ -39,7 +39,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 																  Flavour flavor,
 																  int numSpatialDimensions,
 																  AffineTransform3D transform,
-																  File segmentsTable // TODO: what to do here if the table is not from a file?
+																  File segmentsTable
 	)
 	{
 

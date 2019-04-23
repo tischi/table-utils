@@ -48,13 +48,14 @@ public class SegmentsBdvView< T extends ImageSegment >
 	private BdvHandle bdv;
 	private String segmentsName;
 	private BdvOptions bdvOptions;
-	private SourceAndMetadata currentLabelSource;
+	private SourceAndMetadata labelsSource;
+	private LabelsARGBConverter labelsSourceConverter;
+
 	private T recentFocus;
 	private ViewerState recentViewerState;
 	private List< ConverterSetup > recentConverterSetups;
 	private double voxelSpacing3DView;
 	private Set< SourceAndMetadata< ? extends RealType< ? > > > currentSources;
-	private Set< LabelsARGBConverter > labelsARGBConverters;
 	private boolean grayValueOverlayWasFirstSource;
 	private HashMap< LabelFrameAndImage, T > labelFrameAndImageToSegment;
 	private List< T > segments;
@@ -70,6 +71,20 @@ public class SegmentsBdvView< T extends ImageSegment >
 		this( segments, selectionModel, selectionColoringModel, imageSourcesModel, null );
 	}
 
+
+	/**
+	 *
+	 * There can be multiple label images, both in the segments list as well as in
+	 * the imageSourcesModel. However, only one of the label images can be displayed at
+	 * a time. If a segment is selected in the segments list, the appropriate label
+	 * source is identified and shown.
+	 *
+	 * @param segments
+	 * @param selectionModel
+	 * @param selectionColoringModel
+	 * @param imageSourcesModel
+	 * @param bdv
+	 */
 	public SegmentsBdvView(
 			final List< T > segments,
 			final SelectionModel< T > selectionModel,
@@ -85,25 +100,25 @@ public class SegmentsBdvView< T extends ImageSegment >
 		this.voxelSpacing3DView = 0.1;
 		this.segmentFocusAnimationDurationMillis = 750;
 		this.currentSources = new HashSet<>( );
-		this.labelsARGBConverters = new HashSet<>(  );
 
-		this.segments = segments;
-		this.labelFrameAndImageToSegment = SegmentUtils.createSegmentMap( this.segments );
-
+		initSegments( segments );
 		initBdvOptions();
-
 		showInitialSources();
-
-//		this.bdv.getViewerPanel().addTransformListener( affineTransform3D -> {
-//			System.out.println( "BDV");
-//			System.out.println( affineTransform3D );} );
-
-//		addGrayValueOverlay();
+		addGrayValueOverlay();
 
 		registerAsSelectionListener( this.selectionModel );
 		registerAsColoringListener( this.selectionColoringModel );
 
 		installBdvBehaviours();
+	}
+
+	public void initSegments( List< T > segments )
+	{
+		if ( segments != null )
+		{
+			this.segments = segments;
+			this.labelFrameAndImageToSegment = SegmentUtils.createSegmentMap( this.segments );
+		}
 	}
 
 	public void addGrayValueOverlay()
@@ -202,7 +217,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 	{
 		final String imageId = imageSegment.imageId();
 
-		if ( currentLabelSource.metadata().imageId.equals( imageId ) )
+		if ( labelsSource.metadata().imageId.equals( imageId ) )
 		{
 			// Nothing to be done, the imageSegment belongs to the
 			// currently shown image set.
@@ -313,7 +328,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 		Source< ? > source = sourceAndMetadata.source();
 
 		if ( metadata.flavour == Flavour.LabelSource )
-			source = asLabelSource( sourceAndMetadata );
+			source = asLabelsSource( sourceAndMetadata );
 
 		bdvOptions = bdvOptions.sourceTransform( metadata.sourceTransform );
 
@@ -330,23 +345,16 @@ public class SegmentsBdvView< T extends ImageSegment >
 
 		bdv = bdvStackSource.getBdvHandle();
 
-		updateBdvTimePointListeners();
-
 		bdvOptions = bdvOptions.addTo( bdv );
 
 		metadata.bdvStackSource = bdvStackSource;
 
 		currentSources.add( sourceAndMetadata );
 
-		return bdvStackSource;
-	}
+		if ( labelsSourceConverter != null )
+			bdv.getViewerPanel().addTimePointListener( labelsSourceConverter );
 
-	public void updateBdvTimePointListeners()
-	{
-		for ( LabelsARGBConverter converter : labelsARGBConverters )
-		{
-			bdv.getViewerPanel().addTimePointListener( converter );
-		}
+		return bdvStackSource;
 	}
 
 	public int getNumTimePoints( Source< ? > source )
@@ -391,31 +399,50 @@ public class SegmentsBdvView< T extends ImageSegment >
 		}
 	}
 
-	private Source asLabelSource(
+
+	/**
+	 * Currently, the logic is that there can be only one labels source
+	 * within this SegmentsBdvView class. Thus, creation of the labels source
+	 * also registers it as "the" labelsSource
+	 *
+	 * @param sourceAndMetadata
+	 * @return
+	 */
+	private Source asLabelsSource(
 			SourceAndMetadata< ? extends RealType< ? > > sourceAndMetadata )
+	{
+
+		this.labelsSource = sourceAndMetadata;
+
+		final LabelsARGBConverter labelsARGBConverter =
+				createLabelsARGBConverter( labelsSource );
+
+		this.labelsSourceConverter = labelsARGBConverter;
+
+		final ARGBConvertedRealSource convertedRealSource =
+				new ARGBConvertedRealSource( sourceAndMetadata.source(), labelsARGBConverter );
+
+		return convertedRealSource;
+	}
+
+	private LabelsARGBConverter createLabelsARGBConverter( SourceAndMetadata labelsSource )
 	{
 		LabelsARGBConverter labelsARGBConverter;
 
-		if ( sourceAndMetadata.metadata().segmentsTable == null )
+		if ( labelFrameAndImageToSegment == null )
 		{
 			labelsARGBConverter = new LazyLabelsARGBConverter();
 		}
 		else
 		{
-			// TODO: implement different logic of what is the active label source
-			currentLabelSource = sourceAndMetadata;
-
 			labelsARGBConverter =
 					new SegmentsARGBConverter(
 							labelFrameAndImageToSegment,
-							currentLabelSource.metadata().imageId,
+							labelsSource.metadata().imageId,
 							selectionColoringModel );
 
 		}
-
-		labelsARGBConverters.add( labelsARGBConverter );
-
-		return new ARGBConvertedRealSource( sourceAndMetadata.source(), labelsARGBConverter );
+		return labelsARGBConverter;
 	}
 
 	private void initBdvOptions( )
@@ -456,7 +483,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 
 	private synchronized void shuffleRandomColors()
 	{
-		if ( ! isCurrentLabelSourceActive() ) return;
+		if ( ! isLabelSourceActive() ) return;
 
 		final ColoringModel< T > coloringModel =
 				selectionColoringModel.getWrappedColoringModel();
@@ -478,7 +505,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 
 	public synchronized void selectNone()
 	{
-		if ( ! isCurrentLabelSourceActive() ) return;
+		if ( ! isLabelSourceActive() ) return;
 
 		selectionModel.clearSelection( );
 
@@ -495,15 +522,19 @@ public class SegmentsBdvView< T extends ImageSegment >
 
 	private synchronized void toggleSelectionAtMousePosition()
 	{
-		if ( currentLabelSource == null ) return;
+		if ( segments == null )
+		{
+			// TODO: maybe also make this work if there are now segments, i.e. a table provided
+			return;
+		}
 
-		if ( ! isCurrentLabelSourceActive() ) return;
+		if ( ! isLabelSourceActive() ) return;
 
-		final double labelId = getLabelIdAtCurrentMouseCoordinates( currentLabelSource );
+		final double labelId = getLabelIdAtCurrentMouseCoordinates( labelsSource );
 
 		if ( labelId == BACKGROUND ) return;
 
-		final String labelImageId = currentLabelSource.metadata().imageId;
+		final String labelImageId = labelsSource.metadata().imageId;
 
 		final LabelFrameAndImage labelFrameAndImage =
 				new LabelFrameAndImage( labelId, getCurrentTimePoint(),labelImageId );
@@ -519,11 +550,11 @@ public class SegmentsBdvView< T extends ImageSegment >
 		}
 	}
 
-	private boolean isCurrentLabelSourceActive()
+	private boolean isLabelSourceActive()
 	{
 		final Source< ? > source
-				= currentLabelSource.metadata()
-				.bdvStackSource.getSources().get( 0 ).getSpimSource();
+				= labelsSource.metadata().bdvStackSource
+				.getSources().get( 0 ).getSpimSource();
 
 		final boolean active = BdvUtils.isActive( bdv, source );
 
@@ -535,18 +566,14 @@ public class SegmentsBdvView< T extends ImageSegment >
 		final RealPoint globalMouseCoordinates =
 				BdvUtils.getGlobalMouseCoordinates( bdv );
 
-//		System.out.println( "Finding pixel value at " + globalMouseCoordinates );
-
 		final Double value = BdvUtils.getValueAtGlobalCoordinates(
 				activeLabelSource.source(),
 				globalMouseCoordinates,
 				getCurrentTimePoint() );
 
 		if ( value == null )
-			System.out.println(
+			System.err.println(
 					"Could not find pixel value at position " + globalMouseCoordinates);
-		else
-			System.out.println( "Pixel value is " + value );
 
 		return value;
 	}
@@ -556,7 +583,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
 				new Thread( () ->
 				{
-					if ( ! isCurrentLabelSourceActive() ) return;
+					if ( ! isLabelSourceActive() ) return;
 					selectionColoringModel.iterateSelectionMode();
 					BdvUtils.repaint( bdv );
 				} ).start(),
@@ -569,11 +596,11 @@ public class SegmentsBdvView< T extends ImageSegment >
 
 				new Thread( () -> {
 
-					if ( currentLabelSource == null ) return;
-					if ( ! isCurrentLabelSourceActive() ) return;
-					if ( getLabelIdAtCurrentMouseCoordinates( currentLabelSource ) == BACKGROUND ) return;
+					if ( labelsSource == null ) return;
+					if ( ! isLabelSourceActive() ) return;
+					if ( getLabelIdAtCurrentMouseCoordinates( labelsSource ) == BACKGROUND ) return;
 
-					viewObjectAtCurrentMouseCoordinatesIn3D( currentLabelSource );
+					viewObjectAtCurrentMouseCoordinatesIn3D( labelsSource );
 
 				}).start(),
 				segmentsName + "-view-3d", viewIn3DTrigger );

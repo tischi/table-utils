@@ -4,12 +4,13 @@ import net.imglib2.FinalRealInterval;
 
 public class DefaultImageSegment implements ImageSegment
 {
-	private final FinalRealInterval boundingBox;
 	private final double[] position;
 	private final String imageId;
 	private final double labelId;
 	private final int timePoint;
+
 	private float[] mesh;
+	private FinalRealInterval boundingBox;
 
 	public DefaultImageSegment(
 			String imageId,
@@ -49,6 +50,12 @@ public class DefaultImageSegment implements ImageSegment
 	public FinalRealInterval boundingBox()
 	{
 		return boundingBox;
+	}
+
+	@Override
+	public void setBoundingBox( FinalRealInterval boundingBox )
+	{
+		this.boundingBox = boundingBox;
 	}
 
 	@Override

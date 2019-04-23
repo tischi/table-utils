@@ -152,7 +152,7 @@ public class ExploreMorphoLibJLabelImage
 				SourceMetadata.Flavour.LabelSource,
 				numSpatialDimensions,
 				Calibrations.getScalingTransform( labelImage ),
-				new File("") // TODO: If this was null BdvSegmentsView thinks there is no table at all...
+				null
 		);
 
 		imageSourcesModel.sources().get( labelImageId ).metadata().showInitially = true;
@@ -189,6 +189,7 @@ public class ExploreMorphoLibJLabelImage
 				COLUMN_NAME_LABEL_IMAGE_ID,
 				labelImageId );
 
+		// TODO: replace this by proper bounding box
 		if ( numSpatialDimensions == 3 )
 		{
 			columns = addBoundingBoxColumn( CENTROID_X, BB_MIN_X, true );

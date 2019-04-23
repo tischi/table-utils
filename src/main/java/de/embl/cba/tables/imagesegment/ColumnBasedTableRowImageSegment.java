@@ -100,8 +100,16 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	@Override
 	public FinalRealInterval boundingBox()
 	{
-		setBoundingBox();
+		if ( boundingBox == null )
+			setBoundingBoxFromTableRow();
+
 		return boundingBox;
+	}
+
+	@Override
+	public void setBoundingBox( FinalRealInterval boundingBox )
+	{
+		this.boundingBox = boundingBox;
 	}
 
 	@Override
@@ -116,7 +124,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 		this.mesh = mesh;
 	}
 
-	private void setBoundingBox()
+	private void setBoundingBoxFromTableRow()
 	{
 		// TODO: this checking needs improvement...
 		if ( ! segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxXMin ) )

@@ -3,6 +3,7 @@ package de.embl.cba.tables.view;
 import bdv.viewer.Source;
 import customnode.CustomTriangleMesh;
 import de.embl.cba.bdv.utils.BdvUtils;
+import de.embl.cba.bdv.utils.objects3d.FloodFill;
 import de.embl.cba.tables.ij3d.AnimatedViewAdjuster;
 import de.embl.cba.tables.mesh.MeshExtractor;
 import de.embl.cba.tables.mesh.MeshUtils;
@@ -11,7 +12,6 @@ import de.embl.cba.tables.image.ImageSourcesModel;
 import de.embl.cba.tables.imagesegment.ImageSegment;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
-import ij.IJ;
 import ij3d.Content;
 import ij3d.Image3DUniverse;
 import ij3d.UniverseListener;
@@ -19,6 +19,7 @@ import isosurface.MeshEditor;
 import net.imglib2.FinalInterval;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.algorithm.neighborhood.DiamondShape;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
@@ -112,7 +113,7 @@ public class Segments3dView < T extends ImageSegment >
 		return universe;
 	}
 
-	private ArrayList< double[] > getCalibrations( Source< ? > labelsSource )
+	private ArrayList< double[] > getVoxelSpacings( Source< ? > labelsSource )
 	{
 		final ArrayList< double[] > calibrations = new ArrayList<>();
 		final int numMipmapLevels = labelsSource.getNumMipmapLevels();
@@ -215,12 +216,7 @@ public class Segments3dView < T extends ImageSegment >
 	private CustomTriangleMesh getTriangleMesh( T segment )
 	{
 		if ( segment.getMesh() == null )
-			if ( segment.boundingBox() != null )
-				addMesh( segment );
-			else // TODO: Create mesh with FloodFill
-				return null;
-//				IJ.showMessage( "ImageSegments without bounding box " +
-//						"are currently not supported." );
+			addMesh( segment );
 
 		CustomTriangleMesh triangleMesh = MeshUtils.asCustomTriangleMesh( segment.getMesh() );
 		triangleMesh.setColor( getColor3f( segment ) );
@@ -230,18 +226,24 @@ public class Segments3dView < T extends ImageSegment >
 	private void addMesh( ImageSegment segment )
 	{
 
-		final Source< ? > labelsSource = imageSourcesModel.sources().get( segment.imageId() ).source();
-		ArrayList< double[] > labelsSourceCalibrations = getCalibrations( labelsSource );
-		final int level = getLevel( labelsSourceCalibrations, voxelSpacing3DView );
-		final RandomAccessibleInterval< ? extends RealType< ? > > rai = getLabelsRAI( segment, level );
+		final Source< ? > labelsSource =
+				imageSourcesModel.sources().get( segment.imageId() ).source();
 
+		final int level = getLevel( getVoxelSpacings( labelsSource ), voxelSpacing3DView );
+		final double[] voxelSpacing = getVoxelSpacings( labelsSource ).get( level );
 
-		final FinalInterval interval =
-				getVoxelSpaceInterval( labelsSourceCalibrations, level, segment.boundingBox() );
+		final RandomAccessibleInterval< ? extends RealType< ? > > labelsRAI =
+				getLabelsRAI( segment, level );
+
+		if ( segment.boundingBox() == null )
+			setSegmentBoundingBox( segment, labelsRAI, voxelSpacing );
+
+		FinalInterval boundingBox =
+				getVoxelInterval( segment.boundingBox(), voxelSpacing );
 
 		final MeshExtractor meshExtractor = new MeshExtractor(
-				Views.extendZero( ( RandomAccessibleInterval ) rai ), // TODO: get rid of raw cast, somehow....
-				interval,
+				Views.extendZero( ( RandomAccessibleInterval ) labelsRAI ),
+				boundingBox,
 				new AffineTransform3D(),
 				new int[]{ 1, 1, 1 },
 				() -> false );
@@ -251,19 +253,54 @@ public class Segments3dView < T extends ImageSegment >
 		segment.setMesh( meshCoordinates );
 	}
 
-	private FinalInterval getVoxelSpaceInterval(
-			ArrayList< double[] > labelsSourceCalibrations,
-			int level,
-			FinalRealInterval realInterval )
+	private void setSegmentBoundingBox(
+			ImageSegment segment,
+			RandomAccessibleInterval< ? extends RealType< ? > > labelsRAI,
+			double[] voxelSpacing )
+	{
+		final long[] voxelCoordinate =
+				getSegmentVoxelCoordinate( segment, voxelSpacing );
+
+		final FloodFill floodFill = new FloodFill(
+				labelsRAI,
+				new DiamondShape( 1 ),
+				1000 * 1000 * 1000L );
+
+		floodFill.run( voxelCoordinate );
+		final RandomAccessibleInterval mask = floodFill.getCroppedRegionMask();
+
+		final int numDimensions = segment.numDimensions();
+		final double[] min = new double[ numDimensions ];
+		final double[] max = new double[ numDimensions ];
+		for ( int d = 0; d < numDimensions; d++ )
+		{
+			min[ d ] = mask.min( d ) * voxelSpacing[ d ];
+			max[ d ] = mask.max( d ) * voxelSpacing[ d ];
+		}
+
+		segment.setBoundingBox( new FinalRealInterval( min, max ));
+	}
+
+	private long[] getSegmentVoxelCoordinate( ImageSegment segment, double[] calibration )
+	{
+		final long[] voxelCoordinate = new long[ segment.numDimensions() ];
+		for ( int d = 0; d < segment.numDimensions(); d++ )
+			voxelCoordinate[ d ] = ( long ) (
+					segment.getDoublePosition( d ) / calibration[ d ] );
+		return voxelCoordinate;
+	}
+
+	private FinalInterval getVoxelInterval(
+			FinalRealInterval realInterval, double[] calibration )
 	{
 		final long[] min = new long[ 3 ];
 		final long[] max = new long[ 3 ];
 		for ( int d = 0; d < 3; d++ )
 		{
 			min[ d ] = (long) ( realInterval.realMin( d )
-					/ labelsSourceCalibrations.get( level )[ d ] );
+					/ calibration[ d ] );
 			max[ d ] = (long) ( realInterval.realMax( d )
-					/ labelsSourceCalibrations.get( level )[ d ] );
+					/ calibration[ d ] );
 		}
 		return new FinalInterval( min, max );
 	}
@@ -275,7 +312,8 @@ public class Segments3dView < T extends ImageSegment >
 				= imageSourcesModel.sources().get( segment.imageId() ).source();
 
 		final RandomAccessibleInterval< ? extends RealType< ? > > rai =
-				BdvUtils.getRealTypeNonVolatileRandomAccessibleInterval( labelsSource, 0, level );
+				BdvUtils.getRealTypeNonVolatileRandomAccessibleInterval(
+						labelsSource, 0, level );
 
 		return rai;
 	}

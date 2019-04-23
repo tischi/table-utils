@@ -54,11 +54,6 @@ public class FileImageSourcesModel implements ImageSourcesModel
 
 		final SourceMetadata metadata = new SourceMetadata( imageId );
 		metadata.flavour = flavor;
-
-		// TODO: implement proper logic, issue is that sometimes there is a table associated, but no file
-		if ( metadata.flavour.equals( Flavour.LabelSource ) )
-			metadata.segmentsTable = new File("");
-
 		metadata.imageSetIDs = imageSetIDs;
 		metadata.displayName = imageDisplayName;
 

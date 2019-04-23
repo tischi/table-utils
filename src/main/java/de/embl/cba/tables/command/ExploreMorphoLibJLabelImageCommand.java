@@ -23,8 +23,7 @@ public class ExploreMorphoLibJLabelImageCommand implements Command
 	@Override
 	public void run()
 	{
-		final ExploreMorphoLibJLabelImage explore
-				= new ExploreMorphoLibJLabelImage(
+		new ExploreMorphoLibJLabelImage(
 						intensityImage,
 						labelImage,
 						resultsTableTitle );
