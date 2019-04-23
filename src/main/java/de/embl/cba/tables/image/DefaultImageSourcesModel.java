@@ -8,7 +8,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.embl.cba.tables.image.SourceMetadata.*;
+import static de.embl.cba.tables.image.Metadata.*;
 
 
 public class DefaultImageSourcesModel implements ImageSourcesModel
@@ -43,7 +43,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 	)
 	{
 
-		final SourceMetadata metadata = new SourceMetadata( imageId );
+		final Metadata metadata = new Metadata( imageId );
 		metadata.flavour = flavor;
 		metadata.numSpatialDimensions = numSpatialDimensions;
 		metadata.sourceTransform = transform;

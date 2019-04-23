@@ -6,7 +6,7 @@ import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableColumns;
 import de.embl.cba.tables.image.DefaultImageSourcesModel;
 import de.embl.cba.tables.image.ImageSourcesModel;
-import de.embl.cba.tables.image.SourceMetadata;
+import de.embl.cba.tables.image.Metadata;
 import de.embl.cba.tables.imagesegment.SegmentProperty;
 import de.embl.cba.tables.imagesegment.SegmentUtils;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
@@ -17,7 +17,6 @@ import ij.WindowManager;
 import ij.text.TextWindow;
 
 import java.awt.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -149,7 +148,7 @@ public class ExploreMorphoLibJLabelImage
 		imageSourcesModel.addSourceAndMetadata(
 				Wraps.imagePlusAsSource4DChannelList( labelImage ).get( 0 ),
 				labelImageId,
-				SourceMetadata.Flavour.LabelSource,
+				Metadata.Flavour.LabelSource,
 				numSpatialDimensions,
 				Calibrations.getScalingTransform( labelImage ),
 				null
@@ -166,7 +165,7 @@ public class ExploreMorphoLibJLabelImage
 			imageSourcesModel.addSourceAndMetadata(
 					Wraps.imagePlusAsSource4DChannelList( intensityImage ).get( 0 ),
 					intensityImageId,
-					SourceMetadata.Flavour.IntensitySource,
+					Metadata.Flavour.IntensitySource,
 					numSpatialDimensions,
 					Calibrations.getScalingTransform( intensityImage ),
 					null

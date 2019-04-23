@@ -7,7 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.embl.cba.tables.image.SourceMetadata.Flavour.IntensitySource;
+import static de.embl.cba.tables.image.Metadata.Flavour.IntensitySource;
 
 
 /**
@@ -15,7 +15,7 @@ import static de.embl.cba.tables.image.SourceMetadata.Flavour.IntensitySource;
  * - make it rather an interface with methods ?
  * -
  */
-public class SourceMetadata
+public class Metadata
 {
 	public String displayName = "Image";
 	public String imageId;
@@ -36,7 +36,7 @@ public class SourceMetadata
 		IntensitySource
 	}
 
-	public SourceMetadata( String imageId )
+	public Metadata( String imageId )
 	{
 		this.imageId = imageId;
 		imageSetIDs.add( this.imageId );

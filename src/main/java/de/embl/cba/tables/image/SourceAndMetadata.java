@@ -6,9 +6,9 @@ import net.imglib2.type.numeric.RealType;
 public class SourceAndMetadata< R extends RealType< R > >
 {
 	private final Source< R > source;
-	private final SourceMetadata metadata;
+	private final Metadata metadata;
 
-	public SourceAndMetadata( Source< R > source, SourceMetadata metadata )
+	public SourceAndMetadata( Source< R > source, Metadata metadata )
 	{
 		this.source = source;
 		this.metadata = metadata;
@@ -19,7 +19,7 @@ public class SourceAndMetadata< R extends RealType< R > >
 		return source;
 	}
 
-	public SourceMetadata metadata()
+	public Metadata metadata()
 	{
 		return metadata;
 	}

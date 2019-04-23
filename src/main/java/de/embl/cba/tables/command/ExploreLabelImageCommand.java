@@ -8,7 +8,7 @@ import de.embl.cba.tables.color.LazyCategoryColoringModel;
 import de.embl.cba.tables.color.SelectionColoringModel;
 import de.embl.cba.tables.imagesegment.LazyImageSegmentsModel;
 import de.embl.cba.tables.image.DefaultImageSourcesModel;
-import de.embl.cba.tables.image.SourceMetadata;
+import de.embl.cba.tables.image.Metadata;
 import de.embl.cba.tables.imagesegment.ImageSegment;
 import de.embl.cba.tables.select.DefaultSelectionModel;
 import de.embl.cba.tables.select.SelectionModel;
@@ -84,7 +84,7 @@ public class ExploreLabelImageCommand < R extends RealType< R > > implements Com
 		imageSourcesModel.addSourceAndMetadata(
 				Wraps.imagePlusAsSource4DChannelList( labelImage ).get( 0 ),
 				labelImageId,
-				SourceMetadata.Flavour.LabelSource,
+				Metadata.Flavour.LabelSource,
 				getNumSpatialDimensions( labelImage.getNSlices() ),
 				Calibrations.getScalingTransform( labelImage ),
 				null
@@ -101,7 +101,7 @@ public class ExploreLabelImageCommand < R extends RealType< R > > implements Com
 			imageSourcesModel.addSourceAndMetadata(
 					Wraps.imagePlusAsSource4DChannelList( intensityImage ).get( 0 ),
 					intensityImageId,
-					SourceMetadata.Flavour.IntensitySource,
+					Metadata.Flavour.IntensitySource,
 					getNumSpatialDimensions( intensityImage.getNSlices() ),
 					Calibrations.getScalingTransform( intensityImage ),
 					null

@@ -18,7 +18,7 @@ import net.imglib2.type.numeric.RealType;
 import java.io.File;
 import java.util.*;
 
-import static de.embl.cba.tables.image.SourceMetadata.*;
+import static de.embl.cba.tables.image.Metadata.*;
 
 public class FileImageSourcesModel implements ImageSourcesModel
 {
@@ -52,7 +52,7 @@ public class FileImageSourcesModel implements ImageSourcesModel
 	{
 		if ( nameToSourceAndMetadata.containsKey( imageId ) ) return;
 
-		final SourceMetadata metadata = new SourceMetadata( imageId );
+		final Metadata metadata = new Metadata( imageId );
 		metadata.flavour = flavor;
 		metadata.imageSetIDs = imageSetIDs;
 		metadata.displayName = imageDisplayName;
@@ -79,12 +79,12 @@ public class FileImageSourcesModel implements ImageSourcesModel
 	// TODO: put somewhere else...maybe bdv-utils?
 	class DefaultImageFileSource< R extends RealType< R > & NativeType< R > > implements Source< R >
 	{
-		private final SourceMetadata metadata;
+		private final Metadata metadata;
 		private final File file;
 		private RandomAccessibleIntervalSource4D source;
 		private ImagePlus imagePlus;
 
-		public DefaultImageFileSource( SourceMetadata metadata, File file )
+		public DefaultImageFileSource( Metadata metadata, File file )
 		{
 			this.metadata = metadata;
 			this.file = file;

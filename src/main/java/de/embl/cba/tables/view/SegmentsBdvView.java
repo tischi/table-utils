@@ -11,7 +11,7 @@ import de.embl.cba.bdv.utils.overlays.BdvGrayValuesOverlay;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
 import de.embl.cba.tables.color.*;
 import de.embl.cba.tables.image.ImageSourcesModel;
-import de.embl.cba.tables.image.SourceMetadata;
+import de.embl.cba.tables.image.Metadata;
 import de.embl.cba.tables.image.SourceAndMetadata;
 import de.embl.cba.tables.imagesegment.ImageSegment;
 import de.embl.cba.tables.imagesegment.LabelFrameAndImage;
@@ -28,13 +28,15 @@ import org.scijava.ui.behaviour.util.Behaviours;
 import java.util.*;
 
 import static de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter.BACKGROUND;
-import static de.embl.cba.tables.image.SourceMetadata.*;
+import static de.embl.cba.tables.image.Metadata.*;
 
 // TODO: reconsider what a "segment" needs to be here
 public class SegmentsBdvView< T extends ImageSegment >
 {
 	private String selectTrigger = "ctrl button1";
-	private String selectNoneTrigger = "ctrl N";
+	private String selectNoneTrigger = "ctrl shift N";
+	private String nextImageSetTrigger = "ctrl N";
+	private String previousImageSetTrigger = "ctrl P";
 	private String incrementCategoricalLutRandomSeedTrigger = "ctrl L";
 	private String iterateSelectionModeTrigger = "ctrl S";
 	private String viewIn3DTrigger = "ctrl shift button1";
@@ -60,6 +62,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 	private HashMap< LabelFrameAndImage, T > labelFrameAndImageToSegment;
 	private List< T > segments;
 	private int segmentFocusAnimationDurationMillis;
+	private ArrayList< String > labelSourceIds;
 
 	public SegmentsBdvView(
 			final List< T > segments,
@@ -104,7 +107,8 @@ public class SegmentsBdvView< T extends ImageSegment >
 		initSegments( segments );
 		initBdvOptions();
 		showInitialSources();
-		addGrayValueOverlay();
+		initLabelSourceIds();
+//		addGrayValueOverlay(); // TODO: If added, this is the image name shown in Bdv...which is bad
 
 		registerAsSelectionListener( this.selectionModel );
 		registerAsColoringListener( this.selectionColoringModel );
@@ -196,7 +200,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 
 	public synchronized void centerBdvOnSegment( ImageSegment imageSegment )
 	{
-		ensureVisibilityOfImageSetOfImageSegment( imageSegment );
+		updateImageSet( imageSegment.imageId() );
 
 		final double[] position = new double[ 3 ];
 		imageSegment.localize( position );
@@ -213,10 +217,8 @@ public class SegmentsBdvView< T extends ImageSegment >
 		this.segmentFocusAnimationDurationMillis = duration;
 	}
 
-	private void ensureVisibilityOfImageSetOfImageSegment( ImageSegment imageSegment )
+	private void updateImageSet( String imageId )
 	{
-		final String imageId = imageSegment.imageId();
-
 		if ( labelsSource.metadata().imageId.equals( imageId ) )
 		{
 			// Nothing to be done, the imageSegment belongs to the
@@ -324,7 +326,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 
 	public BdvStackSource showSource( SourceAndMetadata sourceAndMetadata )
 	{
-		final SourceMetadata metadata = sourceAndMetadata.metadata();
+		final Metadata metadata = sourceAndMetadata.metadata();
 		Source< ? > source = sourceAndMetadata.source();
 
 		if ( metadata.flavour == Flavour.LabelSource )
@@ -471,6 +473,8 @@ public class SegmentsBdvView< T extends ImageSegment >
 		installSelectionColoringModeBehaviour( );
 		installRandomColorShufflingBehaviour();
 		install3DViewBehaviour();
+		installImageSetNavigationBehaviour( );
+
 	}
 
 	private void installRandomColorShufflingBehaviour()
@@ -500,7 +504,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
 				new Thread( () -> selectNone() ).start(),
-				segmentsName + "-select-none", selectNoneTrigger );
+				segmentsName + "-select-none", nextImageSetTrigger );
 	}
 
 	public synchronized void selectNone()
@@ -518,6 +522,43 @@ public class SegmentsBdvView< T extends ImageSegment >
 				( ClickBehaviour ) ( x, y ) ->
 						new Thread( () -> toggleSelectionAtMousePosition() ).start(),
 				segmentsName + "-toggle-select", selectTrigger ) ;
+	}
+
+
+	private void installImageSetNavigationBehaviour()
+	{
+		behaviours.behaviour(
+				( ClickBehaviour ) ( x, y ) ->
+						new Thread( () -> changeImageSet( +1 ) ).start(),
+				segmentsName + "-toggle-select", nextImageSetTrigger ) ;
+
+
+		behaviours.behaviour(
+				( ClickBehaviour ) ( x, y ) ->
+						new Thread( () -> changeImageSet( -1 ) ).start(),
+				segmentsName + "-toggle-select", previousImageSetTrigger ) ;
+
+	}
+
+	private void changeImageSet( int di )
+	{
+		int i = labelSourceIds.indexOf( labelsSource.metadata().imageId );
+		i += di;
+
+		if ( i >= 0 && i < labelSourceIds.size() )
+			updateImageSet( labelSourceIds.get( i ) );
+
+	}
+
+	private void initLabelSourceIds()
+	{
+		final ArrayList< String > sourceIds = new ArrayList( imageSourcesModel.sources().keySet() );
+		labelSourceIds = new ArrayList<>();
+
+		for ( String sourceId : sourceIds )
+			if ( imageSourcesModel.sources().get( sourceId ).metadata()
+					.flavour.equals( Flavour.LabelSource ) )
+				labelSourceIds.add( sourceId );
 	}
 
 	private synchronized void toggleSelectionAtMousePosition()

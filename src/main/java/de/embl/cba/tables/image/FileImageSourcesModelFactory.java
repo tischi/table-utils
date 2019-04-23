@@ -111,17 +111,17 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		return imageSetIds;
 	}
 
-	private SourceMetadata.Flavour getImageFlavour( String imageName )
+	private Metadata.Flavour getImageFlavour( String imageName )
 	{
-		final SourceMetadata.Flavour flavour;
+		final Metadata.Flavour flavour;
 
 		if ( FileUtils.stringContainsItemFromList( imageName, labelMaskColumnIds ) )
 		{
-			flavour = SourceMetadata.Flavour.LabelSource;
+			flavour = Metadata.Flavour.LabelSource;
 		}
 		else
 		{
-			flavour = SourceMetadata.Flavour.IntensitySource;
+			flavour = Metadata.Flavour.IntensitySource;
 		}
 
 		return flavour;
