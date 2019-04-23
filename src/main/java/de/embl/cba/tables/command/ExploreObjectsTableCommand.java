@@ -1,6 +1,7 @@
 package de.embl.cba.tables.command;
 
 import de.embl.cba.tables.TableColumns;
+import de.embl.cba.tables.cellprofiler.CellProfilerUtils;
 import de.embl.cba.tables.image.FileImageSourcesModel;
 import de.embl.cba.tables.image.FileImageSourcesModelFactory;
 import de.embl.cba.tables.imagesegment.SegmentProperty;
@@ -16,10 +17,7 @@ import org.scijava.plugin.Plugin;
 import org.scijava.widget.Button;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static de.embl.cba.tables.imagesegment.SegmentPropertyColumnsSelectionDialog.NO_COLUMN_SELECTED;
 
@@ -27,30 +25,43 @@ import static de.embl.cba.tables.imagesegment.SegmentPropertyColumnsSelectionDia
 		"Plugins>Segmentation>Explore>Explore Objects Table" )
 public class ExploreObjectsTableCommand implements Command
 {
+	public static final String DEFAULT = "\'Path_\' (Default)";
+	public static final String IMAGE_PATH_COLUMNS_ID_CELL_PROFILER = "\'FileName_\' and \'PathName_\' (CellProfiler)";
+	public static final String IMAGE_PATH_COLUMNS_ID_DEFAULT = "Path_";
+
 	@Parameter
 	public LogService logService;
 
 	@Parameter ( label = "Table" )
 	public File tableFile;
 
-	@Parameter ( label = "Image Path Columns Id" )
-	public String imagePathColumnId = "Path_";
+	@Parameter ( label = "Image Path Column IDs", choices = { DEFAULT })
+	public String imagePathColumnsId;
 
-	@Parameter ( label = "Log Image Paths", callback = "logImagePaths")
-	private Button logImagePathsButton;
-
-	@Parameter ( label = "All image are 2D" )
-	public boolean is2D;
-
-	@Parameter ( label = "Timepoints in table are one-based" )
-	public boolean isOneBasedTimePoint;
-
-	@Parameter ( label = "Paths to image in table are relative" )
+	@Parameter ( label = "Paths to images are relative" )
 	public boolean isRelativeImagePath;
 
 	@Parameter ( label = "Parent folder (for relative image paths)",
 			required = false, style = "directory")
 	public File imageRootFolder;
+
+	@Parameter ( label = "Apply Path Mapping" )
+	public boolean isPathMapping = false;
+
+	@Parameter ( label = "Root path in table (for path mapping)" )
+	public String imageRootPathInTable = "/Volumes/";
+
+	@Parameter ( label = "Root path on this computer (for path mapping)" )
+	public String imageRootPathOnThisComputer = "/g/";
+
+	@Parameter ( label = "Log Image Paths", callback = "logImagePaths")
+	private Button logImagePathsButton;
+
+	@Parameter ( label = "All images are 2D" )
+	public boolean is2D;
+
+	@Parameter ( label = "Time points in table are one-based" )
+	public boolean isOneBasedTimePoint;
 
 
 	private LinkedHashMap< String, List< ? > > columns;
@@ -90,11 +101,11 @@ public class ExploreObjectsTableCommand implements Command
 	private List< TableRowImageSegment > createSegments(
 			File tableFile )
 	{
-		columns = TableColumns.asTypedColumns(
-				       TableColumns.stringColumnsFromTableFile( tableFile ) );
+		if ( columns == null )
+			loadColumnsFromFile( tableFile );
 
 		final Map< SegmentProperty, List< ? > > coordinateToColumn
-				= createCoordinateToColumnMap();
+				= createCoordinateToColumnMap( columns.keySet() );
 
 		final List< TableRowImageSegment > segments
 				= SegmentUtils.tableRowImageSegmentsFromColumns(
@@ -103,10 +114,28 @@ public class ExploreObjectsTableCommand implements Command
 		return segments;
 	}
 
-	private LinkedHashMap< SegmentProperty, List< ? > > createCoordinateToColumnMap( )
+	private void loadColumnsFromFile( File tableFile )
+	{
+		columns = TableColumns.asTypedColumns(
+				TableColumns.stringColumnsFromTableFile( tableFile ) );
+
+		if ( imagePathColumnsId.equals( IMAGE_PATH_COLUMNS_ID_CELL_PROFILER ) )
+		{
+			CellProfilerUtils.replaceFolderAndFileColumnsByPathColumn( columns );
+		}
+
+		if ( isPathMapping )
+		{
+			// TODO
+		}
+
+	}
+
+	private LinkedHashMap< SegmentProperty, List< ? > > createCoordinateToColumnMap(
+			Set< String > columnNames )
 	{
 		final SegmentPropertyColumnsSelectionDialog selectionDialog
-				= new SegmentPropertyColumnsSelectionDialog( columns.keySet() );
+				= new SegmentPropertyColumnsSelectionDialog( columnNames );
 
 		coordinateToColumnName = selectionDialog.fetchUserInput();
 
@@ -120,7 +149,7 @@ public class ExploreObjectsTableCommand implements Command
 
 			coordinateToColumn.put(
 					coordinate,
-					columns.get( coordinateToColumnName.get( coordinate ) ) );
+					this.columns.get( coordinateToColumnName.get( coordinate ) ) );
 		}
 
 		return coordinateToColumn;
@@ -128,20 +157,18 @@ public class ExploreObjectsTableCommand implements Command
 
 	private void logImagePaths()
 	{
-		final LinkedHashMap< String, List< String > > columns =
-				TableColumns.stringColumnsFromTableFile( tableFile );
+		if ( columns == null )
+			loadColumnsFromFile( tableFile );
 
 		for ( String column : columns.keySet() )
 		{
-			imagePathColumnId = "Path_";
-			if ( column.contains( imagePathColumnId ) )
+			if ( column.contains( IMAGE_PATH_COLUMNS_ID_DEFAULT ) )
 			{
-				final HashSet< String > paths = new HashSet<>( columns.get( column ) );
-				paths.forEach( s -> logService.info( s ) );
+				final HashSet< String > pathColumnNames =
+						new HashSet<>( ( List< String > ) columns.get( column ) );
+				pathColumnNames.forEach( s -> logService.info( s ) );
 			}
 		}
-
-
 	}
 
 }

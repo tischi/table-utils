@@ -66,9 +66,7 @@ public class SegmentPropertyColumnsSelectionDialog
 
 		int i = 1;
 		for ( String column : columns )
-		{
 			columnChoices[ i++ ] = column;
-		}
 	}
 
 

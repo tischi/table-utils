@@ -5,7 +5,7 @@ import net.imagej.ImageJ;
 
 import java.io.File;
 
-public class RunExploreObjectsTableCommand
+public class RunExploreCellProfilerOutput
 {
 	public static void main( String[] args )
 	{
@@ -14,11 +14,16 @@ public class RunExploreObjectsTableCommand
 
 		final ExploreObjectsTableCommand command = new ExploreObjectsTableCommand();
 
-		command.imageRootFolder = new File( "/Users/tischer/Documents/table-utils/src/test/resources" );
-		command.is2D = false;
+		command.imageRootFolder = new File( ExploreObjectsTableCommand.class.getResource( "" ).getFile() );
+		command.is2D = true;
 		command.isOneBasedTimePoint = false;
 		command.isRelativeImagePath = true;
-		command.tableFile = new File("/Users/tischer/Documents/table-utils/src/test/resources/3d-image-with-paths.csv");
+		command.imageRootFolder = new File( "/Users/tischer/Documents/table-utils/" +
+				"src/test/resources/" +
+				"cellprofiler/" );
+		command.tableFile = new File("/Users/tischer/Documents/table-utils/" +
+				"src/test/resources/" +
+				"cellprofiler/output/final_table.csv");
 		command.logService = ij.log();
 		command.imagePathColumnsId = ExploreObjectsTableCommand.IMAGE_PATH_COLUMNS_ID_DEFAULT;
 

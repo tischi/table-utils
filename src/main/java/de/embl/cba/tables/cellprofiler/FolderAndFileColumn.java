@@ -11,7 +11,6 @@ public class FolderAndFileColumn
 		this.fileColumn = fileColumn;
 	}
 
-
 	public String fileColumn()
 	{
 		return fileColumn;

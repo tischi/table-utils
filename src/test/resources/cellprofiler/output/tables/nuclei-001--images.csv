@@ -1,0 +1,2 @@
+Count_Nuclei,FileName_DNA,FileName_NucleiLabelMask,Group_Index,Group_Number,ImageNumber,Metadata_FileLocation,Metadata_FileName,PathName_DNA,PathName_NucleiLabelMask
+7.0,nuclei-001.tif,nuclei-001--labels.tiff,1,1,1,file:/Volumes/almf/software/almf-cluster-scripts/CellProfiler/test/data/nuclei-001.tif,nuclei-001,/g/almf/software/almf-cluster-scripts/CellProfiler/test/data,/g/almf/software/almf-cluster-scripts/CellProfiler/test/output/images

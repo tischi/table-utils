@@ -1,7 +1,7 @@
 package de.embl.cba.tables.command;
 
 import de.embl.cba.tables.TableColumns;
-import de.embl.cba.tables.Tables;
+import de.embl.cba.tables.cellprofiler.CellProfilerUtils;
 import de.embl.cba.tables.cellprofiler.FolderAndFileColumn;
 import de.embl.cba.tables.image.FileImageSourcesModel;
 import de.embl.cba.tables.image.FileImageSourcesModelFactory;
@@ -17,9 +17,7 @@ import org.scijava.plugin.Plugin;
 import java.io.File;
 import java.util.*;
 
-
-@Plugin(type = Command.class,
-		menuPath = "Plugins>Segmentation>Explore>Explore CellProfiler Objects Table" )
+@Deprecated
 public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R > >
 		implements Command
 {
@@ -30,18 +28,19 @@ public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R
 	public static final String COLUMN_NAME_OBJECT_LOCATION_CENTER_X = "Location_Center_X";
 	public static final String COLUMN_NAME_OBJECT_LOCATION_CENTER_Y = "Location_Center_Y";
 
-	@Parameter ( label = "CellProfiler Table" )
+	@Parameter ( label = "CellProfiler Objects Table with Image Paths" )
 	public File inputTableFile;
 
 	@Parameter ( label = "Apply Path Mapping" )
 	public boolean isPathMapping = false;
 
-	@Parameter ( label = "Image Path Mapping (Table)" )
+	@Parameter ( label = "Image Path Mapping (In Table)" )
 	public String imageRootPathInTable = "/Volumes/cba/exchange/Daja-Christian/20190116_for_classification_interphase_versus_mitotic";
 
-	@Parameter ( label = "Image Path Mapping (This Computer)" )
-
+	@Parameter ( label = "Image Path Mapping (On this Computer)" )
 	public String imageRootPathOnThisComputer = "/Users/tischer/Documents/daja-schichler-nucleoli-segmentation--data/2019-01-31";
+
+
 	private HashMap< String, FolderAndFileColumn > imageNameToFolderAndFileColumns;
 	private LinkedHashMap< String, List< ? > > columns;
 
@@ -49,7 +48,7 @@ public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R
 	public void run()
 	{
 		final List< TableRowImageSegment > tableRowImageSegments
-				= createAnnotatedImageSegments( inputTableFile );
+				= createSegments( inputTableFile );
 
 		final String tablePath = inputTableFile.toString();
 
@@ -59,26 +58,33 @@ public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R
 						tablePath,
 						true ).getImageSourcesModel();
 
-		new SegmentsTableAndBdvViews( tableRowImageSegments, imageSourcesModel, inputTableFile.getName() );
+		new SegmentsTableAndBdvViews(
+				tableRowImageSegments,
+				imageSourcesModel,
+				inputTableFile.getName() );
 	}
 
-	private List< TableRowImageSegment > createAnnotatedImageSegments( File tableFile )
+	private List< TableRowImageSegment > createSegments( File tableFile )
 	{
 		columns = TableColumns.asTypedColumns(
 				TableColumns.stringColumnsFromTableFile( tableFile ) );
 
-		final List< String > pathColumnNames = replaceFolderAndFileColumnsByPathColumn();
+		final List< String > pathColumnNames = CellProfilerUtils.replaceFolderAndFileColumnsByPathColumn( columns );
 
 		final Map< SegmentProperty, List< ? > > segmentPropertyToColumn
 				= getSegmentPropertyToColumn( pathColumnNames );
 
 		final List< TableRowImageSegment > segments
-				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, segmentPropertyToColumn, false );
+				= SegmentUtils.tableRowImageSegmentsFromColumns(
+						columns,
+						segmentPropertyToColumn,
+						false );
 
 		return segments;
 	}
 
-	private HashMap< SegmentProperty, List< ? > > getSegmentPropertyToColumn( List< String > pathColumnNames )
+	private HashMap< SegmentProperty, List< ? > > getSegmentPropertyToColumn(
+			List< String > pathColumnNames )
 	{
 		final HashMap< SegmentProperty, List< ? > > segmentPropertyToColumn
 				= new HashMap<>();
@@ -118,91 +124,4 @@ public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R
 		return labelImagePathColumnName;
 	}
 
-	private List< String > replaceFolderAndFileColumnsByPathColumn()
-	{
-		final int numRows = columns.values().iterator().next().size();
-		imageNameToFolderAndFileColumns = fetchFolderAndFileColumns( columns.keySet() );
-
-		final String tableFile = inputTableFile.toString();
-
-		final List< String > pathColumnNames = new ArrayList<>();
-
-		for ( String imageName : imageNameToFolderAndFileColumns.keySet() )
-		{
-			final String fileColumnName = imageNameToFolderAndFileColumns.get( imageName ).fileColumn();
-			final String folderColumnName = imageNameToFolderAndFileColumns.get( imageName ).folderColumn();
-			final List< ? > fileColumn = columns.get( fileColumnName );
-			final List< ? > folderColumn = columns.get( folderColumnName );
-
-			final List< String > pathColumn = new ArrayList<>();
-
-			for ( int row = 0; row < numRows; row++ )
-			{
-				String imagePath = folderColumn.get( row ) + File.separator + fileColumn.get( row );
-
-				if ( isPathMapping )
-				{
-					imagePath = getMappedPath( imagePath );
-				}
-
-				imagePath = Tables.getRelativePath( tableFile, imagePath ).toString();
-
-				pathColumn.add( imagePath );
-			}
-
-			columns.remove( fileColumnName );
-			columns.remove( folderColumnName );
-
-			final String pathColumnName = getPathColumnName( imageName );
-			columns.put( pathColumnName, pathColumn );
-			pathColumnNames.add( pathColumnName );
-		}
-
-		return pathColumnNames;
-	}
-
-	public String getPathColumnName( String imageName )
-	{
-		String pathColumn = "Path_" + imageName;
-
-		return pathColumn;
-	}
-
-	private String getMappedPath( String imagePath )
-	{
-		imagePath = imagePath.replace( imageRootPathInTable, imageRootPathOnThisComputer );
-		return imagePath;
-	}
-
-	public HashMap< String, FolderAndFileColumn > fetchFolderAndFileColumns( Set< String > columns )
-	{
-		final HashMap< String, FolderAndFileColumn > imageNameToFolderAndFileColumns = new HashMap<>();
-
-		for ( String column : columns )
-		{
-			if ( column.contains( CELLPROFILER_FOLDER_COLUMN_PREFIX ) )
-			{
-				final String image = column.split( CELLPROFILER_FOLDER_COLUMN_PREFIX )[ 1 ];
-				String fileColumn = getMatchingFileColumn( image, columns );
-				imageNameToFolderAndFileColumns.put( image, new FolderAndFileColumn( column, fileColumn ) );
-			}
-		}
-		return imageNameToFolderAndFileColumns;
-	}
-
-	private String getMatchingFileColumn( String image, Set< String > columns )
-	{
-		String matchingFileColumn = null;
-
-		for ( String column : columns )
-		{
-			if ( column.contains( CELLPROFILER_FILE_COLUMN_PREFIX ) && column.contains( image ) )
-			{
-				matchingFileColumn = column;
-				break;
-			}
-		}
-
-		return matchingFileColumn;
-	}
 }

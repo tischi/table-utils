@@ -45,8 +45,8 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		labelMaskColumnIds.add( "labelMasks" );
 		labelMaskColumnIds.add( "LabelMask" );
 		labelMaskColumnIds.add( "LabelImage" );
-		labelMaskColumnIds.add( "Labels" );
-		labelMaskColumnIds.add( "labels" );
+		labelMaskColumnIds.add( "Label" );
+		labelMaskColumnIds.add( "label" );
 	}
 
 	public FileImageSourcesModel getImageSourcesModel()
