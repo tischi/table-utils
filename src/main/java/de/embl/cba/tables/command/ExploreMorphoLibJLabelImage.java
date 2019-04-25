@@ -93,6 +93,8 @@ public class ExploreMorphoLibJLabelImage
 					tableRowImageSegments,
 					imageSourcesModel,
 					resultsTableTitle );
+
+			tableBdvAnd3dViews.getSegments3dView().setSegmentFocusZoomLevel( 0.01 );
 		}
 	}
 

@@ -95,6 +95,7 @@ public class AnimatedViewAdjuster {
 
 	private final Transform3D toCamera = new Transform3D();
 	private final Transform3D toCameraInverse = new Transform3D();
+	private final int adjustmentDirection;
 
 	private boolean firstPoint = true;
 
@@ -102,7 +103,7 @@ public class AnimatedViewAdjuster {
 	private double w = 2 * Math.tan(Math.PI / 8);
 	private double h = 2 * Math.tan(Math.PI / 8);
 
-	private final Adjuster adjuster;
+	private Adjuster adjuster;
 
 	private interface Adjuster {
 		void add(Point3d p);
@@ -111,15 +112,21 @@ public class AnimatedViewAdjuster {
 	/**
 	 * Create a new ViewAdjuster.
 	 *
-	 * @param dir One of ADJUST_HEIGHT, ADJUST_WIDTH or ADJUST_BOTH. The former
+	 * @param adjustmentDirection One of ADJUST_HEIGHT, ADJUST_WIDTH or ADJUST_BOTH. The former
 	 *          adjusts the view so that the added points fit in width, the latter
 	 *          so that they fit in height in the canvas.
 	 */
-	public AnimatedViewAdjuster(final Image3DUniverse univ, final int dir) {
+	public AnimatedViewAdjuster(final Image3DUniverse univ, final int adjustmentDirection) {
 		this.univ = univ;
 		this.canvas = univ.getCanvas();
+		this.adjustmentDirection = adjustmentDirection;
+	}
 
-		switch (dir) {
+	private void updateViewAdjustments()
+	{
+		firstPoint = true;
+
+		switch (adjustmentDirection) {
 			case ADJUST_HORIZONTAL:
 				adjuster = new HorizontalAdjuster();
 				break;
@@ -169,24 +176,33 @@ public class AnimatedViewAdjuster {
 		univ.getVworldToCameraInverse(toCameraInverse);
 	}
 
+	public void apply( Content content, int fps, int durationMillis )
+	{
+		apply( content, fps, durationMillis, 1.0, 0, 0 );
+	}
+
+
+	public void apply( Content content, int fps, int durationMillis, double zoomLevel )
+	{
+		apply( content, fps, durationMillis, zoomLevel, 0, 0 );
+	}
+
 	/**
 	 * After all points/contents were added, apply() finally adjusts center and
 	 * zoom transformations of the view.
 	 *
 	 * The adjustment is animated.
 	 * Currently, when a new object is added, it is zoomed in on it from an overview perspective.
-	 *
+	 * @param content
 	 * @param fps
 	 * 				The frequency of the animation in frames per seconds (Hz). The animation
 	 * 			frequency of movies in the cinema is around 30 Hz.
 	 * @param durationMillis
-	 * 	  			The total time the animation should take in milliseconds.
-	 *
-	 * 	@param zoomLevel
-	 *  			The zoom level at the end of the animation.
-	 *  			1.0 is quite close, lower numbers are less close.
+	 * @param zoomLevel
+	 * @param dxyMin
+	 * @param dzMin
 	 */
-	public void apply( int fps, int durationMillis, double zoomLevel ) {
+	public void apply( Content content, int fps, int durationMillis, double zoomLevel, double dxyMin, double dzMin ) {
 		/* The camera to vworld transformation is given by
 		 * C * T * R * Z, where
 		 *
@@ -216,16 +232,31 @@ public class AnimatedViewAdjuster {
 		final int numFrames = (int) ( durationMillis / 1000.0 * fps );
 		final int intervalBetweenFramesMillis = ( int ) ( 1.0 * 1000.0 / fps );
 
-		final double dx = eye.x - oldEye.x;
-		final double dy = eye.y - oldEye.y;
-		final double dz = eye.z - oldEye.z;
+		//eye.z += 1.0 / zoomLevel;
 
-		final double ddx = dx * 1.0 / numFrames;
-		final double ddy = dy * 1.0 / numFrames;
-		final double ddz = dz * zoomLevel / numFrames;
+		this.updateViewAdjustments( );
+		this.add( content );
+
+		double dx = eye.x - oldEye.x;
+		double dy = eye.y - oldEye.y;
+		double dz = eye.z - oldEye.z;
+
+		if ( Math.abs( dx ) < dxyMin  && Math.abs( dy ) < dxyMin && Math.abs( dz ) < dzMin  )
+			return;
 
 		for ( int i = 1; i <= numFrames; i++ )
 		{
+			this.updateViewAdjustments( );
+			this.add( content );
+
+			dx = eye.x - oldEye.x;
+			dy = eye.y - oldEye.y;
+			dz = eye.z + 1.0 / zoomLevel - oldEye.z;
+
+			final double ddx = dx * i / numFrames;
+			final double ddy = dy * i / numFrames;
+			final double ddz = dz * i / numFrames;
+
 			// adjust zoom
 			univ.getZoomTG().getTransform( t3d );
 			t3d.get( transl );
@@ -251,6 +282,7 @@ public class AnimatedViewAdjuster {
 
 			sleep( intervalBetweenFramesMillis );
 		}
+
 
 	}
 

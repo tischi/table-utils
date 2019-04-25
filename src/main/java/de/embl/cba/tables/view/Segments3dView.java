@@ -47,6 +47,10 @@ public class Segments3dView < T extends ImageSegment >
 	private boolean isListeningToUniverse;
 	private int meshSmoothingIterations;
 	private int segmentFocusAnimationDurationMillis;
+	private boolean contentModificationInProgress;
+	private double segmentFocusZoomLevel;
+	private double segmentFocusDxyMin;
+	private double segmentFocusDzMin;
 
 	public Segments3dView(
 			final List< T > segments,
@@ -79,6 +83,9 @@ public class Segments3dView < T extends ImageSegment >
 		this.voxelSpacing3DView = 0.1;
 		this.meshSmoothingIterations = 5;
 		this.segmentFocusAnimationDurationMillis = 750;
+		this.segmentFocusZoomLevel = 0.8;
+		this.segmentFocusDxyMin = 20.0;
+		this.segmentFocusDzMin = 20.0;
 
 		this.segmentToMesh = new HashMap<>();
 		this.segmentToContent = new HashMap<>();
@@ -106,6 +113,21 @@ public class Segments3dView < T extends ImageSegment >
 	public void setSegmentFocusAnimationDurationMillis( int duration )
 	{
 		this.segmentFocusAnimationDurationMillis = duration;
+	}
+
+	public void setSegmentFocusZoomLevel( double segmentFocusZoomLevel )
+	{
+		this.segmentFocusZoomLevel = segmentFocusZoomLevel;
+	}
+
+	public void setSegmentFocusDxyMin( double segmentFocusDxyMin )
+	{
+		this.segmentFocusDxyMin = segmentFocusDxyMin;
+	}
+
+	public void setSegmentFocusDzMin( double segmentFocusDzMin )
+	{
+		this.segmentFocusDzMin = segmentFocusDzMin;
 	}
 
 	public Image3DUniverse getUniverse()
@@ -146,25 +168,38 @@ public class Segments3dView < T extends ImageSegment >
 			@Override
 			public synchronized void selectionChanged()
 			{
+				contentModificationInProgress = true;
 				final Set< T > selected = selectionModel.getSelected();
 				showSelectedSegments( selected );
 				removeUnselectedSegments( selected );
+				contentModificationInProgress = false;
 			}
 
 			@Override
 			public synchronized void focusEvent( T selection )
 			{
+				// TODO:
+				// How to ensure focusing only happens after
+				// a new segment mesh is fully added?
+				// Segments are added in the selectionChanged method above.
+				// This can take quite some time, such that below statement
+				// if( segmentToContent.containsKey( selection ) )
+				// should frequently be false.
+				// However in practice this did not happen. Why?
+				// Maybe add a segmentsAreBeingModified lock?
+
+//				if ( contentModificationInProgress )
+//					System.out.println("contentModificationInProgress");
+//				else
+//					System.out.println("focusing");
+
+				if ( universe.getContents().size() < 2 ) return;
+
 				if ( selection == recentFocus )
 					return;
 				else
 					recentFocus = selection;
 
-				// TODO: how to ensure focussing happens after a new segment mesh is added?
-				// Segments are added in the selectionChanged method above, this
-				// show take quite some time, such that below if statement should
-				// frequently be false.
-				// However in practice this did not happen. Why?
-				// Maybe add a segmentsAreBeingModified lock?
 				if ( segmentToContent.containsKey( selection ) )
 				{
 					final AnimatedViewAdjuster adjuster =
@@ -172,17 +207,14 @@ public class Segments3dView < T extends ImageSegment >
 									universe,
 									AnimatedViewAdjuster.ADJUST_BOTH );
 
-					adjuster.add( segmentToContent.get( selection )  );
-
 					adjuster.apply(
+							segmentToContent.get( selection ),
 							30,
 							segmentFocusAnimationDurationMillis,
-							0.8 );
+							segmentFocusZoomLevel, segmentFocusDxyMin, segmentFocusDzMin );
 				}
 			}
 		} );
-
-
 	}
 
 	public void removeUnselectedSegments( Set< T > selectedSegments )
@@ -352,7 +384,10 @@ public class Segments3dView < T extends ImageSegment >
 			universe.getWindow().setResizable( false );
 		}
 
-		universe.setAutoAdjustView( false );
+		if ( universe.getContents().isEmpty() )
+			universe.setAutoAdjustView( true );
+		else
+			universe.setAutoAdjustView( false );
 
 		if ( ! isListeningToUniverse )
 			isListeningToUniverse = addUniverseListener();
