@@ -4,6 +4,7 @@ import bdv.viewer.Source;
 import customnode.CustomTriangleMesh;
 import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.objects3d.FloodFill;
+import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.ij3d.AnimatedViewAdjuster;
 import de.embl.cba.tables.mesh.MeshExtractor;
 import de.embl.cba.tables.mesh.MeshUtils;
@@ -23,11 +24,15 @@ import net.imglib2.algorithm.neighborhood.DiamondShape;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.util.Intervals;
 import net.imglib2.view.Views;
 import org.scijava.java3d.View;
 import org.scijava.vecmath.Color3f;
 
+import java.awt.*;
+import java.awt.Component;
 import java.util.*;
+import java.util.List;
 
 public class Segments3dView < T extends ImageSegment >
 {
@@ -51,6 +56,8 @@ public class Segments3dView < T extends ImageSegment >
 	private double segmentFocusZoomLevel;
 	private double segmentFocusDxyMin;
 	private double segmentFocusDzMin;
+	private long maxNumBoundingBoxElements;
+	private Component parentComponent;
 
 	public Segments3dView(
 			final List< T > segments,
@@ -86,6 +93,7 @@ public class Segments3dView < T extends ImageSegment >
 		this.segmentFocusZoomLevel = 0.8;
 		this.segmentFocusDxyMin = 20.0;
 		this.segmentFocusDzMin = 20.0;
+		this.maxNumBoundingBoxElements = 100 * 100 * 100;
 
 		this.segmentToMesh = new HashMap<>();
 		this.segmentToContent = new HashMap<>();
@@ -93,6 +101,11 @@ public class Segments3dView < T extends ImageSegment >
 
 		registerAsSelectionListener( this.selectionModel );
 		registerAsColoringListener( this.selectionColoringModel );
+	}
+
+	public void setParentComponent( Component parentComponent )
+	{
+		this.parentComponent = parentComponent;
 	}
 
 	public void setVoxelSpacing3DView( double voxelSpacing3DView )
@@ -128,6 +141,11 @@ public class Segments3dView < T extends ImageSegment >
 	public void setSegmentFocusDzMin( double segmentFocusDzMin )
 	{
 		this.segmentFocusDzMin = segmentFocusDzMin;
+	}
+
+	public void setMaxNumBoundingBoxElements( long maxNumBoundingBoxElements )
+	{
+		this.maxNumBoundingBoxElements = maxNumBoundingBoxElements;
 	}
 
 	public Image3DUniverse getUniverse()
@@ -193,6 +211,7 @@ public class Segments3dView < T extends ImageSegment >
 //				else
 //					System.out.println("focusing");
 
+				if ( universe == null ) return;
 				if ( universe.getContents().size() < 2 ) return;
 
 				if ( selection == recentFocus )
@@ -211,7 +230,9 @@ public class Segments3dView < T extends ImageSegment >
 							segmentToContent.get( selection ),
 							30,
 							segmentFocusAnimationDurationMillis,
-							segmentFocusZoomLevel, segmentFocusDxyMin, segmentFocusDzMin );
+							segmentFocusZoomLevel,
+							segmentFocusDxyMin,
+							segmentFocusDzMin );
 				}
 			}
 		} );
@@ -255,14 +276,20 @@ public class Segments3dView < T extends ImageSegment >
 	private CustomTriangleMesh getTriangleMesh( T segment )
 	{
 		if ( segment.getMesh() == null )
-			addMeshToSegment( segment );
+		{
+			final float[] mesh = createMesh( segment );
+			if ( mesh == null )
+				return null;
+			else
+				segment.setMesh( mesh );
+		}
 
 		CustomTriangleMesh triangleMesh = MeshUtils.asCustomTriangleMesh( segment.getMesh() );
 		triangleMesh.setColor( getColor3f( segment ) );
 		return triangleMesh;
 	}
 
-	private void addMeshToSegment( ImageSegment segment )
+	private float[] createMesh( ImageSegment segment )
 	{
 		final Source< ? > labelsSource =
 				imageSourcesModel.sources().get( segment.imageId() ).source();
@@ -279,6 +306,16 @@ public class Segments3dView < T extends ImageSegment >
 		FinalInterval boundingBox =
 				getIntervalVoxels( segment.boundingBox(), voxelSpacing );
 
+		final long numElements = Intervals.numElements( boundingBox );
+
+		if ( numElements > maxNumBoundingBoxElements )
+		{
+			Logger.error( "The bounding box of the selected segment has " + numElements + " voxels.\n" +
+					"The maximum enabled number is " + maxNumBoundingBoxElements + ".\n" +
+					"Thus the image segment will not be displayed in 3D." );
+			return null;
+		}
+
 		final MeshExtractor meshExtractor = new MeshExtractor(
 				Views.extendZero( ( RandomAccessibleInterval ) labelsRAI ),
 				boundingBox,
@@ -288,7 +325,7 @@ public class Segments3dView < T extends ImageSegment >
 
 		final float[] meshCoordinates = meshExtractor.generateMesh( segment.labelId() );
 
-		segment.setMesh( meshCoordinates );
+		return meshCoordinates;
 	}
 
 	private void setSegmentBoundingBox(
@@ -382,6 +419,21 @@ public class Segments3dView < T extends ImageSegment >
 		{
 			universe.show();
 			universe.getWindow().setResizable( false );
+
+
+			if ( parentComponent != null )
+			{
+				universe.getWindow().setLocation(
+						parentComponent.getLocationOnScreen().x + parentComponent.getWidth() + 10,
+						parentComponent.getLocationOnScreen().y
+				);
+
+
+				universe.getWindow().setPreferredSize( new Dimension(
+						parentComponent.getWidth() / 2 ,
+						parentComponent.getHeight() / 2  ) );
+			}
+
 		}
 
 		if ( universe.getContents().isEmpty() )

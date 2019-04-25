@@ -13,6 +13,7 @@ import de.embl.cba.tables.view.SegmentsBdvView;
 import de.embl.cba.tables.view.TableRowsTableView;
 import ij3d.Image3DUniverse;
 
+import java.awt.*;
 import java.util.List;
 
 public class SegmentsTableBdvAnd3dViews
@@ -71,6 +72,10 @@ public class SegmentsTableBdvAnd3dViews
 				selectionColoringModel,
 				viewName );
 
+		tableRowsTableView.setParentComponent( segmentsBdvView.getBdv().getViewerPanel() );
+
+		tableRowsTableView.showTable();
+
 		segments3dView = new Segments3dView<>(
 				tableRowImageSegments,
 				selectionModel,
@@ -78,6 +83,9 @@ public class SegmentsTableBdvAnd3dViews
 				imageSourcesModel,
 				universe
 		);
+
+		segments3dView.setParentComponent( segmentsBdvView.getBdv().getViewerPanel() );
+
 
 
 	}

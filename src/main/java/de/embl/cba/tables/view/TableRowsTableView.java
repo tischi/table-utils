@@ -39,6 +39,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private Set< String > customColumns;
 	private ColorByColumn< T > colorByColumn;
 	private MeasureDistance< T > measureDistance;
+	private Component parentComponent;
 
 	public TableRowsTableView(
 			final List< T > tableRows,
@@ -67,7 +68,10 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		registerAsSelectionListener( selectionModel );
 		registerAsColoringListener( selectionColoringModel );
+	}
 
+	public void showTable()
+	{
 		createTable();
 		createTableUIAndShow();
 
@@ -222,6 +226,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
         table.setRowSelectionAllowed( true );
 		table.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
 
+
 		scrollPane = new JScrollPane(
 				table,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -230,7 +235,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
         this.add( scrollPane );
         table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 
-    }
+	}
 
 	private void createMenuBar()
 	{
@@ -346,6 +351,20 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		//Create and set up the content pane.
 		this.setOpaque( true ); //content panes must be opaque
 		frame.setContentPane( this );
+
+		if ( parentComponent != null )
+		{
+			frame.setLocation(
+					parentComponent.getLocationOnScreen().x,
+					parentComponent.getLocationOnScreen().y + parentComponent.getHeight()
+			);
+
+
+			frame.setPreferredSize( new Dimension(
+					parentComponent.getWidth() + 10,
+					parentComponent.getHeight() / 3  ) );
+		}
+
 
 		//Display the window.
 		frame.pack();
@@ -512,5 +531,10 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	public void close()
 	{
 		// TODO
+	}
+
+	public void setParentComponent( Component component )
+	{
+		this.parentComponent = component;
 	}
 }
