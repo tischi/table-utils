@@ -13,7 +13,6 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 	public DefaultSelectionModel()
 	{
 		listeners = new Listeners.SynchronizedList<>(  );
-
 		selected = new HashSet();
 	}
 
@@ -28,13 +27,9 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 	public void setSelected( T object, boolean select )
 	{
 		if ( select )
-		{
 			add( object );
-		}
 		else
-		{
 			remove( object );
-		}
 	}
 
 	private void remove( T object )
@@ -44,9 +39,7 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 			selected.remove( object );
 
 			for ( SelectionListener listener : listeners.list )
-			{
 				new Thread( () -> listener.selectionChanged() ).start();
-			}
 		}
 	}
 
@@ -57,9 +50,7 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 			selected.add( object );
 
 			for ( SelectionListener listener : listeners.list )
-			{
 				new Thread( () -> listener.selectionChanged() ).start();
-			}
 		}
 	}
 
@@ -67,13 +58,9 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 	public void toggle( T object )
 	{
 		if ( selected.contains( object ) )
-		{
 			remove( object );
-		}
 		else
-		{
 			add( object );
-		}
 	}
 
 	@Override
@@ -82,22 +69,16 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 		focusObject = object;
 
 		for ( SelectionListener listener : listeners.list )
-		{
 			new Thread( () -> listener.focusEvent( object ) ).start();
-		}
 	}
 
 	@Override
 	public boolean isFocused( T object )
 	{
 		if ( focusObject != null && focusObject.equals( object ) )
-		{
 			return true;
-		}
 		else
-		{
 			return false;
-		}
 	}
 
 	@Override
@@ -119,14 +100,7 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 
 			for ( SelectionListener listener : listeners.list )
 			{
-				new Thread( new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						listener.selectionChanged();
-					}
-				}).start();
+				new Thread( () -> listener.selectionChanged() ).start();
 			}
 			return true;
 		}

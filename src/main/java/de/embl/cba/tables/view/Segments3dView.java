@@ -147,24 +147,31 @@ public class Segments3dView < T extends ImageSegment >
 			public synchronized void selectionChanged()
 			{
 				final Set< T > selected = selectionModel.getSelected();
-
-				addSelectedSegments( selected );
+				showSelectedSegments( selected );
 				removeUnselectedSegments( selected );
 			}
 
 			@Override
 			public synchronized void focusEvent( T selection )
 			{
-				if ( selection == recentFocus ) return;
+				if ( selection == recentFocus )
+					return;
+				else
+					recentFocus = selection;
 
-				recentFocus = selection;
-
+				// TODO: how to ensure focussing happens after a new segment mesh is added?
+				// Segments are added in the selectionChanged method above, this
+				// show take quite some time, such that below if statement should
+				// frequently be false.
+				// However in practice this did not happen. Why?
+				// Maybe add a segmentsAreBeingModified lock?
 				if ( segmentToContent.containsKey( selection ) )
 				{
 					final AnimatedViewAdjuster adjuster =
 							new AnimatedViewAdjuster(
 									universe,
 									AnimatedViewAdjuster.ADJUST_BOTH );
+
 					adjuster.add( segmentToContent.get( selection )  );
 
 					adjuster.apply(
@@ -190,11 +197,11 @@ public class Segments3dView < T extends ImageSegment >
 			removeSegmentFrom3DView( segment );
 	}
 
-	public void addSelectedSegments( Set< T > segments )
+	public synchronized void showSelectedSegments( Set< T > segments )
 	{
 		for ( T segment : segments )
 			if ( ! segmentToContent.containsKey( segment ) )
-				addSegmentTo3DView( segment );
+				addSegmentToView( segment );
 	}
 
 	private synchronized void removeSegmentFrom3DView( T segment )
@@ -205,27 +212,26 @@ public class Segments3dView < T extends ImageSegment >
 		contentToSegment.remove( content );
 	}
 
-	private synchronized void addSegmentTo3DView( T segment )
+	private synchronized void addSegmentToView( T segment )
 	{
 		CustomTriangleMesh triangleMesh = getTriangleMesh( segment );
 		if ( triangleMesh == null ) return;
-		MeshEditor.smooth2(triangleMesh, meshSmoothingIterations );
+		MeshEditor.smooth2( triangleMesh, meshSmoothingIterations );
 		addMeshToUniverse( segment, triangleMesh );
 	}
 
 	private CustomTriangleMesh getTriangleMesh( T segment )
 	{
 		if ( segment.getMesh() == null )
-			addMesh( segment );
+			addMeshToSegment( segment );
 
 		CustomTriangleMesh triangleMesh = MeshUtils.asCustomTriangleMesh( segment.getMesh() );
 		triangleMesh.setColor( getColor3f( segment ) );
 		return triangleMesh;
 	}
 
-	private void addMesh( ImageSegment segment )
+	private void addMeshToSegment( ImageSegment segment )
 	{
-
 		final Source< ? > labelsSource =
 				imageSourcesModel.sources().get( segment.imageId() ).source();
 
@@ -239,7 +245,7 @@ public class Segments3dView < T extends ImageSegment >
 			setSegmentBoundingBox( segment, labelsRAI, voxelSpacing );
 
 		FinalInterval boundingBox =
-				getVoxelInterval( segment.boundingBox(), voxelSpacing );
+				getIntervalVoxels( segment.boundingBox(), voxelSpacing );
 
 		final MeshExtractor meshExtractor = new MeshExtractor(
 				Views.extendZero( ( RandomAccessibleInterval ) labelsRAI ),
@@ -259,7 +265,7 @@ public class Segments3dView < T extends ImageSegment >
 			double[] voxelSpacing )
 	{
 		final long[] voxelCoordinate =
-				getSegmentVoxelCoordinate( segment, voxelSpacing );
+				getSegmentCoordinateVoxels( segment, voxelSpacing );
 
 		final FloodFill floodFill = new FloodFill(
 				labelsRAI,
@@ -281,7 +287,9 @@ public class Segments3dView < T extends ImageSegment >
 		segment.setBoundingBox( new FinalRealInterval( min, max ));
 	}
 
-	private long[] getSegmentVoxelCoordinate( ImageSegment segment, double[] calibration )
+	private long[] getSegmentCoordinateVoxels(
+			ImageSegment segment,
+			double[] calibration )
 	{
 		final long[] voxelCoordinate = new long[ segment.numDimensions() ];
 		for ( int d = 0; d < segment.numDimensions(); d++ )
@@ -290,8 +298,9 @@ public class Segments3dView < T extends ImageSegment >
 		return voxelCoordinate;
 	}
 
-	private FinalInterval getVoxelInterval(
-			FinalRealInterval realInterval, double[] calibration )
+	private FinalInterval getIntervalVoxels(
+			FinalRealInterval realInterval,
+			double[] calibration )
 	{
 		final long[] min = new long[ 3 ];
 		final long[] max = new long[ 3 ];
@@ -318,18 +327,15 @@ public class Segments3dView < T extends ImageSegment >
 		return rai;
 	}
 
-
-	private void addMeshToUniverse( T segment, CustomTriangleMesh mesh )
+	private synchronized void addMeshToUniverse( T segment, CustomTriangleMesh mesh )
 	{
 		initUniverseAndListener();
 
-		// TODO: is the viewer transform altered here?
 		final Content content =
 				universe.addCustomMesh( mesh, "" + segment.labelId() );
 
 		content.setTransparency( (float) transparency );
 		content.setLocked( true );
-		//universe.adjustView( content );
 
 		segmentToContent.put( segment, content );
 		contentToSegment.put( content, segment );
@@ -345,6 +351,8 @@ public class Segments3dView < T extends ImageSegment >
 			universe.show();
 			universe.getWindow().setResizable( false );
 		}
+
+		universe.setAutoAdjustView( false );
 
 		if ( ! isListeningToUniverse )
 			isListeningToUniverse = addUniverseListener();
@@ -365,7 +373,7 @@ public class Segments3dView < T extends ImageSegment >
 			public void transformationUpdated( View view )
 			{
 
-				// TODO maybe try to synch this with the Bdv View
+				// TODO: maybe try to synch this with the Bdv View
 
 				//				final Transform3D transform3D = new Transform3D();
 //			view.getUserHeadToVworld( transform3D );
@@ -425,8 +433,6 @@ public class Segments3dView < T extends ImageSegment >
 					return;
 				else
 					selectionModel.focus( segment );
-
-
 			}
 
 			@Override
