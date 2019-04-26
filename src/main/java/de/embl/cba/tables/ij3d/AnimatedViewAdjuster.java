@@ -239,7 +239,7 @@ public class AnimatedViewAdjuster {
 
 		double dx = eye.x - oldEye.x;
 		double dy = eye.y - oldEye.y;
-		double dz = eye.z - oldEye.z;
+		double dz = eye.z + 1.0 / zoomLevel - oldEye.z;
 
 		if ( Math.abs( dx ) < dxyMin  && Math.abs( dy ) < dxyMin && Math.abs( dz ) < dzMin  )
 			return;

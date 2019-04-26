@@ -196,44 +196,25 @@ public class Segments3dView < T extends ImageSegment >
 			@Override
 			public synchronized void focusEvent( T selection )
 			{
-				// TODO:
-				// How to ensure focusing only happens after
-				// a new segment mesh is fully added?
-				// Segments are added in the selectionChanged method above.
-				// This can take quite some time, such that below statement
-				// if( segmentToContent.containsKey( selection ) )
-				// should frequently be false.
-				// However in practice this did not happen. Why?
-				// Maybe add a segmentsAreBeingModified lock?
-
-//				if ( contentModificationInProgress )
-//					System.out.println("contentModificationInProgress");
-//				else
-//					System.out.println("focusing");
-
 				if ( universe == null ) return;
-				if ( universe.getContents().size() < 2 ) return;
+				if ( universe.getContents().size() == 0 ) return;
+				if ( selection == recentFocus ) return;
+				if ( ! segmentToContent.containsKey( selection ) ) return;
 
-				if ( selection == recentFocus )
-					return;
-				else
-					recentFocus = selection;
+				recentFocus = selection;
 
-				if ( segmentToContent.containsKey( selection ) )
-				{
-					final AnimatedViewAdjuster adjuster =
-							new AnimatedViewAdjuster(
-									universe,
-									AnimatedViewAdjuster.ADJUST_BOTH );
+				final AnimatedViewAdjuster adjuster =
+						new AnimatedViewAdjuster(
+								universe,
+								AnimatedViewAdjuster.ADJUST_BOTH );
 
-					adjuster.apply(
-							segmentToContent.get( selection ),
-							30,
-							segmentFocusAnimationDurationMillis,
-							segmentFocusZoomLevel,
-							segmentFocusDxyMin,
-							segmentFocusDzMin );
-				}
+				adjuster.apply(
+						segmentToContent.get( selection ),
+						30,
+						segmentFocusAnimationDurationMillis,
+						segmentFocusZoomLevel,
+						segmentFocusDxyMin,
+						segmentFocusDzMin );
 			}
 		} );
 	}
@@ -436,10 +417,10 @@ public class Segments3dView < T extends ImageSegment >
 
 		}
 
+		universe.setAutoAdjustView( false );
+
 		if ( universe.getContents().isEmpty() )
 			universe.setAutoAdjustView( true );
-		else
-			universe.setAutoAdjustView( false );
 
 		if ( ! isListeningToUniverse )
 			isListeningToUniverse = addUniverseListener();
@@ -519,7 +500,11 @@ public class Segments3dView < T extends ImageSegment >
 				if ( selectionModel.isFocused( segment ) )
 					return;
 				else
+				{
+					recentFocus = segment; // This avoids "self-focusing"
 					selectionModel.focus( segment );
+				}
+
 			}
 
 			@Override
