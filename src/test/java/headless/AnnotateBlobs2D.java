@@ -1,5 +1,6 @@
 package headless;
 
+import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.annotate.Annotator;
 import de.embl.cba.tables.color.ColorByColumn;
 import de.embl.cba.tables.command.ExploreMorphoLibJLabelImage;
@@ -10,6 +11,7 @@ import ij.IJ;
 import ij.ImagePlus;
 import net.imagej.ImageJ;
 
+import java.io.File;
 import java.util.List;
 
 public class AnnotateBlobs2D
@@ -42,6 +44,9 @@ public class AnnotateBlobs2D
 				"Annotation",
 				ColorByColumn.RANDOM_GLASBEY
 				);
+
+		Tables.saveTable( tableView.getTable(),
+				new File( "/Users/tischer/Desktop/annotated_blobs.txt") );
 
 	}
 

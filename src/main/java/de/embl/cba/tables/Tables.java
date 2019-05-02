@@ -59,21 +59,19 @@ public class Tables
 	{
 		BufferedWriter bfw = new BufferedWriter( new FileWriter( file ) );
 
+		final int lastColumn = table.getColumnCount() - 1;
+
 		// header
-		for ( int column = 0; column < table.getColumnCount(); column++ )
-		{
-			bfw.write( table.getColumnName( column ) + "\t" );
-		}
-		bfw.write( "\n" );
+		for ( int col = 0; col < lastColumn; col++ )
+			bfw.write( table.getColumnName( col ) + "\t" );
+		bfw.write( table.getColumnName( lastColumn ) + "\n" );
 
 		// content
 		for ( int row = 0; row < table.getRowCount(); row++ )
 		{
-			for ( int column = 0; column < table.getColumnCount(); column++ )
-			{
-				bfw.write( table.getValueAt( row, column ) + "\t" );
-			}
-			bfw.write( "\n" );
+			for ( int col = 0; col < lastColumn; col++ )
+				bfw.write( table.getValueAt( row, col ) + "\t" );
+			bfw.write( table.getValueAt( row, lastColumn ) + "\n" );
 		}
 
 		bfw.close();
