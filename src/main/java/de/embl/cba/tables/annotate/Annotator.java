@@ -1,77 +1,86 @@
 package de.embl.cba.tables.annotate;
 
-import de.embl.cba.tables.tablerow.TableRow;
-import org.fife.rsta.ac.js.Logger;
+import de.embl.cba.tables.select.SelectionModel;
+import de.embl.cba.tables.tablerow.TableRowImageSegment;
 
 import javax.swing.*;
-import javax.swing.table.TableModel;
+import javax.swing.table.TableColumn;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Annotator
 {
+	private final String annotationColumnName;
+	private final List< TableRowImageSegment > tableRows;
+	private final JTable table;
+	private final SelectionModel< TableRowImageSegment > selectionModel;
+	private final JPanel panel;
 
-	public static < T extends TableRow >
-	void assignAttributes(
-			final String column,
-			final Set< T > rows,
-			final String attribute,
-			JTable table )
+	public Annotator(
+			String annotationColumnName,
+			List< TableRowImageSegment > tableRows,
+			JTable table,
+			SelectionModel< TableRowImageSegment > selectionModel )
 	{
-		for ( T row : rows )
-			assignAttribute( column, row, attribute, table );
+		this.annotationColumnName = annotationColumnName;
+		this.tableRows = tableRows;
+		this.table = table;
+		this.selectionModel = selectionModel;
+
+		panel = new JPanel();
 	}
 
-	/**
-	 * Write the values both in the TableRows and JTable
-	 *
-	 * @param column
-	 * @param row
-	 * @param attribute
-	 * @param tableModel
-	 * @param table
-	 */
-	public static  < T extends TableRow >
-	void assignAttribute( String column,
-						  T row,
-						  String attribute,
-						  JTable table )
+	public void showAnnotationUI()
 	{
-
-		final TableModel model = table.getModel();
-		final int columnIndex = table.getColumnModel().getColumnIndex( column );
-
-		final Object valueToBeReplaced = model.getValueAt(
-				row.rowIndex(),
-				columnIndex
-		);
-
-		if ( valueToBeReplaced.getClass().equals( Double.class ) )
-		{
-			try
-			{
-				final double number = Double.parseDouble( attribute );
-
-				model.setValueAt(
-						number,
-						row.rowIndex(),
-						columnIndex );
-
-				row.setCell( column, Double.toString( number ) );
-			}
-			catch ( Exception e )
-			{
-				Logger.logError( "Entered value must be numeric for column: "
-						+ column );
-			}
-		}
-		else
-		{
-			model.setValueAt(
-					attribute,
-					row.rowIndex(),
-					columnIndex );
-
-			row.setCell( column, attribute );
-		}
+		addAnnotationButtons();
+		addNewAnnotationButton();
+		showFrame();
 	}
+
+	private void showFrame()
+	{
+		final JFrame frame = new JFrame( "" );
+		//Create and set up the window.
+		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+
+		//Create and set up the content pane.
+		panel.setOpaque( true ); //content panes must be opaque
+		panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
+
+		frame.setContentPane( panel );
+
+		//Display the window.
+		frame.pack();
+		frame.setVisible( true );
+	}
+
+
+	private void addNewAnnotationButton()
+	{
+	}
+
+	private void addAnnotationButtons()
+	{
+		final Set< String > annotations = getAnnotations();
+		for ( String annotation : annotations )
+			addAnnotationButton( annotation );
+	}
+
+	private void addAnnotationButton( String annotation )
+	{
+		final JButton button = new JButton( annotation );
+		panel.add( button );
+	}
+
+	private Set< String > getAnnotations()
+	{
+		final HashSet< String > annotations = new HashSet<>();
+		for ( int row = 0; row < tableRows.size(); row++ )
+			annotations.add( tableRows.get( row ).getCell( annotationColumnName ) );
+
+		return annotations;
+	}
+
+
 }

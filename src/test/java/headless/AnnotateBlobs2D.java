@@ -1,5 +1,6 @@
 package headless;
 
+import de.embl.cba.tables.TableRows;
 import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.annotate.Annotator;
 import de.embl.cba.tables.color.ColorByColumn;
@@ -23,17 +24,22 @@ public class AnnotateBlobs2D
 		final TableRowsTableView< TableRowImageSegment > tableView
 				= views.getTableRowsTableView();
 
-		final String annotation = "Annotation";
-		tableView.addColumn( annotation, "None" );
+		final String annotationColumnName = "Annotation";
+		tableView.addColumn( annotationColumnName, "None" );
 
 		final List< TableRowImageSegment > tableRows = tableView.getTableRows();
 
-		Annotator.assignAttribute(
-				annotation,
+		TableRows.assignValue(
+				annotationColumnName,
 				tableRows.get( 0 ),
 				"Class1",
 				tableView.getTable() );
 
+		new Annotator(
+				annotationColumnName,
+				tableRows,
+				tableView.getTable(),
+				views.getSelectionModel() );
 
 		final ColorByColumn< TableRowImageSegment > colorByColumn = new ColorByColumn<>(
 				tableView.getTable(),
