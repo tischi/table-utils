@@ -429,32 +429,51 @@ public class Tables
 
 
 	public static JTable jTableFromTableRows( List< ? extends TableRow > tableRows )
-			throws UnsupportedDataTypeException
 	{
-
-		if ( ! ( tableRows instanceof ColumnBasedTableRowImageSegment ) ) return null;
-
-
-		final Map< String, List< String > > columns =
-				( ( ColumnBasedTableRowImageSegment ) tableRows ).getColumns();
-
-		/**
-		 * Init model and columns
-		 */
 
 		ColumnClassAwareTableModel model = new ColumnClassAwareTableModel();
 
-		final Set< String > columnNames = columns.keySet();
+		final Set< String > columnNames = tableRows.get( 0 ).getColumnNames();
 
 		for ( String columnName : columnNames )
 		{
-			final Object[] objects = TableColumns.asTypedArray( columns.get( columnName ) );
+			List< String > strings = getStrings( tableRows, columnName );
+
+			Object[] objects = null;
+			try
+			{
+				objects = TableColumns.asTypedArray( strings );
+			} catch ( UnsupportedDataTypeException e )
+			{
+				e.printStackTrace();
+			}
 			model.addColumn( columnName, objects  );
 		}
 
 		model.refreshColumnClassesFromObjectColumns();
 
 		return new JTable( model );
+	}
+
+	public static List< String >
+	getStrings( List< ? extends TableRow > tableRows,
+				String columnName )
+	{
+
+		if ( tableRows instanceof ColumnBasedTableRowImageSegment )
+		{
+			final Map< String, List< String > > columns
+					= ( ( ColumnBasedTableRowImageSegment ) tableRows ).getColumns();
+			return columns.get( columnName );
+		}
+		else
+		{
+			final ArrayList< String > strings = new ArrayList<>();
+			final int size = tableRows.size();
+			for ( int row = 0; row < size; row++ )
+				strings.add( tableRows.get( row ).getCell( columnName ) );
+			return strings;
+		}
 	}
 
 

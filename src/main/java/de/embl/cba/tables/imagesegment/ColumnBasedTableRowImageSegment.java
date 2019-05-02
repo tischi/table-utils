@@ -3,10 +3,7 @@ package de.embl.cba.tables.imagesegment;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import net.imglib2.FinalRealInterval;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -200,9 +197,9 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	}
 
 	@Override
-	public ArrayList< String > getColumnNames()
+	public Set< String > getColumnNames()
 	{
-		return null;
+		return columns.keySet();
 	}
 
 	@Override

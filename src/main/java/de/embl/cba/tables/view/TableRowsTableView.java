@@ -5,6 +5,7 @@ import de.embl.cba.tables.TableRows;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.color.*;
+import de.embl.cba.tables.imagesegment.ColumnBasedTableRowImageSegment;
 import de.embl.cba.tables.tablerow.TableRow;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
@@ -17,7 +18,6 @@ import net.imglib2.type.numeric.ARGBType;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
 
 
@@ -213,11 +213,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private void configureJTable()
 	{
-		if ( scrollPane != null )
-			remove( scrollPane );
-
 		table = Tables.jTableFromTableRows( tableRows );
-
 		table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
 		table.setFillsViewportHeight( true );
 		table.setAutoCreateRowSorter( true );

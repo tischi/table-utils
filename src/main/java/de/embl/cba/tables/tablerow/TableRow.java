@@ -1,6 +1,6 @@
 package de.embl.cba.tables.tablerow;
 
-import java.util.ArrayList;
+import java.util.Set;
 
 
 public interface TableRow
@@ -10,7 +10,7 @@ public interface TableRow
 
 	void setCell( String columnName, String value );
 
-	ArrayList< String > getColumnNames();
+	Set< String > getColumnNames();
 
 	/**
 	 * The index of the row in the underlying table.

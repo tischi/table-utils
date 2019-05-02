@@ -15,7 +15,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 	public ArrayList< String > labelMaskColumnIds;
 
 	private final List< T > tableRowImageSegments;
-	private ArrayList< String > columns;
+	private Set< String > columnNames;
 	private final Map< String, String > imageNameToPathColumnName;
 	private FileImageSourcesModel imageSourcesModel;
 	private final String imageRootFolder;
@@ -30,7 +30,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		this.imageRootFolder = imageRootFolder;
 		this.is2D = is2D;
 
-		columns = tableRowImageSegments.get( 0 ).getColumnNames();
+		columnNames = tableRowImageSegments.get( 0 ).getColumnNames();
 
 		createLabelMaskIds(); // TODO: how to handle this? could be anything...
 
@@ -130,7 +130,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 	private Map< String, String > getImageNameToPathColumnName( )
 	{
 		final HashMap< String, String > imageNameToPathColumnName = new HashMap<>();
-		for ( String column : columns )
+		for ( String column : columnNames )
 		{
 			if ( column.contains( PATH_COLUMN_ID ) )
 			{
