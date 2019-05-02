@@ -1,6 +1,7 @@
 package de.embl.cba.tables.view;
 
 import bdv.tools.HelpDialog;
+import de.embl.cba.tables.TableRows;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.color.*;
@@ -31,12 +32,10 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
     private JScrollPane scrollPane;
     private JMenuBar menuBar;
 
-	private Set< String > categoricalColumnNames;
 	private JTable table;
 	private int recentlySelectedRowInView;
 	private AssignValuesToSelectedRowsDialog assignObjectAttributesUI;
 	private HelpDialog helpDialog;
-	private Set< String > customColumns;
 	private ColorByColumn< T > colorByColumn;
 	private MeasureDistance< T > measureDistance;
 	private Component parentComponent;
@@ -61,27 +60,23 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		this.selectionModel = selectionModel;
 		this.tableName = tableName;
 
-		this.categoricalColumnNames = new HashSet<>(  );
-		this.customColumns = new HashSet<>(  );
-
 		recentlySelectedRowInView = -1;
 
 		registerAsSelectionListener( selectionModel );
 		registerAsColoringListener( selectionColoringModel );
 	}
 
-	public void showTable()
+	public List< T > getTableRows()
 	{
-		createTable();
-		createTableUIAndShow();
-
-		registerAsListSelectionListener();
-		configureTableRowColoring();
+		return tableRows;
 	}
 
-	public Set< String > categoricalColumnNames( )
+	public void showTableAndMenu()
 	{
-		return categoricalColumnNames;
+		configureJTable();
+		registerAsListSelectionListener();
+		configureTableRowColoring();
+		createMenuAndShow();
 	}
 
 	private void configureTableRowColoring()
@@ -216,25 +211,29 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		selectionColoringModel.listeners().add( () -> table.repaint( ) );
 	}
 
-	private void createTable()
-    {
+	private void configureJTable()
+	{
+		if ( scrollPane != null )
+			remove( scrollPane );
+
 		table = Tables.jTableFromTableRows( tableRows );
 
 		table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
-        table.setFillsViewportHeight( true );
-        table.setAutoCreateRowSorter( true );
-        table.setRowSelectionAllowed( true );
+		table.setFillsViewportHeight( true );
+		table.setAutoCreateRowSorter( true );
+		table.setRowSelectionAllowed( true );
 		table.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
-
 
 		scrollPane = new JScrollPane(
 				table,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        this.add( scrollPane );
-        table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
+		add( scrollPane );
 
+		table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
+
+		updateUI();
 	}
 
 	private void createMenuBar()
@@ -337,7 +336,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
-    private void createTableUIAndShow()
+    private void createMenuAndShow()
 	{
 		frame = new JFrame( tableName );
 
@@ -356,12 +355,11 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		{
 			frame.setLocation(
 					parentComponent.getLocationOnScreen().x,
-					parentComponent.getLocationOnScreen().y + parentComponent.getHeight()
+					parentComponent.getLocationOnScreen().y + parentComponent.getHeight() + 10
 			);
 
-
 			frame.setPreferredSize( new Dimension(
-					parentComponent.getWidth() + 10,
+					parentComponent.getWidth(),
 					parentComponent.getHeight() / 3  ) );
 		}
 
@@ -373,8 +371,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	public void addColumn( String column, Object defaultValue )
 	{
-		customColumns.add( column );
 		Tables.addColumn( table.getModel(), column, defaultValue );
+		TableRows.addColumn( tableRows, column, defaultValue );
 	}
 
 	public List< String > getColumnNames()

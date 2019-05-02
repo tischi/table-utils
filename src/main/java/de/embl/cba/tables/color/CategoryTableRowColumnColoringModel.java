@@ -32,7 +32,7 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	@Override
 	public void convert( T input, ARGBType output )
 	{
-		final Object featureValue = input.cells().get( column );
+		final Object featureValue = input.getCell( column );
 
 		if( ! inputToColorMap.keySet().contains( featureValue ) )
 		{

@@ -1,13 +1,11 @@
 package de.embl.cba.tables;
 
 import de.embl.cba.tables.table.ColumnClassAwareTableModel;
-import de.embl.cba.tables.imagesegment.SegmentUtils;
 import de.embl.cba.tables.imagesegment.*;
-import de.embl.cba.tables.imagesegment.SegmentProperty;
 import de.embl.cba.tables.tablerow.*;
-import net.imglib2.util.ValuePair;
 import org.scijava.table.GenericTable;
 
+import javax.activation.UnsupportedDataTypeException;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -229,109 +227,109 @@ public class Tables
 	}
 
 
-	// TODO: replace by more performant column based version (see below)
-	public static List< TableRowImageSegment > segmentsFromTableFile(
-			final File file,
-			String delim,
-			final Map< SegmentProperty, String > coordinateColumnMap,
-			final DefaultImageSegmentBuilder segmentBuilder )
-	{
-
-		final List< TableRowImageSegment > segments = new ArrayList<>();
-
-		final List< String > rowsInTable = readRows( file );
-
-		delim = autoDelim( delim, rowsInTable );
-
-		List< String > columns = getColumnNames( rowsInTable, delim );
-
-		for ( int row = 1; row < rowsInTable.size(); ++row )
-		{
-			final LinkedHashMap< String, Object > columnValueMap = new LinkedHashMap<>();
-
-			StringTokenizer st = new StringTokenizer( rowsInTable.get( row ), delim );
-
-			for ( String column : columns )
-			{
-				final String string = st.nextToken();
-
-				addColumn( columnValueMap, column, string );
-			}
-
-			final DefaultImageSegment segment =
-					SegmentUtils.segmentFromFeatures(
-							coordinateColumnMap,
-							columnValueMap,
-							segmentBuilder );
-
-			final TableRow tableRow = new DefaultTableRow( columnValueMap, row - 1  );
-
-			segments.add( new DefaultTableRowImageSegment( segment, tableRow ) );
-		}
-
-		return segments;
-
-	}
-
-	public static List< DefaultTableRowImageSegment > segmentsFromTableFileColumnWise(
-			final File file,
-			String delim,
-			final Map< SegmentProperty, String > coordinateColumnMap,
-			final DefaultImageSegmentBuilder segmentBuilder
-	)
-	{
-
-		final List< DefaultTableRowImageSegment > segments = new ArrayList<>();
-
-		final List< String > rowsInTable = readRows( file );
-
-		delim = autoDelim( delim, rowsInTable );
-
-		List< String > columns = getColumnNames( rowsInTable, delim );
-
-		final LinkedHashMap< String, List< Object > > columnToValues = new LinkedHashMap<>();
-
-		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
-		{
-			final String columnName = columns.get( columnIndex );
-			columnToValues.put( columnName, new ArrayList<>(  ) );
-			//setColumnIndex( coordinateColumnMap, columnIndex, columnName );
-		}
-
-
-		final List< TableRowMap > tableRowMaps = new ArrayList<>();
-		for ( int row = 1; row < rowsInTable.size(); ++row )
-		{
+//	// TODO: replace by more performant column based version (see below)
+//	public static List< TableRowImageSegment > segmentsFromTableFile(
+//			final File file,
+//			String delim,
+//			final Map< SegmentProperty, String > coordinateColumnMap,
+//			final DefaultImageSegmentBuilder segmentBuilder )
+//	{
+//
+//		final List< TableRowImageSegment > segments = new ArrayList<>();
+//
+//		final List< String > rowsInTable = readRows( file );
+//
+//		delim = autoDelim( delim, rowsInTable );
+//
+//		List< String > columns = getColumnNames( rowsInTable, delim );
+//
+//		for ( int row = 1; row < rowsInTable.size(); ++row )
+//		{
 //			final LinkedHashMap< String, Object > columnValueMap = new LinkedHashMap<>();
-
-			StringTokenizer st = new StringTokenizer( rowsInTable.get( row ), delim );
-
-			for ( String column : columns )
-			{
-				final String string = st.nextToken();
-				columnToValues.get( column ).add( string );
-			}
-
-
-			final TableRowFromColumns tableRowMap =
-					new TableRowFromColumns( columnToValues, row - 1);
-
-			// TODO
+//
+//			StringTokenizer st = new StringTokenizer( rowsInTable.get( row ), delim );
+//
+//			for ( String column : columns )
+//			{
+//				final String string = st.nextToken();
+//
+//				addColumn( columnValueMap, column, string );
+//			}
+//
 //			final DefaultImageSegment segment =
-//					SegmentUtils.segmentFromTableRowMap(
+//					SegmentUtils.segmentFromFeatures(
 //							coordinateColumnMap,
-//							tableRowMap,
+//							columnValueMap,
 //							segmentBuilder );
 //
+//			final TableRow tableRow = new DefaultTableRow( columnValueMap, row - 1  );
 //
-//			tableRowMaps.add( tableRowMap );
+//			segments.add( new DefaultTableRowImageSegment( segment, tableRow ) );
+//		}
 //
-//			imagesegment.add( new DefaultAnnotatedImageSegment( null, tableRow ) );
-		}
+//		return segments;
+//
+//	}
 
-		return segments;
-
-	}
+//	public static List< DefaultTableRowImageSegment > segmentsFromTableFileColumnWise(
+//			final File file,
+//			String delim,
+//			final Map< SegmentProperty, String > coordinateColumnMap,
+//			final DefaultImageSegmentBuilder segmentBuilder
+//	)
+//	{
+//
+//		final List< DefaultTableRowImageSegment > segments = new ArrayList<>();
+//
+//		final List< String > rowsInTable = readRows( file );
+//
+//		delim = autoDelim( delim, rowsInTable );
+//
+//		List< String > columns = getColumnNames( rowsInTable, delim );
+//
+//		final LinkedHashMap< String, List< Object > > columnToValues = new LinkedHashMap<>();
+//
+//		for ( int columnIndex = 0; columnIndex < columns.size(); columnIndex++ )
+//		{
+//			final String columnName = columns.get( columnIndex );
+//			columnToValues.put( columnName, new ArrayList<>(  ) );
+//			//setColumnIndex( coordinateColumnMap, columnIndex, columnName );
+//		}
+//
+//
+//		final List< TableRowMap > tableRowMaps = new ArrayList<>();
+//		for ( int row = 1; row < rowsInTable.size(); ++row )
+//		{
+////			final LinkedHashMap< String, Object > columnValueMap = new LinkedHashMap<>();
+//
+//			StringTokenizer st = new StringTokenizer( rowsInTable.get( row ), delim );
+//
+//			for ( String column : columns )
+//			{
+//				final String string = st.nextToken();
+//				columnToValues.get( column ).add( string );
+//			}
+//
+//
+//			final TableRowFromColumns tableRowMap =
+//					new TableRowFromColumns( columnToValues, row - 1);
+//
+//			// TODO
+////			final DefaultImageSegment segment =
+////					SegmentUtils.segmentFromTableRowMap(
+////							coordinateColumnMap,
+////							tableRowMap,
+////							segmentBuilder );
+////
+////
+////			tableRowMaps.add( tableRowMap );
+////
+////			imagesegment.add( new DefaultAnnotatedImageSegment( null, tableRow ) );
+//		}
+//
+//		return segments;
+//
+//	}
 
 
 	public static void addColumn(
@@ -358,79 +356,87 @@ public class Tables
 		}
 	}
 
-	public static void addStringColumn(
-			HashMap< String, Object > columnValueMap,
-			String column,
-			String string )
-	{
-		columnValueMap.put( column, string );
-//		try
+//	public static void addStringColumn(
+//			HashMap< String, Object > columnValueMap,
+//			String column,
+//			String string )
+//	{
+//		columnValueMap.put( column, string );
+////		try
+////		{
+////			final double number = Integer.parseInt( string );
+////			columnValueMap.put( column, number );
+////		}
+////		catch ( Exception e )
+////		{
+////			try
+////			{
+////				final double number = Double.parseDouble( string );
+////				columnValueMap.put( column, number );
+////			}
+////			catch ( Exception e2 )
+////			{
+////				columnValueMap.put( column, string );
+////			}
+////		}
+//	}
+
+//	public static void setColumnIndex(
+//			Map< SegmentProperty, ValuePair< String, Integer > > coordinateColumnMap,
+//			int columnIndex,
+//			String columnName )
+//	{
+//		for ( SegmentProperty coordinate : coordinateColumnMap.keySet() )
 //		{
-//			final double number = Integer.parseInt( string );
-//			columnValueMap.put( column, number );
+//			if ( coordinateColumnMap.get( coordinate ).getA().equals( columnName ) )
+//			{
+//				coordinateColumnMap.put(
+//						coordinate,
+//						new ValuePair< String, Integer>( columnName, columnIndex ) );
+//				break;
+//			}
 //		}
-//		catch ( Exception e )
+//	}
+//
+//	public static int getInteger( int columnIndex, String[] rowEntries  )
+//	{
+//		if ( columnIndex == -1 )
 //		{
-//			try
-//			{
-//				final double number = Double.parseDouble( string );
-//				columnValueMap.put( column, number );
-//			}
-//			catch ( Exception e2 )
-//			{
-//				columnValueMap.put( column, string );
-//			}
+//			return 0;
 //		}
-	}
+//		else
+//		{
+//			return Integer.parseInt( rowEntries[ columnIndex ] );
+//		}
+//	}
+//
+//	public static String getString( int columnIndex, String[] rowEntries )
+//	{
+//		if ( columnIndex == -1 )
+//		{
+//			return "";
+//		}
+//		else
+//		{
+//			return rowEntries[ columnIndex ];
+//		}
+//	}
+//
+//	public static double getDouble( int columnIndex, String[] rowEntries )
+//	{
+//		return Double.parseDouble( rowEntries[ columnIndex ] );
+//	}
 
-	public static void setColumnIndex(
-			Map< SegmentProperty, ValuePair< String, Integer > > coordinateColumnMap,
-			int columnIndex,
-			String columnName )
-	{
-		for ( SegmentProperty coordinate : coordinateColumnMap.keySet() )
-		{
-			if ( coordinateColumnMap.get( coordinate ).getA().equals( columnName ) )
-			{
-				coordinateColumnMap.put(
-						coordinate,
-						new ValuePair< String, Integer>( columnName, columnIndex ) );
-				break;
-			}
-		}
-	}
-
-	public static int getInteger( int columnIndex, String[] rowEntries  )
-	{
-		if ( columnIndex == -1 )
-		{
-			return 0;
-		}
-		else
-		{
-			return Integer.parseInt( rowEntries[ columnIndex ] );
-		}
-	}
-
-	public static String getString( int columnIndex, String[] rowEntries )
-	{
-		if ( columnIndex == -1 )
-		{
-			return "";
-		}
-		else
-		{
-			return rowEntries[ columnIndex ];
-		}
-	}
-
-	public static double getDouble( int columnIndex, String[] rowEntries )
-	{
-		return Double.parseDouble( rowEntries[ columnIndex ] );
-	}
 
 	public static JTable jTableFromTableRows( List< ? extends TableRow > tableRows )
+			throws UnsupportedDataTypeException
 	{
+
+		if ( ! ( tableRows instanceof ColumnBasedTableRowImageSegment ) ) return null;
+
+
+		final Map< String, List< String > > columns =
+				( ( ColumnBasedTableRowImageSegment ) tableRows ).getColumns();
 
 		/**
 		 * Init model and columns
@@ -438,24 +444,12 @@ public class Tables
 
 		ColumnClassAwareTableModel model = new ColumnClassAwareTableModel();
 
-		final Set< String > columns = tableRows.get( 0 ).cells().keySet();
+		final Set< String > columnNames = columns.keySet();
 
-		for ( String column : columns )
+		for ( String columnName : columnNames )
 		{
-			model.addColumn( column );
-		}
-
-		for ( int row = 0; row < tableRows.size(); ++row )
-		{
-			model.addRow( new Object[ columns.size() ] );
-
-			final Collection< Object > values = tableRows.get( row ).cells().values();
-
-			int col = 0;
-			for ( Object value : values )
-			{
-				model.setValueAt( value, row, col++ );
-			}
+			final Object[] objects = TableColumns.asTypedArray( columns.get( columnName ) );
+			model.addColumn( columnName, objects  );
 		}
 
 		model.refreshColumnClassesFromObjectColumns();

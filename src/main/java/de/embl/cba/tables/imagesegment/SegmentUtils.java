@@ -158,8 +158,8 @@ public class SegmentUtils
 
 
 	public static List< TableRowImageSegment > tableRowImageSegmentsFromColumns(
-			final LinkedHashMap< String, List< ? > > columns,
-			final Map< SegmentProperty, List< ? > > segmentPropertiesToColumn,
+			final Map< String, List< String > > columns,
+			final Map< SegmentProperty, List< String > > segmentPropertiesToColumn,
 			boolean isOneBasedTimePoint )
 	{
 
@@ -176,6 +176,7 @@ public class SegmentUtils
 							columns,
 							segmentPropertiesToColumn,
 							isOneBasedTimePoint );
+
 			columnBasedTableRowImageSegments.add( segment );
 		}
 
@@ -196,8 +197,8 @@ public class SegmentUtils
 	}
 
 	public static void putDefaultBoundingBoxMapping(
-			HashMap< SegmentProperty, List< ? > > segmentPropertyToColumn,
-			LinkedHashMap< String, List< ? > > columns )
+			Map< SegmentProperty, List< String > > segmentPropertyToColumn,
+			Map< String, List< String > > columns )
 	{
 		segmentPropertyToColumn.put(
 				SegmentProperty.BoundingBoxXMin,

@@ -33,7 +33,7 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	@Override
 	public void convert( T tableRow, ARGBType output )
 	{
-		final Object featureValue = tableRow.cells().get( columnName );
+		final Double featureValue = Double.parseDouble( tableRow.getCell( columnName ) );
 		setColorLinearly( featureValue, output );
 	}
 
@@ -77,10 +77,8 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 //	}
 
 
-	private void setColorLinearly( Object featureValue, ARGBType output )
+	private void setColorLinearly( Double value, ARGBType output )
 	{
-		final double value = Tables.asDouble( featureValue );
-
 		if ( paintZeroBlack )
 			if ( value == 0 )
 			{

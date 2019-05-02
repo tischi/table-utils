@@ -1,9 +1,9 @@
 package de.embl.cba.tables.select;
 
 import de.embl.cba.tables.SwingUtils;
+import de.embl.cba.tables.annotate.Annotator;
 import de.embl.cba.tables.tablerow.TableRow;
 import de.embl.cba.tables.view.TableRowsTableView;
-import org.fife.rsta.ac.js.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -59,11 +59,12 @@ public class AssignValuesToSelectedRowsDialog< T extends TableRow > extends JPan
 			selectedColumn = ( String ) columnComboBox.getSelectedItem();
 			selectedAttribute = ( String ) attributeComboBox.getSelectedItem();
 
-			assignAttributes(
+			Annotator.assignAttributes(
 					selectedColumn,
 					selectedRows,
-					selectedAttribute
-					);
+					selectedAttribute,
+					tableView.getTable()
+			);
 
 			location = frame.getLocation();
 			frame.dispose();
@@ -143,64 +144,6 @@ public class AssignValuesToSelectedRowsDialog< T extends TableRow > extends JPan
 
 		if ( selectedColumn != null )
 			columnComboBox.setSelectedItem( selectedColumn );
-	}
-
-	private void assignAttributes(
-			final String column,
-			final Set< T > rows,
-			final String attribute )
-	{
-		for ( T row : rows )
-		{
-			assignAttribute( column, row, attribute );
-		}
-	}
-
-	/**
-	 * Write the values both in the TableRows and the actual table
-	 *
-	 * @param column
-	 * @param row
-	 * @param attribute
-	 */
-	private void assignAttribute( String column,
-								  T row,
-								  String attribute )
-	{
-
-		final int columnIndex = getColumnIndex( column );
-
-		final Object valueToBeReplaced = tableView.getTable().getModel().getValueAt(
-				row.rowIndex(),
-				columnIndex
-		);
-
-		if ( valueToBeReplaced.getClass().equals( Double.class ) )
-		{
-			try
-			{
-				final double number = Double.parseDouble( attribute );
-				tableView.getTable().getModel().setValueAt(
-						number,
-						row.rowIndex(),
-						columnIndex );
-
-				row.cells().put( column, number );
-			}
-			catch ( Exception e )
-			{
-				Logger.logError( "Entered value must be numeric for column: " + column );
-			}
-		}
-		else
-		{
-			tableView.getTable().getModel().setValueAt(
-					attribute,
-					row.rowIndex(),
-					columnIndex );
-
-			row.cells().put( column, attribute );
-		}
 	}
 
 

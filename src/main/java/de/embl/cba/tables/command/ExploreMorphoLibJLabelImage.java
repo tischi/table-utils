@@ -17,9 +17,7 @@ import ij.WindowManager;
 import ij.text.TextWindow;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
 
 import static de.embl.cba.tables.imagesegment.SegmentUtils.*;
@@ -42,7 +40,7 @@ public class ExploreMorphoLibJLabelImage
 
 	private HashMap< String, ij.measure.ResultsTable > titleToResultsTable;
 	private ij.measure.ResultsTable resultsTable;
-	private LinkedHashMap< String, List< ? > > columns;
+	private Map< String, List< String > > columns;
 	private int numSpatialDimensions;
 	private String labelImageId;
 	private SegmentsTableBdvAnd3dViews tableBdvAnd3dViews;
@@ -201,7 +199,7 @@ public class ExploreMorphoLibJLabelImage
 			columns = addBoundingBoxColumn( CENTROID_Z, BB_MAX_Z, false );
 		}
 
-		final HashMap< SegmentProperty, List< ? > > segmentPropertyToColumn
+		final Map< SegmentProperty, List< String > > segmentPropertyToColumn
 				= createSegmentPropertyToColumnMap();
 
 		final List< TableRowImageSegment > segments
@@ -213,27 +211,26 @@ public class ExploreMorphoLibJLabelImage
 		return segments;
 	}
 
-	private LinkedHashMap< String, List<?>> addBoundingBoxColumn(
+	private Map< String, List< String > > addBoundingBoxColumn(
 			String centroid,
 			String bb,
-			boolean min
-	)
+			boolean min )
 	{
 		final int numRows = columns.values().iterator().next().size();
 
-		final List< Object > column = new ArrayList<>();
+		final List< String > column = new ArrayList<>();
 		for ( int row = 0; row < numRows; row++ )
 		{
 			final double centre = Double.parseDouble(
-					columns.get( centroid ).get( row ).toString() );
+					columns.get( centroid ).get( row ) );
 
 			final double meanBreadth = Double.parseDouble(
-					columns.get( MEAN_BREADTH ).get( row ).toString() );
+					columns.get( MEAN_BREADTH ).get( row ) );
 
 			if ( min )
-				column.add( (long) ( centre - 0.5 * meanBreadth ) );
+				column.add( "" + (long) ( centre - 0.5 * meanBreadth ) );
 			else
-				column.add( (long) ( centre + 0.5 * meanBreadth ) );
+				column.add( "" + (long) ( centre + 0.5 * meanBreadth ) );
 		}
 
 		columns.put( bb, column );
@@ -242,9 +239,9 @@ public class ExploreMorphoLibJLabelImage
 
 	}
 
-	private HashMap< SegmentProperty, List< ? > > createSegmentPropertyToColumnMap( )
+	private Map< SegmentProperty, List< String > > createSegmentPropertyToColumnMap( )
 	{
-		final HashMap< SegmentProperty, List< ? > > segmentPropertyToColumn
+		final Map< SegmentProperty, List< String > > segmentPropertyToColumn
 				= new HashMap<>();
 
 		segmentPropertyToColumn.put(

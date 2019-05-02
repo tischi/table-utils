@@ -1,12 +1,14 @@
 package de.embl.cba.tables;
 
 import ij.measure.ResultsTable;
+
+import javax.activation.UnsupportedDataTypeException;
 import java.io.File;
 import java.util.*;
 
 public class TableColumns
 {
-	public static LinkedHashMap< String, List< ? > >
+	public static Map< String, List< String > >
 			columnsFromImageJ1ResultsTable(
 			ResultsTable resultsTable )
 	{
@@ -14,7 +16,7 @@ public class TableColumns
 		List< String > columnNames = Arrays.asList( resultsTable.getHeadings() );
 		final int numRows = resultsTable.size();
 
-		final LinkedHashMap< String, List< ? > > columnNamesToValues
+		final Map< String, List< String > > columnNamesToValues
 				= new LinkedHashMap<>();
 
 		for ( String columnName : columnNames )
@@ -23,11 +25,9 @@ public class TableColumns
 
 			final double[] columnValues = getColumnValues( resultsTable, columnName );
 
-			final List< Object > list = new ArrayList<>( );
+			final List< String > list = new ArrayList<>( );
 			for ( int row = 0; row < numRows; ++row )
-			{
-				list.add( columnValues[ row ] );
-			}
+				list.add( "" + columnValues[ row ] );
 
 			columnNamesToValues.put( columnName, list );
 		}
@@ -68,13 +68,13 @@ public class TableColumns
 		return table.getLastColumn() == (table.getHeadings().length-2);
 	}
 
-	public static LinkedHashMap< String, List< String > >
+	public static Map< String, List< String > >
 	stringColumnsFromTableFile( final File file )
 	{
 		return stringColumnsFromTableFile( file, null );
 	}
 
-	public static LinkedHashMap< String, List< String > >
+	public static Map< String, List< String > >
 	stringColumnsFromTableFile(
 			final File file,
 			String delim )
@@ -85,7 +85,7 @@ public class TableColumns
 
 		List< String > columnNames = Tables.getColumnNames( rowsInTableIncludingHeader, delim );
 
-		final LinkedHashMap< String, List< String > > columnToStringValues = new LinkedHashMap<>();
+		final Map< String, List< String > > columnToStringValues = new LinkedHashMap<>();
 
 		for ( int columnIndex = 0; columnIndex < columnNames.size(); columnIndex++ )
 		{
@@ -110,53 +110,113 @@ public class TableColumns
 		return columnToStringValues;
 	}
 
-	public static LinkedHashMap< String, List< ? > > asTypedColumns( LinkedHashMap< String, List< String > > columnToStringValues )
+	public static Map< String, List< ? > >
+	asTypedColumns( Map< String, List< String > > columnToStringValues )
+			throws UnsupportedDataTypeException
 	{
 		final Set< String > columnNames = columnToStringValues.keySet();
-		final int numRows = columnToStringValues.get( columnNames.iterator().next() ).size();
 
 		final LinkedHashMap< String, List< ? > > columnToValues = new LinkedHashMap<>();
 
 		for ( String columnName : columnNames )
 		{
-			final List< String > strings = columnToStringValues.get( columnName );
-			final Class columnType = getColumnType( strings.get( 0 ) );
-
-			if ( columnType == Double.class )
-			{
-				final ArrayList< Double > doubles = new ArrayList<>( numRows );
-				for ( int row = 0; row < numRows; ++row )
-				{
-
-					final String s = strings.get( row );
-					if ( isNaN( s ) )
-					{
-						doubles.add( Double.NaN );
-					}
-					else
-					{
-						doubles.add( Double.parseDouble( s ) );
-					}
-				}
-				columnToValues.put( columnName, doubles );
-			}
-			else if ( columnType == Integer.class )
-			{
-				final ArrayList< Double > doubles = new ArrayList<>( numRows );
-				for ( int row = 0; row < numRows; ++row )
-				{
-					doubles.add( Double.parseDouble( strings.get( row ) ) );
-				}
-				columnToValues.put( columnName, doubles );
-			}
-			else if ( columnType == String.class )
-			{
-				columnToValues.put( columnName, strings );
-			}
+			final List< ? > values = asTypedList( columnToStringValues.get( columnName ) );
+			columnToValues.put( columnName, values );
 		}
-
 		return columnToValues;
 	}
+
+	public static List< ? > asTypedList( List< String > strings )
+			throws UnsupportedDataTypeException
+	{
+		final Class columnType = getColumnType( strings.get( 0 ) );
+
+		int numRows = strings.size();
+
+		if ( columnType == Double.class )
+		{
+			final ArrayList< Double > doubles = new ArrayList<>( numRows );
+
+			for ( int row = 0; row < numRows; ++row )
+				toDouble( strings, doubles, row );
+
+			return doubles;
+		}
+		else if ( columnType == Integer.class ) // cast to Double anyway...
+		{
+			final ArrayList< Double > doubles = new ArrayList<>( numRows );
+
+			for ( int row = 0; row < numRows; ++row )
+				toDouble( strings, doubles, row );
+
+			return doubles;
+		}
+		else if ( columnType == String.class )
+		{
+			return strings;
+		}
+		else
+		{
+			throw new UnsupportedDataTypeException("");
+		}
+	}
+
+	public static Object[] asTypedArray( List< String > strings )
+			throws UnsupportedDataTypeException
+	{
+		final Class columnType = getColumnType( strings.get( 0 ) );
+
+		int numRows = strings.size();
+
+		if ( columnType == Double.class )
+		{
+			return toDoubles( strings, numRows );
+		}
+		else if ( columnType == Integer.class ) // cast to Double anyway...
+		{
+			return toDoubles( strings, numRows );
+		}
+		else if ( columnType == String.class )
+		{
+			final String[] stringsArray = new String[ strings.size() ];
+			strings.toArray( stringsArray );
+			return stringsArray;
+		}
+		else
+		{
+			throw new UnsupportedDataTypeException("");
+		}
+
+	}
+
+	public static Object[] toDoubles( List< String > strings, int numRows )
+	{
+		final Double[] doubles = new Double[ numRows ];
+
+		for ( int row = 0; row < numRows; ++row )
+			toDouble( strings, doubles, row );
+
+		return doubles;
+	}
+
+	public static void toDouble( List< String > strings, ArrayList< Double > doubles, int row )
+	{
+		final String s = strings.get( row );
+		if ( isNaN( s ) )
+			doubles.add( Double.NaN );
+		else
+			doubles.add( Double.parseDouble( s ) );
+	}
+
+	public static void toDouble( List< String > strings, Double[] doubles, int row )
+	{
+		final String s = strings.get( row );
+		if ( isNaN( s ) )
+			doubles[ row ] =  Double.NaN ;
+		else
+			doubles[ row ] =  Double.parseDouble( s );
+	}
+
 
 	public static boolean isNaN( String s )
 	{
@@ -176,18 +236,17 @@ public class TableColumns
 		}
 	}
 
-	public static LinkedHashMap< String, List< ? > > addLabelImageIdColumn(
-			LinkedHashMap< String, List< ? > > columns,
+	public static Map< String, List< String > > addLabelImageIdColumn(
+			Map< String, List< String > > columns,
 			String columnNameLabelImageId,
 			String labelImageId )
 	{
 		final int numRows = columns.values().iterator().next().size();
 
-		final List< Object > labelImageIdColumn = new ArrayList<>();
+		final List< String > labelImageIdColumn = new ArrayList<>();
+
 		for ( int row = 0; row < numRows; row++ )
-		{
 			labelImageIdColumn.add( labelImageId );
-		}
 
 		columns.put( columnNameLabelImageId, labelImageIdColumn );
 

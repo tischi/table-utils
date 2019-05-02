@@ -3,6 +3,7 @@ package de.embl.cba.tables.imagesegment;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import net.imglib2.FinalRealInterval;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,18 +17,17 @@ import java.util.Map;
 public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 {
 	private final int row;
-	private final LinkedHashMap< String, List< ? > > columns;
-	private final Map< SegmentProperty, List< ? > > segmentPropertyToColumn;
+	private final Map< String, List< String > > columns;
+	private final Map< SegmentProperty, List< String > > segmentPropertyToColumn;
 	private double[] position;
 	FinalRealInterval boundingBox;
-	private LinkedHashMap< String, Object > cells;
 	private boolean isOneBasedTimePoint;
 	private float[] mesh;
 
 	public ColumnBasedTableRowImageSegment(
 			int row,
-			LinkedHashMap< String, List< ? > > columns,
-			Map< SegmentProperty, List< ? > > segmentPropertyToColumn,
+			Map< String, List< String > > columns,
+			Map< SegmentProperty, List< String > > segmentPropertyToColumn,
 			boolean isOneBasedTimePoint )
 	{
 		this.row = row;
@@ -36,7 +36,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 		this.isOneBasedTimePoint = isOneBasedTimePoint;
 	}
 
-	public LinkedHashMap< String, List< ? > > getColumns()
+	public Map< String, List< String > > getColumns()
 	{
 		return columns;
 	}
@@ -51,19 +51,19 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 			position[ 0 ] = Double.parseDouble(
 								segmentPropertyToColumn
 								.get( SegmentProperty.X )
-								.get( row ).toString() );
+								.get( row ) );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.Y ) )
 			position[ 1 ] = Double.parseDouble(
 								segmentPropertyToColumn
 								.get( SegmentProperty.Y )
-								.get( row ).toString() );
+								.get( row ) );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.Z ) )
 			position[ 2 ] = Double.parseDouble(
 								segmentPropertyToColumn
 								.get( SegmentProperty.Z )
-								.get( row ).toString() );
+								.get( row ) );
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	{
 		return segmentPropertyToColumn
 				.get( SegmentProperty.LabelImage )
-				.get( row ).toString();
+				.get( row );
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	{
 		return Double.parseDouble( segmentPropertyToColumn
 				.get( SegmentProperty.ObjectLabel )
-				.get( row ).toString() );
+				.get( row ) );
 	}
 
 	@Override
@@ -88,9 +88,9 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 		if ( segmentPropertyToColumn.get( SegmentProperty.T ) == null )
 			return 0;
 
-		int timePoint = ( ( Double ) segmentPropertyToColumn
+		int timePoint = Integer.parseInt( segmentPropertyToColumn
 				.get( SegmentProperty.T )
-				.get( row )).intValue();
+				.get( row ) );
 
 		if ( isOneBasedTimePoint ) timePoint -= 1;
 
@@ -147,19 +147,19 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 			max[ 0 ] = Double.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxXMax )
-							.get( row ).toString() );
+							.get( row ) );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxYMax ) )
 			max[ 1 ] = Double.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxYMax )
-							.get( row ).toString() );
+							.get( row ) );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxZMax ) )
 			max[ 2 ] = Double.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxZMax )
-							.get( row ).toString() );
+							.get( row ) );
 		return max;
 	}
 
@@ -171,39 +171,38 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 			min[ 0 ] = Double.parseDouble(
 							segmentPropertyToColumn
 								.get( SegmentProperty.BoundingBoxXMin )
-								.get( row ).toString() );
+								.get( row ) );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxYMin ) )
 			min[ 1 ] = Double.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxYMin )
-							.get( row ).toString() );
+							.get( row ) );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxZMin ) )
 			min[ 2 ] = Double.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxZMin )
-							.get( row ).toString() );
+							.get( row ) );
 		return min;
 	}
 
 	@Override
-	public synchronized LinkedHashMap< String, Object > cells()
+	public String getCell( String columnName )
 	{
-		setCellsFromColumns();
-
-		return cells;
+		return columns.get( columnName ).get( row );
 	}
 
-	private synchronized void setCellsFromColumns()
+	@Override
+	public void setCell( String columnName, String value )
 	{
-		cells = new LinkedHashMap<>();
+		columns.get( columnName ).set( row, value );
+	}
 
-		for ( String columnName : columns.keySet() )
-		{
-			final Object columnValue = columns.get( columnName ).get( row );
-			cells.put( columnName, columnValue );
-		}
+	@Override
+	public ArrayList< String > getColumnNames()
+	{
+		return null;
 	}
 
 	@Override

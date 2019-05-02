@@ -401,18 +401,17 @@ public class Segments3dView < T extends ImageSegment >
 			universe.show();
 			universe.getWindow().setResizable( false );
 
-
 			if ( parentComponent != null )
 			{
-				universe.getWindow().setLocation(
-						parentComponent.getLocationOnScreen().x + parentComponent.getWidth() + 10,
-						parentComponent.getLocationOnScreen().y
-				);
-
-
 				universe.getWindow().setPreferredSize( new Dimension(
 						parentComponent.getWidth() / 2 ,
 						parentComponent.getHeight() / 2  ) );
+
+				universe.getWindow().setLocation(
+						parentComponent.getLocationOnScreen().x - universe.getWindow().getWidth() - 10,
+						parentComponent.getLocationOnScreen().y
+				);
+
 			}
 
 		}

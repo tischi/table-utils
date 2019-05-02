@@ -42,7 +42,7 @@ public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R
 
 
 	private HashMap< String, FolderAndFileColumn > imageNameToFolderAndFileColumns;
-	private LinkedHashMap< String, List< ? > > columns;
+	private Map< String, List< String > > columns;
 
 	@Override
 	public void run()
@@ -66,12 +66,12 @@ public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R
 
 	private List< TableRowImageSegment > createSegments( File tableFile )
 	{
-		columns = TableColumns.asTypedColumns(
-				TableColumns.stringColumnsFromTableFile( tableFile ) );
+		columns = TableColumns.stringColumnsFromTableFile( tableFile );
 
-		final List< String > pathColumnNames = CellProfilerUtils.replaceFolderAndFileColumnsByPathColumn( columns );
+		final List< String > pathColumnNames =
+				CellProfilerUtils.replaceFolderAndFileColumnsByPathColumn( columns );
 
-		final Map< SegmentProperty, List< ? > > segmentPropertyToColumn
+		final Map< SegmentProperty, List< String > > segmentPropertyToColumn
 				= getSegmentPropertyToColumn( pathColumnNames );
 
 		final List< TableRowImageSegment > segments
@@ -83,10 +83,10 @@ public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R
 		return segments;
 	}
 
-	private HashMap< SegmentProperty, List< ? > > getSegmentPropertyToColumn(
+	private Map< SegmentProperty, List< String > > getSegmentPropertyToColumn(
 			List< String > pathColumnNames )
 	{
-		final HashMap< SegmentProperty, List< ? > > segmentPropertyToColumn
+		final Map< SegmentProperty, List< String > > segmentPropertyToColumn
 				= new HashMap<>();
 
 		String labelImagePathColumnName = getLabelImagePathColumnName( pathColumnNames );

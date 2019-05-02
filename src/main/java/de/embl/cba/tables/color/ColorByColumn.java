@@ -14,9 +14,9 @@ import java.util.Map;
 public class ColorByColumn< T extends TableRow >
 {
 
-	public static final String LINEAR_BLUE_WHITE_RED = "Linear: BlueWhiteRed";
-	public static final String LINEAR_ZERO_BLACK_BLUE_WHITE_RED = "Linear: ZeroBlackBlueWhiteRed";
-	public static final String RANDOM_GLASBEY = "Categorical: Glasbey";
+	public static final String LINEAR_BLUE_WHITE_RED = "Linea - Blue White Red";
+	public static final String LINEAR_ZERO_BLACK_BLUE_WHITE_RED = "Linear - Black Blue White Red";
+	public static final String RANDOM_GLASBEY = "Categorical - Glasbey";
 
 	private final JTable table;
 	private final SelectionColoringModel< T > selectionColoringModel;
@@ -26,6 +26,13 @@ public class ColorByColumn< T extends TableRow >
 
 	private Map< String, double[] > columnNameToMinMax;
 	private HashMap< String, double[] > columnNameToRangeSettings;
+
+	public static final String[] COLORING_MODES = new String[]
+			{
+					LINEAR_BLUE_WHITE_RED,
+					LINEAR_ZERO_BLACK_BLUE_WHITE_RED,
+					RANDOM_GLASBEY
+			};
 
 
 	public ColorByColumn( JTable table,
@@ -42,20 +49,14 @@ public class ColorByColumn< T extends TableRow >
 	public void showDialog()
 	{
 		final String[] columnNames = Tables.getColumnNamesAsArray( table );
-		final String[] coloringModes = new String[]
-				{
-						LINEAR_BLUE_WHITE_RED,
-						LINEAR_ZERO_BLACK_BLUE_WHITE_RED,
-						RANDOM_GLASBEY
-				};
 
 		final GenericDialog gd = new GenericDialog( "Color by Column" );
 
 		if ( selectedColumnName == null ) selectedColumnName = columnNames[ 0 ];
 		gd.addChoice( "Column", columnNames, selectedColumnName );
 
-		if ( selectedColoringMode == null ) selectedColoringMode = coloringModes[ 0 ];
-		gd.addChoice( "Coloring Mode", coloringModes, selectedColoringMode );
+		if ( selectedColoringMode == null ) selectedColoringMode = COLORING_MODES[ 0 ];
+		gd.addChoice( "Coloring Mode", COLORING_MODES, selectedColoringMode );
 
 		gd.showDialog();
 		if ( gd.wasCanceled() ) return;
@@ -87,7 +88,8 @@ public class ColorByColumn< T extends TableRow >
 						true );
 				break;
 			case RANDOM_GLASBEY:
-				colorCategorical( selectionColoringModel,
+				colorCategorical(
+						selectionColoringModel,
 						selectedColumnName );
 				break;
 		}
@@ -99,8 +101,8 @@ public class ColorByColumn< T extends TableRow >
 	{
 		final CategoryTableRowColumnColoringModel< T > coloringModel
 				= new CategoryTableRowColumnColoringModel< >(
-				selectedColumnName,
-				new GlasbeyARGBLut( 255 ) );
+						selectedColumnName,
+						new GlasbeyARGBLut( 255 ) );
 
 		selectionColoringModel.setWrappedColoringModel( coloringModel );
 	}

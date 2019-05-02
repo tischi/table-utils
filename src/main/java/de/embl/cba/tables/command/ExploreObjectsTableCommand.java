@@ -64,8 +64,8 @@ public class ExploreObjectsTableCommand implements Command
 	public boolean isOneBasedTimePoint;
 
 
-	private LinkedHashMap< String, List< ? > > columns;
-	private Map< SegmentProperty, String > coordinateToColumnName;
+	private Map< String, List< String > > columns;
+	private Map< SegmentProperty, String > propertyToColumnName;
 
 
 	public void run()
@@ -104,20 +104,19 @@ public class ExploreObjectsTableCommand implements Command
 		if ( columns == null )
 			loadColumnsFromFile( tableFile );
 
-		final Map< SegmentProperty, List< ? > > coordinateToColumn
-				= createCoordinateToColumnMap( columns.keySet() );
+		final Map< SegmentProperty, List< String > > propertyToColumn
+				= createPropertyToColumnMap( columns.keySet() );
 
 		final List< TableRowImageSegment > segments
 				= SegmentUtils.tableRowImageSegmentsFromColumns(
-						columns, coordinateToColumn, isOneBasedTimePoint );
+						columns, propertyToColumn, isOneBasedTimePoint );
 
 		return segments;
 	}
 
 	private void loadColumnsFromFile( File tableFile )
 	{
-		columns = TableColumns.asTypedColumns(
-				TableColumns.stringColumnsFromTableFile( tableFile ) );
+		columns = TableColumns.stringColumnsFromTableFile( tableFile );
 
 		if ( imagePathColumnsId.equals( IMAGE_PATH_COLUMNS_ID_CELL_PROFILER ) )
 			CellProfilerUtils.replaceFolderAndFileColumnsByPathColumn( columns );
@@ -130,28 +129,28 @@ public class ExploreObjectsTableCommand implements Command
 
 	}
 
-	private LinkedHashMap< SegmentProperty, List< ? > > createCoordinateToColumnMap(
+	private Map< SegmentProperty, List< String > > createPropertyToColumnMap(
 			Set< String > columnNames )
 	{
 		final SegmentPropertyColumnsSelectionDialog selectionDialog
 				= new SegmentPropertyColumnsSelectionDialog( columnNames );
 
-		coordinateToColumnName = selectionDialog.fetchUserInput();
+		propertyToColumnName = selectionDialog.fetchUserInput();
 
-		final LinkedHashMap< SegmentProperty, List< ? > > coordinateToColumn
+		final Map< SegmentProperty, List< String > > propertyToColumn
 				= new LinkedHashMap<>();
 
-		for( SegmentProperty coordinate : coordinateToColumnName.keySet() )
+		for( SegmentProperty property : propertyToColumnName.keySet() )
 		{
-			if ( coordinateToColumnName.get( coordinate ).equals( NO_COLUMN_SELECTED ) )
+			if ( propertyToColumnName.get( property ).equals( NO_COLUMN_SELECTED ) )
 				continue;
 
-			coordinateToColumn.put(
-					coordinate,
-					this.columns.get( coordinateToColumnName.get( coordinate ) ) );
+			propertyToColumn.put(
+					property,
+					this.columns.get( propertyToColumnName.get( property ) ) );
 		}
 
-		return coordinateToColumn;
+		return propertyToColumn;
 	}
 
 	private void logImagePaths()

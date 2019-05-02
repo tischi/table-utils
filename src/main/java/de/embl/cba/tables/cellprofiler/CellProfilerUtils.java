@@ -8,7 +8,7 @@ import java.util.*;
 public abstract class CellProfilerUtils
 {
 	public static List< String > replaceFolderAndFileColumnsByPathColumn(
-			LinkedHashMap< String, List< ? > > columns )
+			Map< String, List< String > > columns )
 	{
 		final int numRows = columns.values().iterator().next().size();
 		HashMap< String, FolderAndFileColumn >

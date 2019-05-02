@@ -21,6 +21,7 @@ public class SegmentsTableAndBdvViews
 	private final String viewName;
 	private SegmentsBdvView< TableRowImageSegment > segmentsBdvView;
 	private TableRowsTableView< TableRowImageSegment > tableRowsTableView;
+	private SelectionColoringModel< TableRowImageSegment > selectionColoringModel;
 
 	public SegmentsTableAndBdvViews(
 			List< TableRowImageSegment > tableRowImageSegments,
@@ -50,10 +51,9 @@ public class SegmentsTableAndBdvViews
 		final LazyCategoryColoringModel< TableRowImageSegment > coloringModel
 				= new LazyCategoryColoringModel<>( new GlasbeyARGBLut( 255 ) );
 
-		final SelectionColoringModel< TableRowImageSegment > selectionColoringModel
-				= new SelectionColoringModel<>(
-					coloringModel,
-					selectionModel );
+		selectionColoringModel = new SelectionColoringModel<>(
+			coloringModel,
+			selectionModel );
 
 		final DefaultImageSegmentsModel< TableRowImageSegment > imageSegmentsModel
 				= new DefaultImageSegmentsModel<>( tableRowImageSegments, viewName );
@@ -72,8 +72,13 @@ public class SegmentsTableAndBdvViews
 
 		tableRowsTableView.setParentComponent( segmentsBdvView.getBdv().getViewerPanel() );
 
-		tableRowsTableView.showTable();
+		tableRowsTableView.showTableAndMenu();
 
+	}
+
+	public SelectionColoringModel< TableRowImageSegment > getSelectionColoringModel()
+	{
+		return selectionColoringModel;
 	}
 
 	public SegmentsBdvView< TableRowImageSegment > getSegmentsBdvView()

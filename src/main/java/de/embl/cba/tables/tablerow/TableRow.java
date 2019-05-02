@@ -1,25 +1,20 @@
 package de.embl.cba.tables.tablerow;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+
 
 public interface TableRow
 {
-	// TODO: still not sure what is the best here...
 
-	/**
-	 * Contains feature names and values.
-	 * Keeping it as a {@link LinkedHashMap} ensures that the
-	 * order of both cells and values is fixed.
-	 * This is convenient, e.g., when building a table from
-	 * many {@link TableRow} instances that are derived from the
-	 * same data source.
-	 *
-	 * @return
-	 */
-	LinkedHashMap< String, Object > cells();
+	String getCell( String columnName );
+
+	void setCell( String columnName, String value );
+
+	ArrayList< String > getColumnNames();
 
 	/**
 	 * The index of the row in the underlying table.
+	 * TODO: Maybe this is not needed...
 	 *
 	 * @return row index
 	 */
