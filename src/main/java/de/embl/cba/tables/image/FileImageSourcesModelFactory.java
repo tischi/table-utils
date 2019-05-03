@@ -16,10 +16,11 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 
 	private final List< T > tableRowImageSegments;
 	private Set< String > columnNames;
-	private final Map< String, String > imageNameToPathColumnName;
+	private Map< String, String > imageNameToPathColumnName;
 	private FileImageSourcesModel imageSourcesModel;
 	private final String imageRootFolder;
 	private final boolean is2D;
+	private Set< String > excludeImages;
 
 	public FileImageSourcesModelFactory(
 			final List< T > tableRowImageSegments,
@@ -29,13 +30,15 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		this.tableRowImageSegments = tableRowImageSegments;
 		this.imageRootFolder = imageRootFolder;
 		this.is2D = is2D;
+		this.excludeImages = new HashSet<>(  );
 
 		columnNames = tableRowImageSegments.get( 0 ).getColumnNames();
 
-		createLabelMaskIds(); // TODO: how to handle this? could be anything...
+	}
 
-		imageNameToPathColumnName = getImageNameToPathColumnName();
-		imageSourcesModel = createImageSourcesModel();
+	public void excludeImage( String excludeImages )
+	{
+		this.excludeImages.add( excludeImages );
 	}
 
 	public void createLabelMaskIds()
@@ -51,19 +54,28 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 
 	public FileImageSourcesModel getImageSourcesModel()
 	{
+		createLabelMaskIds(); // TODO: how to handle this? could be anything...
+		imageNameToPathColumnName = getImageNameToPathColumnName();
+		imageSourcesModel = createImageSourcesModel();
 		return imageSourcesModel;
 	}
+
 
 	private FileImageSourcesModel createImageSourcesModel( )
 	{
 		imageSourcesModel = new FileImageSourcesModel( is2D );
 
+		final Set< String > allImageNames = imageNameToPathColumnName.keySet();
+
+		final HashSet< String > imageNames = new HashSet<>();
+		for ( String imageName : allImageNames )
+			if ( ! excludeImages.contains( imageName ) )
+				imageNames.add( imageName );
+
+
 		for ( TableRowImageSegment tableRowImageSegment : tableRowImageSegments )
 		{
-			final Set< String > imageNames = imageNameToPathColumnName.keySet();
-
-			final List< String > imageSetIds =
-					getImageSetIds( tableRowImageSegment, imageNames );
+			final List< String > imageSetIds = getImageSetIds( tableRowImageSegment, imageNames );
 
 			for ( String imageName : imageNames )
 			{
@@ -127,17 +139,20 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		return flavour;
 	}
 
-	private Map< String, String > getImageNameToPathColumnName( )
+	public Map< String, String > getImageNameToPathColumnName( )
 	{
 		final HashMap< String, String > imageNameToPathColumnName = new HashMap<>();
+
 		for ( String column : columnNames )
 		{
-			if ( column.contains( PATH_COLUMN_ID ) )
-			{
-				final String image = column.split( PATH_COLUMN_ID )[ 1 ];
-				imageNameToPathColumnName.put( image, column );
-			}
+			if ( ! column.contains( PATH_COLUMN_ID ) ) continue;
+
+			final String image = column.split( PATH_COLUMN_ID )[ 1 ];
+
+			imageNameToPathColumnName.put( image, column );
+
 		}
+
 		return imageNameToPathColumnName;
 	}
 

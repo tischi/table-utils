@@ -10,6 +10,7 @@ import de.embl.cba.tables.imagesegment.SegmentUtils;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import de.embl.cba.tables.view.combined.SegmentsTableAndBdvViews;
 import de.embl.cba.tables.view.combined.SegmentsTableBdvAnd3dViews;
+import ij.gui.GenericDialog;
 import org.scijava.command.Command;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
@@ -75,11 +76,14 @@ public class ExploreObjectsTableCommand implements Command
 		final List< TableRowImageSegment > tableRowImageSegments
 				= createSegments( tableFile );
 
-		final FileImageSourcesModel imageSourcesModel =
-				new FileImageSourcesModelFactory(
-						tableRowImageSegments,
-						imageRootFolder.toString(),
-						is2D ).getImageSourcesModel();
+		final FileImageSourcesModelFactory< TableRowImageSegment > factory = new FileImageSourcesModelFactory(
+				tableRowImageSegments,
+				imageRootFolder.toString(),
+				is2D );
+
+		if ( ! showImageChoiceDialog( factory ) ) return;
+
+		final FileImageSourcesModel imageSourcesModel = factory.getImageSourcesModel();
 
 		if ( is2D )
 		{
@@ -96,6 +100,20 @@ public class ExploreObjectsTableCommand implements Command
 					tableFile.getName() );
 		}
 
+	}
+
+	public boolean showImageChoiceDialog( FileImageSourcesModelFactory< TableRowImageSegment > factory )
+	{
+		final Map< String, String > imageNameToPathColumnName = factory.getImageNameToPathColumnName();
+		final GenericDialog gd = new GenericDialog( "Show images" );
+		for( String image : imageNameToPathColumnName.keySet() )
+			gd.addCheckbox( image, true );
+		gd.showDialog();
+		if ( gd.wasCanceled() ) return false;
+		for( String image : imageNameToPathColumnName.keySet()  )
+			if( ! gd.getNextBoolean() )
+				factory.excludeImage( image );
+		return true;
 	}
 
 	private List< TableRowImageSegment > createSegments(
