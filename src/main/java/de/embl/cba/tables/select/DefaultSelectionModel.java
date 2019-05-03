@@ -99,9 +99,8 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 			selected.clear();
 
 			for ( SelectionListener listener : listeners.list )
-			{
 				new Thread( () -> listener.selectionChanged() ).start();
-			}
+
 			return true;
 		}
 	}

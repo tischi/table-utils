@@ -68,34 +68,32 @@ public class ColorByColumn< T extends TableRow >
 
 	}
 
-	public void colorByColumn( String selectedColumnName,
-							   String selectedColoringMode )
+	public ColoringModel< T > colorByColumn(
+			String selectedColumnName,
+			String selectedColoringMode )
 	{
-
 
 		switch ( selectedColoringMode )
 		{
 			case LINEAR_BLUE_WHITE_RED:
-				colorLinear(
+				return colorLinear(
 						selectionColoringModel,
 						selectedColumnName,
 						false );
-				break;
 			case LINEAR_ZERO_BLACK_BLUE_WHITE_RED:
-				colorLinear(
+				return colorLinear(
 						selectionColoringModel,
 						selectedColumnName,
 						true );
-				break;
 			case RANDOM_GLASBEY:
-				colorCategorical(
+				return colorCategorical(
 						selectionColoringModel,
 						selectedColumnName );
-				break;
 		}
+		return null;
 	}
 
-	private void colorCategorical(
+	private CategoryTableRowColumnColoringModel< T > colorCategorical(
 			SelectionColoringModel< T > selectionColoringModel,
 			String selectedColumnName )
 	{
@@ -105,9 +103,11 @@ public class ColorByColumn< T extends TableRow >
 						new GlasbeyARGBLut( 255 ) );
 
 		selectionColoringModel.setWrappedColoringModel( coloringModel );
+
+		return coloringModel;
 	}
 
-	private void colorLinear(
+	private NumericTableRowColumnColoringModel< T > colorLinear(
 			SelectionColoringModel< T > selectionColoringModel,
 			String selectedColumnName,
 			boolean paintZeroBlack )
@@ -117,7 +117,7 @@ public class ColorByColumn< T extends TableRow >
 		{
 			Logger.error( "Linear color mode is only available for numeric columns.\n" +
 					"The selected " + selectedColumnName + " column however appears to be non-numeric.");
-			return;
+			return null;
 		}
 
 		final double[] valueRange = getValueRange( table, selectedColumnName );
@@ -135,6 +135,8 @@ public class ColorByColumn< T extends TableRow >
 
 		SwingUtilities.invokeLater( () ->
 				new NumericColoringModelDialog( selectedColumnName, coloringModel, valueRange ) );
+
+		return coloringModel;
 	}
 
 	private double[] getValueSettings( String columnName, double[] valueRange )

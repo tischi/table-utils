@@ -20,7 +20,7 @@ public abstract class TableRows
 
 			final ArrayList< String > strings = new ArrayList<>();
 			for ( int i = 0; i < values.length; i++ )
-				strings.add( values.toString() );
+				strings.add( values[ i ].toString() );
 
 			columns.put( columnName, strings );
 		}

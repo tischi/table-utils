@@ -3,7 +3,10 @@ package headless;
 import de.embl.cba.tables.TableRows;
 import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.annotate.Annotator;
+import de.embl.cba.tables.color.CategoryTableRowColumnColoringModel;
 import de.embl.cba.tables.color.ColorByColumn;
+import de.embl.cba.tables.color.ColoringModel;
+import de.embl.cba.tables.color.SelectionColoringModel;
 import de.embl.cba.tables.command.ExploreMorphoLibJLabelImage;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import de.embl.cba.tables.view.TableRowsTableView;
@@ -35,24 +38,31 @@ public class AnnotateBlobs2D
 				"Class1",
 				tableView.getTable() );
 
-		new Annotator(
-				annotationColumnName,
-				tableRows,
-				tableView.getTable(),
-				views.getSelectionModel() );
-
 		final ColorByColumn< TableRowImageSegment > colorByColumn = new ColorByColumn<>(
 				tableView.getTable(),
 				views.getSelectionColoringModel()
 		);
 
-		colorByColumn.colorByColumn(
+		views.getSelectionColoringModel().setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
+
+		final ColoringModel< TableRowImageSegment > coloringModel = colorByColumn.colorByColumn(
 				"Annotation",
 				ColorByColumn.RANDOM_GLASBEY
-				);
+		);
 
-		Tables.saveTable( tableView.getTable(),
-				new File( "/Users/tischer/Desktop/annotated_blobs.txt") );
+		final Annotator annotator = new Annotator(
+				annotationColumnName,
+				tableRows,
+				tableView.getTable(),
+				views.getSelectionModel(),
+				coloringModel );
+
+		annotator.showDialog();
+
+
+
+//		Tables.saveTable( tableView.getTable(),
+//				new File( "/Users/tischer/Desktop/annotated_blobs.txt") );
 
 	}
 
