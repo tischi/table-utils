@@ -1,13 +1,9 @@
 package de.embl.cba.tables.annotate;
 
-import com.jgoodies.common.collect.ArrayListModel;
 import de.embl.cba.tables.TableRows;
-import de.embl.cba.tables.color.ColoringListener;
 import de.embl.cba.tables.color.ColoringModel;
-import de.embl.cba.tables.ij3d.AnimatedViewAdjuster;
 import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.tablerow.TableRow;
-import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import ij.gui.GenericDialog;
 import net.imglib2.type.numeric.ARGBType;
 
@@ -25,7 +21,7 @@ public class Annotator < T extends TableRow >
 	private final ColoringModel< T > coloringModel;
 	private final JPanel panel;
 	private JFrame frame;
-	private ArrayList< ButtonAndTableRow< T > > buttons;
+	private Map< JButton, T  > buttonToTableRow;
 
 	public Annotator(
 			String annotationColumnName,
@@ -40,11 +36,11 @@ public class Annotator < T extends TableRow >
 		this.selectionModel = selectionModel;
 		this.coloringModel = coloringModel;
 
-		buttons = new ArrayList<>(  );
+		buttonToTableRow = new HashMap<>(  );
 
 		coloringModel.listeners().add( () -> {
-			for ( ButtonAndTableRow< T > bt : buttons )
-				setButtonColor( bt.button, bt.tableRow );
+			for ( JButton button : buttonToTableRow.keySet() )
+				setButtonColor( button, buttonToTableRow.get( button ) );
 		} );
 
 		panel = new JPanel();
@@ -70,6 +66,7 @@ public class Annotator < T extends TableRow >
 		frame.setContentPane( panel );
 
 		//Display the window.
+		frame.setLocation( MouseInfo.getPointerInfo().getLocation().x, MouseInfo.getPointerInfo().getLocation().y );
 		frame.pack();
 		frame.setVisible( true );
 	}
@@ -97,28 +94,19 @@ public class Annotator < T extends TableRow >
 			addAnnotationButton( annotation, annotations.get( annotation ) );
 	}
 
-	class ButtonAndTableRow < T >
-	{
-		public JButton button;
-		public T tableRow;
-
-		public ButtonAndTableRow( JButton button, T tableRow )
-		{
-			this.button = button;
-			this.tableRow = tableRow;
-		}
-	}
-
 	private void addAnnotationButton( String annotation, T tableRow )
 	{
 		final JButton button = new JButton( String.format("%1$15s", annotation) );
+		button.setFont( new Font("monospaced", Font.PLAIN, 12) );
 		button.setOpaque( true );
 		setButtonColor( button, tableRow );
 		button.setAlignmentX( Component.CENTER_ALIGNMENT );
-		buttons.add( new ButtonAndTableRow<>( button, tableRow ) );
+		buttonToTableRow.put( button, tableRow );
 		panel.add( button );
 
 		button.addActionListener( e -> {
+
+			if ( selectionModel.isEmpty() ) return;
 
 			final Set< T > selected = selectionModel.getSelected();
 
@@ -128,8 +116,9 @@ public class Annotator < T extends TableRow >
 					annotation,
 					table );
 
+			buttonToTableRow.put( button, selected.iterator().next() );
+			setButtonColor( button, buttonToTableRow.get( button ) );
 			selectionModel.clearSelection();
-
 		} );
 	}
 
