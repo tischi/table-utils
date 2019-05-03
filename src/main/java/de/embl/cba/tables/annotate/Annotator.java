@@ -12,7 +12,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class Annotator < T extends TableRow >
+public class Annotator < T extends TableRow > extends JFrame
 {
 	private final String annotationColumnName;
 	private final List< T > tableRows;
@@ -20,7 +20,6 @@ public class Annotator < T extends TableRow >
 	private final SelectionModel< T > selectionModel;
 	private final ColoringModel< T > coloringModel;
 	private final JPanel panel;
-	private JFrame frame;
 	private Map< JButton, T  > buttonToTableRow;
 
 	public Annotator(
@@ -30,6 +29,7 @@ public class Annotator < T extends TableRow >
 			SelectionModel selectionModel,
 			ColoringModel< T > coloringModel )
 	{
+		super("");
 		this.annotationColumnName = annotationColumnName;
 		this.tableRows = tableRows;
 		this.table = table;
@@ -55,20 +55,13 @@ public class Annotator < T extends TableRow >
 
 	private void showFrame()
 	{
-		frame = new JFrame( "" );
-		//Create and set up the window.
-		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-
-		//Create and set up the content pane.
+		this.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 		panel.setOpaque( true ); //content panes must be opaque
 		panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
-
-		frame.setContentPane( panel );
-
-		//Display the window.
-		frame.setLocation( MouseInfo.getPointerInfo().getLocation().x, MouseInfo.getPointerInfo().getLocation().y );
-		frame.pack();
-		frame.setVisible( true );
+		this.setContentPane( panel );
+		this.setLocation( MouseInfo.getPointerInfo().getLocation().x, MouseInfo.getPointerInfo().getLocation().y );
+		this.pack();
+		this.setVisible( true );
 	}
 
 
@@ -77,7 +70,6 @@ public class Annotator < T extends TableRow >
 		final JButton button = new JButton( "Add new annotation" );
 		panel.add( button );
 		button.addActionListener( e -> {
-
 			final GenericDialog gd = new GenericDialog( "" );
 			gd.addStringField( "New annotation", "", 10 );
 			gd.showDialog();
@@ -150,7 +142,7 @@ public class Annotator < T extends TableRow >
 	{
 		panel.revalidate();
 		panel.repaint();
-		frame.pack();
+		this.pack();
 	}
 
 

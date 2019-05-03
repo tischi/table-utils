@@ -46,6 +46,12 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 		output.set( colorIndex );
 	}
 
+	@Override
+	public Map< Object, ARGBType > getInputToColorMap()
+	{
+		return inputToColorMap;
+	}
+
 	private double createRandom( double x )
 	{
 		double random = ( x * randomSeed ) * goldenRatio;

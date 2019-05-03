@@ -3,10 +3,7 @@ package headless;
 import de.embl.cba.tables.TableRows;
 import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.annotate.Annotator;
-import de.embl.cba.tables.color.CategoryTableRowColumnColoringModel;
-import de.embl.cba.tables.color.ColorByColumn;
-import de.embl.cba.tables.color.ColoringModel;
-import de.embl.cba.tables.color.SelectionColoringModel;
+import de.embl.cba.tables.color.*;
 import de.embl.cba.tables.command.ExploreMorphoLibJLabelImage;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import de.embl.cba.tables.view.TableRowsTableView;
@@ -14,6 +11,7 @@ import de.embl.cba.tables.view.combined.SegmentsTableAndBdvViews;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imagej.ImageJ;
+import net.imglib2.type.numeric.ARGBType;
 
 import java.io.File;
 import java.util.List;
@@ -49,6 +47,8 @@ public class AnnotateBlobs2D
 				"Annotation",
 				ColorByColumn.RANDOM_GLASBEY
 		);
+
+		(( CategoryColoringModel< TableRowImageSegment > ) coloringModel ).getInputToColorMap().put( "None", new ARGBType( 0 ) );
 
 		final Annotator annotator = new Annotator(
 				annotationColumnName,

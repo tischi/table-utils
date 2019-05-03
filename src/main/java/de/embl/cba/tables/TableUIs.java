@@ -33,6 +33,17 @@ public class TableUIs
 		tableView.addColumn( columnName, defaultValue );
 	}
 
+	public static String selectColumnNameUI( JTable table, String text )
+	{
+		final String[] columnNames = Tables.getColumnNamesAsArray( table );
+		final GenericDialog gd = new GenericDialog( "" );
+		gd.addChoice( text, columnNames, columnNames[ 0 ] );
+		gd.showDialog();
+		if ( gd.wasCanceled() ) return null;
+		final String columnName = gd.getNextChoice();
+		return columnName;
+	}
+
 	public static void saveTableUI( JTable table )
 	{
 		final JFileChooser jFileChooser = new JFileChooser( "" );

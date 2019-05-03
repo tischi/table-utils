@@ -4,15 +4,17 @@ import bdv.tools.HelpDialog;
 import de.embl.cba.tables.TableRows;
 import de.embl.cba.tables.TableUIs;
 import de.embl.cba.tables.Tables;
+import de.embl.cba.tables.annotate.Annotator;
 import de.embl.cba.tables.color.*;
-import de.embl.cba.tables.imagesegment.ColumnBasedTableRowImageSegment;
 import de.embl.cba.tables.tablerow.TableRow;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.select.AssignValuesToSelectedRowsDialog;
 import de.embl.cba.tables.color.ColorByColumn;
 import de.embl.cba.tables.measure.MeasureDistance;
+import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import ij.IJ;
+import ij.gui.GenericDialog;
 import net.imglib2.type.numeric.ARGBType;
 
 import javax.swing.*;
@@ -45,7 +47,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			final SelectionModel< T > selectionModel,
 			final SelectionColoringModel< T > selectionColoringModel )
 	{
-		this( tableRows, selectionModel, selectionColoringModel, "Table" );
+		this( tableRows, selectionModel, selectionColoringModel, "" );
 	}
 	
 	public TableRowsTableView(
@@ -240,9 +242,22 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		menuBar.add( createColoringMenu() );
 
+		menuBar.add( createAnnotateMenu() );
+
 		menuBar.add( createMeasureMenu() );
 
 		menuBar.add( createHelpMenu() );
+	}
+
+	private JMenu createAnnotateMenu()
+	{
+		JMenu menu = new JMenu( "Annotate" );
+
+		menu.add( createStartNewAnnotationMenuItem() );
+
+		menu.add( createContinueExistingAnnotationMenuItem() );
+
+		return menu;
 	}
 
 	private JMenu createMeasureMenu()
@@ -288,26 +303,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
         menu.add( createSaveAsMenuItem() );
 
-		menu.add( createAddColumnMenuItem() );
-
-		menu.add( assignValueMenuItem() );
-
 		return menu;
     }
-
-	private JMenuItem assignValueMenuItem()
-	{
-		assignObjectAttributesUI = new AssignValuesToSelectedRowsDialog( this );
-
-		final JMenuItem menuItem = new JMenuItem( "Assign Value to Selected Objects..." );
-
-		// TODO: make only show custom columns
-		menuItem.addActionListener( e ->
-				SwingUtilities.invokeLater( () ->
-						assignObjectAttributesUI.showUI( selectionModel.getSelected() ) ) );
-
-		return menuItem;
-	}
 
 	private JMenuItem createSaveAsMenuItem()
 	{
@@ -319,20 +316,71 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
-	private JMenuItem createAddColumnMenuItem()
+	private JMenuItem createStartNewAnnotationMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "New Column..." );
-
-		final TableRowsTableView tableView = this;
+		final JMenuItem menuItem = new JMenuItem( "Start new annotation..." );
 
 		menuItem.addActionListener( e ->
 				SwingUtilities.invokeLater( () ->
-						TableUIs.addColumnUI( tableView ) ) );
+						startNewAnnotation() ) );
 
 		return menuItem;
 	}
 
-    private void createMenuAndShow()
+	private JMenuItem createContinueExistingAnnotationMenuItem()
+	{
+		final JMenuItem menuItem = new JMenuItem( "Continue existing annotation..." );
+
+		menuItem.addActionListener( e ->
+				SwingUtilities.invokeLater( () ->
+						{
+							final String annotationColumn = TableUIs.selectColumnNameUI( table, "Annotation column" );
+							continueExistingAnnotation( annotationColumn );
+						}
+						) );
+
+		return menuItem;
+	}
+
+
+	private void startNewAnnotation()
+	{
+
+		final GenericDialog gd = new GenericDialog( "" );
+		gd.addStringField( "Annotation column name", "", 30 );
+		gd.showDialog();
+		if( gd.wasCanceled() ) return;
+		final String columnName = gd.getNextString();
+		this.addColumn( columnName, "None" );
+
+		continueExistingAnnotation( columnName );
+	}
+
+	private void continueExistingAnnotation( String columnName )
+	{
+		final ColorByColumn< T > colorByColumn = new ColorByColumn<>(
+				table,
+				selectionColoringModel );
+
+		selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
+
+		final ColoringModel< T > coloringModel = colorByColumn.colorByColumn(
+				columnName,
+				ColorByColumn.RANDOM_GLASBEY );
+
+		(( CategoryColoringModel< TableRowImageSegment > ) coloringModel ).getInputToColorMap().put( "None", new ARGBType( 0 ) );
+
+		final Annotator annotator = new Annotator(
+				columnName,
+				tableRows,
+				table,
+				selectionModel,
+				coloringModel );
+
+		annotator.showDialog();
+	}
+
+	private void createMenuAndShow()
 	{
 		frame = new JFrame( tableName );
 

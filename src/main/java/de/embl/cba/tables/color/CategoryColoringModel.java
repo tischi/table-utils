@@ -4,6 +4,8 @@ import de.embl.cba.tables.select.Listeners;
 import net.imglib2.converter.Converter;
 import net.imglib2.type.numeric.ARGBType;
 
+import java.util.Map;
+
 public interface CategoryColoringModel< T > extends Converter< T, ARGBType >
 {
 	/**
@@ -15,5 +17,7 @@ public interface CategoryColoringModel< T > extends Converter< T, ARGBType >
 	Listeners< ColoringListener > listeners();
 
 	void incRandomSeed();
+
+	Map< Object, ARGBType > getInputToColorMap();
 
 }

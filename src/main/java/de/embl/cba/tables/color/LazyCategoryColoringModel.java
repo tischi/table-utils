@@ -58,5 +58,11 @@ public class LazyCategoryColoringModel< T > extends AbstractColoringModel< T > i
 		notifyColoringListeners();
 	}
 
+	@Override
+	public Map< Object, ARGBType > getInputToColorMap()
+	{
+		return null;
+	}
+
 
 }
