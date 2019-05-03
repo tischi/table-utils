@@ -12,10 +12,11 @@ import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 public class CategoryTableRowColumnColoringModel< T extends TableRow >
 		extends AbstractColoringModel< T > implements CategoryColoringModel< T >
 {
-	Map< Object, ARGBType > inputToColorMap;
+	Map< Object, ARGBType > inputToColor;
 	private final String column;
 	ARGBLut argbLut;
 	private int randomSeed;
+	private final Map< Object, ARGBType > specialInputToColor;
 
 	/**
 	 *
@@ -25,8 +26,9 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	{
 		this.column = column;
 		this.argbLut = argbLut;
-		this.inputToColorMap = new ConcurrentHashMap<>(  );
+		this.inputToColor = new ConcurrentHashMap<>(  );
 		this.randomSeed = 50;
+		specialInputToColor = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -34,22 +36,28 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	{
 		final Object featureValue = input.getCell( column );
 
-		if( ! inputToColorMap.keySet().contains( featureValue ) )
+		if ( specialInputToColor.keySet().contains( featureValue ) )
 		{
-			// TODO: replace by other type of LUT ( not 0..1 )
-			final double random = createRandom( inputToColorMap.size() + 1 );
-			inputToColorMap.put( featureValue,
-					new ARGBType( argbLut.getARGB( random ) ) );
+			final int color = specialInputToColor.get( featureValue ).get();
+			output.set( color );
 		}
-
-		final int colorIndex = inputToColorMap.get( featureValue ).get();
-		output.set( colorIndex );
+		else if ( inputToColor.keySet().contains( featureValue ) )
+		{
+			final int color = inputToColor.get( featureValue ).get();
+			output.set( color );
+		}
+		else
+		{
+			final double random = createRandom( inputToColor.size() + 1 );
+			inputToColor.put( featureValue, new ARGBType( argbLut.getARGB( random ) ) );
+			final int color = inputToColor.get( featureValue ).get();
+			output.set( color );
+		}
 	}
 
-	@Override
-	public Map< Object, ARGBType > getInputToColorMap()
+	public Map< Object, ARGBType > getSpecialInputToColor()
 	{
-		return inputToColorMap;
+		return specialInputToColor;
 	}
 
 	private double createRandom( double x )
@@ -62,7 +70,7 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	@Override
 	public void incRandomSeed( )
 	{
-		inputToColorMap.clear();
+		inputToColor.clear();
 		this.randomSeed++;
 
 		notifyColoringListeners();

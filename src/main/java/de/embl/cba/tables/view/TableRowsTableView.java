@@ -368,7 +368,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 				columnName,
 				ColorByColumn.RANDOM_GLASBEY );
 
-		(( CategoryColoringModel< TableRowImageSegment > ) coloringModel ).getInputToColorMap().put( "None", new ARGBType( 0 ) );
+		(( CategoryTableRowColumnColoringModel< TableRowImageSegment > ) coloringModel )
+				.getSpecialInputToColor().put( "None", new ARGBType( 0 ) );
 
 		final Annotator annotator = new Annotator(
 				columnName,

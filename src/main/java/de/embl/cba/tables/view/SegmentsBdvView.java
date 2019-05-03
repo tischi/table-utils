@@ -541,14 +541,13 @@ public class SegmentsBdvView< T extends ImageSegment >
 
 	}
 
-	private void changeImageSet( int di )
+	private synchronized void changeImageSet( int di )
 	{
 		int i = labelSourceIds.indexOf( labelsSource.metadata().imageId );
-		i += di;
 
+		i += di;
 		if ( i >= 0 && i < labelSourceIds.size() )
 			updateImageSet( labelSourceIds.get( i ) );
-
 	}
 
 	private void initLabelSourceIds()

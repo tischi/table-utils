@@ -1,7 +1,6 @@
 package headless;
 
 import de.embl.cba.tables.TableRows;
-import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.annotate.Annotator;
 import de.embl.cba.tables.color.*;
 import de.embl.cba.tables.command.ExploreMorphoLibJLabelImage;
@@ -13,7 +12,6 @@ import ij.ImagePlus;
 import net.imagej.ImageJ;
 import net.imglib2.type.numeric.ARGBType;
 
-import java.io.File;
 import java.util.List;
 
 public class AnnotateBlobs2D
@@ -48,7 +46,8 @@ public class AnnotateBlobs2D
 				ColorByColumn.RANDOM_GLASBEY
 		);
 
-		(( CategoryColoringModel< TableRowImageSegment > ) coloringModel ).getInputToColorMap().put( "None", new ARGBType( 0 ) );
+		(( CategoryTableRowColumnColoringModel< TableRowImageSegment > ) coloringModel )
+				.getSpecialInputToColor().put( "None", new ARGBType( 0 ) );
 
 		final Annotator annotator = new Annotator(
 				annotationColumnName,
