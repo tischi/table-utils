@@ -11,6 +11,7 @@ import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import de.embl.cba.tables.view.combined.SegmentsTableAndBdvViews;
 import de.embl.cba.tables.view.combined.SegmentsTableBdvAnd3dViews;
 import ij.gui.GenericDialog;
+import org.fife.rsta.ac.js.Logger;
 import org.scijava.command.Command;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
@@ -73,9 +74,11 @@ public class ExploreObjectsTableCommand implements Command
 	{
 		if ( ! isRelativeImagePath ) imageRootFolder = new File("" );
 
+		Logger.log("Opening table: " + tableFile );
 		final List< TableRowImageSegment > tableRowImageSegments
 				= createSegments( tableFile );
 
+		Logger.log("Creating image sources model..." );
 		final FileImageSourcesModelFactory< TableRowImageSegment > factory = new FileImageSourcesModelFactory(
 				tableRowImageSegments,
 				imageRootFolder.toString(),
@@ -85,21 +88,32 @@ public class ExploreObjectsTableCommand implements Command
 
 		final FileImageSourcesModel imageSourcesModel = factory.getImageSourcesModel();
 
+		showViews( tableRowImageSegments, imageSourcesModel );
+
+	}
+
+	public void showViews( List< TableRowImageSegment > tableRowImageSegments, FileImageSourcesModel imageSourcesModel )
+	{
 		if ( is2D )
 		{
-			new SegmentsTableAndBdvViews(
+			final SegmentsTableAndBdvViews views = new SegmentsTableAndBdvViews(
 					tableRowImageSegments,
 					imageSourcesModel,
 					tableFile.getName() );
+
+			if ( views.getSegmentsBdvView().getSourceSetIds().size() > 1 )
+				views.getSegmentsBdvView().showSourceSetSelectionDialog();
 		}
 		else
 		{
-			new SegmentsTableBdvAnd3dViews(
+			final SegmentsTableBdvAnd3dViews views = new SegmentsTableBdvAnd3dViews(
 					tableRowImageSegments,
 					imageSourcesModel,
 					tableFile.getName() );
-		}
 
+			if ( views.getSegmentsBdvView().getSourceSetIds().size() > 1 )
+				views.getSegmentsBdvView().showSourceSetSelectionDialog();
+		}
 	}
 
 	public boolean showImageChoiceDialog( FileImageSourcesModelFactory< TableRowImageSegment > factory )

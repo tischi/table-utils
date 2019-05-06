@@ -18,6 +18,7 @@ import de.embl.cba.tables.imagesegment.LabelFrameAndImage;
 import de.embl.cba.tables.imagesegment.SegmentUtils;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
+import de.embl.cba.tables.view.dialogs.BdvViewSourceSetSelectionDialog;
 import net.imglib2.RealPoint;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.RealType;
@@ -125,6 +126,16 @@ public class SegmentsBdvView< T extends ImageSegment >
 		}
 	}
 
+	public ArrayList< String > getSourceSetIds()
+	{
+		return labelSourceIds;
+	}
+
+	public void showSourceSetSelectionDialog()
+	{
+		new BdvViewSourceSetSelectionDialog( this );
+	}
+
 	public void addGrayValueOverlay()
 	{
 		// TODO: put this to lower right corner not to interfere with the scale bar
@@ -217,7 +228,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 		this.segmentFocusAnimationDurationMillis = duration;
 	}
 
-	private void updateImageSet( String imageId )
+	public synchronized void updateImageSet( String imageId )
 	{
 		if ( labelsSource.metadata().imageId.equals( imageId ) )
 		{
@@ -561,6 +572,8 @@ public class SegmentsBdvView< T extends ImageSegment >
 				labelSourceIds.add( sourceId );
 	}
 
+
+
 	private synchronized void toggleSelectionAtMousePosition()
 	{
 		if ( segments == null )
@@ -607,7 +620,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 		final RealPoint globalMouseCoordinates =
 				BdvUtils.getGlobalMouseCoordinates( bdv );
 
-		final Double value = BdvUtils.getValueAtGlobalCoordinates(
+		final Double value = BdvUtils.getPixelValue(
 				activeLabelSource.source(),
 				globalMouseCoordinates,
 				getCurrentTimePoint() );

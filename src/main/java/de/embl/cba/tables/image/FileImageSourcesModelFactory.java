@@ -1,9 +1,11 @@
 package de.embl.cba.tables.image;
 
+import bdv.util.Bdv;
 import de.embl.cba.tables.FileUtils;
 import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import de.embl.cba.tables.tablerow.TableRow;
+import org.scijava.ui.behaviour.io.InputTriggerConfig;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -71,6 +73,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		for ( String imageName : allImageNames )
 			if ( ! excludeImages.contains( imageName ) )
 				imageNames.add( imageName );
+
 
 
 		for ( TableRowImageSegment tableRowImageSegment : tableRowImageSegments )
