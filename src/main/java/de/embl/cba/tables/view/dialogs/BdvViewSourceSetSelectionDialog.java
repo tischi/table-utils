@@ -1,6 +1,5 @@
 package de.embl.cba.tables.view.dialogs;
 
-import bdv.util.*;
 import de.embl.cba.tables.view.SegmentsBdvView;
 
 import javax.swing.*;
@@ -65,14 +64,5 @@ public class BdvViewSourceSetSelectionDialog extends JPanel
 		this.add( horizontalLayoutPanel );
 	}
 
-	private void refreshGui()
-	{
-		this.revalidate();
-		this.repaint();
-	}
 
-	public BdvHandle getBdv()
-	{
-		return bdv;
-	}
 }
