@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>25.0.0</version>
+		<version>26.0.0</version>
 	</parent>
 
 	<groupId>de.embl.cba</groupId>
 	<artifactId>table-utils</artifactId>
 	<url>https://github.com/tischi/table-utils</url>
-	<version>0.3.06</version>
+	<version>0.3.07</version>
 
 	<name>Table Utils</name>
 	<description>TODO</description>
@@ -123,22 +123,21 @@
 			<artifactId>ij</artifactId>
 		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>nz.ac.waikato.cms.weka</groupId>-->
-<!--			<artifactId>weka-dev</artifactId>-->
-<!--			<version>3.9.2</version>-->
-<!--		</dependency>-->
-
-		<dependency>
-			<groupId>de.embl.cba</groupId>
-			<artifactId>classifiers</artifactId>
-			<version>0.1.02</version>
-		</dependency>
+		<!-- With Versions, TODO: Remove version when possible	-->
 
 		<dependency>
 			<groupId>sc.fiji</groupId>
 			<artifactId>bigdataviewer-vistools</artifactId>
 			<version>1.0.0-beta-12</version>
+		</dependency>
+
+
+		<!-- CBA		-->
+
+		<dependency>
+			<groupId>de.embl.cba</groupId>
+			<artifactId>classifiers</artifactId>
+			<version>0.1.02</version>
 		</dependency>
 
 		<dependency>
