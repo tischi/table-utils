@@ -9,9 +9,11 @@ public abstract class ColorUtils
 	public static Color getColor( ARGBType argbType )
 	{
 		final int colorIndex = argbType.get();
+
 		return new Color(
 				ARGBType.red( colorIndex ),
 				ARGBType.green( colorIndex ),
-				ARGBType.blue( colorIndex ) );
+				ARGBType.blue( colorIndex ),
+				ARGBType.alpha( colorIndex ));
 	}
 }

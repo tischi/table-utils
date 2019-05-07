@@ -3,6 +3,7 @@ package de.embl.cba.tables.color;
 import de.embl.cba.tables.imagesegment.ImageSegment;
 import de.embl.cba.tables.imagesegment.LabelFrameAndImage;
 import net.imglib2.Volatile;
+import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.volatiles.VolatileARGBType;
 
@@ -59,6 +60,11 @@ public class SegmentsARGBConverter< T extends ImageSegment >
 			color.setValid( true );
 		} else {
 			coloringModel.convert( imageSegment, color.get() );
+
+			final int alpha = ARGBType.alpha( color.get().get() );
+			if( alpha < 255 )
+				color.mul( alpha / 255.0 );
+
 			color.setValid( true );
 		}
 

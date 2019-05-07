@@ -6,9 +6,6 @@ import net.imglib2.type.numeric.ARGBType;
 import java.util.Arrays;
 import java.util.List;
 
-import static de.embl.cba.tables.color.SelectionColoringModel.SelectionMode.OnlyShowSelected;
-import static de.embl.cba.tables.color.SelectionColoringModel.SelectionMode.SelectionColor;
-
 public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 {
 	ColoringModel< T > wrappedColoringModel;
@@ -58,13 +55,13 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 			case DimNotSelected:
 
 				if ( ! isSelected )
-					output.mul( brightnessNotSelected );
+					dim( output, brightnessNotSelected );
 				break;
 
 			case OnlyShowSelected:
 
 				if ( ! isSelected )
-					output.mul( 0.0 );
+					dim( output, 0.0 );
 				break;
 
 			case SelectionColor:
@@ -78,13 +75,23 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 				if ( isSelected )
 					output.set( selectionColor );
 				else
-					output.mul( brightnessNotSelected );
+					dim( output, brightnessNotSelected );
 				break;
 
 			default:
 				break;
 		}
 
+	}
+
+	public void dim( ARGBType output, double brightnessNotSelected )
+	{
+		final int colorIndex = output.get();
+		output.set( ARGBType.rgba(
+				ARGBType.red( colorIndex ),
+				ARGBType.green( colorIndex ),
+				ARGBType.blue( colorIndex ),
+				brightnessNotSelected * 255 )  );
 	}
 
 	public void setSelectionMode( SelectionMode selectionMode )

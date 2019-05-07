@@ -424,7 +424,6 @@ public class SegmentsBdvView< T extends ImageSegment >
 	private Source asLabelsSource(
 			SourceAndMetadata< ? extends RealType< ? > > sourceAndMetadata )
 	{
-
 		this.labelsSource = sourceAndMetadata;
 
 		final LabelsARGBConverter labelsARGBConverter =
