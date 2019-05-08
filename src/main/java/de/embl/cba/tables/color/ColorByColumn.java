@@ -14,7 +14,7 @@ import java.util.Map;
 public class ColorByColumn< T extends TableRow >
 {
 
-	public static final String LINEAR_BLUE_WHITE_RED = "Linea - Blue White Red";
+	public static final String LINEAR_BLUE_WHITE_RED = "Linear - Blue White Red";
 	public static final String LINEAR_ZERO_BLACK_BLUE_WHITE_RED = "Linear - Black Blue White Red";
 	public static final String RANDOM_GLASBEY = "Categorical - Glasbey";
 

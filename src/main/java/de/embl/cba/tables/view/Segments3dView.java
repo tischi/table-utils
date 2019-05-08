@@ -33,6 +33,7 @@ import java.awt.*;
 import java.awt.Component;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Segments3dView < T extends ImageSegment >
 {
@@ -58,6 +59,7 @@ public class Segments3dView < T extends ImageSegment >
 	private double segmentFocusDzMin;
 	private long maxNumBoundingBoxElements;
 	private Component parentComponent;
+	private AtomicBoolean showSegments = new AtomicBoolean( true );
 
 	public Segments3dView(
 			final List< T > segments,
@@ -179,6 +181,8 @@ public class Segments3dView < T extends ImageSegment >
 		}
 	}
 
+
+
 	public void registerAsSelectionListener( SelectionModel< T > selectionModel )
 	{
 		selectionModel.listeners().add( new SelectionListener< T >()
@@ -186,6 +190,8 @@ public class Segments3dView < T extends ImageSegment >
 			@Override
 			public synchronized void selectionChanged()
 			{
+				if ( ! showSegments.get() ) return;
+
 				contentModificationInProgress = true;
 				final Set< T > selected = selectionModel.getSelected();
 				showSelectedSegments( selected );
@@ -196,6 +202,9 @@ public class Segments3dView < T extends ImageSegment >
 			@Override
 			public synchronized void focusEvent( T selection )
 			{
+				if ( ! showSegments.get() ) return;
+
+
 				if ( universe == null ) return;
 				if ( universe.getContents().size() == 0 ) return;
 				if ( selection == recentFocus ) return;
@@ -219,7 +228,9 @@ public class Segments3dView < T extends ImageSegment >
 		} );
 	}
 
-	public void removeUnselectedSegments( Set< T > selectedSegments )
+
+
+	private void removeUnselectedSegments( Set< T > selectedSegments )
 	{
 		final Set< T > currentSegments = segmentToContent.keySet();
 		final Set< T > remove = new HashSet<>();
@@ -231,7 +242,7 @@ public class Segments3dView < T extends ImageSegment >
 			removeSegmentFrom3DView( segment );
 	}
 
-	public synchronized void showSelectedSegments( Set< T > segments )
+	private synchronized void showSelectedSegments( Set< T > segments )
 	{
 		for ( T segment : segments )
 			if ( ! segmentToContent.containsKey( segment ) )
@@ -307,6 +318,11 @@ public class Segments3dView < T extends ImageSegment >
 		final float[] meshCoordinates = meshExtractor.generateMesh( segment.labelId() );
 
 		return meshCoordinates;
+	}
+
+	public synchronized void setShowSegments( AtomicBoolean showSegments )
+	{
+		this.showSegments = showSegments;
 	}
 
 	private void setSegmentBoundingBox(
