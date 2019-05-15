@@ -14,6 +14,7 @@ import de.embl.cba.tables.imagesegment.ImageSegment;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
 import ij3d.Content;
+import ij3d.DefaultUniverse;
 import ij3d.Image3DUniverse;
 import ij3d.UniverseListener;
 import isosurface.MeshEditor;

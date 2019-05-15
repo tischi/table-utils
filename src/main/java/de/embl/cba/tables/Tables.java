@@ -77,6 +77,13 @@ public class Tables
 		bfw.close();
 	}
 
+	public static JTable loadTable( final File file )
+	{
+		List< String > rows = readRows( file );
+
+		return createJTableFromStringList( rows, null );
+	}
+
 	public static JTable loadTable( final File file, String delim )
 	{
 		List< String > rows = readRows( file );
