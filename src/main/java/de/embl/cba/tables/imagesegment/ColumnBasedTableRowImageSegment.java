@@ -85,7 +85,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 		if ( segmentPropertyToColumn.get( SegmentProperty.T ) == null )
 			return 0;
 
-		int timePoint = Integer.parseInt( segmentPropertyToColumn
+		int timePoint = (int) Double.parseDouble( segmentPropertyToColumn
 				.get( SegmentProperty.T )
 				.get( row ) );
 

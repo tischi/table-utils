@@ -1,6 +1,6 @@
 package headless;
 
-import de.embl.cba.tables.command.ExploreMorphoLibJLabelImage;
+import de.embl.cba.tables.morpholibj.ExploreMorphoLibJLabelImage;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imagej.ImageJ;

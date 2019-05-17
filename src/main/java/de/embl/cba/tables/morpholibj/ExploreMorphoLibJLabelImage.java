@@ -1,4 +1,4 @@
-package de.embl.cba.tables.command;
+package de.embl.cba.tables.morpholibj;
 
 import de.embl.cba.bdv.utils.wrap.Wraps;
 import de.embl.cba.tables.Calibrations;
@@ -32,7 +32,6 @@ public class ExploreMorphoLibJLabelImage
 	public static final String CENTROID_Y = "Centroid.Y";
 	public static final String CENTROID_Z = "Centroid.Z";
 	public static final String MEAN_BREADTH = "MeanBreadth";
-
 
 	private final ImagePlus intensityImage;
 	private final ImagePlus labelImage;

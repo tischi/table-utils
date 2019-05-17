@@ -607,7 +607,7 @@ public class Tables
 	{
 		if ( imageFile == null ) return;
 		final Path relativeImagePath = getRelativePath( tableFile, imageFile );
-		Tables.addColumn( table, "RelativeImagePath_" + imageName, relativeImagePath );
+		Tables.addColumn( table, "Path_" + imageName, relativeImagePath );
 	}
 
 	public static Path getRelativePath( File tableFile, File imageFile )

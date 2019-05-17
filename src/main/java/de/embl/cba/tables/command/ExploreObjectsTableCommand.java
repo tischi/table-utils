@@ -1,5 +1,6 @@
 package de.embl.cba.tables.command;
 
+import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableColumns;
 import de.embl.cba.tables.cellprofiler.CellProfilerUtils;
 import de.embl.cba.tables.image.FileImageSourcesModel;
@@ -11,7 +12,7 @@ import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import de.embl.cba.tables.view.combined.SegmentsTableAndBdvViews;
 import de.embl.cba.tables.view.combined.SegmentsTableBdvAnd3dViews;
 import ij.gui.GenericDialog;
-import org.fife.rsta.ac.js.Logger;
+
 import org.scijava.command.Command;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
@@ -74,15 +75,16 @@ public class ExploreObjectsTableCommand implements Command
 	{
 		if ( ! isRelativeImagePath ) imageRootFolder = new File("" );
 
-		Logger.log("Opening table: " + tableFile );
+		Logger.info("Opening table: " + tableFile );
 		final List< TableRowImageSegment > tableRowImageSegments
 				= createSegments( tableFile );
 
-		Logger.log("Creating image sources model..." );
-		final FileImageSourcesModelFactory< TableRowImageSegment > factory = new FileImageSourcesModelFactory(
-				tableRowImageSegments,
-				imageRootFolder.toString(),
-				is2D );
+		Logger.info("Creating image sources model..." );
+		final FileImageSourcesModelFactory< TableRowImageSegment > factory =
+				new FileImageSourcesModelFactory(
+						tableRowImageSegments,
+						imageRootFolder.toString(),
+						is2D );
 
 		if ( ! showImageChoiceDialog( factory ) ) return;
 
@@ -92,7 +94,9 @@ public class ExploreObjectsTableCommand implements Command
 
 	}
 
-	public void showViews( List< TableRowImageSegment > tableRowImageSegments, FileImageSourcesModel imageSourcesModel )
+	public void showViews(
+			List< TableRowImageSegment > tableRowImageSegments,
+			FileImageSourcesModel imageSourcesModel )
 	{
 		if ( is2D )
 		{
@@ -185,25 +189,5 @@ public class ExploreObjectsTableCommand implements Command
 		return propertyToColumn;
 	}
 
-	private void logImagePaths()
-	{
-		if ( columns == null )
-			loadColumnsFromFile( tableFile );
-
-		for ( String column : columns.keySet() )
-		{
-			if ( column.contains( IMAGE_PATH_COLUMNS_ID_DEFAULT ) )
-			{
-				final HashSet< String > pathColumnNames =
-						new HashSet<>( ( List< String > ) columns.get( column ) );
-
-				if ( isRelativeImagePath )
-					pathColumnNames.forEach( s -> logService.info(
-							imageRootFolder + File.separator + s ) );
-				else
-					pathColumnNames.forEach( s -> logService.info( s ) );
-			}
-		}
-	}
 
 }

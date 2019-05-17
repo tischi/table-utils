@@ -28,17 +28,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Plugin(type = Command.class, menuPath = "Plugins>Tables>Merge Tables" )
-public class MergeTablesCommand< R extends RealType< R > > implements Command
+@Plugin(type = Command.class, menuPath = "Plugins>Tables>Concatenate Tables" )
+public class ConcatTablesCommand< R extends RealType< R > > implements Command
 {
 	@Parameter ( label = "Input directory", style = "directory" )
-	File directory;
+	public File directory;
 
 	@Parameter ( label = "Output table file", style = "save" )
-	File outputTable;
+	public File outputTable;
 
 	@Parameter ( label = "Regular expression" )
-	String regExp = ".*";
+	public String regExp = ".*";
 
 	@Override
 	public void run()

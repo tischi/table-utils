@@ -8,8 +8,8 @@ import org.scijava.plugin.Plugin;
 
 
 @Plugin(type = Command.class,
-		menuPath = "Plugins>Segmentation>Explore>Explore MorphoLibJ Segmentation" )
-public class ExploreMorphoLibJLabelImageCommand implements Command
+		menuPath = "Plugins>Segmentation>Explore>Explore Intensity Image and Label Image and Table" )
+public class ExploreIntensityImageAndLabelImageAndTableCommand implements Command
 {
 
 	@Parameter ( label = "Intensity image", required = false )

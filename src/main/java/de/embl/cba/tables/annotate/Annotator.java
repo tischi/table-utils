@@ -67,11 +67,11 @@ public class Annotator < T extends TableRow > extends JFrame
 
 	private void addNewAnnotationButton()
 	{
-		final JButton button = new JButton( "Add new annotation" );
+		final JButton button = new JButton( "Add new category" );
 		panel.add( button );
 		button.addActionListener( e -> {
 			final GenericDialog gd = new GenericDialog( "" );
-			gd.addStringField( "New annotation", "", 10 );
+			gd.addStringField( "New category", "", 10 );
 			gd.showDialog();
 			if( gd.wasCanceled() ) return;
 			addAnnotationButton( gd.getNextString(), null );
