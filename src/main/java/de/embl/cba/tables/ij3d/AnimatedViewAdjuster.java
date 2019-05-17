@@ -202,7 +202,13 @@ public class AnimatedViewAdjuster {
 	 * @param dxyMin
 	 * @param dzMin
 	 */
-	public void apply( Content content, int fps, int durationMillis, double zoomLevel, double dxyMin, double dzMin ) {
+	public void apply(
+			Content content,
+			int fps,
+			int durationMillis,
+			double zoomLevel,
+			double dxyMin,
+			double dzMin ) {
 		/* The camera to vworld transformation is given by
 		 * C * T * R * Z, where
 		 *
@@ -239,7 +245,7 @@ public class AnimatedViewAdjuster {
 
 		double dx = eye.x - oldEye.x;
 		double dy = eye.y - oldEye.y;
-		double dz = eye.z + 1.0 / zoomLevel - oldEye.z;
+		double dz = eye.z - oldEye.z;
 
 		if ( Math.abs( dx ) < dxyMin  && Math.abs( dy ) < dxyMin && Math.abs( dz ) < dzMin  )
 			return;

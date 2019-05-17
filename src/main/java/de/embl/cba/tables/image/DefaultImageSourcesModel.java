@@ -46,7 +46,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 		final Metadata metadata = new Metadata( imageId );
 		metadata.flavour = flavor;
 		metadata.numSpatialDimensions = numSpatialDimensions;
-		metadata.sourceTransform = transform;
+//		metadata.sourceTransform = transform;
 		metadata.segmentsTable = segmentsTable;
 
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( source, metadata ) );

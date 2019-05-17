@@ -343,7 +343,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 		if ( metadata.flavour == Flavour.LabelSource )
 			source = asLabelsSource( sourceAndMetadata );
 
-		bdvOptions = bdvOptions.sourceTransform( metadata.sourceTransform );
+//		bdvOptions = bdvOptions.sourceTransform( metadata.sourceTransform );
 
 		int numTimePoints = getNumTimePoints( source );
 

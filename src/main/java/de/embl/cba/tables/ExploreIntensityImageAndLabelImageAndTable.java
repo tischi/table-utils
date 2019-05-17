@@ -1,7 +1,6 @@
 package de.embl.cba.tables;
 
 import de.embl.cba.bdv.utils.wrap.Wraps;
-import de.embl.cba.tables.cellprofiler.CellProfilerUtils;
 import de.embl.cba.tables.image.DefaultImageSourcesModel;
 import de.embl.cba.tables.image.Metadata;
 import de.embl.cba.tables.imagesegment.SegmentProperty;
@@ -23,20 +22,28 @@ public class ExploreIntensityImageAndLabelImageAndTable
 {
 	private final ImagePlus intensityImage;
 	private final ImagePlus labelImage;
+	private final File tablePath;
+
 	private Map< String, List< String > > columns;
 	private int numSpatialDimensions;
 	private String labelImageId;
 	private SegmentsTableBdvAnd3dViews tableBdvAnd3dViews;
 	private SegmentsTableAndBdvViews tableAndBdvViews;
 
-	private final boolean isOneBasedTimePoint = true; // TODO
-	private final boolean is2D = false; // TODO
+	private boolean timePointsInTableAreOneBased;
+	private boolean coordinatesInTableAreCalibrated;
 
 	public ExploreIntensityImageAndLabelImageAndTable(
 			File intensityImagePath,
 			File labelImagePath,
-			File tablePath )
+			File tablePath,
+			boolean timePointsInTableAreOneBased,
+			boolean coordinatesInTableAreCalibrated )
 	{
+		this.tablePath = tablePath;
+		this.timePointsInTableAreOneBased = timePointsInTableAreOneBased;
+		this.coordinatesInTableAreCalibrated = coordinatesInTableAreCalibrated;
+
 		Logger.info("Opening intensity image: " + intensityImagePath );
 		intensityImage = IJ.openImage( intensityImagePath.toString() );
 
@@ -45,7 +52,7 @@ public class ExploreIntensityImageAndLabelImageAndTable
 
 		Logger.info("Opening table: " + tablePath );
 		final List< TableRowImageSegment > tableRowImageSegments
-				= createSegments( tablePath, isOneBasedTimePoint );
+				= createSegments( tablePath, timePointsInTableAreOneBased );
 
 		numSpatialDimensions = labelImage.getNSlices() > 1 ? 3 : 2;
 		labelImageId = labelImage.getTitle();
@@ -66,7 +73,11 @@ public class ExploreIntensityImageAndLabelImageAndTable
 					imageSourcesModel,
 					labelImageId );
 
-			tableBdvAnd3dViews.getSegments3dView().setSegmentFocusZoomLevel( 0.01 );
+			tableBdvAnd3dViews.getSegments3dView().setSegmentFocusZoomLevel( 0.1 );
+
+			final double pixelWidth = labelImage.getCalibration().pixelWidth;
+			tableBdvAnd3dViews.getSegments3dView().setVoxelSpacing3DView( pixelWidth );
+
 		}
 	}
 
@@ -76,6 +87,14 @@ public class ExploreIntensityImageAndLabelImageAndTable
 				new DefaultImageSourcesModel( numSpatialDimensions == 2 );
 
 		Logger.info( "Adding to image sources: " + labelImageId );
+
+		if ( !coordinatesInTableAreCalibrated )
+		{
+			Logger.info( "Since the coordinates in the table are not calibrated, the" +
+					" images will be shown in pixel units as well." );
+			Utils.removeCalibration( labelImage );
+			Utils.removeCalibration( intensityImage );
+		}
 
 		imageSourcesModel.addSourceAndMetadata(
 				Wraps.imagePlusAsSource4DChannelList( labelImage ).get( 0 ),
@@ -105,7 +124,18 @@ public class ExploreIntensityImageAndLabelImageAndTable
 
 			imageSourcesModel.sources().get( labelImageId )
 					.metadata().imageSetIDs.add( intensityImageId );
+
+			imageSourcesModel.sources().get( intensityImageId )
+					.metadata().displayRangeMax = intensityImage.getProcessor().getMax();
+
 		}
+
+
+
+		imageSourcesModel.sources().get( labelImageId )
+				.metadata().displayRangeMax = 500D;
+
+
 
 		return imageSourcesModel;
 	}

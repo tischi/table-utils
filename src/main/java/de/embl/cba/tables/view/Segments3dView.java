@@ -22,10 +22,12 @@ import net.imglib2.FinalInterval;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.neighborhood.DiamondShape;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Intervals;
+import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 import org.scijava.java3d.View;
 import org.scijava.vecmath.Color3f;
@@ -46,7 +48,7 @@ public class Segments3dView < T extends ImageSegment >
 
 	private Image3DUniverse universe;
 	private T recentFocus;
-	private double voxelSpacing3DView;
+	private Double voxelSpacing3DView;
 	private HashMap< T, CustomTriangleMesh > segmentToMesh;
 	private HashMap< T, Content > segmentToContent;
 	private HashMap< Content, T > contentToSegment;
@@ -90,7 +92,7 @@ public class Segments3dView < T extends ImageSegment >
 		this.universe = universe;
 
 		this.transparency = 0.5;
-		this.voxelSpacing3DView = 0.1;
+		this.voxelSpacing3DView = null;
 		this.meshSmoothingIterations = 5;
 		this.segmentFocusAnimationDurationMillis = 750;
 		this.segmentFocusZoomLevel = 0.8;
@@ -158,12 +160,12 @@ public class Segments3dView < T extends ImageSegment >
 
 	private ArrayList< double[] > getVoxelSpacings( Source< ? > labelsSource )
 	{
-		final ArrayList< double[] > calibrations = new ArrayList<>();
+		final ArrayList< double[] > voxelSpacings = new ArrayList<>();
 		final int numMipmapLevels = labelsSource.getNumMipmapLevels();
 		for ( int level = 0; level < numMipmapLevels; ++level )
-			calibrations.add( BdvUtils.getCalibration( labelsSource, level ) );
+			voxelSpacings.add( BdvUtils.getCalibration( labelsSource, level ) );
 
-		return calibrations;
+		return voxelSpacings;
 	}
 
 
@@ -204,7 +206,6 @@ public class Segments3dView < T extends ImageSegment >
 			public synchronized void focusEvent( T selection )
 			{
 				if ( ! showSegments.get() ) return;
-
 
 				if ( universe == null ) return;
 				if ( universe.getContents().size() == 0 ) return;
@@ -287,7 +288,8 @@ public class Segments3dView < T extends ImageSegment >
 		final Source< ? > labelsSource =
 				imageSourcesModel.sources().get( segment.imageId() ).source();
 
-		final int level = getLevel( getVoxelSpacings( labelsSource ), voxelSpacing3DView );
+		int level = getLevel( labelsSource );
+
 		final double[] voxelSpacing = getVoxelSpacings( labelsSource ).get( level );
 
 		final RandomAccessibleInterval< ? extends RealType< ? > > labelsRAI =
@@ -309,6 +311,8 @@ public class Segments3dView < T extends ImageSegment >
 			return null;
 		}
 
+//		ImageJFunctions.show( ( RandomAccessibleInterval ) Views.interval( labelsRAI, boundingBox ) );
+
 		final MeshExtractor meshExtractor = new MeshExtractor(
 				Views.extendZero( ( RandomAccessibleInterval ) labelsRAI ),
 				boundingBox,
@@ -318,7 +322,24 @@ public class Segments3dView < T extends ImageSegment >
 
 		final float[] meshCoordinates = meshExtractor.generateMesh( segment.labelId() );
 
+		if ( meshCoordinates.length == 0 )
+		{
+			Logger.warn( "Could not find any pixels for segment with label " + segment.labelId()
+					+ "\nwithin bounding box " + boundingBox );
+			return null;
+		}
+
 		return meshCoordinates;
+	}
+
+	private int getLevel( Source< ? > labelsSource )
+	{
+		int level;
+		if ( voxelSpacing3DView != null )
+			level = getLevel( getVoxelSpacings( labelsSource ), voxelSpacing3DView );
+		else
+			level = 0;
+		return level;
 	}
 
 	public synchronized void setShowSegments( AtomicBoolean showSegments )
@@ -351,7 +372,7 @@ public class Segments3dView < T extends ImageSegment >
 			max[ d ] = mask.max( d ) * voxelSpacing[ d ];
 		}
 
-		segment.setBoundingBox( new FinalRealInterval( min, max ));
+		segment.setBoundingBox( new FinalRealInterval( min, max ) );
 	}
 
 	private long[] getSegmentCoordinateVoxels(
@@ -425,7 +446,8 @@ public class Segments3dView < T extends ImageSegment >
 						parentComponent.getHeight() / 2  ) );
 
 				universe.getWindow().setLocation(
-						parentComponent.getLocationOnScreen().x - universe.getWindow().getWidth() - 10,
+						parentComponent.getLocationOnScreen().x
+								- universe.getWindow().getWidth() - 10,
 						parentComponent.getLocationOnScreen().y
 				);
 
@@ -551,7 +573,7 @@ public class Segments3dView < T extends ImageSegment >
 		int level;
 
 		for ( level = 0; level < calibrations.size(); level++ )
-			if ( calibrations.get( level )[ 0 ] > voxelSpacing3DView ) break;
+			if ( calibrations.get( level )[ 0 ] >= voxelSpacing3DView ) break;
 
 		return level;
 	}
