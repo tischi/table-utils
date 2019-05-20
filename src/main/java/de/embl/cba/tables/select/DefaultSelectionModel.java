@@ -26,41 +26,51 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 	@Override
 	public void setSelected( T object, boolean select )
 	{
-		if ( select )
-			add( object );
-		else
-			remove( object );
+		setSelected( object, select, true );
 	}
 
-	private void remove( T object )
+	public void setSelected( T object, boolean select, boolean notify )
+	{
+		if ( select )
+			add( object, notify );
+		else
+			remove( object, notify );
+	}
+
+	private void remove( T object, boolean notify )
 	{
 		if ( selected.contains( object ) )
 		{
 			selected.remove( object );
-
-			for ( SelectionListener listener : listeners.list )
-				new Thread( () -> listener.selectionChanged() ).start();
+			if ( notify )
+				notifySelectionListeners();
+			notifySelectionListeners();
 		}
 	}
 
-	private void add( T object )
+	private void add( T object, boolean notify )
 	{
 		if ( ! selected.contains( object ) )
 		{
 			selected.add( object );
-
-			for ( SelectionListener listener : listeners.list )
-				new Thread( () -> listener.selectionChanged() ).start();
+			if ( notify )
+				notifySelectionListeners();
 		}
+	}
+
+	private void notifySelectionListeners()
+	{
+		for ( SelectionListener listener : listeners.list )
+			new Thread( () -> listener.selectionChanged() ).start();
 	}
 
 	@Override
 	public void toggle( T object )
 	{
 		if ( selected.contains( object ) )
-			remove( object );
+			remove( object, true );
 		else
-			add( object );
+			add( object, true );
 	}
 
 	@Override
@@ -84,23 +94,23 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 	@Override
 	public boolean setSelected( Collection< T > objects, boolean select )
 	{
-		return false;
+		for( T object : objects )
+			setSelected( object, select, false );
+
+		notifySelectionListeners();
+
+		return true;
 	}
 
 	@Override
 	public boolean clearSelection()
 	{
 		if ( selected.size() == 0 )
-		{
 			return false;
-		}
 		else
 		{
 			selected.clear();
-
-			for ( SelectionListener listener : listeners.list )
-				new Thread( () -> listener.selectionChanged() ).start();
-
+			notifySelectionListeners();
 			return true;
 		}
 	}

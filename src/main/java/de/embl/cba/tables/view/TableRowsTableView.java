@@ -240,6 +240,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		menuBar.add( createTableMenu() );
 
+		menuBar.add( createSelectionMenu() );
+
 		menuBar.add( createColoringMenu() );
 
 		menuBar.add( createAnnotateMenu() );
@@ -247,6 +249,15 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		menuBar.add( createMeasureMenu() );
 
 		menuBar.add( createHelpMenu() );
+	}
+
+	private JMenu createSelectionMenu()
+	{
+		JMenu menu = new JMenu( "Select" );
+
+		menu.add( createSelectAllMenuItem() );
+
+		return menu;
 	}
 
 	private JMenu createAnnotateMenu()
@@ -316,6 +327,18 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
+
+	private JMenuItem createSelectAllMenuItem()
+	{
+		final JMenuItem menuItem = new JMenuItem( "Select all" );
+
+		menuItem.addActionListener( e ->
+				SwingUtilities.invokeLater( () ->
+						selectAll() ) );
+
+		return menuItem;
+	}
+
 	private JMenuItem createStartNewAnnotationMenuItem()
 	{
 		final JMenuItem menuItem = new JMenuItem( "Start new annotation..." );
@@ -342,6 +365,17 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
+	private void selectAll()
+	{
+
+		selectionModel.setSelected( tableRows, true );
+//		for ( T tableRow : tableRows )
+//		{
+//			selectionModel.setSelected( tableRow, true );
+//			selectionModel.focus( tableRow );
+//		}
+
+	}
 
 	private void startNewAnnotation()
 	{

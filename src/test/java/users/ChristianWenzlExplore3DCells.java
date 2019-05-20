@@ -12,9 +12,9 @@ public class ChristianWenzlExplore3DCells
 		new ImageJ().ui().showUI();
 
 		new ExploreIntensityImageAndLabelImageAndTable(
-				new File( "/Users/tischer/Documents/christian-wenzl--data/Archive/test_raw.tif" ),
-				new File( "/Users/tischer/Documents/christian-wenzl--data/Archive/test_labels.tif" ),
-				new File( "/Users/tischer/Documents/christian-wenzl--data/Archive/table.csv"),
+				new File( "/Users/tischer/Documents/christian-wenzl--data/Archive_new/test_raw.tif" ),
+				new File( "/Users/tischer/Documents/christian-wenzl--data/Archive_new/test_labels.tif" ),
+				new File( "/Users/tischer/Documents/christian-wenzl--data/Archive_new/table.csv"),
 				true,
 				false
 		);

@@ -13,6 +13,7 @@ import de.embl.cba.tables.image.ImageSourcesModel;
 import de.embl.cba.tables.imagesegment.ImageSegment;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
+import ij.IJ;
 import ij3d.Content;
 import ij3d.DefaultUniverse;
 import ij3d.Image3DUniverse;
@@ -36,6 +37,7 @@ import java.awt.*;
 import java.awt.Component;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Segments3dView < T extends ImageSegment >
@@ -49,9 +51,9 @@ public class Segments3dView < T extends ImageSegment >
 	private Image3DUniverse universe;
 	private T recentFocus;
 	private Double voxelSpacing3DView;
-	private HashMap< T, CustomTriangleMesh > segmentToMesh;
-	private HashMap< T, Content > segmentToContent;
-	private HashMap< Content, T > contentToSegment;
+	private ConcurrentHashMap< T, CustomTriangleMesh > segmentToMesh;
+	private ConcurrentHashMap< T, Content > segmentToContent;
+	private ConcurrentHashMap< Content, T > contentToSegment;
 	private double transparency;
 	private boolean isListeningToUniverse;
 	private int meshSmoothingIterations;
@@ -63,6 +65,7 @@ public class Segments3dView < T extends ImageSegment >
 	private long maxNumBoundingBoxElements;
 	private Component parentComponent;
 	private AtomicBoolean showSegments = new AtomicBoolean( true );
+	private ConcurrentHashMap< T, CustomTriangleMesh > segmentToTriangleMesh;
 
 	public Segments3dView(
 			final List< T > segments,
@@ -100,9 +103,9 @@ public class Segments3dView < T extends ImageSegment >
 		this.segmentFocusDzMin = 20.0;
 		this.maxNumBoundingBoxElements = 100 * 100 * 100;
 
-		this.segmentToMesh = new HashMap<>();
-		this.segmentToContent = new HashMap<>();
-		this.contentToSegment = new HashMap<>();
+		this.segmentToMesh = new ConcurrentHashMap<>();
+		this.segmentToContent = new ConcurrentHashMap<>();
+		this.contentToSegment = new ConcurrentHashMap<>();
 
 		registerAsSelectionListener( this.selectionModel );
 		registerAsColoringListener( this.selectionColoringModel );
@@ -230,12 +233,11 @@ public class Segments3dView < T extends ImageSegment >
 		} );
 	}
 
-
-
 	private void removeUnselectedSegments( Set< T > selectedSegments )
 	{
 		final Set< T > currentSegments = segmentToContent.keySet();
 		final Set< T > remove = new HashSet<>();
+
 		for ( T segment : currentSegments )
 			if ( ! selectedSegments.contains( segment ) )
 				remove.add( segment );
@@ -246,9 +248,66 @@ public class Segments3dView < T extends ImageSegment >
 
 	private synchronized void showSelectedSegments( Set< T > segments )
 	{
+		final ExecutorService executorService = Executors.newFixedThreadPool( 2 * Runtime.getRuntime().availableProcessors() );
+
+//		segmentToTriangleMesh = new ConcurrentHashMap<>();
+
+		initUniverseAndListener();
+
+		final ArrayList< Future > futures = new ArrayList<>();
 		for ( T segment : segments )
 			if ( ! segmentToContent.containsKey( segment ) )
-				addSegmentToView( segment );
+			{
+				futures.add(
+						executorService.submit( () ->
+								{
+//									segmentToTriangleMesh.put( segment, getCustomTriangleMesh( segment ) );
+									final CustomTriangleMesh mesh = getCustomTriangleMesh( segment );
+									if ( mesh != null )
+									{
+										addMeshToUniverse( segment, mesh  );
+										Logger.info( "Added mesh " + ( segment.labelId() ) + "/" + segments.size() );
+									} else
+									{
+										Logger.info( "Error creating mesh of segment " + segment.labelId() );
+									}
+								}
+						) );
+			}
+
+		int i = 1;
+		for ( Future future : futures )
+		{
+			try
+			{
+				future.get();
+				Logger.info( "Computed mesh " + (i++) + "/" + futures.size() );
+			} catch ( InterruptedException e )
+			{
+				e.printStackTrace();
+			} catch ( ExecutionException e )
+			{
+				e.printStackTrace();
+			}
+		}
+
+
+
+//		for ( T segment : segments )
+//		{
+//			executorService.submit( () -> {
+//				final CustomTriangleMesh mesh = segmentToTriangleMesh.get( segment );
+//				if ( mesh != null )
+//				{
+//					addMeshToUniverse( segment, mesh );
+//					Logger.info( "Added mesh " + ( segment.labelId()) + "/" + segments.size() );
+//				}
+//				else
+//				{
+//					Logger.info( "Error creating mesh of segment " + segment.labelId() );
+//				}
+//			} );
+//		}
 	}
 
 	private synchronized void removeSegmentFrom3DView( T segment )
@@ -259,12 +318,12 @@ public class Segments3dView < T extends ImageSegment >
 		contentToSegment.remove( content );
 	}
 
-	private synchronized void addSegmentToView( T segment )
+	private CustomTriangleMesh getCustomTriangleMesh( T segment )
 	{
 		CustomTriangleMesh triangleMesh = getTriangleMesh( segment );
-		if ( triangleMesh == null ) return;
+		if ( triangleMesh == null ) return null;
 		MeshEditor.smooth2( triangleMesh, meshSmoothingIterations );
-		addMeshToUniverse( segment, triangleMesh );
+		return triangleMesh;
 	}
 
 	private CustomTriangleMesh getTriangleMesh( T segment )
@@ -415,21 +474,21 @@ public class Segments3dView < T extends ImageSegment >
 		return rai;
 	}
 
-	private synchronized void addMeshToUniverse( T segment, CustomTriangleMesh mesh )
+	private void addMeshToUniverse( T segment, CustomTriangleMesh mesh )
 	{
-		initUniverseAndListener();
-
 		final Content content =
 				universe.addCustomMesh( mesh, "" + segment.labelId() );
 
-		content.setTransparency( (float) transparency );
+		content.setTransparency( ( float ) transparency );
 		content.setLocked( true );
 
 		segmentToContent.put( segment, content );
 		contentToSegment.put( content, segment );
+
+		universe.setAutoAdjustView( false );
 	}
 
-	private void initUniverseAndListener()
+	private synchronized void initUniverseAndListener()
 	{
 		if ( universe == null )
 			universe = new Image3DUniverse();
@@ -454,11 +513,6 @@ public class Segments3dView < T extends ImageSegment >
 			}
 
 		}
-
-		universe.setAutoAdjustView( false );
-
-		if ( universe.getContents().isEmpty() )
-			universe.setAutoAdjustView( true );
 
 		if ( ! isListeningToUniverse )
 			isListeningToUniverse = addUniverseListener();
@@ -530,6 +584,8 @@ public class Segments3dView < T extends ImageSegment >
 			@Override
 			public void contentSelected( Content c )
 			{
+				if ( c == null ) return;
+
 				if ( ! contentToSegment.containsKey( c ) )
 					return;
 
