@@ -66,6 +66,7 @@ public class Segments3dView < T extends ImageSegment >
 	private Component parentComponent;
 	private AtomicBoolean showSegments = new AtomicBoolean( true );
 	private ConcurrentHashMap< T, CustomTriangleMesh > segmentToTriangleMesh;
+	private ExecutorService executorService;
 
 	public Segments3dView(
 			final List< T > segments,
@@ -102,6 +103,8 @@ public class Segments3dView < T extends ImageSegment >
 		this.segmentFocusDxyMin = 20.0;
 		this.segmentFocusDzMin = 20.0;
 		this.maxNumBoundingBoxElements = 100 * 100 * 100;
+
+		this.executorService = Executors.newFixedThreadPool( 2 * Runtime.getRuntime().availableProcessors() );
 
 		this.segmentToMesh = new ConcurrentHashMap<>();
 		this.segmentToContent = new ConcurrentHashMap<>();
@@ -181,9 +184,12 @@ public class Segments3dView < T extends ImageSegment >
 	{
 		for ( T segment : segmentToContent.keySet() )
 		{
-			final Color3f color3f = getColor3f( segment );
-			final Content content = segmentToContent.get( segment );
-			content.setColor( color3f );
+			executorService.submit( () ->
+			{
+				final Color3f color3f = getColor3f( segment );
+				final Content content = segmentToContent.get( segment );
+				content.setColor( color3f );
+			});
 		}
 	}
 
@@ -248,11 +254,11 @@ public class Segments3dView < T extends ImageSegment >
 
 	private synchronized void showSelectedSegments( Set< T > segments )
 	{
-		final ExecutorService executorService = Executors.newFixedThreadPool( 2 * Runtime.getRuntime().availableProcessors() );
 
 //		segmentToTriangleMesh = new ConcurrentHashMap<>();
 
 		initUniverseAndListener();
+
 
 		final ArrayList< Future > futures = new ArrayList<>();
 		for ( T segment : segments )
@@ -264,13 +270,9 @@ public class Segments3dView < T extends ImageSegment >
 //									segmentToTriangleMesh.put( segment, getCustomTriangleMesh( segment ) );
 									final CustomTriangleMesh mesh = getCustomTriangleMesh( segment );
 									if ( mesh != null )
-									{
 										addMeshToUniverse( segment, mesh  );
-										Logger.info( "Added mesh " + ( segment.labelId() ) + "/" + segments.size() );
-									} else
-									{
+									else
 										Logger.info( "Error creating mesh of segment " + segment.labelId() );
-									}
 								}
 						) );
 			}
@@ -281,7 +283,7 @@ public class Segments3dView < T extends ImageSegment >
 			try
 			{
 				future.get();
-				Logger.info( "Computed mesh " + (i++) + "/" + futures.size() );
+				Logger.info( "Added object to 3D Viewer " + (i++) + "/" + futures.size() );
 			} catch ( InterruptedException e )
 			{
 				e.printStackTrace();
