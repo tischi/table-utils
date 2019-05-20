@@ -22,13 +22,21 @@ public class ExploreIntensityImageAndLabelImageAndTableCommand implements Comman
 	@Parameter ( label = "Object table" )
 	public File objectTable;
 
+	@Parameter ( label = "Time points in table are one based" )
+	public boolean timePointsInTableAreOneBased = true;
+
+	@Parameter ( label = "Coordinates in table are in calibrated units" )
+	private boolean coordinatesInTableAreCalibrated = false;
+
 	@Override
 	public void run()
 	{
 		new ExploreIntensityImageAndLabelImageAndTable(
 				intensityImage,
 				labelImage,
-				objectTable, true, true );
+				objectTable,
+				timePointsInTableAreOneBased,
+				coordinatesInTableAreCalibrated );
 	}
 
 }
