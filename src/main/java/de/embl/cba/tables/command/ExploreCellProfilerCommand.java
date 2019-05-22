@@ -48,7 +48,7 @@ public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R
 	public void run()
 	{
 		final List< TableRowImageSegment > tableRowImageSegments
-				= createSegments( inputTableFile );
+				= createSegments( inputTableFile.getAbsolutePath() );
 
 		final String tablePath = inputTableFile.toString();
 
@@ -64,9 +64,9 @@ public class ExploreCellProfilerCommand< R extends RealType< R > & NativeType< R
 				inputTableFile.getName() );
 	}
 
-	private List< TableRowImageSegment > createSegments( File tableFile )
+	private List< TableRowImageSegment > createSegments( String tablePath )
 	{
-		columns = TableColumns.stringColumnsFromTableFile( tableFile );
+		columns = TableColumns.stringColumnsFromTableFile( tablePath );
 
 		final List< String > pathColumnNames =
 				CellProfilerUtils.replaceFolderAndFileColumnsByPathColumn( columns );

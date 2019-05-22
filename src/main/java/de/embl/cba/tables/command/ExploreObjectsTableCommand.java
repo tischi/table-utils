@@ -77,7 +77,7 @@ public class ExploreObjectsTableCommand implements Command
 
 		Logger.info("Opening table: " + tableFile );
 		final List< TableRowImageSegment > tableRowImageSegments
-				= createSegments( tableFile );
+				= createSegments( tableFile.getAbsolutePath() );
 
 		Logger.info("Creating image sources model..." );
 		final FileImageSourcesModelFactory< TableRowImageSegment > factory =
@@ -135,10 +135,10 @@ public class ExploreObjectsTableCommand implements Command
 	}
 
 	private List< TableRowImageSegment > createSegments(
-			File tableFile )
+			String tablePath )
 	{
 		if ( columns == null )
-			loadColumnsFromFile( tableFile );
+			loadColumnsFromFile( tablePath );
 
 		final Map< SegmentProperty, List< String > > propertyToColumn
 				= createPropertyToColumnMap( columns.keySet() );
@@ -150,9 +150,9 @@ public class ExploreObjectsTableCommand implements Command
 		return segments;
 	}
 
-	private void loadColumnsFromFile( File tableFile )
+	private void loadColumnsFromFile( String tablePath )
 	{
-		columns = TableColumns.stringColumnsFromTableFile( tableFile );
+		columns = TableColumns.stringColumnsFromTableFile( tablePath );
 
 		if ( imagePathColumnsId.equals( IMAGE_PATH_COLUMNS_ID_CELL_PROFILER ) )
 			CellProfilerUtils.replaceFolderAndFileColumnsByPathColumn( columns );

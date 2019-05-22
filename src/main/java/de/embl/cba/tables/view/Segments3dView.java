@@ -95,7 +95,7 @@ public class Segments3dView < T extends ImageSegment >
 		this.imageSourcesModel = imageSourcesModel;
 		this.universe = universe;
 
-		this.transparency = 0.5;
+		this.transparency = 0.0;
 		this.voxelSpacing3DView = null;
 		this.meshSmoothingIterations = 5;
 		this.segmentFocusAnimationDurationMillis = 750;

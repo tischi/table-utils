@@ -28,7 +28,7 @@ public class Metadata
 	public Color displayColor = Color.white;
 	public BdvStackSource< ? > bdvStackSource = null;
 //	public AffineTransform3D sourceTransform = new AffineTransform3D();
-	public File segmentsTable = null;
+	public String segmentsTablePath = null;
 
 	public enum Flavour
 	{

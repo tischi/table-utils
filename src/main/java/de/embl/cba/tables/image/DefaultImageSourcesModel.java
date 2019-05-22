@@ -39,7 +39,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 																  Flavour flavor,
 																  int numSpatialDimensions,
 																  AffineTransform3D transform,
-																  File segmentsTable
+																  String segmentsTablePath
 	)
 	{
 
@@ -47,7 +47,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 		metadata.flavour = flavor;
 		metadata.numSpatialDimensions = numSpatialDimensions;
 //		metadata.sourceTransform = transform;
-		metadata.segmentsTable = segmentsTable;
+		metadata.segmentsTablePath = segmentsTablePath;
 
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( source, metadata ) );
 	}

@@ -77,28 +77,28 @@ public class Tables
 		bfw.close();
 	}
 
-	public static JTable loadTable( final File file )
+	public static JTable loadTable( final String path )
 	{
-		List< String > rows = readRows( file );
+		List< String > rows = readRows( path );
 
 		return createJTableFromStringList( rows, null );
 	}
 
-	public static JTable loadTable( final File file, String delim )
+	public static JTable loadTable( final String path, String delim )
 	{
-		List< String > rows = readRows( file );
+		List< String > rows = readRows( path );
 
 		return createJTableFromStringList( rows, delim );
 	}
 
 	
-	public static List< String > readRows( File file )
+	public static List< String > readRows( String path )
 	{
 		List< String > rows = new ArrayList<>();
 
 		try
 		{
-			FileInputStream fin = new FileInputStream( file );
+			FileInputStream fin = new FileInputStream( path );
 			BufferedReader br = new BufferedReader( new InputStreamReader( fin ) );
 
 			String aRow;
@@ -601,8 +601,8 @@ public class Tables
 
 	public static void addRelativeImagePathColumn(
 			JTable table,
-			File tableFile,
-			File imageFile,
+			String tableFile,
+			String imageFile,
 			String imageName )
 	{
 		if ( imageFile == null ) return;
@@ -610,21 +610,14 @@ public class Tables
 		Tables.addColumn( table, "Path_" + imageName, relativeImagePath );
 	}
 
-	public static Path getRelativePath( File tableFile, File imageFile )
+	public static Path getRelativePath( String pathA, String pathB )
 	{
-		final Path imagePath = Paths.get( imageFile.toString() );
-		final Path tablePath = Paths.get( tableFile.toString() );
+		final Path imagePath = Paths.get( pathA );
+		final Path tablePath = Paths.get( pathB );
 
 		return tablePath.relativize( imagePath );
 	}
 
-	public static Path getRelativePath( String tableFile, String imageFile )
-	{
-		final Path imagePath = Paths.get( imageFile );
-		final Path tablePath = Paths.get( tableFile );
-
-		return tablePath.relativize( imagePath );
-	}
 
 	public static Path getAbsolutePath( String referenceFile, String relativePath )
 	{

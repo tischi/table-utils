@@ -98,7 +98,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 					imageSourcesModel.addSourceAndMetadata(
 							imageId,
 							imageDisplayName,
-							absoluteImagePath.toFile(),
+							absoluteImagePath.toString(),
 							imageSetIds,
 							getImageFlavour( imageName ) );
 				}

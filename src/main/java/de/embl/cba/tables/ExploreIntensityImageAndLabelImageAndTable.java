@@ -22,7 +22,7 @@ public class ExploreIntensityImageAndLabelImageAndTable
 {
 	private final ImagePlus intensityImage;
 	private final ImagePlus labelImage;
-	private final File tablePath;
+	private final String tablePath;
 
 	private Map< String, List< String > > columns;
 	private int numSpatialDimensions;
@@ -36,7 +36,7 @@ public class ExploreIntensityImageAndLabelImageAndTable
 	public ExploreIntensityImageAndLabelImageAndTable(
 			File intensityImagePath,
 			File labelImagePath,
-			File tablePath,
+			String tablePath,
 			boolean timePointsInTableAreOneBased,
 			boolean coordinatesInTableAreCalibrated )
 	{
@@ -74,7 +74,6 @@ public class ExploreIntensityImageAndLabelImageAndTable
 					labelImageId );
 
 			tableBdvAnd3dViews.getSegments3dView().setSegmentFocusZoomLevel( 0.1 );
-
 			final double pixelWidth = labelImage.getCalibration().pixelWidth;
 			tableBdvAnd3dViews.getSegments3dView().setVoxelSpacing3DView( pixelWidth );
 
@@ -141,9 +140,9 @@ public class ExploreIntensityImageAndLabelImageAndTable
 	}
 
 	private List< TableRowImageSegment >
-	createSegments( File tableFile, boolean isOneBasedTimePoint )
+	createSegments( String tablePath, boolean isOneBasedTimePoint )
 	{
-		columns = TableColumns.stringColumnsFromTableFile( tableFile );
+		columns = TableColumns.stringColumnsFromTableFile( tablePath );
 
 		final Map< SegmentProperty, List< String > > propertyToColumn
 				= createPropertyToColumnMap( columns.keySet() );

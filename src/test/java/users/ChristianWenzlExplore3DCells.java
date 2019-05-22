@@ -14,7 +14,7 @@ public class ChristianWenzlExplore3DCells
 		new ExploreIntensityImageAndLabelImageAndTable(
 				new File( "/Users/tischer/Documents/christian-wenzl--data/Archive_new/test_raw.tif" ),
 				new File( "/Users/tischer/Documents/christian-wenzl--data/Archive_new/test_labels.tif" ),
-				new File( "/Users/tischer/Documents/christian-wenzl--data/Archive_new/table.csv"),
+				"/Users/tischer/Documents/christian-wenzl--data/Archive_new/table.csv",
 				true,
 				false
 		);

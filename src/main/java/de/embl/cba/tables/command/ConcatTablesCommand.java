@@ -49,7 +49,7 @@ public class ConcatTablesCommand< R extends RealType< R > > implements Command
 		for ( File file : files )
 		{
 			Logger.info( "Loading: " + file );
-			models.add( Tables.loadTable( file ).getModel() );
+			models.add( Tables.loadTable( file.getAbsolutePath() ).getModel() );
 		}
 
 		final ConcatenatedTableModel concat = new ConcatenatedTableModel( models );

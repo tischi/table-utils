@@ -15,7 +15,6 @@ import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 
-import java.io.File;
 import java.util.*;
 
 import static de.embl.cba.tables.image.Metadata.*;
@@ -46,7 +45,7 @@ public class FileImageSourcesModel implements ImageSourcesModel
 	public void addSourceAndMetadata(
 			String imageId,
 			String imageDisplayName,
-			File file,
+			String imagePath,
 			List< String > imageSetIDs,
 			Flavour flavor )
 	{
@@ -57,9 +56,9 @@ public class FileImageSourcesModel implements ImageSourcesModel
 		metadata.imageSetIDs = imageSetIDs;
 		metadata.displayName = imageDisplayName;
 
-		if ( file.toString().endsWith( ".xml" ) )
+		if ( imagePath.endsWith( ".xml" ) )
 		{
-			final LazySpimSource lazySpimSource = new LazySpimSource( imageId, file );
+			final LazySpimSource lazySpimSource = new LazySpimSource( imageId, imagePath );
 			nameToSourceAndMetadata.put(
 					imageId,
 					new SourceAndMetadata( lazySpimSource, metadata ) );
@@ -67,7 +66,7 @@ public class FileImageSourcesModel implements ImageSourcesModel
 		else
 		{
 			final DefaultImageFileSource defaultImageFileSource =
-					new DefaultImageFileSource( metadata, file );
+					new DefaultImageFileSource( metadata, imagePath );
 			nameToSourceAndMetadata.put(
 					imageId,
 					new SourceAndMetadata( defaultImageFileSource, metadata ) );
@@ -80,14 +79,14 @@ public class FileImageSourcesModel implements ImageSourcesModel
 	class DefaultImageFileSource< R extends RealType< R > & NativeType< R > > implements Source< R >
 	{
 		private final Metadata metadata;
-		private final File file;
+		private final String imagePath;
 		private RandomAccessibleIntervalSource4D source;
 		private ImagePlus imagePlus;
 
-		public DefaultImageFileSource( Metadata metadata, File file )
+		public DefaultImageFileSource( Metadata metadata, String imagePath )
 		{
 			this.metadata = metadata;
-			this.file = file;
+			this.imagePath = imagePath;
 		}
 
 		@Override
@@ -105,9 +104,7 @@ public class FileImageSourcesModel implements ImageSourcesModel
 		private RandomAccessibleIntervalSource4D< R > wrappedSource()
 		{
 			if ( source == null )
-			{
 				loadAndCreateSource();
-			}
 
 			return source;
 		}
@@ -134,11 +131,12 @@ public class FileImageSourcesModel implements ImageSourcesModel
 
 		private void openImagePlus()
 		{
-			imagePlus = IJ.openImage( file.toString() );
+			imagePlus = IJ.openImage( imagePath );
+
 			if ( imagePlus == null )
-			{
-				Logger.error("Could not open image: " + file.toString());
-			}
+				Logger.error("Could not open image: " + imagePath );
+
+
 			imagePlus.setTitle( metadata.displayName );
 		}
 

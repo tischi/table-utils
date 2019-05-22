@@ -69,17 +69,17 @@ public class TableColumns
 	}
 
 	public static Map< String, List< String > >
-	stringColumnsFromTableFile( final File file )
+	stringColumnsFromTableFile( final String path )
 	{
-		return stringColumnsFromTableFile( file, null );
+		return stringColumnsFromTableFile( path, null );
 	}
 
 	public static Map< String, List< String > >
 	stringColumnsFromTableFile(
-			final File file,
+			final String path,
 			String delim )
 	{
-		final List< String > rowsInTableIncludingHeader = Tables.readRows( file );
+		final List< String > rowsInTableIncludingHeader = Tables.readRows( path );
 
 		delim = Tables.autoDelim( delim, rowsInTableIncludingHeader );
 
