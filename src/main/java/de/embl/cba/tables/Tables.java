@@ -10,6 +10,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -94,26 +96,67 @@ public class Tables
 	
 	public static List< String > readRows( String path )
 	{
-		List< String > rows = new ArrayList<>();
+		BufferedReader br = getReader( path );
 
+		List< String > rows = readRows( br );
+
+		return rows;
+	}
+
+	public static List< String > readRows( BufferedReader br )
+	{
+		List< String > rows = new ArrayList<>();
 		try
 		{
-			FileInputStream fin = new FileInputStream( path );
-			BufferedReader br = new BufferedReader( new InputStreamReader( fin ) );
-
 			String aRow;
-
 			while ( ( aRow = br.readLine() ) != null )
-			{
 				rows.add( aRow );
-			}
-
 			br.close();
-		} catch ( Exception e )
+		}
+		catch ( IOException e )
 		{
 			e.printStackTrace();
 		}
 		return rows;
+	}
+
+	public static BufferedReader getReader( String path )
+	{
+		if ( path.startsWith( "http:/" ) )
+		{
+			URL oracle = null;
+			try
+			{
+				oracle = new URL( path );
+			} catch ( MalformedURLException e )
+			{
+				e.printStackTrace();
+			}
+
+			try
+			{
+				return new BufferedReader(
+						new InputStreamReader( oracle.openStream() ) );
+			} catch ( IOException e )
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			FileInputStream fin = null;
+			try
+			{
+				fin = new FileInputStream( path );
+			} catch ( FileNotFoundException e )
+			{
+				e.printStackTrace();
+			}
+			return new BufferedReader( new InputStreamReader( fin ) );
+		}
+
+		return null;
+
 	}
 
 	public static List< String > readRows( File file, int numRows )
