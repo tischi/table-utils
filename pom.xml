@@ -3,15 +3,16 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.scijava</groupId>
-		<artifactId>pom-scijava</artifactId>
-		<version>26.0.0</version>
+		<groupId>de.embl.cba</groupId>
+		<artifactId>pom-embl-cba</artifactId>
+		<version>0.1.00</version>
+		<relativePath>../pom-embl-cba</relativePath>
 	</parent>
 
 	<groupId>de.embl.cba</groupId>
 	<artifactId>table-utils</artifactId>
 	<url>https://github.com/tischi/table-utils</url>
-	<version>0.3.10</version>
+	<version>0.3.11</version>
 
 	<name>Table Utils</name>
 	<description>TODO</description>
@@ -123,12 +124,9 @@
 			<artifactId>ij</artifactId>
 		</dependency>
 
-		<!-- With Versions, TODO: Remove version when possible	-->
-
 		<dependency>
 			<groupId>sc.fiji</groupId>
 			<artifactId>bigdataviewer-vistools</artifactId>
-			<version>1.0.0-beta-12</version>
 		</dependency>
 
 
@@ -137,13 +135,11 @@
 		<dependency>
 			<groupId>de.embl.cba</groupId>
 			<artifactId>classifiers</artifactId>
-			<version>0.1.02</version>
 		</dependency>
 
 		<dependency>
 			<groupId>de.embl.cba</groupId>
 			<artifactId>bdv-utils</artifactId>
-			<version>0.2.16</version>
 		</dependency>
 
 	</dependencies>
