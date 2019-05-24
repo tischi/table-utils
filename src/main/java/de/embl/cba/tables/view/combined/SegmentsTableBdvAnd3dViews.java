@@ -2,6 +2,7 @@ package de.embl.cba.tables.view.combined;
 
 import bdv.util.BdvHandle;
 import bdv.viewer.ViewerFrame;
+import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.color.LazyCategoryColoringModel;
 import de.embl.cba.tables.color.SelectionColoringModel;
@@ -67,16 +68,9 @@ public class SegmentsTableBdvAnd3dViews
 				imageSourcesModel,
 				bdv );
 
+		bdv = segmentsBdvView.getBdv();
 
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
-		// TODO: put to BdvUtils
-		final ViewerFrame viewerFrame =
-				( ViewerFrame ) segmentsBdvView.getBdv().getViewerPanel().getParent().getParent().getParent().getParent();
-
-		viewerFrame.setLocation(
-				screenSize.width / 2 - viewerFrame.getWidth() / 2,
-				0 + 50 );
+		BdvUtils.centerBdvWindowLocation( bdv );
 
 		tableRowsTableView = new TableRowsTableView<>(
 				tableRowImageSegments,
@@ -84,8 +78,7 @@ public class SegmentsTableBdvAnd3dViews
 				selectionColoringModel,
 				viewName );
 
-
-		tableRowsTableView.setParentComponent( viewerFrame );
+		tableRowsTableView.setParentComponent( bdv.getViewerPanel() );
 
 		tableRowsTableView.showTableAndMenu();
 
@@ -97,9 +90,7 @@ public class SegmentsTableBdvAnd3dViews
 				universe
 		);
 
-		segments3dView.setParentComponent( segmentsBdvView.getBdv().getViewerPanel() );
-
-
+		segments3dView.setParentComponent( bdv.getViewerPanel() );
 
 	}
 

@@ -32,8 +32,8 @@ public class ExploreIntensityImageAndLabelImageAndTableCommand implements Comman
 	public void run()
 	{
 		new ExploreIntensityImageAndLabelImageAndTable(
-				intensityImage,
-				labelImage,
+				intensityImage.getAbsolutePath(),
+				labelImage.getAbsolutePath(),
 				objectTable.getAbsolutePath(),
 				timePointsInTableAreOneBased,
 				coordinatesInTableAreCalibrated );

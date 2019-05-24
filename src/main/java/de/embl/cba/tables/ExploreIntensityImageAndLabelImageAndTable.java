@@ -12,8 +12,10 @@ import de.embl.cba.tables.view.combined.SegmentsTableBdvAnd3dViews;
 import ij.IJ;
 import ij.ImagePlus;
 
-import java.io.File;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static de.embl.cba.tables.imagesegment.SegmentPropertyColumnsSelectionDialog.NO_COLUMN_SELECTED;
 
@@ -22,33 +24,27 @@ public class ExploreIntensityImageAndLabelImageAndTable
 {
 	private final ImagePlus intensityImage;
 	private final ImagePlus labelImage;
-	private final String tablePath;
 
 	private Map< String, List< String > > columns;
 	private int numSpatialDimensions;
 	private String labelImageId;
-	private SegmentsTableBdvAnd3dViews tableBdvAnd3dViews;
-	private SegmentsTableAndBdvViews tableAndBdvViews;
 
-	private boolean timePointsInTableAreOneBased;
 	private boolean coordinatesInTableAreCalibrated;
 
 	public ExploreIntensityImageAndLabelImageAndTable(
-			File intensityImagePath,
-			File labelImagePath,
+			String intensityImagePath,
+			String labelImagePath,
 			String tablePath,
 			boolean timePointsInTableAreOneBased,
 			boolean coordinatesInTableAreCalibrated )
 	{
-		this.tablePath = tablePath;
-		this.timePointsInTableAreOneBased = timePointsInTableAreOneBased;
 		this.coordinatesInTableAreCalibrated = coordinatesInTableAreCalibrated;
 
 		Logger.info("Opening intensity image: " + intensityImagePath );
-		intensityImage = IJ.openImage( intensityImagePath.toString() );
+		intensityImage = IJ.openImage( intensityImagePath );
 
 		Logger.info("Opening label image: " + labelImagePath );
-		labelImage = IJ.openImage( labelImagePath.toString() );
+		labelImage = IJ.openImage( labelImagePath );
 
 		Logger.info("Opening table: " + tablePath );
 		final List< TableRowImageSegment > tableRowImageSegments
@@ -61,21 +57,21 @@ public class ExploreIntensityImageAndLabelImageAndTable
 
 		if ( numSpatialDimensions == 2 )
 		{
-			tableAndBdvViews = new SegmentsTableAndBdvViews(
+			final SegmentsTableAndBdvViews views = new SegmentsTableAndBdvViews(
 					tableRowImageSegments,
 					imageSourcesModel,
 					labelImageId );
 		}
 		else
 		{
-			tableBdvAnd3dViews = new SegmentsTableBdvAnd3dViews(
+			final SegmentsTableBdvAnd3dViews views = new SegmentsTableBdvAnd3dViews(
 					tableRowImageSegments,
 					imageSourcesModel,
 					labelImageId );
 
-			tableBdvAnd3dViews.getSegments3dView().setSegmentFocusZoomLevel( 0.1 );
+			views.getSegments3dView().setSegmentFocusZoomLevel( 0.1 );
 			final double pixelWidth = labelImage.getCalibration().pixelWidth;
-			tableBdvAnd3dViews.getSegments3dView().setVoxelSpacing3DView( pixelWidth );
+			views.getSegments3dView().setVoxelSpacing3DView( pixelWidth );
 
 		}
 	}

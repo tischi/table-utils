@@ -7,7 +7,8 @@ import java.util.ArrayList;
 
 public class MeshUtils
 {
-	public static CustomTriangleMesh asCustomTriangleMesh( final float[] meshCoordinates )
+	public static CustomTriangleMesh asCustomTriangleMesh(
+			final float[] meshCoordinates )
 	{
 		CustomTriangleMesh mesh;
 		final ArrayList< Point3f > points = new ArrayList<>();

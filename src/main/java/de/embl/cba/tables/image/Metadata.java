@@ -23,8 +23,8 @@ public class Metadata
 	public Flavour flavour = IntensitySource;
 	public int numSpatialDimensions = 3;
 	public boolean showInitially = false;
-	public Double displayRangeMin = 0.0;
-	public Double displayRangeMax = 65535.0;
+	public Double displayRangeMin = 0.0; // TODO
+	public Double displayRangeMax = 65535.0; // TODO
 	public Color displayColor = Color.white;
 	public BdvStackSource< ? > bdvStackSource = null;
 //	public AffineTransform3D sourceTransform = new AffineTransform3D();

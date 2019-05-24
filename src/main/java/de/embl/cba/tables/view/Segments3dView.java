@@ -339,7 +339,8 @@ public class Segments3dView < T extends ImageSegment >
 				segment.setMesh( mesh );
 		}
 
-		CustomTriangleMesh triangleMesh = MeshUtils.asCustomTriangleMesh( segment.getMesh() );
+		CustomTriangleMesh triangleMesh = MeshUtils.asCustomTriangleMesh(
+				segment.getMesh() );
 		triangleMesh.setColor( getColor3f( segment ) );
 		return triangleMesh;
 	}

@@ -23,7 +23,6 @@ import java.util.List;
 import static de.embl.cba.tables.imagesegment.SegmentUtils.*;
 
 
-
 public class ExploreMorphoLibJLabelImage
 {
 	public static final String LABEL = "Label";
@@ -118,9 +117,7 @@ public class ExploreMorphoLibJLabelImage
 				final ij.measure.ResultsTable resultsTable = textWindow.getResultsTable();
 
 				if ( resultsTable != null )
-				{
 					titleToResultsTable.put( resultsTable.getTitle(), resultsTable );
-				}
 			}
 		}
 	}

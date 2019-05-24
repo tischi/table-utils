@@ -34,12 +34,13 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 		return is2D;
 	}
 
-	public < R extends RealType< R > > void addSourceAndMetadata( Source< R > source,
-																  String imageId,
-																  Flavour flavor,
-																  int numSpatialDimensions,
-																  AffineTransform3D transform,
-																  String segmentsTablePath
+	public < R extends RealType< R > > void addSourceAndMetadata(
+			Source< R > source,
+			String imageId,
+			Flavour flavor,
+			int numSpatialDimensions,
+			AffineTransform3D transform,
+			String segmentsTablePath
 	)
 	{
 

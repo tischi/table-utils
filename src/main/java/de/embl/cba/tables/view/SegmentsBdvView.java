@@ -343,8 +343,6 @@ public class SegmentsBdvView< T extends ImageSegment >
 		if ( metadata.flavour == Flavour.LabelSource )
 			source = asLabelsSource( sourceAndMetadata );
 
-//		bdvOptions = bdvOptions.sourceTransform( metadata.sourceTransform );
-
 		int numTimePoints = getNumTimePoints( source );
 
 		final BdvStackSource bdvStackSource = BdvFunctions.show(
@@ -354,7 +352,11 @@ public class SegmentsBdvView< T extends ImageSegment >
 
 		bdvStackSource.setActive( true );
 
+		// TODO: only do this if not null
 		bdvStackSource.setDisplayRange( metadata.displayRangeMin, metadata.displayRangeMax );
+
+		// Implement auto-contrast
+		// Take code from bdp2
 
 		bdv = bdvStackSource.getBdvHandle();
 

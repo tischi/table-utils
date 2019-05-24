@@ -23,9 +23,7 @@ public class RunExploreMLJSegmentation3D
 		IJ.open( RunExploreMLJSegmentation3D.class.getResource(
 				"../3d-image-lbl-morpho.csv" ).getFile() );
 
-		final ExploreMorphoLibJLabelImage explore =
-				new ExploreMorphoLibJLabelImage(
-						intensities, labels, "Results" );
+		new ExploreMorphoLibJLabelImage( intensities, labels, "Results" );
 
 	}
 }

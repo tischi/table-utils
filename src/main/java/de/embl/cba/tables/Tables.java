@@ -122,12 +122,12 @@ public class Tables
 
 	public static BufferedReader getReader( String path )
 	{
-		if ( path.startsWith( "http:/" ) )
+		if ( path.startsWith( "http" )  )
 		{
-			URL oracle = null;
+			URL url = null;
 			try
 			{
-				oracle = new URL( path );
+				url = new URL( path );
 			} catch ( MalformedURLException e )
 			{
 				e.printStackTrace();
@@ -136,7 +136,7 @@ public class Tables
 			try
 			{
 				return new BufferedReader(
-						new InputStreamReader( oracle.openStream() ) );
+						new InputStreamReader( url.openStream() ) );
 			} catch ( IOException e )
 			{
 				e.printStackTrace();
