@@ -644,12 +644,12 @@ public class Tables
 
 	public static void addRelativeImagePathColumn(
 			JTable table,
-			String tableFile,
-			String imageFile,
+			String imagePath,
+			String rootPath,
 			String imageName )
 	{
-		if ( imageFile == null ) return;
-		final Path relativeImagePath = getRelativePath( tableFile, imageFile );
+		if ( rootPath == null ) return;
+		final Path relativeImagePath = getRelativePath( imagePath, rootPath );
 		Tables.addColumn( table, "Path_" + imageName, relativeImagePath );
 	}
 

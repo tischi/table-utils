@@ -5,14 +5,13 @@
 	<parent>
 		<groupId>de.embl.cba</groupId>
 		<artifactId>pom-embl-cba</artifactId>
-		<version>0.1.00</version>
+		<version>0.1.01</version>
 		<relativePath>../pom-embl-cba</relativePath>
 	</parent>
 
-	<groupId>de.embl.cba</groupId>
 	<artifactId>table-utils</artifactId>
 	<url>https://github.com/tischi/table-utils</url>
-	<version>0.3.11</version>
+	<version>0.3.12</version>
 
 	<name>Table Utils</name>
 	<description>TODO</description>
@@ -128,7 +127,6 @@
 			<groupId>sc.fiji</groupId>
 			<artifactId>bigdataviewer-vistools</artifactId>
 		</dependency>
-
 
 		<!-- CBA		-->
 
