@@ -13,9 +13,7 @@ import de.embl.cba.tables.image.ImageSourcesModel;
 import de.embl.cba.tables.imagesegment.ImageSegment;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
-import ij.IJ;
 import ij3d.Content;
-import ij3d.DefaultUniverse;
 import ij3d.Image3DUniverse;
 import ij3d.UniverseListener;
 import isosurface.MeshEditor;
@@ -23,12 +21,10 @@ import net.imglib2.FinalInterval;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.neighborhood.DiamondShape;
-import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.util.Intervals;
-import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 import org.scijava.java3d.View;
 import org.scijava.vecmath.Color3f;
@@ -63,6 +59,7 @@ public class Segments3dView < T extends ImageSegment >
 	private double segmentFocusDxyMin;
 	private double segmentFocusDzMin;
 	private long maxNumBoundingBoxElements;
+	private boolean autoResolutionLevel;
 	private Component parentComponent;
 	private AtomicBoolean showSegments = new AtomicBoolean( true );
 	private ConcurrentHashMap< T, CustomTriangleMesh > segmentToTriangleMesh;
@@ -103,6 +100,7 @@ public class Segments3dView < T extends ImageSegment >
 		this.segmentFocusDxyMin = 20.0;
 		this.segmentFocusDzMin = 20.0;
 		this.maxNumBoundingBoxElements = 100 * 100 * 100;
+		this.autoResolutionLevel = true;
 
 		this.executorService = Executors.newFixedThreadPool( 2 * Runtime.getRuntime().availableProcessors() );
 
@@ -159,6 +157,11 @@ public class Segments3dView < T extends ImageSegment >
 		this.maxNumBoundingBoxElements = maxNumBoundingBoxElements;
 	}
 
+	public void setAutoResolutionLevel( boolean autoResolutionLevel )
+	{
+		this.autoResolutionLevel = autoResolutionLevel;
+	}
+
 	public Image3DUniverse getUniverse()
 	{
 		return universe;
@@ -192,8 +195,6 @@ public class Segments3dView < T extends ImageSegment >
 			});
 		}
 	}
-
-
 
 	public void registerAsSelectionListener( SelectionModel< T > selectionModel )
 	{
@@ -350,12 +351,14 @@ public class Segments3dView < T extends ImageSegment >
 		final Source< ? > labelsSource =
 				imageSourcesModel.sources().get( segment.imageId() ).source();
 
-		int level = getLevel( labelsSource );
+		Integer resolutionLevel = getResolutionLevel( segment, labelsSource );
 
-		final double[] voxelSpacing = getVoxelSpacings( labelsSource ).get( level );
+		if ( resolutionLevel == null ) return null;
+
+		final double[] voxelSpacing = getVoxelSpacings( labelsSource ).get( resolutionLevel );
 
 		final RandomAccessibleInterval< ? extends RealType< ? > > labelsRAI =
-				getLabelsRAI( segment, level );
+				getLabelsRAI( segment, resolutionLevel );
 
 		if ( segment.boundingBox() == null )
 			setSegmentBoundingBox( segment, labelsRAI, voxelSpacing );
@@ -367,7 +370,8 @@ public class Segments3dView < T extends ImageSegment >
 
 		if ( numElements > maxNumBoundingBoxElements )
 		{
-			Logger.error( "The bounding box of the selected segment has " + numElements + " voxels.\n" +
+			Logger.error( "3D View:\n" +
+					"The bounding box of the selected segment has " + numElements + " voxels.\n" +
 					"The maximum enabled number is " + maxNumBoundingBoxElements + ".\n" +
 					"Thus the image segment will not be displayed in 3D." );
 			return null;
@@ -394,10 +398,47 @@ public class Segments3dView < T extends ImageSegment >
 		return meshCoordinates;
 	}
 
-	private int getLevel( Source< ? > labelsSource )
+	private Integer getResolutionLevel( ImageSegment segment, Source< ? > labelsSource )
+	{
+		Integer resolutionLevel;
+
+		if ( autoResolutionLevel )
+		{
+			if ( segment.boundingBox() == null )
+			{
+				Logger.error( "3D View:\n" +
+						"Automated resolution level selection is enabled, but the segment has no bounding box.\n" +
+						"This combination is currently not possible." );
+				resolutionLevel = null;
+			}
+			else
+			{
+
+				final ArrayList< double[] > voxelSpacings = getVoxelSpacings( labelsSource );
+
+				for ( resolutionLevel = 0; resolutionLevel < voxelSpacings.size(); resolutionLevel++ )
+				{
+					FinalInterval boundingBox =
+							getIntervalVoxels( segment.boundingBox(), voxelSpacings.get( resolutionLevel ) );
+
+					final long numElements = Intervals.numElements( boundingBox );
+
+					if ( numElements <= maxNumBoundingBoxElements ) break;
+				}
+			}
+
+		}
+		else
+		{
+			resolutionLevel = getLevel( labelsSource, voxelSpacing3DView );
+		}
+		return resolutionLevel;
+	}
+
+	private int getLevel( Source< ? > labelsSource, Double voxelSpacing3DView )
 	{
 		int level;
-		if ( voxelSpacing3DView != null )
+		if ( this.voxelSpacing3DView != null )
 			level = getLevel( getVoxelSpacings( labelsSource ), voxelSpacing3DView );
 		else
 			level = 0;

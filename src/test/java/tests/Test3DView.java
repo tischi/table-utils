@@ -9,11 +9,14 @@ import headless.RunExploreMLJSegmentation3D;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imagej.ImageJ;
+import org.junit.Test;
 
 import java.util.List;
 
 public class Test3DView
 {
+
+	@Test
 	public void showObjectsIn3D()
 	{
 		final ImageJ ij = new ImageJ();
@@ -36,6 +39,7 @@ public class Test3DView
 
 		final SelectionModel< TableRowImageSegment > selectionModel = views.getSelectionModel();
 		final List< TableRowImageSegment > tableRowImageSegments = views.getTableRowImageSegments();
+		final Segments3dView< TableRowImageSegment > segments3dView = views.getSegments3dView();
 
 		selectionModel.setSelected( tableRowImageSegments.get( 0 ), true );
 		selectionModel.focus( tableRowImageSegments.get( 0 ) );

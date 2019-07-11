@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>table-utils</artifactId>
 	<url>https://github.com/tischi/table-utils</url>
-	<version>0.3.12</version>
+	<version>0.3.13</version>
 	<name>Table Utils</name>
 	<description>TODO</description>
 	<inceptionYear>2018</inceptionYear>
@@ -73,6 +73,7 @@
 		<license.licenseName>bsd_2</license.licenseName>
 		<license.copyrightOwners>EMBL</license.copyrightOwners>
 		<imagej.app.directory>/Applications/Fiji.app/</imagej.app.directory>
+		<enforcer.skip>true</enforcer.skip>
 	</properties>
 	<repositories>
 		<!-- for SciJava dependencies -->
@@ -116,6 +117,10 @@
 		<dependency>
 			<groupId>de.embl.cba</groupId>
 			<artifactId>bdv-utils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
 		</dependency>
 	</dependencies>
 </project>
