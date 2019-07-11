@@ -14,14 +14,14 @@ public class RunExploreMLJSegmentation3D
 
 		final ImagePlus intensities = IJ.openImage(
 				RunExploreMLJSegmentation3D.class.getResource(
-				"../3d-image.zip" ).getFile() );
+				"../test-data/3d-image.zip" ).getFile() );
 
 		final ImagePlus labels = IJ.openImage(
 				RunExploreMLJSegmentation3D.class.getResource(
-				"../3d-image-lbl.zip" ).getFile() );
+				"../test-data/3d-image-lbl.zip" ).getFile() );
 
 		IJ.open( RunExploreMLJSegmentation3D.class.getResource(
-				"../3d-image-lbl-morpho.csv" ).getFile() );
+				"../test-data/3d-image-lbl-morpho.csv" ).getFile() );
 
 		new ExploreMorphoLibJLabelImage( intensities, labels, "Results" );
 

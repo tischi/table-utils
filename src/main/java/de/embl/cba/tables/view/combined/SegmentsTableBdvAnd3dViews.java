@@ -26,6 +26,7 @@ public class SegmentsTableBdvAnd3dViews
 	private SegmentsBdvView< TableRowImageSegment > segmentsBdvView;
 	private TableRowsTableView< TableRowImageSegment > tableRowsTableView;
 	private Segments3dView< TableRowImageSegment > segments3dView;
+	private SelectionModel< TableRowImageSegment > selectionModel;
 
 	public SegmentsTableBdvAnd3dViews(
 			List< TableRowImageSegment > tableRowImageSegments,
@@ -50,8 +51,7 @@ public class SegmentsTableBdvAnd3dViews
 
 	private void show( BdvHandle bdv, Image3DUniverse universe )
 	{
-		final SelectionModel< TableRowImageSegment > selectionModel
-				= new DefaultSelectionModel<>();
+		selectionModel = new DefaultSelectionModel<>();
 
 		final LazyCategoryColoringModel< TableRowImageSegment > coloringModel
 				= new LazyCategoryColoringModel<>( new GlasbeyARGBLut( 255 ) );
@@ -59,7 +59,7 @@ public class SegmentsTableBdvAnd3dViews
 		final SelectionColoringModel< TableRowImageSegment > selectionColoringModel
 				= new SelectionColoringModel<>(
 					coloringModel,
-					selectionModel );
+				selectionModel );
 
 		segmentsBdvView = new SegmentsBdvView<>(
 				tableRowImageSegments,
@@ -92,6 +92,16 @@ public class SegmentsTableBdvAnd3dViews
 
 		segments3dView.setParentComponent( bdv.getViewerPanel() );
 
+	}
+
+	public SelectionModel< TableRowImageSegment > getSelectionModel()
+	{
+		return selectionModel;
+	}
+
+	public List< TableRowImageSegment > getTableRowImageSegments()
+	{
+		return tableRowImageSegments;
 	}
 
 	public SegmentsBdvView< TableRowImageSegment > getSegmentsBdvView()

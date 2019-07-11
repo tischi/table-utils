@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
 		<groupId>de.embl.cba</groupId>
 		<artifactId>pom-embl-cba</artifactId>
-		<version>0.1.01</version>
+		<version>0.3.5</version>
 		<relativePath>../pom-embl-cba</relativePath>
 	</parent>
-
 	<artifactId>table-utils</artifactId>
 	<url>https://github.com/tischi/table-utils</url>
 	<version>0.3.12</version>
-
 	<name>Table Utils</name>
 	<description>TODO</description>
 	<inceptionYear>2018</inceptionYear>
@@ -26,7 +23,6 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-
 	<developers>
 		<developer>
 			<id>tischi</id>
@@ -46,14 +42,12 @@
 			<name>TODO</name>
 		</contributor>
 	</contributors>
-
 	<mailingLists>
 		<mailingList>
 			<name>ImageJ Forum</name>
 			<archive>http://forum.imagej.net/</archive>
 		</mailingList>
 	</mailingLists>
-
 	<distributionManagement>
 		<repository>
 			<id>bintray-tischi-snapshots</id>
@@ -61,7 +55,6 @@
 			<url>https://api.bintray.com/maven/tischi/snapshots/table-utils/;publish=1</url>
 		</repository>
 	</distributionManagement>
-
 	<scm>
 		<connection>scm:git:git://github.com/tischi/table-utils</connection>
 		<developerConnection>scm:git:git@github.com/tischi/table-utils</developerConnection>
@@ -75,72 +68,54 @@
 	<ciManagement>
 		<system>None</system>
 	</ciManagement>
-
 	<properties>
 		<package-name>de.embl.cba.tables</package-name>
 		<license.licenseName>bsd_2</license.licenseName>
 		<license.copyrightOwners>EMBL</license.copyrightOwners>
 		<imagej.app.directory>/Applications/Fiji.app/</imagej.app.directory>
 	</properties>
-
-
 	<repositories>
-
 		<!-- for SciJava dependencies -->
 		<repository>
 			<id>imagej.public</id>
 			<url>https://maven.imagej.net/content/groups/public</url>
 		</repository>
-
 		<!-- for CBA dependencies -->
 		<repository>
 			<id>bintray-tischi-snapshots</id>
 			<name>bintray</name>
 			<url>https://dl.bintray.com/tischi/snapshots</url>
 		</repository>
-
 	</repositories>
-
 	<dependencies>
-
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej-legacy</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej-common</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>ij</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>sc.fiji</groupId>
 			<artifactId>bigdataviewer-vistools</artifactId>
 		</dependency>
-
 		<!-- CBA		-->
-
 		<dependency>
 			<groupId>de.embl.cba</groupId>
 			<artifactId>classifiers</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>de.embl.cba</groupId>
 			<artifactId>bdv-utils</artifactId>
 		</dependency>
-
 	</dependencies>
-
 </project>
-

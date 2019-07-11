@@ -39,6 +39,25 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 			String imageId,
 			Flavour flavor,
 			int numSpatialDimensions,
+			String segmentsTablePath,
+			double displayRangeMax
+	)
+	{
+
+		final Metadata metadata = new Metadata( imageId );
+		metadata.flavour = flavor;
+		metadata.numSpatialDimensions = numSpatialDimensions;
+		metadata.segmentsTablePath = segmentsTablePath;
+		metadata.displayRangeMax = displayRangeMax;
+
+		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( source, metadata ) );
+	}
+
+	public < R extends RealType< R > > void addSourceAndMetadata(
+			Source< R > source,
+			String imageId,
+			Flavour flavor,
+			int numSpatialDimensions,
 			AffineTransform3D transform,
 			String segmentsTablePath
 	)

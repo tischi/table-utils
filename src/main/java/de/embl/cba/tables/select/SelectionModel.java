@@ -34,7 +34,7 @@ public interface SelectionModel< T >
 
 
 	/**
-	 * Focus on an object without changing its select state.
+	 * Focus on an object without changing its selection state.
 	 *
 	 * @param object
 	 *            a object.

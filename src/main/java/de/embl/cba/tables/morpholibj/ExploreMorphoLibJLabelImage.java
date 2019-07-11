@@ -146,8 +146,8 @@ public class ExploreMorphoLibJLabelImage
 				labelImageId,
 				Metadata.Flavour.LabelSource,
 				numSpatialDimensions,
-				Calibrations.getScalingTransform( labelImage ),
-				null
+				null,
+				255
 		);
 
 		imageSourcesModel.sources().get( labelImageId ).metadata().showInitially = true;
@@ -163,8 +163,8 @@ public class ExploreMorphoLibJLabelImage
 					intensityImageId,
 					Metadata.Flavour.IntensitySource,
 					numSpatialDimensions,
-					Calibrations.getScalingTransform( intensityImage ),
-					null
+					null,
+					255
 			);
 
 			imageSourcesModel.sources().get( labelImageId )

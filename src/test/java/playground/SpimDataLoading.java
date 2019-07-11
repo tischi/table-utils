@@ -40,8 +40,6 @@ public class SpimDataLoading
 		final BdvStackSource< ? extends Volatile< ? > > show = BdvFunctions.show( volatileSpimSource );
 		final Source< ? extends Volatile< ? > > spimSource = show.getSources().get( 0 ).getSpimSource();
 
-		final SpimSource spimSource1 = ( ( VolatileSpimSource )( (TransformedSource )volatileSpimSource ).getWrappedSource()).nonVolatile();
-
 		/**
 		 * Version 01: show SpimData
 		 */
