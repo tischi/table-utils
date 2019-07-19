@@ -388,6 +388,13 @@ public class Segments3dView < T extends ImageSegment >
 
 		final float[] meshCoordinates = meshExtractor.generateMesh( segment.labelId() );
 
+		for ( int i = 0; i < meshCoordinates.length; )
+		{
+			meshCoordinates[ i++ ] *= voxelSpacing[ 0 ];
+			meshCoordinates[ i++ ] *= voxelSpacing[ 1 ];
+			meshCoordinates[ i++ ] *= voxelSpacing[ 2 ];
+		}
+
 		if ( meshCoordinates.length == 0 )
 		{
 			Logger.warn( "Could not find any pixels for segment with label " + segment.labelId()
@@ -413,7 +420,6 @@ public class Segments3dView < T extends ImageSegment >
 			}
 			else
 			{
-
 				final ArrayList< double[] > voxelSpacings = getVoxelSpacings( labelsSource );
 
 				for ( resolutionLevel = 0; resolutionLevel < voxelSpacings.size(); resolutionLevel++ )
@@ -423,7 +429,10 @@ public class Segments3dView < T extends ImageSegment >
 
 					final long numElements = Intervals.numElements( boundingBox );
 
-					if ( numElements <= maxNumBoundingBoxElements ) break;
+					if ( numElements <= maxNumBoundingBoxElements )
+					{
+						break;
+					}
 				}
 			}
 

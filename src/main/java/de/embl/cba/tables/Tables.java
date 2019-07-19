@@ -128,16 +128,20 @@ public class Tables
 			try
 			{
 				url = new URL( path );
-			} catch ( MalformedURLException e )
+			}
+			catch ( MalformedURLException e )
 			{
 				e.printStackTrace();
 			}
 
 			try
 			{
-				return new BufferedReader(
-						new InputStreamReader( url.openStream() ) );
-			} catch ( IOException e )
+				final InputStream in = url.openStream();
+				final InputStreamReader inReader = new InputStreamReader( in );
+				final BufferedReader bufferedReader = new BufferedReader( inReader );
+				return bufferedReader;
+			}
+			catch ( IOException e )
 			{
 				e.printStackTrace();
 			}

@@ -33,7 +33,10 @@ public class Test3DView
 		IJ.open( RunExploreMLJSegmentation3D.class.getResource(
 				"../test-data/3d-image-lbl-morpho.csv" ).getFile() );
 
-		final ExploreMorphoLibJLabelImage explore = new ExploreMorphoLibJLabelImage( intensities, labels, "Results" );
+		final ExploreMorphoLibJLabelImage explore = new ExploreMorphoLibJLabelImage(
+				intensities,
+				labels,
+				"3d-image-lbl-morpho.csv" );
 
 		final SegmentsTableBdvAnd3dViews views = explore.getTableBdvAnd3dViews();
 
