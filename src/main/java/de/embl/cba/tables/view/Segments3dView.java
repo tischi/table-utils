@@ -60,6 +60,7 @@ public class Segments3dView < T extends ImageSegment >
 	private double segmentFocusDzMin;
 	private long maxNumBoundingBoxElements;
 	private boolean autoResolutionLevel;
+	private String objectsName;
 	private Component parentComponent;
 	private AtomicBoolean showSegments = new AtomicBoolean( true );
 	private ConcurrentHashMap< T, CustomTriangleMesh > segmentToTriangleMesh;
@@ -102,6 +103,8 @@ public class Segments3dView < T extends ImageSegment >
 		this.maxNumBoundingBoxElements = 100 * 100 * 100;
 		this.autoResolutionLevel = true;
 
+		this.objectsName = "";
+
 		this.executorService = Executors.newFixedThreadPool( 2 * Runtime.getRuntime().availableProcessors() );
 
 		this.segmentToMesh = new ConcurrentHashMap<>();
@@ -110,6 +113,11 @@ public class Segments3dView < T extends ImageSegment >
 
 		registerAsSelectionListener( this.selectionModel );
 		registerAsColoringListener( this.selectionColoringModel );
+	}
+
+	public void setObjectsName( String objectsName )
+	{
+		this.objectsName = objectsName;
 	}
 
 	public void setParentComponent( Component parentComponent )
@@ -530,7 +538,7 @@ public class Segments3dView < T extends ImageSegment >
 	private void addMeshToUniverse( T segment, CustomTriangleMesh mesh )
 	{
 		final Content content =
-				universe.addCustomMesh( mesh, "" + segment.labelId() );
+				universe.addCustomMesh( mesh, objectsName + "_" + segment.labelId() );
 
 		content.setTransparency( ( float ) transparency );
 		content.setLocked( true );
