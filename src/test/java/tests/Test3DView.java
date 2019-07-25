@@ -1,5 +1,8 @@
 package tests;
 
+import bdv.viewer.Source;
+import de.embl.cba.tables.Utils;
+import de.embl.cba.tables.ij3d.UniverseUtils;
 import de.embl.cba.tables.morpholibj.ExploreMorphoLibJLabelImage;
 import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
@@ -8,16 +11,22 @@ import de.embl.cba.tables.view.combined.SegmentsTableBdvAnd3dViews;
 import headless.RunExploreMLJSegmentation3D;
 import ij.IJ;
 import ij.ImagePlus;
+import ij3d.ContentConstants;
+import ij3d.Image3DUniverse;
+import mpicbg.spim.data.SpimData;
+import mpicbg.spim.data.SpimDataException;
+import mpicbg.spim.data.XmlIoSpimData;
 import net.imagej.ImageJ;
+import net.imglib2.type.numeric.ARGBType;
+import net.imglib2.type.numeric.RealType;
 import org.junit.Test;
 
 import java.util.List;
 
-public class Test3DView
+public class Test3DView < R extends RealType< R > >
 {
-
 	@Test
-	public void showObjectsIn3D()
+	public void showObjectAndVolumeIn3D() throws SpimDataException
 	{
 		final ImageJ ij = new ImageJ();
 		ij.ui().showUI();
@@ -42,15 +51,35 @@ public class Test3DView
 
 		final SelectionModel< TableRowImageSegment > selectionModel = views.getSelectionModel();
 		final List< TableRowImageSegment > tableRowImageSegments = views.getTableRowImageSegments();
-		final Segments3dView< TableRowImageSegment > segments3dView = views.getSegments3dView();
 
 		selectionModel.setSelected( tableRowImageSegments.get( 0 ), true );
 		selectionModel.focus( tableRowImageSegments.get( 0 ) );
 
+		final Segments3dView< TableRowImageSegment > segments3dView = views.getSegments3dView();
+
+		// Add ImagePlus volume
+		//segments3dView.addImagePlusToUniverse( universe, intensities, ContentConstants.VOLUME );
+
+		// Add SpimData volume
+		SpimData spimData = new XmlIoSpimData().load( RunExploreMLJSegmentation3D.class.getResource(
+				"../test-data/3d-image.xml" ).getFile()  );
+
+		final Source< ? > source = Utils.getSource( spimData, 0 );
+
+		IJ.wait( 5000 );  // Universe needs to be created...
+
+		UniverseUtils.addSourceToUniverse(
+				segments3dView.getUniverse(),
+				source,
+				100 * 100 * 100,
+				ContentConstants.VOLUME,
+				new ARGBType( 0xff00ff00 ),
+				0.0F );
+
 	}
 
-	public static void main( String[] args )
+	public static void main( String[] args ) throws SpimDataException
 	{
-		new Test3DView().showObjectsIn3D();
+		new Test3DView().showObjectAndVolumeIn3D();
 	}
 }
