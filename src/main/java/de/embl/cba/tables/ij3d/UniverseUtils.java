@@ -23,7 +23,9 @@ public class UniverseUtils
 			long maxNumVoxels,
 			int displayType,
 			ARGBType argbType,
-			float transparency )
+			float transparency,
+			int min,
+			int max )
 	{
 		final Integer level = Utils.getLevel( source, maxNumVoxels );
 
@@ -44,7 +46,7 @@ public class UniverseUtils
 		rai = Views.permute( Views.addDimension( rai, 0, 0 ), 2, 3 );
 		final ImagePlus wrap = ImageJFunctions.wrapUnsignedByte(
 				( RandomAccessibleInterval ) rai,
-				new RealUnsignedByteConverter< R >( 0, 255 ),
+				new RealUnsignedByteConverter< R >( min, max ),
 				source.getName() );
 
 		final Content content = universe.addContent( wrap, displayType );

@@ -12,7 +12,6 @@ import headless.RunExploreMLJSegmentation3D;
 import ij.IJ;
 import ij.ImagePlus;
 import ij3d.ContentConstants;
-import ij3d.Image3DUniverse;
 import mpicbg.spim.data.SpimData;
 import mpicbg.spim.data.SpimDataException;
 import mpicbg.spim.data.XmlIoSpimData;
@@ -74,7 +73,7 @@ public class Test3DView < R extends RealType< R > >
 				100 * 100 * 100,
 				ContentConstants.VOLUME,
 				new ARGBType( 0xff00ff00 ),
-				0.0F );
+				0.0F, 0, 255 );
 
 	}
 
