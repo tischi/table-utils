@@ -2,13 +2,14 @@ package de.embl.cba.tables.color;
 
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import net.imglib2.Volatile;
+import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.volatiles.VolatileARGBType;
 
 public class LazyLabelsARGBConverter implements LabelsARGBConverter
 {
 	private final ColoringModel< Double > coloringModel;
-
+	private ARGBType singleColor;
 	private int timePointIndex; // TODO: ??
 
 	public LazyLabelsARGBConverter()
@@ -39,6 +40,13 @@ public class LazyLabelsARGBConverter implements LabelsARGBConverter
 			return;
 		}
 
+		if ( singleColor != null )
+		{
+			color.setValid( true );
+			color.set( singleColor.get() );
+			return;
+		}
+
 		coloringModel.convert( realDouble, color.get() );
 		color.setValid( true );
 
@@ -48,5 +56,11 @@ public class LazyLabelsARGBConverter implements LabelsARGBConverter
 	public void timePointChanged( int timePointIndex )
 	{
 		this.timePointIndex = timePointIndex;
+	}
+
+	@Override
+	public void setSingleColor( ARGBType argbType )
+	{
+		singleColor = argbType;
 	}
 }

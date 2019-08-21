@@ -63,7 +63,10 @@ public class ExploreMorphoLibJLabelImage
 
 		fetchResultsTables();
 
-		resultsTable = titleToResultsTable.get( resultsTableTitle );
+		if ( titleToResultsTable.size() == 1 )
+			resultsTable = titleToResultsTable.values().iterator().next();
+		else
+			resultsTable = titleToResultsTable.get( resultsTableTitle );
 
 		if ( resultsTable == null )
 		{

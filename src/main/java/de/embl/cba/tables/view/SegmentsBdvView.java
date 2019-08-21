@@ -21,6 +21,7 @@ import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.view.dialogs.BdvViewSourceSetSelectionDialog;
 import net.imglib2.RealPoint;
 import net.imglib2.realtransform.AffineTransform3D;
+import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
@@ -39,6 +40,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 	private String nextImageSetTrigger = "ctrl N";
 	private String previousImageSetTrigger = "ctrl P";
 	private String incrementCategoricalLutRandomSeedTrigger = "ctrl L";
+	private String singleColorTrigger = "ctrl M";
 	private String iterateSelectionModeTrigger = "ctrl S";
 	private String viewIn3DTrigger = "ctrl shift button1";
 
@@ -64,6 +66,8 @@ public class SegmentsBdvView< T extends ImageSegment >
 	private List< T > segments;
 	private int segmentFocusAnimationDurationMillis;
 	private ArrayList< String > labelSourceIds;
+	private ARGBType labelSourceSingleColor;
+	private boolean labelSourceSingleColorIsActive;
 
 	public SegmentsBdvView(
 			final List< T > segments,
@@ -100,6 +104,9 @@ public class SegmentsBdvView< T extends ImageSegment >
 		this.selectionColoringModel = selectionColoringModel;
 		this.imageSourcesModel = imageSourcesModel;
 		this.bdv = bdv;
+
+		this.labelSourceSingleColor = new ARGBType( ARGBType.rgba( 255, 255, 255, 255 ) );;
+		this.labelSourceSingleColorIsActive = false;
 
 		this.voxelSpacing3DView = 0.1;
 		this.segmentFocusAnimationDurationMillis = 750;
@@ -456,6 +463,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 							selectionColoringModel );
 
 		}
+
 		return labelsARGBConverter;
 	}
 
@@ -480,11 +488,11 @@ public class SegmentsBdvView< T extends ImageSegment >
 				bdv.getBdvHandle().getTriggerbindings(),
 				segmentsName + "-bdv-select-handler" );
 
-
 		installSelectionBehaviour( );
 		installSelectNoneBehaviour( );
 		installSelectionColoringModeBehaviour( );
 		installRandomColorShufflingBehaviour();
+		installToggleSingleColorBehaviour();
 		install3DViewBehaviour();
 		installImageSetNavigationBehaviour( );
 
@@ -496,6 +504,14 @@ public class SegmentsBdvView< T extends ImageSegment >
 						new Thread( () -> shuffleRandomColors() ).start(),
 				segmentsName + "-change-color-random-seed",
 				incrementCategoricalLutRandomSeedTrigger );
+	}
+
+	private void installToggleSingleColorBehaviour()
+	{
+		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
+						new Thread( () -> toggleSingleCategoryColor() ).start(),
+				segmentsName + "-single-color",
+				singleColorTrigger );
 	}
 
 	private synchronized void shuffleRandomColors()
@@ -512,6 +528,27 @@ public class SegmentsBdvView< T extends ImageSegment >
 		}
 	}
 
+	private synchronized void toggleSingleCategoryColor()
+	{
+		if ( ! isLabelSourceActive() ) return;
+
+		if ( labelSourceSingleColorIsActive  )
+			labelsSourceConverter.setSingleColor( null );
+		else
+			labelsSourceConverter.setSingleColor( labelSourceSingleColor );
+
+		labelSourceSingleColorIsActive = !labelSourceSingleColorIsActive;
+
+		BdvUtils.repaint( bdv );
+	}
+
+	public void setLabelSourceSingleColor( ARGBType labelSourceSingleColor )
+	{
+		this.labelSourceSingleColor = labelSourceSingleColor;
+		labelsSourceConverter.setSingleColor( labelSourceSingleColor );
+		labelSourceSingleColorIsActive = true;
+		BdvUtils.repaint( bdv );
+	}
 
 	private void installSelectNoneBehaviour( )
 	{

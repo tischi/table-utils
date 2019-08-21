@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class Test3DView < R extends RealType< R > >
+public class Test3DView
 {
 	@Test
 	public void showObjectAndVolumeIn3D() throws SpimDataException
@@ -56,9 +56,6 @@ public class Test3DView < R extends RealType< R > >
 
 		final Segments3dView< TableRowImageSegment > segments3dView = views.getSegments3dView();
 
-		// Add ImagePlus volume
-		//segments3dView.addImagePlusToUniverse( universe, intensities, ContentConstants.VOLUME );
-
 		// Add SpimData volume
 		SpimData spimData = new XmlIoSpimData().load( RunExploreMLJSegmentation3D.class.getResource(
 				"../test-data/3d-image.xml" ).getFile()  );
@@ -74,6 +71,10 @@ public class Test3DView < R extends RealType< R > >
 				ContentConstants.VOLUME,
 				new ARGBType( 0xff00ff00 ),
 				0.0F, 0, 255 );
+
+		// Add ImagePlus volume
+		intensities.getCalibration().pixelWidth = 10;
+		UniverseUtils.addImagePlusToUniverse( segments3dView.getUniverse(), intensities, ContentConstants.VOLUME, 0F );
 
 	}
 

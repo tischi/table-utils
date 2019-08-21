@@ -1,6 +1,7 @@
 package de.embl.cba.tables.ij3d;
 
 import bdv.viewer.Source;
+import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.Utils;
 import de.embl.cba.tables.color.ColorUtils;
@@ -15,9 +16,11 @@ import net.imglib2.type.numeric.RealType;
 import net.imglib2.view.Views;
 import org.scijava.vecmath.Color3f;
 
+import java.awt.*;
+
 public class UniverseUtils
 {
-	public static < R extends RealType< R > > void addSourceToUniverse(
+	public static < R extends RealType< R > > Content addSourceToUniverse(
 			Image3DUniverse universe,
 			Source< ? > source,
 			long maxNumVoxels,
@@ -32,22 +35,23 @@ public class UniverseUtils
 		if ( level == null )
 		{
 			Logger.warn( "Image is too large to be displayed in 3D." );
-			return;
+			return null;
 		}
 
 		if ( universe == null )
 		{
 			Logger.warn( "No Universe exists => Cannot show volume." );
-			return;
+			return null;
+		}
+
+		if ( universe.getWindow() == null )
+		{
+			Logger.warn( "No Universe window exists => Cannot show volume." );
+			return null;
 		}
 
 
-		RandomAccessibleInterval< ?  > rai = source.getSource( 0, level );
-		rai = Views.permute( Views.addDimension( rai, 0, 0 ), 2, 3 );
-		final ImagePlus wrap = ImageJFunctions.wrapUnsignedByte(
-				( RandomAccessibleInterval ) rai,
-				new RealUnsignedByteConverter< R >( min, max ),
-				source.getName() );
+		final ImagePlus wrap = getImagePlus( source, min, max, level );
 
 		final Content content = universe.addContent( wrap, displayType );
 
@@ -59,6 +63,26 @@ public class UniverseUtils
 		//contentToSegment.put( content, segment );
 
 		universe.setAutoAdjustView( false );
+
+		return content;
+	}
+
+	public static < R extends RealType< R > > ImagePlus getImagePlus( Source< ? > source, int min, int max, Integer level )
+	{
+		RandomAccessibleInterval< ? extends RealType< ? > > rai
+				= BdvUtils.getRealTypeNonVolatileRandomAccessibleInterval( source, 0, level );
+
+		rai = Views.permute( Views.addDimension( rai, 0, 0 ), 2, 3 );
+		final ImagePlus wrap = ImageJFunctions.wrapUnsignedByte(
+				( RandomAccessibleInterval ) rai,
+				new RealUnsignedByteConverter< R >( min, max ),
+				source.getName() );
+
+		final double[] voxelSpacing = Utils.getVoxelSpacings( source ).get( level );
+		wrap.getCalibration().pixelWidth = voxelSpacing[ 0 ];
+		wrap.getCalibration().pixelHeight = voxelSpacing[ 1 ];
+		wrap.getCalibration().pixelDepth = voxelSpacing[ 2 ];
+		return wrap;
 	}
 
 	public static void addImagePlusToUniverse(
@@ -76,5 +100,29 @@ public class UniverseUtils
 
 		//segmentToContent.put( segment, content );
 		//contentToSegment.put( content, segment );
+	}
+
+	public static void showUniverseWindow( Image3DUniverse universe, Component parentComponent )
+	{
+		if ( universe.getWindow() == null )
+		{
+			universe.show();
+			universe.getWindow().setResizable( false );
+
+			if ( parentComponent != null )
+			{
+				universe.getWindow().setPreferredSize( new Dimension(
+						parentComponent.getWidth() / 2 ,
+						parentComponent.getHeight() / 2  ) );
+
+				universe.getWindow().setLocation(
+						parentComponent.getLocationOnScreen().x
+								- universe.getWindow().getWidth() - 10,
+						parentComponent.getLocationOnScreen().y
+				);
+
+			}
+
+		}
 	}
 }

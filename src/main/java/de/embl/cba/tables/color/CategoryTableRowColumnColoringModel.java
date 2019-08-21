@@ -16,7 +16,6 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	private final String column;
 	ARGBLut argbLut;
 	private int randomSeed;
-	private final Map< Object, ARGBType > specialInputToColor;
 
 	/**
 	 *
@@ -28,7 +27,6 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 		this.argbLut = argbLut;
 		this.inputToColor = new ConcurrentHashMap<>(  );
 		this.randomSeed = 50;
-		specialInputToColor = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -36,12 +34,7 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	{
 		final Object featureValue = input.getCell( column );
 
-		if ( specialInputToColor.keySet().contains( featureValue ) )
-		{
-			final int color = specialInputToColor.get( featureValue ).get();
-			output.set( color );
-		}
-		else if ( inputToColor.keySet().contains( featureValue ) )
+ 		if ( inputToColor.keySet().contains( featureValue ) )
 		{
 			final int color = inputToColor.get( featureValue ).get();
 			output.set( color );
@@ -53,11 +46,6 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 			final int color = inputToColor.get( featureValue ).get();
 			output.set( color );
 		}
-	}
-
-	public Map< Object, ARGBType > getSpecialInputToColor()
-	{
-		return specialInputToColor;
 	}
 
 	private double createRandom( double x )

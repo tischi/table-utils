@@ -7,6 +7,7 @@ import de.embl.cba.bdv.utils.objects3d.FloodFill;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.Utils;
 import de.embl.cba.tables.ij3d.AnimatedViewAdjuster;
+import de.embl.cba.tables.ij3d.UniverseUtils;
 import de.embl.cba.tables.mesh.MeshExtractor;
 import de.embl.cba.tables.mesh.MeshUtils;
 import de.embl.cba.tables.color.*;
@@ -14,7 +15,6 @@ import de.embl.cba.tables.image.ImageSourcesModel;
 import de.embl.cba.tables.imagesegment.ImageSegment;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
-import ij.ImagePlus;
 import ij3d.*;
 import isosurface.MeshEditor;
 import net.imglib2.FinalInterval;
@@ -29,7 +29,6 @@ import net.imglib2.view.Views;
 import org.scijava.java3d.View;
 import org.scijava.vecmath.Color3f;
 
-import java.awt.*;
 import java.awt.Component;
 import java.util.*;
 import java.util.List;
@@ -281,7 +280,7 @@ public class Segments3dView < T extends ImageSegment >
 			try
 			{
 				future.get();
-				Logger.info( "Added object to 3D Viewer " + (i++) + "/" + futures.size() );
+				// Logger.info( "Added object to 3D Viewer " + (i++) + "/" + futures.size() );
 			} catch ( InterruptedException e )
 			{
 				e.printStackTrace();
@@ -541,26 +540,7 @@ public class Segments3dView < T extends ImageSegment >
 		if ( universe == null )
 			universe = new Image3DUniverse();
 
-		if ( universe.getWindow() == null )
-		{
-			universe.show();
-			universe.getWindow().setResizable( false );
-
-			if ( parentComponent != null )
-			{
-				universe.getWindow().setPreferredSize( new Dimension(
-						parentComponent.getWidth() / 2 ,
-						parentComponent.getHeight() / 2  ) );
-
-				universe.getWindow().setLocation(
-						parentComponent.getLocationOnScreen().x
-								- universe.getWindow().getWidth() - 10,
-						parentComponent.getLocationOnScreen().y
-				);
-
-			}
-
-		}
+		UniverseUtils.showUniverseWindow( universe, parentComponent );
 
 		if ( ! isListeningToUniverse )
 			isListeningToUniverse = addUniverseListener();

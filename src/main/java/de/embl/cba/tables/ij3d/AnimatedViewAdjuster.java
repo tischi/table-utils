@@ -289,6 +289,7 @@ public class AnimatedViewAdjuster {
 			sleep( intervalBetweenFramesMillis );
 		}
 
+		univ.getViewPlatformTransformer().updateFrontBackClip();
 
 	}
 

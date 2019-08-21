@@ -15,6 +15,7 @@ public class SegmentsARGBConverter< T extends ImageSegment >
 	private final Map< LabelFrameAndImage, T > labelFrameAndImageToSegment;
 	private final String imageId;
 	private final ColoringModel< T > coloringModel;
+	private ARGBType singleColor;
 
 	private int frame;
 
@@ -26,6 +27,7 @@ public class SegmentsARGBConverter< T extends ImageSegment >
 		this.labelFrameAndImageToSegment = labelFrameAndImageToSegment;
 		this.imageId = imageId;
 		this.coloringModel = coloringModel;
+		this.singleColor = null;
 		this.frame = 0;
 	}
 
@@ -49,6 +51,13 @@ public class SegmentsARGBConverter< T extends ImageSegment >
 			return;
 		}
 
+		if ( singleColor != null )
+		{
+			color.setValid( true );
+			color.set( singleColor.get() );
+			return;
+		}
+
 		final LabelFrameAndImage labelFrameAndImage =
 				new LabelFrameAndImage( label.getRealDouble(), frame, imageId  );
 
@@ -58,7 +67,9 @@ public class SegmentsARGBConverter< T extends ImageSegment >
 		{
 			color.set( 0 );
 			color.setValid( true );
-		} else {
+		}
+		else
+		{
 			coloringModel.convert( imageSegment, color.get() );
 
 			final int alpha = ARGBType.alpha( color.get().get() );
@@ -67,12 +78,17 @@ public class SegmentsARGBConverter< T extends ImageSegment >
 
 			color.setValid( true );
 		}
-
 	}
 
 	@Override
 	public void timePointChanged( int timePointIndex )
 	{
 		this.frame = timePointIndex;
+	}
+
+	@Override
+	public void setSingleColor( ARGBType argbType )
+	{
+		singleColor = argbType;
 	}
 }

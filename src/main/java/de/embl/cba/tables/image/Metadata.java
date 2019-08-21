@@ -1,9 +1,9 @@
 package de.embl.cba.tables.image;
-import bdv.util.BdvStackSource;
-import net.imglib2.realtransform.AffineTransform3D;
 
-import java.awt.Color;
-import java.io.File;
+import bdv.util.BdvStackSource;
+import ij3d.Content;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +13,7 @@ import static de.embl.cba.tables.image.Metadata.Flavour.IntensitySource;
 /**
  * Questions:
  * - make it rather an interface with methods ?
- * -
+ * - how to make it extensible, for adding more (typed) metadata?
  */
 public class Metadata
 {
@@ -27,6 +27,7 @@ public class Metadata
 	public Double displayRangeMax = 65535.0; // TODO
 	public Color displayColor = Color.white;
 	public BdvStackSource< ? > bdvStackSource = null;
+	public Content content = null;
 //	public AffineTransform3D sourceTransform = new AffineTransform3D();
 	public String segmentsTablePath = null;
 
