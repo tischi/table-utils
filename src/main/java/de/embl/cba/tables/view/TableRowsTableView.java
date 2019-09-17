@@ -315,8 +315,23 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
         menu.add( createSaveAsMenuItem() );
 
+		menu.add( createAppendTableMenuItem() );
+
 		return menu;
     }
+
+	private JMenuItem createAppendTableMenuItem()
+	{
+		final JMenuItem menuItem = new JMenuItem( "Append Table..." );
+		menuItem.addActionListener( e ->
+				SwingUtilities.invokeLater( () ->
+						{
+							final Map< String, List< String > > columns = TableUIs.openTableUI();
+							addColumns( columns );
+						} ) );
+
+		return menuItem;
+	}
 
 	private JMenuItem createSaveAsMenuItem()
 	{

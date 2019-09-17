@@ -5,6 +5,8 @@ import ij.gui.GenericDialog;
 
 import javax.swing.*;
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 
 public class TableUIs
@@ -56,5 +58,18 @@ public class TableUIs
 		}
 	}
 
+	public static Map< String, List< String > > openTableUI( )
+	{
+		final JFileChooser jFileChooser = new JFileChooser( "" );
+
+		if ( jFileChooser.showOpenDialog( null ) == JFileChooser.APPROVE_OPTION )
+		{
+			final File selectedFile = jFileChooser.getSelectedFile();
+
+			return TableColumns.stringColumnsFromTableFile( selectedFile.toString() );
+		}
+
+		return null;
+	}
 
 }
