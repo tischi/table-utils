@@ -221,7 +221,6 @@ public class Tables
 
 	public static JTable createJTableFromStringList( List< String > strings, String delim )
 	{
-
 		delim = autoDelim( delim, strings );
 
 		StringTokenizer st = new StringTokenizer( strings.get( 0 ), delim );
@@ -229,9 +228,7 @@ public class Tables
 		List< String > colNames = new ArrayList<>();
 
 		while ( st.hasMoreTokens() )
-		{
 			colNames.add( st.nextToken() );
-		}
 
 		/**
 		 * Init model and columns
@@ -240,9 +237,7 @@ public class Tables
 		ColumnClassAwareTableModel model = new ColumnClassAwareTableModel();
 
 		for ( String colName : colNames )
-		{
 			model.addColumn( colName );
-		}
 
 		int numCols = colNames.size();
 
@@ -750,5 +745,24 @@ public class Tables
 
 		final Class< ? > columnClass = model.getColumnClass( columnIndex );
 		return Number.class.isAssignableFrom( columnClass );
+	}
+
+	public static JTable createNewTableFromSelectedColumns( JTable table, ArrayList< String > selectedColumns )
+	{
+		DefaultTableModel newModel = new DefaultTableModel();
+		final TableModel model = table.getModel();
+		final int rowCount = table.getRowCount();
+
+		for ( String columnName : selectedColumns )
+		{
+			final int columnIndex = table.getColumnModel().getColumnIndex( columnName );
+			final Object[] objects = new Object[ rowCount ];
+			for ( int rowIndex = 0; rowIndex < objects.length; rowIndex++ )
+				objects[ rowIndex ] = model.getValueAt( rowIndex, columnIndex );
+
+			newModel.addColumn( columnName, objects );
+		}
+
+		return new JTable( newModel );
 	}
 }

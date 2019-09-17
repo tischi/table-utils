@@ -4,7 +4,9 @@ import de.embl.cba.tables.view.TableRowsTableView;
 import ij.gui.GenericDialog;
 
 import javax.swing.*;
+import javax.swing.table.TableModel;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +48,24 @@ public class TableUIs
 		return columnName;
 	}
 
+	public static ArrayList< String > selectColumnNamesUI( JTable table, String text )
+	{
+		final String[] columnNames = Tables.getColumnNamesAsArray( table );
+		final int n = (int) Math.ceil( Math.sqrt( columnNames.length ) );
+		final GenericDialog gd = new GenericDialog( "" );
+		boolean[] booleans = new boolean[ columnNames.length ];
+		gd.addCheckboxGroup( n, n, columnNames, booleans );
+		gd.showDialog();
+		if ( gd.wasCanceled() ) return null;
+
+		final ArrayList< String > selectedColumns = new ArrayList<>();
+		for ( int i = 0; i < columnNames.length; i++ )
+			if ( gd.getNextBoolean() )
+				selectedColumns.add( columnNames[ i ] );
+
+		return selectedColumns;
+	}
+
 	public static void saveTableUI( JTable table )
 	{
 		final JFileChooser jFileChooser = new JFileChooser( "" );
@@ -55,6 +75,23 @@ public class TableUIs
 			final File selectedFile = jFileChooser.getSelectedFile();
 
 			Tables.saveTable( table, selectedFile );
+		}
+	}
+
+	public static void saveColumnsUI( JTable table )
+	{
+		final ArrayList< String > selectedColumns
+				= TableUIs.selectColumnNamesUI( table, "Select columns" );
+
+		final JTable newTable = Tables.createNewTableFromSelectedColumns( table, selectedColumns );
+
+		final JFileChooser jFileChooser = new JFileChooser( "" );
+
+		if ( jFileChooser.showSaveDialog( null ) == JFileChooser.APPROVE_OPTION )
+		{
+			final File selectedFile = jFileChooser.getSelectedFile();
+
+			Tables.saveTable( newTable, selectedFile );
 		}
 	}
 

@@ -12,7 +12,6 @@ import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.select.AssignValuesToSelectedRowsDialog;
 import de.embl.cba.tables.color.ColorByColumn;
 import de.embl.cba.tables.measure.MeasureDistance;
-import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import ij.IJ;
 import ij.gui.GenericDialog;
 import net.imglib2.type.numeric.ARGBType;
@@ -20,6 +19,7 @@ import net.imglib2.type.numeric.ARGBType;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -313,7 +313,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
     {
         JMenu menu = new JMenu( "Table" );
 
-        menu.add( createSaveAsMenuItem() );
+        menu.add( createSaveTableAsMenuItem() );
+
+		menu.add( createSaveColumnsAsMenuItem() );
 
 		menu.add( createAppendTableMenuItem() );
 
@@ -333,9 +335,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
-	private JMenuItem createSaveAsMenuItem()
+	private JMenuItem createSaveTableAsMenuItem()
 	{
-		final JMenuItem menuItem = new JMenuItem( "Save as..." );
+		final JMenuItem menuItem = new JMenuItem( "Save Table as..." );
 		menuItem.addActionListener( e ->
 				SwingUtilities.invokeLater( () ->
 						TableUIs.saveTableUI( table ) ) );
@@ -343,6 +345,14 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
+	private JMenuItem createSaveColumnsAsMenuItem()
+	{
+		final JMenuItem menuItem = new JMenuItem( "Save Columns as..." );
+		menuItem.addActionListener( e ->
+				SwingUtilities.invokeLater( () -> TableUIs.saveColumnsUI( table ) ) );
+
+		return menuItem;
+	}
 
 	private JMenuItem createSelectAllMenuItem()
 	{
