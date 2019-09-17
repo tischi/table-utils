@@ -454,6 +454,12 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		TableRows.addColumn( tableRows, column, defaultValue );
 	}
 
+	public void addColumn( String column, Object[] values )
+	{
+		Tables.addColumn( table.getModel(), column, values );
+		TableRows.addColumn( tableRows, column, values );
+	}
+
 	public List< String > getColumnNames()
 	{
 		return Tables.getColumnNames( table );
@@ -463,7 +469,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		return table;
 	}
-
 
 	public void moveToRowInView( int rowInView )
 	{

@@ -631,7 +631,6 @@ public class Tables
 		}
 	}
 
-
 	public static void addColumn( JTable table, String column, Object[] values )
 	{
 		addColumn( table.getModel(), column, values );

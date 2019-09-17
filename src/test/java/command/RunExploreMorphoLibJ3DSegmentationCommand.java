@@ -11,16 +11,20 @@ public class RunExploreMorphoLibJ3DSegmentationCommand
 		final ImageJ ij = new ImageJ();
 		ij.ui().showUI();
 
-		IJ.open( RunExploreMorphoLibJ3DSegmentationCommand.class.getResource(
-				"../3d-image.zip" ).getFile() );
+		final ExploreMorphoLibJLabelImageCommand command = new ExploreMorphoLibJLabelImageCommand();
+
+		command.intensityImage = IJ.openImage( RunExploreMorphoLibJ3DSegmentationCommand.class.getResource(
+				"../test-data/3d-image.zip" ).getFile() );
+
+		command.labelImage = IJ.openImage( RunExploreMorphoLibJ3DSegmentationCommand.class.getResource(
+				"../test-data/3d-image-lbl.zip" ).getFile() );
 
 		IJ.open( RunExploreMorphoLibJ3DSegmentationCommand.class.getResource(
-				"../3d-image-lbl.zip" ).getFile() );
+				"../test-data/3d-image-lbl-morpho.csv" ).getFile() );
 
-		IJ.open( RunExploreMorphoLibJ3DSegmentationCommand.class.getResource(
-				"../3d-image-lbl-morpho.csv" ).getFile() );
+		command.resultsTableTitle = "3d-image-lbl-morpho";
 
-		ij.command().run( ExploreMorphoLibJLabelImageCommand.class, true );
+		command.run();
 	}
 
 
