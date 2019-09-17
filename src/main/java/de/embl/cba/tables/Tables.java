@@ -479,10 +479,8 @@ public class Tables
 //		return Double.parseDouble( rowEntries[ columnIndex ] );
 //	}
 
-
 	public static JTable jTableFromTableRows( List< ? extends TableRow > tableRows )
 	{
-
 		ColumnClassAwareTableModel model = new ColumnClassAwareTableModel();
 
 		final Set< String > columnNames = tableRows.get( 0 ).getColumnNames();

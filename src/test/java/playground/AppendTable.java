@@ -37,12 +37,7 @@ public class AppendTable
 				TableColumns.stringColumnsFromTableFile( AppendTable.class.getResource(
 						"../test-data/3d-image-lbl-morpho-addOn.csv" ).getFile()  );
 
-		final String columnName = columns.keySet().iterator().next();
-		final List< String > strings = columns.get( columnName );
-
-		//Object[] objects = new Object[ strings.size() ];
-		Object[] objects = strings.toArray();
-		views.getTableRowsTableView().addColumn( columnName, objects );
+		views.getTableRowsTableView().addColumns( columns );
 
 	}
 

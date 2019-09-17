@@ -21,6 +21,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 
 
 public class TableRowsTableView < T extends TableRow > extends JPanel
@@ -458,6 +459,12 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		Tables.addColumn( table.getModel(), column, values );
 		TableRows.addColumn( tableRows, column, values );
+	}
+
+	public void addColumns( Map< String, List< String > > columns )
+	{
+		for ( String columnName : columns.keySet() )
+			addColumn( columnName, columns.get( columnName ).toArray() );
 	}
 
 	public List< String > getColumnNames()
