@@ -10,7 +10,7 @@ import de.embl.cba.tables.tablerow.TableRow;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.select.AssignValuesToSelectedRowsDialog;
-import de.embl.cba.tables.color.ColorByColumn;
+import de.embl.cba.tables.color.ColumnBasedColoring;
 import de.embl.cba.tables.measure.MeasureDistance;
 import ij.IJ;
 import ij.gui.GenericDialog;
@@ -19,7 +19,6 @@ import net.imglib2.type.numeric.ARGBType;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +38,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private int recentlySelectedRowInView;
 	private AssignValuesToSelectedRowsDialog assignObjectAttributesUI;
 	private HelpDialog helpDialog;
-	private ColorByColumn< T > colorByColumn;
+	private ColumnBasedColoring< T > columnBasedColoring;
 	private MeasureDistance< T > measureDistance;
 	private Component parentComponent;
 
@@ -203,7 +202,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		final ARGBType argbType = new ARGBType();
 		selectionColoringModel.convert( tableRows.get( row ), argbType );
 
-		if ( argbType.get() == 0 )
+		if ( ARGBType.alpha( argbType.get() ) == 0 )
 			return Color.WHITE;
 		else
 			return ColorUtils.getColor( argbType );
@@ -418,15 +417,16 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private void continueExistingAnnotation( String columnName )
 	{
-		final ColorByColumn< T > colorByColumn = new ColorByColumn<>(
-				table,
-				selectionColoringModel );
+		final ColumnBasedColoring< T > columnBasedColoring =
+				new ColumnBasedColoring<>(
+					table,
+					selectionColoringModel );
 
 		selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
 
-		final ColoringModel< T > coloringModel = colorByColumn.colorByColumn(
+		final ColoringModel< T > coloringModel = columnBasedColoring.getColumnBasedColoringModel(
 				columnName,
-				ColorByColumn.RANDOM_GLASBEY );
+				ColumnBasedColoring.RANDOM_GLASBEY );
 
 //		(( CategoryTableRowColumnColoringModel< TableRowImageSegment > ) coloringModel )
 //				.getSpecialInputToColor().put( "None", new ARGBType( 0 ) );
@@ -588,11 +588,11 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		final JMenuItem menuItem = new JMenuItem( "Color by Column..." );
 
-		this.colorByColumn = new ColorByColumn( table, selectionColoringModel );
+		this.columnBasedColoring = new ColumnBasedColoring( table, selectionColoringModel );
 
 		menuItem.addActionListener( e ->
 				new Thread( () ->
-						colorByColumn.showDialog() ).start() );
+						columnBasedColoring.showDialog() ).start() );
 
 		coloringMenu.add( menuItem );
 	}
@@ -615,9 +615,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 					{
 						if ( measureDistance.showDialog( selectionModel.getSelected() ) )
 						{
-							colorByColumn.colorByColumn(
+							columnBasedColoring.getColumnBasedColoringModel(
 									measureDistance.getNewColumnName(),
-									ColorByColumn.LINEAR_BLUE_WHITE_RED );
+									ColumnBasedColoring.LINEAR_BLUE_WHITE_RED );
 
 							selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
 						}

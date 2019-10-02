@@ -519,7 +519,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 		if ( ! isLabelSourceActive() ) return;
 
 		final ColoringModel< T > coloringModel =
-				selectionColoringModel.getWrappedColoringModel();
+				selectionColoringModel.getColoringModel();
 
 		if ( coloringModel instanceof CategoryColoringModel )
 		{

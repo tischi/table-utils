@@ -10,7 +10,6 @@ import de.embl.cba.tables.view.combined.SegmentsTableAndBdvViews;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imagej.ImageJ;
-import net.imglib2.type.numeric.ARGBType;
 
 import java.util.List;
 
@@ -36,16 +35,16 @@ public class AnnotateBlobs2D
 
 
 
-		final ColorByColumn< TableRowImageSegment > colorByColumn = new ColorByColumn<>(
+		final ColumnBasedColoring< TableRowImageSegment > columnBasedColoring = new ColumnBasedColoring<>(
 				tableView.getTable(),
 				views.getSelectionColoringModel()
 		);
 
 		views.getSelectionColoringModel().setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
 
-		final ColoringModel< TableRowImageSegment > coloringModel = colorByColumn.colorByColumn(
+		final ColoringModel< TableRowImageSegment > coloringModel = columnBasedColoring.getColumnBasedColoringModel(
 				"Annotation",
-				ColorByColumn.RANDOM_GLASBEY
+				ColumnBasedColoring.RANDOM_GLASBEY
 		);
 
 		final Annotator annotator = new Annotator(

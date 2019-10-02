@@ -21,7 +21,6 @@ public class ExploreDajaCellProfilerTable
 		command.logService = ij.log();
 		command.imagePathColumnsId = ExploreObjectsTableCommand.IMAGE_PATH_COLUMNS_ID_DEFAULT;
 		command.imageRootFolder = new File( "/Volumes" );
-		command.isPathMapping = false;
 
 		command.run();
 

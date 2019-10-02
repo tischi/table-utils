@@ -213,14 +213,20 @@ public class TableColumns
 		final String s = strings.get( row );
 		if ( isNaN( s ) )
 			doubles[ row ] =  Double.NaN ;
+		else if ( isInf( s ) )
+			doubles[ row ] =  Double.POSITIVE_INFINITY;
 		else
 			doubles[ row ] =  Double.parseDouble( s );
 	}
 
-
 	public static boolean isNaN( String s )
 	{
 		return s.equals( "NA" );
+	}
+
+	public static boolean isInf( String s )
+	{
+		return s.equals( "Inf" );
 	}
 
 	private static Class getColumnType( String string )

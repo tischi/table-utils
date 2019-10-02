@@ -8,7 +8,7 @@ import java.util.List;
 
 public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 {
-	ColoringModel< T > wrappedColoringModel;
+	ColoringModel< T > coloringModel;
 	SelectionModel< T > selectionModel;
 
 	private SelectionMode selectionMode;
@@ -28,10 +28,10 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 	}
 
 	public SelectionColoringModel(
-			ColoringModel< T > wrappedColoringModel,
+			ColoringModel< T > coloringModel,
 			SelectionModel< T > selectionModel )
 	{
-		setWrappedColoringModel( wrappedColoringModel );
+		setColoringModel( coloringModel );
 		this.selectionModel = selectionModel;
 		this.selectionModes = Arrays.asList( SelectionColoringModel.SelectionMode.values() );
 
@@ -40,11 +40,10 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 		this.selectionMode = SelectionMode.DimNotSelected;
 	}
 
-
 	@Override
 	public void convert( T input, ARGBType output )
 	{
-		wrappedColoringModel.convert( input, output );
+		coloringModel.convert( input, output );
 
 		if ( selectionModel.isEmpty() ) return;
 
@@ -131,19 +130,18 @@ public class SelectionColoringModel < T > extends AbstractColoringModel< T >
 		notifyColoringListeners();
 	}
 
-	public void setWrappedColoringModel( ColoringModel< T > wrappedColoringModel )
+	public void setColoringModel( ColoringModel< T > coloringModel )
 	{
-		this.wrappedColoringModel = wrappedColoringModel;
+		this.coloringModel = coloringModel;
 		notifyColoringListeners();
 
 		// chain event notification
-		wrappedColoringModel.listeners().add( () -> SelectionColoringModel.this.notifyColoringListeners() );
-
+		coloringModel.listeners().add( () -> SelectionColoringModel.this.notifyColoringListeners() );
 	}
 
-	public ColoringModel< T > getWrappedColoringModel()
+	public ColoringModel< T > getColoringModel()
 	{
-		return wrappedColoringModel;
+		return coloringModel;
 	}
 
 	public void iterateSelectionMode()

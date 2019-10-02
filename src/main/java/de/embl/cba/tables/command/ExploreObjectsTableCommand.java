@@ -39,37 +39,31 @@ public class ExploreObjectsTableCommand implements Command
 	public File tableFile;
 
 	@Parameter ( label = "Image path column identifier", choices = { DEFAULT })
-	public String imagePathColumnsId;
+	public String imagePathColumnsId = DEFAULT;
 
 	@Parameter ( label = "Paths to images are relative" )
-	public boolean isRelativeImagePath;
+	public boolean isRelativeImagePath = true;
 
 	@Parameter ( label = "Parent folder (for relative image paths)",
 			required = false, style = "directory")
 	public File imageRootFolder;
 
-//	@Parameter ( label = "Apply Path Mapping" )
-	public boolean isPathMapping = false;
-
-//	@Parameter ( label = "Root path in table (for path mapping)" )
-	public String imageRootPathInTable = "/Volumes/";
-
-//	@Parameter ( label = "Root path on this computer (for path mapping)" )
-	public String imageRootPathOnThisComputer = "/g/";
-
 	@Parameter ( label = "Log Image Paths", callback = "logImagePaths")
 	private Button logImagePathsButton;
 
 	@Parameter ( label = "Images are 2D" )
-	public boolean is2D;
+	public boolean is2D = true;
 
 	@Parameter ( label = "Time points are one-based" )
 	public boolean isOneBasedTimePoint;
 
+	//	@Parameter ( label = "Apply Path Mapping" )
+	private boolean isPathMapping = false;
 
 	private Map< String, List< String > > columns;
-	private Map< SegmentProperty, String > propertyToColumnName;
 
+	// Can be set programmatically
+	public Map< SegmentProperty, String > propertyToColumnName = null;
 
 	public void run()
 	{
@@ -140,6 +134,13 @@ public class ExploreObjectsTableCommand implements Command
 		if ( columns == null )
 			loadColumnsFromFile( tablePath );
 
+		if ( propertyToColumnName == null )
+		{
+			final SegmentPropertyColumnsSelectionDialog selectionDialog
+					= new SegmentPropertyColumnsSelectionDialog( columns.keySet() );
+			propertyToColumnName = selectionDialog.fetchUserInput();
+		}
+
 		final Map< SegmentProperty, List< String > > propertyToColumn
 				= createPropertyToColumnMap( columns.keySet() );
 
@@ -168,11 +169,6 @@ public class ExploreObjectsTableCommand implements Command
 	private Map< SegmentProperty, List< String > > createPropertyToColumnMap(
 			Set< String > columnNames )
 	{
-		final SegmentPropertyColumnsSelectionDialog selectionDialog
-				= new SegmentPropertyColumnsSelectionDialog( columnNames );
-
-		propertyToColumnName = selectionDialog.fetchUserInput();
-
 		final Map< SegmentProperty, List< String > > propertyToColumn
 				= new LinkedHashMap<>();
 

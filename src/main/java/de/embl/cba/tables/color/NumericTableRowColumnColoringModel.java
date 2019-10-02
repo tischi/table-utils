@@ -1,7 +1,6 @@
 package de.embl.cba.tables.color;
 
 import de.embl.cba.bdv.utils.lut.ARGBLut;
-import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.tablerow.TableRow;
 import net.imglib2.type.numeric.ARGBType;
 
@@ -14,20 +13,20 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	private final ARGBLut lut;
 	private double[] lutMinMax;
 	private double[] lutRange;
-	private final boolean paintZeroBlack;
+	private final boolean paintZeroTransparent;
 
 	public NumericTableRowColumnColoringModel(
 			String columnName,
 			ARGBLut lut,
 			double[] lutMinMax,
 			double[] lutRange,
-			boolean paintZeroBlack )
+			boolean paintZeroTransparent )
 	{
 		this.columnName = columnName;
 		this.lut = lut;
 		this.lutMinMax = lutMinMax;
 		this.lutRange = lutRange;
-		this.paintZeroBlack = paintZeroBlack;
+		this.paintZeroTransparent = paintZeroTransparent;
 	}
 
 	@Override
@@ -79,10 +78,10 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 
 	private void setColorLinearly( Double value, ARGBType output )
 	{
-		if ( paintZeroBlack )
+		if ( paintZeroTransparent )
 			if ( value == 0 )
 			{
-				output.set( 0 );
+				output.set( ARGBType.rgba( 0,0,0,0 ) );
 				return;
 			}
 

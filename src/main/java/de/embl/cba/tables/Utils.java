@@ -10,6 +10,8 @@ import mpicbg.spim.data.SpimData;
 import net.imglib2.util.Intervals;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class Utils
 {
@@ -53,5 +55,23 @@ public class Utils
 		ArrayList< SourceAndConverter< ? > > sources = new ArrayList<>();
 		BigDataViewer.initSetups( spimData, converterSetups, sources );
 		return sources.get( sourceIndex ).getSpimSource();
+	}
+
+	public static void fetchFutures( ArrayList< Future > futures )
+	{
+		for ( Future future : futures )
+		{
+			try
+			{
+				future.get();
+				// Logger.info( "Added object to 3D Viewer " + (i++) + "/" + futures.size() );
+			} catch ( InterruptedException e )
+			{
+				e.printStackTrace();
+			} catch ( ExecutionException e )
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 }

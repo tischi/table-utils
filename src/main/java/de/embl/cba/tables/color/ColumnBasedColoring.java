@@ -6,20 +6,20 @@ import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.tablerow.TableRow;
 import ij.gui.GenericDialog;
+import net.imglib2.type.numeric.ARGBType;
 
 import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ColorByColumn< T extends TableRow >
+public class ColumnBasedColoring< T extends TableRow >
 {
-
 	public static final String LINEAR_BLUE_WHITE_RED = "Linear - Blue White Red";
-	public static final String LINEAR_ZERO_BLACK_BLUE_WHITE_RED = "Linear - Black Blue White Red";
+	public static final String LINEAR_ZERO_BLACK_BLUE_WHITE_RED = "Linear - Transparent Blue White Red";
 	public static final String RANDOM_GLASBEY = "Categorical - Glasbey";
 
 	private final JTable table;
-	private final SelectionColoringModel< T > selectionColoringModel;
+	private final SelectionColoringModel< T > coloringModel; // TODO
 
 	private String selectedColumnName;
 	private String selectedColoringMode;
@@ -35,11 +35,11 @@ public class ColorByColumn< T extends TableRow >
 			};
 
 
-	public ColorByColumn( JTable table,
-						  SelectionColoringModel< T > selectionColoringModel )
+	public ColumnBasedColoring( JTable table,
+								SelectionColoringModel< T > coloringModel )
 	{
 		this.table = table;
-		this.selectionColoringModel = selectionColoringModel;
+		this.coloringModel = coloringModel;
 
 		this.columnNameToMinMax = new HashMap<>();
 		this.columnNameToRangeSettings = new HashMap<>();
@@ -64,11 +64,10 @@ public class ColorByColumn< T extends TableRow >
 		selectedColumnName = gd.getNextChoice();
 		selectedColoringMode = gd.getNextChoice();
 
-		colorByColumn( selectedColumnName, selectedColoringMode );
-
+		getColumnBasedColoringModel( selectedColumnName, selectedColoringMode );
 	}
 
-	public ColoringModel< T > colorByColumn(
+	public ColoringModel< T > getColumnBasedColoringModel(
 			String selectedColumnName,
 			String selectedColoringMode )
 	{
@@ -76,24 +75,24 @@ public class ColorByColumn< T extends TableRow >
 		switch ( selectedColoringMode )
 		{
 			case LINEAR_BLUE_WHITE_RED:
-				return colorLinear(
-						selectionColoringModel,
+				return getLinearColoringModel(
+						coloringModel,
 						selectedColumnName,
 						false );
 			case LINEAR_ZERO_BLACK_BLUE_WHITE_RED:
-				return colorLinear(
-						selectionColoringModel,
+				return getLinearColoringModel(
+						coloringModel,
 						selectedColumnName,
 						true );
 			case RANDOM_GLASBEY:
-				return colorCategorical(
-						selectionColoringModel,
+				return getCategoricalColoringModel(
+						coloringModel,
 						selectedColumnName );
 		}
 		return null;
 	}
 
-	private CategoryTableRowColumnColoringModel< T > colorCategorical(
+	private CategoryTableRowColumnColoringModel< T > getCategoricalColoringModel(
 			SelectionColoringModel< T > selectionColoringModel,
 			String selectedColumnName )
 	{
@@ -102,15 +101,17 @@ public class ColorByColumn< T extends TableRow >
 						selectedColumnName,
 						new GlasbeyARGBLut( 255 ) );
 
-		selectionColoringModel.setWrappedColoringModel( coloringModel );
+		coloringModel.addInputToFixedColor( "None", new ARGBType( ARGBType.rgba( 0,0,0,0 ) ) );
+
+		selectionColoringModel.setColoringModel( coloringModel );
 
 		return coloringModel;
 	}
 
-	private NumericTableRowColumnColoringModel< T > colorLinear(
+	private NumericTableRowColumnColoringModel< T > getLinearColoringModel(
 			SelectionColoringModel< T > selectionColoringModel,
 			String selectedColumnName,
-			boolean paintZeroBlack )
+			boolean paintZeroTransparent )
 	{
 
 		if ( ! Tables.isNumeric( table, selectedColumnName ) )
@@ -129,9 +130,9 @@ public class ColorByColumn< T extends TableRow >
 						new BlueWhiteRedARGBLut( 1000 ),
 						valueSettings,
 						valueRange,
-						paintZeroBlack );
+						paintZeroTransparent );
 
-		selectionColoringModel.setWrappedColoringModel( coloringModel );
+		selectionColoringModel.setColoringModel( coloringModel );
 
 		SwingUtilities.invokeLater( () ->
 				new NumericColoringModelDialog( selectedColumnName, coloringModel, valueRange ) );

@@ -12,9 +12,11 @@ import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 public class CategoryTableRowColumnColoringModel< T extends TableRow >
 		extends AbstractColoringModel< T > implements CategoryColoringModel< T >
 {
-	Map< Object, ARGBType > inputToColor;
+
+	private Map< Object, ARGBType > inputToFixedColor;
+	private Map< Object, ARGBType > inputToRandomColor;
 	private final String column;
-	ARGBLut argbLut;
+	private ARGBLut argbLut;
 	private int randomSeed;
 
 	/**
@@ -25,7 +27,8 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	{
 		this.column = column;
 		this.argbLut = argbLut;
-		this.inputToColor = new ConcurrentHashMap<>(  );
+		this.inputToRandomColor = new ConcurrentHashMap<>(  );
+		this.inputToFixedColor = new ConcurrentHashMap<>(  );
 		this.randomSeed = 50;
 	}
 
@@ -34,16 +37,21 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	{
 		final Object featureValue = input.getCell( column );
 
- 		if ( inputToColor.keySet().contains( featureValue ) )
+		if ( inputToFixedColor.keySet().contains( featureValue ) )
 		{
-			final int color = inputToColor.get( featureValue ).get();
+			final int color = inputToFixedColor.get( featureValue ).get();
+			output.set( color );
+		}
+ 		else if ( inputToRandomColor.keySet().contains( featureValue ) )
+		{
+			final int color = inputToRandomColor.get( featureValue ).get();
 			output.set( color );
 		}
 		else
 		{
-			final double random = createRandom( inputToColor.size() + 1 );
-			inputToColor.put( featureValue, new ARGBType( argbLut.getARGB( random ) ) );
-			final int color = inputToColor.get( featureValue ).get();
+			final double random = createRandom( inputToRandomColor.size() + 1 );
+			inputToRandomColor.put( featureValue, new ARGBType( argbLut.getARGB( random ) ) );
+			final int color = inputToRandomColor.get( featureValue ).get();
 			output.set( color );
 		}
 	}
@@ -58,10 +66,15 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	@Override
 	public void incRandomSeed( )
 	{
-		inputToColor.clear();
+		inputToRandomColor.clear();
 		this.randomSeed++;
 
 		notifyColoringListeners();
+	}
+
+	public void addInputToFixedColor( Object input, ARGBType color )
+	{
+		inputToFixedColor.put( input, color );
 	}
 
 }

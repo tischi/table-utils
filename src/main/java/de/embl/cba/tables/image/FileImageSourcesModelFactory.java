@@ -2,11 +2,13 @@ package de.embl.cba.tables.image;
 
 import bdv.util.Bdv;
 import de.embl.cba.tables.FileUtils;
+import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import de.embl.cba.tables.tablerow.TableRow;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -35,7 +37,6 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		this.excludeImages = new HashSet<>(  );
 
 		columnNames = tableRowImageSegments.get( 0 ).getColumnNames();
-
 	}
 
 	public void excludeImage( String excludeImages )
@@ -74,8 +75,6 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 			if ( ! excludeImages.contains( imageName ) )
 				imageNames.add( imageName );
 
-
-
 		for ( TableRowImageSegment tableRowImageSegment : tableRowImageSegments )
 		{
 			final List< String > imageSetIds = getImageSetIds( tableRowImageSegment, imageNames );
@@ -92,15 +91,22 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 					final Path absoluteImagePath =
 							Tables.getAbsolutePath( imageRootFolder, imagePath );
 
-					final String imageDisplayName =
-							absoluteImagePath.getFileName().toString();
+					if ( absoluteImagePath.toFile().exists() )
+					{
+						final String imageDisplayName =
+								absoluteImagePath.getFileName().toString();
 
-					imageSourcesModel.addSourceAndMetadata(
-							imageId,
-							imageDisplayName,
-							absoluteImagePath.toString(),
-							imageSetIds,
-							getImageFlavour( imageName ) );
+						imageSourcesModel.addSourceAndMetadata(
+								imageId,
+								imageDisplayName,
+								absoluteImagePath.toString(),
+								imageSetIds,
+								getImageFlavour( imageName ) );
+					}
+					else
+					{
+						Logger.warn( "Image file not found: " + absoluteImagePath );
+					}
 				}
 			}
 		}

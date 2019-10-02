@@ -251,20 +251,14 @@ public class Segments3dView < T extends ImageSegment >
 
 	private synchronized void showSelectedSegments( Set< T > segments )
 	{
-
-//		segmentToTriangleMesh = new ConcurrentHashMap<>();
-
 		initUniverseAndListener();
-
 
 		final ArrayList< Future > futures = new ArrayList<>();
 		for ( T segment : segments )
 			if ( ! segmentToContent.containsKey( segment ) )
-			{
 				futures.add(
 						executorService.submit( () ->
 								{
-//									segmentToTriangleMesh.put( segment, getCustomTriangleMesh( segment ) );
 									final CustomTriangleMesh mesh = getCustomTriangleMesh( segment );
 									if ( mesh != null )
 										addMeshToUniverse( segment, mesh  );
@@ -272,41 +266,8 @@ public class Segments3dView < T extends ImageSegment >
 										Logger.info( "Error creating mesh of segment " + segment.labelId() );
 								}
 						) );
-			}
 
-		int i = 1;
-		for ( Future future : futures )
-		{
-			try
-			{
-				future.get();
-				// Logger.info( "Added object to 3D Viewer " + (i++) + "/" + futures.size() );
-			} catch ( InterruptedException e )
-			{
-				e.printStackTrace();
-			} catch ( ExecutionException e )
-			{
-				e.printStackTrace();
-			}
-		}
-
-
-
-//		for ( T segment : segments )
-//		{
-//			executorService.submit( () -> {
-//				final CustomTriangleMesh mesh = segmentToTriangleMesh.get( segment );
-//				if ( mesh != null )
-//				{
-//					addMeshToUniverse( segment, mesh );
-//					Logger.info( "Added mesh " + ( segment.labelId()) + "/" + segments.size() );
-//				}
-//				else
-//				{
-//					Logger.info( "Error creating mesh of segment " + segment.labelId() );
-//				}
-//			} );
-//		}
+		Utils.fetchFutures( futures );
 	}
 
 	private synchronized void removeSegmentFrom3DView( T segment )
