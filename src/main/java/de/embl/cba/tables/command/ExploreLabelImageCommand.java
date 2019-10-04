@@ -1,6 +1,7 @@
 package de.embl.cba.tables.command;
 
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
+import de.embl.cba.bdv.utils.sources.Metadata;
 import de.embl.cba.bdv.utils.wrap.Wraps;
 import de.embl.cba.tables.Calibrations;
 import de.embl.cba.tables.Logger;

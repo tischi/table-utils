@@ -558,9 +558,7 @@ public class SegmentsBdvView < T extends ImageSegment >
 		if ( ! isLabelSourceActive() ) return;
 
 		if ( ! ( labelsSource.source() instanceof ModifiableRandomAccessibleIntervalSource4D ) )
-		{
 			return;
-		}
 
 		final ModifiableRandomAccessibleIntervalSource4D source = ( ModifiableRandomAccessibleIntervalSource4D) labelsSource.source();
 
@@ -650,11 +648,7 @@ public class SegmentsBdvView < T extends ImageSegment >
 
 	private synchronized void toggleSelectionAtMousePosition()
 	{
-		if ( segments == null )
-		{
-			// TODO: maybe also make this work if there are now segments, i.e. a table provided
-			return;
-		}
+		if ( segments == null ) return;
 
 		if ( ! isLabelSourceActive() ) return;
 
@@ -689,13 +683,13 @@ public class SegmentsBdvView < T extends ImageSegment >
 		return active;
 	}
 
-	private double getLabelIdAtCurrentMouseCoordinates( SourceAndMetadata activeLabelSource )
+	private double getLabelIdAtCurrentMouseCoordinates( SourceAndMetadata labelSource )
 	{
 		final RealPoint globalMouseCoordinates =
 				BdvUtils.getGlobalMouseCoordinates( bdv );
 
 		final Double value = BdvUtils.getPixelValue(
-				activeLabelSource.source(),
+				labelSource.source(),
 				globalMouseCoordinates,
 				getCurrentTimePoint() );
 

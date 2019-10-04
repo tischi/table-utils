@@ -1,5 +1,6 @@
 package de.embl.cba.tables;
 
+import de.embl.cba.bdv.utils.sources.Metadata;
 import de.embl.cba.bdv.utils.wrap.Wraps;
 import de.embl.cba.tables.image.DefaultImageSourcesModel;
 import de.embl.cba.tables.imagesegment.SegmentProperty;

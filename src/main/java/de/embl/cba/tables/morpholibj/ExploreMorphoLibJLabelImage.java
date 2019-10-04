@@ -1,5 +1,6 @@
 package de.embl.cba.tables.morpholibj;
 
+import de.embl.cba.bdv.utils.sources.Metadata;
 import de.embl.cba.bdv.utils.wrap.Wraps;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableColumns;

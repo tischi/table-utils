@@ -1,6 +1,7 @@
 package de.embl.cba.tables.image;
 
 import bdv.util.Bdv;
+import de.embl.cba.bdv.utils.sources.Metadata;
 import de.embl.cba.tables.FileUtils;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.Tables;
