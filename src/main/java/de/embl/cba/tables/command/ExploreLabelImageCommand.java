@@ -8,7 +8,6 @@ import de.embl.cba.tables.color.LazyCategoryColoringModel;
 import de.embl.cba.tables.color.SelectionColoringModel;
 import de.embl.cba.tables.imagesegment.LazyImageSegmentsModel;
 import de.embl.cba.tables.image.DefaultImageSourcesModel;
-import de.embl.cba.tables.image.Metadata;
 import de.embl.cba.tables.imagesegment.ImageSegment;
 import de.embl.cba.tables.select.DefaultSelectionModel;
 import de.embl.cba.tables.select.SelectionModel;

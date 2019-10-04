@@ -3,7 +3,9 @@ package de.embl.cba.tables.image;
 import bdv.util.RandomAccessibleIntervalSource4D;
 import bdv.viewer.Interpolation;
 import bdv.viewer.Source;
+import de.embl.cba.bdv.utils.sources.ImagePlusFileSource;
 import de.embl.cba.bdv.utils.sources.LazySpimSource;
+import de.embl.cba.bdv.utils.sources.Metadata;
 import de.embl.cba.bdv.utils.wrap.Wraps;
 import de.embl.cba.tables.Logger;
 import ij.IJ;
@@ -15,9 +17,9 @@ import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 
-import java.util.*;
-
-import static de.embl.cba.tables.image.Metadata.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FileImageSourcesModel implements ImageSourcesModel
 {
@@ -47,7 +49,7 @@ public class FileImageSourcesModel implements ImageSourcesModel
 			String imageDisplayName,
 			String imagePath,
 			List< String > imageSetIDs,
-			Flavour flavor )
+			Metadata.Flavour flavor )
 	{
 		if ( nameToSourceAndMetadata.containsKey( imageId ) ) return;
 
@@ -65,115 +67,14 @@ public class FileImageSourcesModel implements ImageSourcesModel
 		}
 		else
 		{
-			final DefaultImageFileSource defaultImageFileSource =
-					new DefaultImageFileSource( metadata, imagePath );
+			final ImagePlusFileSource imagePlusFileSource =
+					new ImagePlusFileSource( metadata, imagePath );
+
 			nameToSourceAndMetadata.put(
 					imageId,
-					new SourceAndMetadata( defaultImageFileSource, metadata ) );
+					new SourceAndMetadata( imagePlusFileSource, metadata ) );
 		}
 
 	}
 
-
-	// TODO: put somewhere else...maybe bdv-utils?
-	class DefaultImageFileSource< R extends RealType< R > & NativeType< R > > implements Source< R >
-	{
-		private final Metadata metadata;
-		private final String imagePath;
-		private RandomAccessibleIntervalSource4D source;
-		private ImagePlus imagePlus;
-
-		public DefaultImageFileSource( Metadata metadata, String imagePath )
-		{
-			this.metadata = metadata;
-			this.imagePath = imagePath;
-		}
-
-		@Override
-		public boolean isPresent( int t )
-		{
-			return wrappedSource().isPresent( t );
-		}
-
-		@Override
-		public RandomAccessibleInterval< R > getSource( int t, int level )
-		{
-			return wrappedSource().getSource( t, level );
-		}
-
-		private RandomAccessibleIntervalSource4D< R > wrappedSource()
-		{
-			if ( source == null )
-				loadAndCreateSource();
-
-			return source;
-		}
-
-		private void loadAndCreateSource()
-		{
-			openImagePlus();
-
-			metadata.numSpatialDimensions = imagePlus.getNSlices() > 1 ? 3 : 2;
-
-			if( metadata.flavour == Flavour.LabelSource || imagePlus.getBitDepth() == 8 )
-			{
-				metadata.displayRangeMin = 0.0;
-				metadata.displayRangeMax = 500.0;
-			}
-			else if( imagePlus.getBitDepth() == 16 )
-			{
-				metadata.displayRangeMin = 0.0;
-				metadata.displayRangeMax = 65535.0;
-			}
-
-			source = Wraps.imagePlusAsSource4DChannelList( imagePlus ).get( 0 );
-		}
-
-		private void openImagePlus()
-		{
-			imagePlus = IJ.openImage( imagePath );
-
-			if ( imagePlus == null )
-				Logger.error("Could not open image: " + imagePath );
-
-
-			imagePlus.setTitle( metadata.displayName );
-		}
-
-		@Override
-		public RealRandomAccessible< R > getInterpolatedSource( int t, int level, Interpolation method )
-		{
-			return wrappedSource().getInterpolatedSource( t, level, method );
-		}
-
-		@Override
-		public void getSourceTransform( int t, int level, AffineTransform3D transform )
-		{
-			wrappedSource().getSourceTransform( t, level, transform  );
-		}
-
-		@Override
-		public R getType()
-		{
-			return wrappedSource().getType();
-		}
-
-		@Override
-		public String getName()
-		{
-			return wrappedSource().getName();
-		}
-
-		@Override
-		public VoxelDimensions getVoxelDimensions()
-		{
-			return wrappedSource().getVoxelDimensions();
-		}
-
-		@Override
-		public int getNumMipmapLevels()
-		{
-			return wrappedSource().getNumMipmapLevels();
-		}
-	}
 }

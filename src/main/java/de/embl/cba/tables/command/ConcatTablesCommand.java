@@ -1,21 +1,9 @@
 package de.embl.cba.tables.command;
 
-import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
-import de.embl.cba.bdv.utils.wrap.Wraps;
-import de.embl.cba.tables.Calibrations;
 import de.embl.cba.tables.FileUtils;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.Tables;
-import de.embl.cba.tables.color.LazyCategoryColoringModel;
-import de.embl.cba.tables.color.SelectionColoringModel;
-import de.embl.cba.tables.image.DefaultImageSourcesModel;
-import de.embl.cba.tables.image.Metadata;
-import de.embl.cba.tables.imagesegment.ImageSegment;
-import de.embl.cba.tables.imagesegment.LazyImageSegmentsModel;
-import de.embl.cba.tables.select.DefaultSelectionModel;
-import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.table.ConcatenatedTableModel;
-import ij.ImagePlus;
 import net.imglib2.type.numeric.RealType;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;

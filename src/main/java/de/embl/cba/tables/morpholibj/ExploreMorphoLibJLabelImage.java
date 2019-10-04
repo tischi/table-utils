@@ -1,12 +1,10 @@
 package de.embl.cba.tables.morpholibj;
 
 import de.embl.cba.bdv.utils.wrap.Wraps;
-import de.embl.cba.tables.Calibrations;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.TableColumns;
 import de.embl.cba.tables.image.DefaultImageSourcesModel;
 import de.embl.cba.tables.image.ImageSourcesModel;
-import de.embl.cba.tables.image.Metadata;
 import de.embl.cba.tables.imagesegment.SegmentProperty;
 import de.embl.cba.tables.imagesegment.SegmentUtils;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;

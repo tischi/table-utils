@@ -1,15 +1,12 @@
 package de.embl.cba.tables.image;
 
 import bdv.viewer.Source;
+import de.embl.cba.bdv.utils.sources.Metadata;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.RealType;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import static de.embl.cba.tables.image.Metadata.*;
-
 
 public class DefaultImageSourcesModel implements ImageSourcesModel
 {
@@ -37,7 +34,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 	public < R extends RealType< R > > void addSourceAndMetadata(
 			Source< R > source,
 			String imageId,
-			Flavour flavor,
+			Metadata.Flavour flavor,
 			int numSpatialDimensions,
 			String segmentsTablePath,
 			double displayRangeMax
@@ -56,7 +53,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 	public < R extends RealType< R > > void addSourceAndMetadata(
 			Source< R > source,
 			String imageId,
-			Flavour flavor,
+			Metadata.Flavour flavor,
 			int numSpatialDimensions,
 			AffineTransform3D transform,
 			String segmentsTablePath
@@ -78,7 +75,5 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 	{
 		nameToSourceAndMetadata.put( imageId, sourceAndMetadata );
 	}
-
-
 
 }

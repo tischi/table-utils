@@ -1,6 +1,7 @@
 package de.embl.cba.tables.image;
 
 import bdv.viewer.Source;
+import de.embl.cba.bdv.utils.sources.Metadata;
 import net.imglib2.type.numeric.RealType;
 
 public class SourceAndMetadata< R extends RealType< R > >
@@ -23,6 +24,5 @@ public class SourceAndMetadata< R extends RealType< R > >
 	{
 		return metadata;
 	}
-
 
 }

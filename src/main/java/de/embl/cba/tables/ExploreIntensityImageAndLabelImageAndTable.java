@@ -2,7 +2,6 @@ package de.embl.cba.tables;
 
 import de.embl.cba.bdv.utils.wrap.Wraps;
 import de.embl.cba.tables.image.DefaultImageSourcesModel;
-import de.embl.cba.tables.image.Metadata;
 import de.embl.cba.tables.imagesegment.SegmentProperty;
 import de.embl.cba.tables.imagesegment.SegmentPropertyColumnsSelectionDialog;
 import de.embl.cba.tables.imagesegment.SegmentUtils;

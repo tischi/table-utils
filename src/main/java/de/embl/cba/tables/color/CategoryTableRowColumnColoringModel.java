@@ -12,7 +12,6 @@ import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 public class CategoryTableRowColumnColoringModel< T extends TableRow >
 		extends AbstractColoringModel< T > implements CategoryColoringModel< T >
 {
-
 	private Map< Object, ARGBType > inputToFixedColor;
 	private Map< Object, ARGBType > inputToRandomColor;
 	private final String column;

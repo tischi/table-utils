@@ -63,7 +63,6 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		return imageSourcesModel;
 	}
 
-
 	private FileImageSourcesModel createImageSourcesModel( )
 	{
 		imageSourcesModel = new FileImageSourcesModel( is2D );

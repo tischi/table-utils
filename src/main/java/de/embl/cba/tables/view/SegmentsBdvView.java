@@ -9,9 +9,12 @@ import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.objects3d.ConnectedComponentExtractorAnd3DViewer;
 import de.embl.cba.bdv.utils.overlays.BdvGrayValuesOverlay;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
+import de.embl.cba.bdv.utils.sources.Metadata;
+import de.embl.cba.bdv.utils.sources.ModifiableRandomAccessibleIntervalSource4D;
+import de.embl.cba.lazyalgorithm.RandomAccessibleIntervalNeighborhoodFilter;
+import de.embl.cba.lazyalgorithm.converter.NeighborhoodNonZeroBoundariesConverter;
 import de.embl.cba.tables.color.*;
 import de.embl.cba.tables.image.ImageSourcesModel;
-import de.embl.cba.tables.image.Metadata;
 import de.embl.cba.tables.image.SourceAndMetadata;
 import de.embl.cba.tables.imagesegment.ImageSegment;
 import de.embl.cba.tables.imagesegment.LabelFrameAndImage;
@@ -20,6 +23,7 @@ import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.view.dialogs.BdvViewSourceSetSelectionDialog;
 import net.imglib2.RealPoint;
+import net.imglib2.algorithm.neighborhood.HyperSphereShape;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
@@ -30,17 +34,17 @@ import org.scijava.ui.behaviour.util.Behaviours;
 import java.util.*;
 
 import static de.embl.cba.bdv.utils.converters.SelectableVolatileARGBConverter.BACKGROUND;
-import static de.embl.cba.tables.image.Metadata.*;
 
 // TODO: reconsider what a "segment" needs to be here
-public class SegmentsBdvView< T extends ImageSegment >
+public class SegmentsBdvView < T extends ImageSegment >
 {
 	private String selectTrigger = "ctrl button1";
 	private String selectNoneTrigger = "ctrl shift N";
 	private String nextImageSetTrigger = "ctrl N";
 	private String previousImageSetTrigger = "ctrl P";
 	private String incrementCategoricalLutRandomSeedTrigger = "ctrl L";
-	private String singleColorTrigger = "ctrl M";
+	private String labelMaskAsBinaryMaskTrigger = "ctrl M";
+	private String labelMaskAsBoundaryTrigger = "ctrl B";
 	private String iterateSelectionModeTrigger = "ctrl S";
 	private String viewIn3DTrigger = "ctrl shift button1";
 
@@ -67,7 +71,8 @@ public class SegmentsBdvView< T extends ImageSegment >
 	private int segmentFocusAnimationDurationMillis;
 	private ArrayList< String > labelSourceIds;
 	private ARGBType labelSourceSingleColor;
-	private boolean labelSourceSingleColorIsActive;
+	private boolean isLabelMaskShownAsBinaryMask;
+	private boolean isLabelMaskShownAsBoundaries;
 
 	public SegmentsBdvView(
 			final List< T > segments,
@@ -75,10 +80,8 @@ public class SegmentsBdvView< T extends ImageSegment >
 			final SelectionColoringModel< T > selectionColoringModel,
 			final ImageSourcesModel imageSourcesModel )
 	{
-
 		this( segments, selectionModel, selectionColoringModel, imageSourcesModel, null );
 	}
-
 
 	/**
 	 *
@@ -106,7 +109,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 		this.bdv = bdv;
 
 		this.labelSourceSingleColor = new ARGBType( ARGBType.rgba( 255, 255, 255, 255 ) );;
-		this.labelSourceSingleColorIsActive = false;
+		this.isLabelMaskShownAsBinaryMask = false;
 
 		this.voxelSpacing3DView = 0.1;
 		this.segmentFocusAnimationDurationMillis = 750;
@@ -347,7 +350,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 		final Metadata metadata = sourceAndMetadata.metadata();
 		Source< ? > source = sourceAndMetadata.source();
 
-		if ( metadata.flavour == Flavour.LabelSource )
+		if ( metadata.flavour == Metadata.Flavour.LabelSource )
 			source = asLabelsSource( sourceAndMetadata );
 
 		int numTimePoints = getNumTimePoints( source );
@@ -492,10 +495,10 @@ public class SegmentsBdvView< T extends ImageSegment >
 		installSelectNoneBehaviour( );
 		installSelectionColoringModeBehaviour( );
 		installRandomColorShufflingBehaviour();
-		installToggleSingleColorBehaviour();
+		installShowLabelMaskAsBinaryMaskBehaviour();
+		installShowLabelMaskAsBoundaryBehaviour();
 		install3DViewBehaviour();
 		installImageSetNavigationBehaviour( );
-
 	}
 
 	private void installRandomColorShufflingBehaviour()
@@ -506,12 +509,20 @@ public class SegmentsBdvView< T extends ImageSegment >
 				incrementCategoricalLutRandomSeedTrigger );
 	}
 
-	private void installToggleSingleColorBehaviour()
+	private void installShowLabelMaskAsBinaryMaskBehaviour()
 	{
 		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
-						new Thread( () -> toggleSingleCategoryColor() ).start(),
-				segmentsName + "-single-color",
-				singleColorTrigger );
+						new Thread( () -> toggleLabelMaskAsBinaryMask() ).start(),
+				segmentsName + "-asMask",
+				labelMaskAsBinaryMaskTrigger );
+	}
+
+	private void installShowLabelMaskAsBoundaryBehaviour()
+	{
+		behaviours.behaviour( ( ClickBehaviour ) ( x, y ) ->
+						new Thread( () -> toggleLabelMaskAsBoundaries() ).start(),
+				segmentsName + "-asBoundaries",
+				labelMaskAsBoundaryTrigger );
 	}
 
 	private synchronized void shuffleRandomColors()
@@ -528,16 +539,42 @@ public class SegmentsBdvView< T extends ImageSegment >
 		}
 	}
 
-	private synchronized void toggleSingleCategoryColor()
+	private synchronized void toggleLabelMaskAsBinaryMask()
 	{
 		if ( ! isLabelSourceActive() ) return;
 
-		if ( labelSourceSingleColorIsActive  )
+		if ( isLabelMaskShownAsBinaryMask )
 			labelsSourceConverter.setSingleColor( null );
 		else
 			labelsSourceConverter.setSingleColor( labelSourceSingleColor );
 
-		labelSourceSingleColorIsActive = !labelSourceSingleColorIsActive;
+		isLabelMaskShownAsBinaryMask = !isLabelMaskShownAsBinaryMask;
+
+		BdvUtils.repaint( bdv );
+	}
+
+	private synchronized void toggleLabelMaskAsBoundaries()
+	{
+		if ( ! isLabelSourceActive() ) return;
+
+		if ( ! ( labelsSource.source() instanceof ModifiableRandomAccessibleIntervalSource4D ) )
+		{
+			return;
+		}
+
+		final ModifiableRandomAccessibleIntervalSource4D source = ( ModifiableRandomAccessibleIntervalSource4D) labelsSource.source();
+
+		final RandomAccessibleIntervalNeighborhoodFilter filter = new RandomAccessibleIntervalNeighborhoodFilter(
+					new NeighborhoodNonZeroBoundariesConverter( ),
+					new HyperSphereShape( 1 ) );
+
+
+		if ( isLabelMaskShownAsBoundaries )
+			source.setFilter( null );
+		else
+			source.setFilter( filter );
+
+		isLabelMaskShownAsBoundaries = ! isLabelMaskShownAsBoundaries;
 
 		BdvUtils.repaint( bdv );
 	}
@@ -546,7 +583,7 @@ public class SegmentsBdvView< T extends ImageSegment >
 	{
 		this.labelSourceSingleColor = labelSourceSingleColor;
 		labelsSourceConverter.setSingleColor( labelSourceSingleColor );
-		labelSourceSingleColorIsActive = true;
+		isLabelMaskShownAsBinaryMask = true;
 		BdvUtils.repaint( bdv );
 	}
 
@@ -601,16 +638,15 @@ public class SegmentsBdvView< T extends ImageSegment >
 
 	private void initLabelSourceIds()
 	{
-		final ArrayList< String > sourceIds = new ArrayList( imageSourcesModel.sources().keySet() );
+		final ArrayList< String > sourceIds =
+				new ArrayList( imageSourcesModel.sources().keySet() );
 		labelSourceIds = new ArrayList<>();
 
 		for ( String sourceId : sourceIds )
 			if ( imageSourcesModel.sources().get( sourceId ).metadata()
-					.flavour.equals( Flavour.LabelSource ) )
+					.flavour.equals( Metadata.Flavour.LabelSource ) )
 				labelSourceIds.add( sourceId );
 	}
-
-
 
 	private synchronized void toggleSelectionAtMousePosition()
 	{
@@ -711,7 +747,6 @@ public class SegmentsBdvView< T extends ImageSegment >
 	{
 		return bdv.getBdvHandle().getViewerPanel().getState().getCurrentTimepoint();
 	}
-
 
 	public void close()
 	{
