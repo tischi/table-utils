@@ -158,12 +158,10 @@ public class ExploreObjectsTableCommand implements Command
 		if ( imagePathColumnsId.equals( IMAGE_PATH_COLUMNS_ID_CELL_PROFILER ) )
 			CellProfilerUtils.replaceFolderAndFileColumnsByPathColumn( columns );
 
-
 		if ( isPathMapping )
 		{
 			// TODO
 		}
-
 	}
 
 	private Map< SegmentProperty, List< String > > createPropertyToColumnMap(

@@ -95,17 +95,16 @@ public class TableColumns
 
 		final int numRows = rowsInTableIncludingHeader.size() - 1;
 
+		final long start = System.currentTimeMillis();
 		for ( int row = 0; row < numRows; ++row )
 		{
-			StringTokenizer st = new StringTokenizer( rowsInTableIncludingHeader.get( row + 1 ), delim );
+			final StringTokenizer st = new StringTokenizer( rowsInTableIncludingHeader.get( row + 1 ), delim );
 
 			for ( String column : columnNames )
-			{
-				String string = st.nextToken();
-				string = string.replace( "\"", "" );
-				columnToStringValues.get( column ).add( string );
-			}
+				columnToStringValues.get( column ).add( st.nextToken().replace( "\"", "" ) );
 		}
+
+		System.out.println( ( System.currentTimeMillis() - start ) / 1000.0 ) ;
 
 		return columnToStringValues;
 	}

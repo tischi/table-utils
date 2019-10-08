@@ -1,21 +1,8 @@
 package de.embl.cba.tables.image;
 
-import bdv.util.RandomAccessibleIntervalSource4D;
-import bdv.viewer.Interpolation;
-import bdv.viewer.Source;
 import de.embl.cba.bdv.utils.sources.ImagePlusFileSource;
 import de.embl.cba.bdv.utils.sources.LazySpimSource;
 import de.embl.cba.bdv.utils.sources.Metadata;
-import de.embl.cba.bdv.utils.wrap.Wraps;
-import de.embl.cba.tables.Logger;
-import ij.IJ;
-import ij.ImagePlus;
-import mpicbg.spim.data.sequence.VoxelDimensions;
-import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.RealRandomAccessible;
-import net.imglib2.realtransform.AffineTransform3D;
-import net.imglib2.type.NativeType;
-import net.imglib2.type.numeric.RealType;
 
 import java.util.HashMap;
 import java.util.List;

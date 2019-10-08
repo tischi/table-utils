@@ -9,10 +9,12 @@ import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.objects3d.ConnectedComponentExtractorAnd3DViewer;
 import de.embl.cba.bdv.utils.overlays.BdvGrayValuesOverlay;
 import de.embl.cba.bdv.utils.sources.ARGBConvertedRealSource;
+import de.embl.cba.bdv.utils.sources.ImagePlusFileSource;
 import de.embl.cba.bdv.utils.sources.Metadata;
 import de.embl.cba.bdv.utils.sources.ModifiableRandomAccessibleIntervalSource4D;
 import de.embl.cba.lazyalgorithm.RandomAccessibleIntervalNeighborhoodFilter;
 import de.embl.cba.lazyalgorithm.converter.NeighborhoodNonZeroBoundariesConverter;
+import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.color.*;
 import de.embl.cba.tables.image.ImageSourcesModel;
 import de.embl.cba.tables.image.SourceAndMetadata;
@@ -22,6 +24,7 @@ import de.embl.cba.tables.imagesegment.SegmentUtils;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.view.dialogs.BdvViewSourceSetSelectionDialog;
+import ij.gui.GenericDialog;
 import net.imglib2.RealPoint;
 import net.imglib2.algorithm.neighborhood.HyperSphereShape;
 import net.imglib2.realtransform.AffineTransform3D;
@@ -73,6 +76,7 @@ public class SegmentsBdvView < T extends ImageSegment >
 	private ARGBType labelSourceSingleColor;
 	private boolean isLabelMaskShownAsBinaryMask;
 	private boolean isLabelMaskShownAsBoundaries;
+	private int labelMaskBoundaryThickness;
 
 	public SegmentsBdvView(
 			final List< T > segments,
@@ -283,11 +287,15 @@ public class SegmentsBdvView < T extends ImageSegment >
 			final SourceAndMetadata associatedSourceAndMetadata =
 					imageSourcesModel.sources().get( imageSetIDs.get( associatedSourceIndex ) );
 
+			// Note: this needs to be done here, because if it is a Lazy Source it might
+			// still change its metadata
+			final int numTimePoints = getNumTimePoints( associatedSourceAndMetadata.source() );
+
 			applyRecentDisplaySettings( associatedSourceIndex, associatedSourceAndMetadata );
-			showSource( associatedSourceAndMetadata );
+			showSource( associatedSourceAndMetadata, numTimePoints );
 		}
 
-		applyRecentViewerSettings( );
+		applyRecentViewerSettings();
 	}
 
 	public void applyRecentViewerSettings( )
@@ -295,7 +303,6 @@ public class SegmentsBdvView < T extends ImageSegment >
 		if ( recentViewerState != null )
 		{
 			applyViewerStateTransform( recentViewerState );
-
 			applyViewerStateVisibility( recentViewerState );
 		}
 	}
@@ -337,23 +344,24 @@ public class SegmentsBdvView < T extends ImageSegment >
 			if ( grayValueOverlayWasFirstSource )
 				recentConverterSetupIndex++;
 
-			associatedSourceAndMetadata.metadata().displayRangeMin =
-					recentConverterSetups.get( recentConverterSetupIndex ).getDisplayRangeMin();
+			final double displayRangeMax = recentConverterSetups.get( recentConverterSetupIndex ).getDisplayRangeMax();
+			final double displayRangeMin = recentConverterSetups.get( recentConverterSetupIndex ).getDisplayRangeMin();
 
-			associatedSourceAndMetadata.metadata().displayRangeMax =
-					recentConverterSetups.get( recentConverterSetupIndex ).getDisplayRangeMax();
+			associatedSourceAndMetadata.metadata().displayRangeMin = new Double( displayRangeMin );
+			associatedSourceAndMetadata.metadata().displayRangeMax = new Double( displayRangeMax );
 		}
 	}
 
-	public BdvStackSource showSource( SourceAndMetadata sourceAndMetadata )
+	public BdvStackSource showSource( SourceAndMetadata sourceAndMetadata, int numTimePoints )
 	{
 		final Metadata metadata = sourceAndMetadata.metadata();
 		Source< ? > source = sourceAndMetadata.source();
 
 		if ( metadata.flavour == Metadata.Flavour.LabelSource )
+		{
 			source = asLabelsSource( sourceAndMetadata );
-
-		int numTimePoints = getNumTimePoints( source );
+			if ( isLabelMaskShownAsBoundaries ) showLabelMaskAsBoundaries();
+		}
 
 		final BdvStackSource bdvStackSource = BdvFunctions.show(
 				source,
@@ -557,24 +565,54 @@ public class SegmentsBdvView < T extends ImageSegment >
 	{
 		if ( ! isLabelSourceActive() ) return;
 
-		if ( ! ( labelsSource.source() instanceof ModifiableRandomAccessibleIntervalSource4D ) )
-			return;
+		final ModifiableRandomAccessibleIntervalSource4D modifiableSource = getModifiableSource( labelsSource.source() );
 
-		final ModifiableRandomAccessibleIntervalSource4D source = ( ModifiableRandomAccessibleIntervalSource4D) labelsSource.source();
+		if ( modifiableSource == null ) return;
+
+		if ( ! isLabelMaskShownAsBoundaries )
+		{
+			final GenericDialog gd = new GenericDialog( "Boundary thickness" );
+			gd.addNumericField( "Boundary thickness [pixels]", 1, 1 );
+			gd.showDialog();
+			if ( gd.wasCanceled() ) return;
+			labelMaskBoundaryThickness = (int) gd.getNextNumber();
+		}
 
 		final RandomAccessibleIntervalNeighborhoodFilter filter = new RandomAccessibleIntervalNeighborhoodFilter(
-					new NeighborhoodNonZeroBoundariesConverter( ),
-					new HyperSphereShape( 1 ) );
-
+				new NeighborhoodNonZeroBoundariesConverter( ),
+				new HyperSphereShape( labelMaskBoundaryThickness ) );
 
 		if ( isLabelMaskShownAsBoundaries )
-			source.setFilter( null );
+			modifiableSource.setFilter( null );
 		else
-			source.setFilter( filter );
+			modifiableSource.setFilter( filter );
 
 		isLabelMaskShownAsBoundaries = ! isLabelMaskShownAsBoundaries;
 
 		BdvUtils.repaint( bdv );
+	}
+
+	private void showLabelMaskAsBoundaries()
+	{
+		final ModifiableRandomAccessibleIntervalSource4D modifiableSource = getModifiableSource( labelsSource.source() );
+		if ( modifiableSource == null ) return;
+		final RandomAccessibleIntervalNeighborhoodFilter filter = new RandomAccessibleIntervalNeighborhoodFilter(
+				new NeighborhoodNonZeroBoundariesConverter( ),
+				new HyperSphereShape( labelMaskBoundaryThickness ) );
+		modifiableSource.setFilter( filter );
+	}
+
+	public ModifiableRandomAccessibleIntervalSource4D getModifiableSource( Source< ? > source )
+	{
+		if ( source instanceof ModifiableRandomAccessibleIntervalSource4D )
+			return ( ModifiableRandomAccessibleIntervalSource4D ) source;
+		else if ( source instanceof ImagePlusFileSource )
+			return  ( ModifiableRandomAccessibleIntervalSource4D ) ( ( ImagePlusFileSource ) source ).getWrappedSource()   ;
+		else
+		{
+			Logger.warn( "Cannot create boundaries of label mask of type: " + labelsSource.source().getClass().toString() );
+			return null;
+		}
 	}
 
 	public void setLabelSourceSingleColor( ARGBType labelSourceSingleColor )

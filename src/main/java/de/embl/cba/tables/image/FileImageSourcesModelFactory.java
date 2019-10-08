@@ -125,9 +125,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		ArrayList< String > imageSetIds = new ArrayList<>(  );
 
 		for ( String imageName : imageNames )
-		{
 			imageSetIds.add( getImagePath( tableRow, imageName ) );
-		}
 
 		return imageSetIds;
 	}
