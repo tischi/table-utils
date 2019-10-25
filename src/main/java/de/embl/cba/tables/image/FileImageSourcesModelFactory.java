@@ -101,7 +101,7 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 								imageDisplayName,
 								absoluteImagePath.toString(),
 								imageSetIds,
-								getImageFlavour( imageName ) );
+								getImageModality( imageName ) );
 					}
 					else
 					{
@@ -130,20 +130,16 @@ public class FileImageSourcesModelFactory< T extends TableRowImageSegment >
 		return imageSetIds;
 	}
 
-	private Metadata.Flavour getImageFlavour( String imageName )
+	private Metadata.Modality getImageModality( String imageName )
 	{
-		final Metadata.Flavour flavour;
+		final Metadata.Modality modality;
 
 		if ( FileUtils.stringContainsItemFromList( imageName, labelMaskColumnIds ) )
-		{
-			flavour = Metadata.Flavour.LabelSource;
-		}
+			modality = Metadata.Modality.Segmentation;
 		else
-		{
-			flavour = Metadata.Flavour.IntensitySource;
-		}
+			modality = Metadata.Modality.FM;
 
-		return flavour;
+		return modality;
 	}
 
 	public Map< String, String > getImageNameToPathColumnName( )

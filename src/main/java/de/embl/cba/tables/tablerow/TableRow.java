@@ -5,7 +5,6 @@ import java.util.Set;
 
 public interface TableRow
 {
-
 	String getCell( String columnName );
 
 	void setCell( String columnName, String value );

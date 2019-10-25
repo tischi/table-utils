@@ -84,7 +84,7 @@ public class ExploreLabelImageCommand < R extends RealType< R > > implements Com
 		imageSourcesModel.addSourceAndMetadata(
 				Wraps.imagePlusAsSource4DChannelList( labelImage ).get( 0 ),
 				labelImageId,
-				Metadata.Flavour.LabelSource,
+				Metadata.Modality.Segmentation,
 				getNumSpatialDimensions( labelImage.getNSlices() ),
 				Calibrations.getScalingTransform( labelImage ),
 				null
@@ -101,7 +101,7 @@ public class ExploreLabelImageCommand < R extends RealType< R > > implements Com
 			imageSourcesModel.addSourceAndMetadata(
 					Wraps.imagePlusAsSource4DChannelList( intensityImage ).get( 0 ),
 					intensityImageId,
-					Metadata.Flavour.IntensitySource,
+					Metadata.Modality.FM,
 					getNumSpatialDimensions( intensityImage.getNSlices() ),
 					Calibrations.getScalingTransform( intensityImage ),
 					null

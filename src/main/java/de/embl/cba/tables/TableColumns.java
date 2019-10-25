@@ -3,7 +3,7 @@ package de.embl.cba.tables;
 import ij.measure.ResultsTable;
 
 import javax.activation.UnsupportedDataTypeException;
-import java.io.File;
+import javax.swing.table.TableModel;
 import java.util.*;
 
 public class TableColumns
@@ -85,28 +85,80 @@ public class TableColumns
 
 		List< String > columnNames = Tables.getColumnNames( rowsInTableIncludingHeader, delim );
 
-		final Map< String, List< String > > columnToStringValues = new LinkedHashMap<>();
+		final Map< String, List< String > > columnNameToStrings = new LinkedHashMap<>();
 
 		for ( int columnIndex = 0; columnIndex < columnNames.size(); columnIndex++ )
 		{
 			final String columnName = columnNames.get( columnIndex );
-			columnToStringValues.put( columnName, new ArrayList<>( ) );
+			columnNameToStrings.put( columnName, new ArrayList<>( ) );
 		}
 
 		final int numRows = rowsInTableIncludingHeader.size() - 1;
 
 		final long start = System.currentTimeMillis();
-		for ( int row = 0; row < numRows; ++row )
+		for ( int row = 1; row <= numRows; ++row )
 		{
-			final StringTokenizer st = new StringTokenizer( rowsInTableIncludingHeader.get( row + 1 ), delim );
+			final StringTokenizer st = new StringTokenizer( rowsInTableIncludingHeader.get( row ), delim );
 
 			for ( String column : columnNames )
-				columnToStringValues.get( column ).add( st.nextToken().replace( "\"", "" ) );
+				columnNameToStrings.get( column ).add( st.nextToken().replace( "\"", "" ) );
 		}
 
 		System.out.println( ( System.currentTimeMillis() - start ) / 1000.0 ) ;
 
-		return columnToStringValues;
+		return columnNameToStrings;
+	}
+
+	public static Map< String, List< String > >
+	orderedStringColumnsFromTableFile(
+			final String path,
+			String delim,
+			String orderColumnName,
+			ArrayList< String > orderColumn )
+	{
+
+		final List< String > rowsInTableIncludingHeader = Tables.readRows( path );
+
+		delim = Tables.autoDelim( delim, rowsInTableIncludingHeader );
+
+		List< String > columnNames = Tables.getColumnNames( rowsInTableIncludingHeader, delim );
+
+		final Map< String, List< String > > columnNameToStrings = new LinkedHashMap<>();
+
+		int orderColumnIndex = -1;
+
+		final int numRows = orderColumn.size();
+		final int numColumns = columnNames.size();
+
+		for ( int columnIndex = 0; columnIndex < numColumns; columnIndex++ )
+		{
+			final String columnName = columnNames.get( columnIndex );
+			final ArrayList< String > values = new ArrayList< >( Collections.nCopies(numRows, "NaN"));
+			columnNameToStrings.put( columnName, values );
+			if ( columnName.equals( orderColumnName ) )
+				orderColumnIndex = columnIndex;
+		}
+
+		if ( orderColumnIndex == -1 )
+			throw new UnsupportedOperationException( "Column by which to merge not found: " + orderColumnName );
+
+//		final long start = System.currentTimeMillis();
+		for ( int rowIndex = 1; rowIndex <= numRows; ++rowIndex )
+		{
+			final String[] split = rowsInTableIncludingHeader.get( rowIndex ).split( delim );
+			final String orderValue = split[ orderColumnIndex ];
+			final int targetRowIndex = orderColumn.indexOf( orderValue );
+
+			for ( int columnIndex = 0; columnIndex < numColumns; columnIndex++ )
+			{
+				final String columName = columnNames.get( columnIndex );
+				columnNameToStrings.get( columName ).set( targetRowIndex, split[ columnIndex ].replace( "\"", "" ) );
+			}
+		}
+
+//		System.out.println( ( System.currentTimeMillis() - start ) / 1000.0 ) ;
+
+		return columnNameToStrings;
 	}
 
 	public static Map< String, List< ? > >

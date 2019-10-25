@@ -146,7 +146,7 @@ public class ExploreMorphoLibJLabelImage
 		imageSourcesModel.addSourceAndMetadata(
 				Wraps.imagePlusAsSource4DChannelList( labelImage ).get( 0 ),
 				labelImageId,
-				Metadata.Flavour.LabelSource,
+				Metadata.Modality.Segmentation,
 				numSpatialDimensions,
 				null,
 				255
@@ -163,7 +163,7 @@ public class ExploreMorphoLibJLabelImage
 			imageSourcesModel.addSourceAndMetadata(
 					Wraps.imagePlusAsSource4DChannelList( intensityImage ).get( 0 ),
 					intensityImageId,
-					Metadata.Flavour.IntensitySource,
+					Metadata.Modality.FM,
 					numSpatialDimensions,
 					null,
 					255

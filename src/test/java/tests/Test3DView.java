@@ -75,7 +75,6 @@ public class Test3DView
 		// Add ImagePlus volume
 		intensities.getCalibration().pixelWidth = 10;
 		UniverseUtils.addImagePlusToUniverse( segments3dView.getUniverse(), intensities, ContentConstants.VOLUME, 0F );
-
 	}
 
 	public static void main( String[] args ) throws SpimDataException

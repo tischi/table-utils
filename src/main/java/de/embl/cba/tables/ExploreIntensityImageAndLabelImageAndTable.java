@@ -94,7 +94,7 @@ public class ExploreIntensityImageAndLabelImageAndTable
 		imageSourcesModel.addSourceAndMetadata(
 				Wraps.imagePlusAsSource4DChannelList( labelImage ).get( 0 ),
 				labelImageId,
-				Metadata.Flavour.LabelSource,
+				Metadata.Modality.Segmentation,
 				numSpatialDimensions,
 				Calibrations.getScalingTransform( labelImage ),
 				null
@@ -111,7 +111,7 @@ public class ExploreIntensityImageAndLabelImageAndTable
 			imageSourcesModel.addSourceAndMetadata(
 					Wraps.imagePlusAsSource4DChannelList( intensityImage ).get( 0 ),
 					intensityImageId,
-					Metadata.Flavour.IntensitySource,
+					Metadata.Modality.FM,
 					numSpatialDimensions,
 					Calibrations.getScalingTransform( intensityImage ),
 					null

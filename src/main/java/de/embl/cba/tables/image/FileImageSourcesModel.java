@@ -36,12 +36,12 @@ public class FileImageSourcesModel implements ImageSourcesModel
 			String imageDisplayName,
 			String imagePath,
 			List< String > imageSetIDs,
-			Metadata.Flavour flavor )
+			Metadata.Modality flavor )
 	{
 		if ( nameToSourceAndMetadata.containsKey( imageId ) ) return;
 
 		final Metadata metadata = new Metadata( imageId );
-		metadata.flavour = flavor;
+		metadata.modality = flavor;
 		metadata.imageSetIDs = imageSetIDs;
 		metadata.displayName = imageDisplayName;
 

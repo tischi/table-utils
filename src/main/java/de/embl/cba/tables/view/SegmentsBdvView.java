@@ -357,7 +357,7 @@ public class SegmentsBdvView < T extends ImageSegment >
 		final Metadata metadata = sourceAndMetadata.metadata();
 		Source< ? > source = sourceAndMetadata.source();
 
-		if ( metadata.flavour == Metadata.Flavour.LabelSource )
+		if ( metadata.modality == Metadata.Modality.Segmentation )
 		{
 			source = asLabelsSource( sourceAndMetadata );
 			if ( isLabelMaskShownAsBoundaries ) showLabelMaskAsBoundaries();
@@ -680,7 +680,7 @@ public class SegmentsBdvView < T extends ImageSegment >
 
 		for ( String sourceId : sourceIds )
 			if ( imageSourcesModel.sources().get( sourceId ).metadata()
-					.flavour.equals( Metadata.Flavour.LabelSource ) )
+					.modality.equals( Metadata.Modality.Segmentation ) )
 				labelSourceIds.add( sourceId );
 	}
 

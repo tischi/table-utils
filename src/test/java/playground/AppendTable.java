@@ -38,9 +38,7 @@ public class AppendTable
 						"../test-data/3d-image-lbl-morpho-addOn.csv" ).getFile()  );
 
 		views.getTableRowsTableView().addColumns( columns );
-
 	}
-
 
 }
 
