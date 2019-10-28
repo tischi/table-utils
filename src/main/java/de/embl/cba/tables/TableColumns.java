@@ -114,9 +114,8 @@ public class TableColumns
 			final String path,
 			String delim,
 			String orderColumnName,
-			ArrayList< String > orderColumn )
+			ArrayList< Double > orderColumn )
 	{
-
 		final List< String > rowsInTableIncludingHeader = Tables.readRows( path );
 
 		delim = Tables.autoDelim( delim, rowsInTableIncludingHeader );
@@ -127,13 +126,13 @@ public class TableColumns
 
 		int orderColumnIndex = -1;
 
-		final int numRows = orderColumn.size();
+		final int numRowsTargetTable = orderColumn.size();
 		final int numColumns = columnNames.size();
 
 		for ( int columnIndex = 0; columnIndex < numColumns; columnIndex++ )
 		{
 			final String columnName = columnNames.get( columnIndex );
-			final ArrayList< String > values = new ArrayList< >( Collections.nCopies(numRows, "NaN"));
+			final ArrayList< String > values = new ArrayList< >( Collections.nCopies( numRowsTargetTable, "NaN"));
 			columnNameToStrings.put( columnName, values );
 			if ( columnName.equals( orderColumnName ) )
 				orderColumnIndex = columnIndex;
@@ -143,10 +142,12 @@ public class TableColumns
 			throw new UnsupportedOperationException( "Column by which to merge not found: " + orderColumnName );
 
 //		final long start = System.currentTimeMillis();
-		for ( int rowIndex = 1; rowIndex <= numRows; ++rowIndex )
+		final int numRowsSourceTable = rowsInTableIncludingHeader.size() - 1;
+
+		for ( int rowIndex = 0; rowIndex < numRowsSourceTable; ++rowIndex )
 		{
-			final String[] split = rowsInTableIncludingHeader.get( rowIndex ).split( delim );
-			final String orderValue = split[ orderColumnIndex ];
+			final String[] split = rowsInTableIncludingHeader.get( rowIndex + 1 ).split( delim );
+			final Double orderValue = Double.parseDouble( split[ orderColumnIndex ] );
 			final int targetRowIndex = orderColumn.indexOf( orderValue );
 
 			for ( int columnIndex = 0; columnIndex < numColumns; columnIndex++ )
@@ -174,6 +175,7 @@ public class TableColumns
 			final List< ? > values = asTypedList( columnToStringValues.get( columnName ) );
 			columnToValues.put( columnName, values );
 		}
+
 		return columnToValues;
 	}
 

@@ -38,11 +38,9 @@ public class TestAppendTables
 
 		final TableModel model = views.getTableRowsTableView().getTable().getModel();
 		final int numRows = model.getRowCount();
-		final ArrayList< String > orderColumn = new ArrayList<>();
-		for ( int rowIndex = 1; rowIndex <= numRows; ++rowIndex )
-		{
-			orderColumn.add( model.getValueAt( rowIndex, objectLabelColumnIndex ).toString() );
-		}
+		final ArrayList< Double > orderColumn = new ArrayList<>();
+		for ( int rowIndex = 0; rowIndex < numRows; ++rowIndex )
+			orderColumn.add( Double.parseDouble( model.getValueAt( rowIndex, objectLabelColumnIndex ).toString() ) );
 
 		Map< String, List< String > > columns2 =
 				TableColumns.orderedStringColumnsFromTableFile(

@@ -162,7 +162,6 @@ public class SegmentUtils
 			final Map< SegmentProperty, List< String > > segmentPropertiesToColumn,
 			boolean isOneBasedTimePoint )
 	{
-
 		final List< TableRowImageSegment > columnBasedTableRowImageSegments
 				= new ArrayList<>();
 

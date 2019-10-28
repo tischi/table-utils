@@ -1,9 +1,7 @@
 package de.embl.cba.tables.view;
 
 import bdv.tools.HelpDialog;
-import de.embl.cba.tables.TableRows;
-import de.embl.cba.tables.TableUIs;
-import de.embl.cba.tables.Tables;
+import de.embl.cba.tables.*;
 import de.embl.cba.tables.annotate.Annotator;
 import de.embl.cba.tables.color.*;
 import de.embl.cba.tables.tablerow.TableRow;
@@ -16,6 +14,7 @@ import ij.IJ;
 import ij.gui.GenericDialog;
 import net.imglib2.type.numeric.ARGBType;
 
+import javax.activation.UnsupportedDataTypeException;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
@@ -489,7 +488,18 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	public void addColumns( Map< String, List< String > > columns )
 	{
 		for ( String columnName : columns.keySet() )
-			addColumn( columnName, columns.get( columnName ).toArray() );
+		{
+			try
+			{
+				final Object[] values = TableColumns.asTypedArray( columns.get( columnName ) );
+				addColumn( columnName, values );
+			} catch ( UnsupportedDataTypeException e )
+			{
+				Logger.error( "Could not add column " + columnName + ", because the" +
+						" data type could not be determined.");
+			}
+
+		}
 	}
 
 	public List< String > getColumnNames()
