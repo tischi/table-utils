@@ -4,6 +4,7 @@ import bdv.tools.HelpDialog;
 import de.embl.cba.tables.*;
 import de.embl.cba.tables.annotate.Annotator;
 import de.embl.cba.tables.color.*;
+import de.embl.cba.tables.morpholibj.ExploreMorphoLibJLabelImage;
 import de.embl.cba.tables.tablerow.TableRow;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
@@ -18,6 +19,7 @@ import javax.activation.UnsupportedDataTypeException;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -326,7 +328,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		menuItem.addActionListener( e ->
 				SwingUtilities.invokeLater( () ->
 						{
-							final Map< String, List< String > > columns = TableUIs.openTableUI();
+							final Map< String, List< String > > columns = TableUIs.openTableForMergingUI( table );
 							addColumns( columns );
 						} ) );
 
@@ -498,7 +500,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 				Logger.error( "Could not add column " + columnName + ", because the" +
 						" data type could not be determined.");
 			}
-
 		}
 	}
 

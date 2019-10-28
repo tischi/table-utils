@@ -6,7 +6,6 @@ import de.embl.cba.tables.view.combined.SegmentsTableBdvAnd3dViews;
 import ij.IJ;
 import net.imagej.ImageJ;
 
-import javax.swing.table.TableModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,17 +29,9 @@ public class TestAppendTables
 
 		final SegmentsTableBdvAnd3dViews views = explore.getTableBdvAnd3dViews();
 
-		Map< String, List< String > > columns =
-				TableColumns.stringColumnsFromTableFile( TestAppendTables.class.getResource(
-						"../test-data/3d-image-lbl-morpho-addOn.csv" ).getFile()  );
-
-		final int objectLabelColumnIndex = views.getTableRowsTableView().getTable().getColumnModel().getColumnIndex( ExploreMorphoLibJLabelImage.LABEL );
-
-		final TableModel model = views.getTableRowsTableView().getTable().getModel();
-		final int numRows = model.getRowCount();
-		final ArrayList< Double > orderColumn = new ArrayList<>();
-		for ( int rowIndex = 0; rowIndex < numRows; ++rowIndex )
-			orderColumn.add( Double.parseDouble( model.getValueAt( rowIndex, objectLabelColumnIndex ).toString() ) );
+		final ArrayList< Double > orderColumn = TableColumns.getNumericColumnAsDoubleList(
+				views.getTableRowsTableView().getTable(),
+				ExploreMorphoLibJLabelImage.LABEL );
 
 		Map< String, List< String > > columns2 =
 				TableColumns.orderedStringColumnsFromTableFile(

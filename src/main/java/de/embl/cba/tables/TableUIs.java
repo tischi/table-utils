@@ -1,5 +1,6 @@
 package de.embl.cba.tables;
 
+import de.embl.cba.tables.morpholibj.ExploreMorphoLibJLabelImage;
 import de.embl.cba.tables.view.TableRowsTableView;
 import ij.gui.GenericDialog;
 
@@ -104,6 +105,33 @@ public class TableUIs
 			final File selectedFile = jFileChooser.getSelectedFile();
 
 			return TableColumns.stringColumnsFromTableFile( selectedFile.toString() );
+		}
+
+		return null;
+	}
+
+	public static Map< String, List< String > > openTableForMergingUI( JTable table )
+	{
+		final String mergeByColumnName = selectColumnNameUI( table, "Merge by " );
+
+		final ArrayList< Double > orderColumn = TableColumns.getNumericColumnAsDoubleList(
+				table,
+				mergeByColumnName );
+
+		final JFileChooser jFileChooser = new JFileChooser( "" );
+
+		if ( jFileChooser.showOpenDialog( null ) == JFileChooser.APPROVE_OPTION )
+		{
+			final File selectedFile = jFileChooser.getSelectedFile();
+
+			Map< String, List< String > > columns =
+					TableColumns.orderedStringColumnsFromTableFile(
+							selectedFile.getAbsolutePath(),
+							null,
+							mergeByColumnName,
+							orderColumn );
+
+			return columns;
 		}
 
 		return null;

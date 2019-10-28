@@ -3,6 +3,7 @@ package de.embl.cba.tables;
 import ij.measure.ResultsTable;
 
 import javax.activation.UnsupportedDataTypeException;
+import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.util.*;
 
@@ -113,8 +114,8 @@ public class TableColumns
 	orderedStringColumnsFromTableFile(
 			final String path,
 			String delim,
-			String orderColumnName,
-			ArrayList< Double > orderColumn )
+			String mergeByColumnName,
+			ArrayList< Double > mergeByColumnValues )
 	{
 		final List< String > rowsInTableIncludingHeader = Tables.readRows( path );
 
@@ -126,7 +127,7 @@ public class TableColumns
 
 		int orderColumnIndex = -1;
 
-		final int numRowsTargetTable = orderColumn.size();
+		final int numRowsTargetTable = mergeByColumnValues.size();
 		final int numColumns = columnNames.size();
 
 		for ( int columnIndex = 0; columnIndex < numColumns; columnIndex++ )
@@ -134,12 +135,12 @@ public class TableColumns
 			final String columnName = columnNames.get( columnIndex );
 			final ArrayList< String > values = new ArrayList< >( Collections.nCopies( numRowsTargetTable, "NaN"));
 			columnNameToStrings.put( columnName, values );
-			if ( columnName.equals( orderColumnName ) )
+			if ( columnName.equals( mergeByColumnName ) )
 				orderColumnIndex = columnIndex;
 		}
 
 		if ( orderColumnIndex == -1 )
-			throw new UnsupportedOperationException( "Column by which to merge not found: " + orderColumnName );
+			throw new UnsupportedOperationException( "Column by which to merge not found: " + mergeByColumnName );
 
 //		final long start = System.currentTimeMillis();
 		final int numRowsSourceTable = rowsInTableIncludingHeader.size() - 1;
@@ -148,7 +149,7 @@ public class TableColumns
 		{
 			final String[] split = rowsInTableIncludingHeader.get( rowIndex + 1 ).split( delim );
 			final Double orderValue = Double.parseDouble( split[ orderColumnIndex ] );
-			final int targetRowIndex = orderColumn.indexOf( orderValue );
+			final int targetRowIndex = mergeByColumnValues.indexOf( orderValue );
 
 			for ( int columnIndex = 0; columnIndex < numColumns; columnIndex++ )
 			{
@@ -310,5 +311,17 @@ public class TableColumns
 		columns.put( columnNameLabelImageId, labelImageIdColumn );
 
 		return columns;
+	}
+
+	public static ArrayList< Double > getNumericColumnAsDoubleList( JTable table, String columnName )
+	{
+		final int objectLabelColumnIndex = table.getColumnModel().getColumnIndex( columnName );
+
+		final TableModel model = table.getModel();
+		final int numRows = model.getRowCount();
+		final ArrayList< Double > orderColumn = new ArrayList<>();
+		for ( int rowIndex = 0; rowIndex < numRows; ++rowIndex )
+			orderColumn.add( Double.parseDouble( model.getValueAt( rowIndex, objectLabelColumnIndex ).toString() ) );
+		return orderColumn;
 	}
 }
