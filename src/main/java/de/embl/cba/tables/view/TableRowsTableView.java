@@ -4,7 +4,6 @@ import bdv.tools.HelpDialog;
 import de.embl.cba.tables.*;
 import de.embl.cba.tables.annotate.Annotator;
 import de.embl.cba.tables.color.*;
-import de.embl.cba.tables.morpholibj.ExploreMorphoLibJLabelImage;
 import de.embl.cba.tables.tablerow.TableRow;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
@@ -19,7 +18,7 @@ import javax.activation.UnsupportedDataTypeException;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +41,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private ColumnBasedColoring< T > columnBasedColoring;
 	private MeasureDistance< T > measureDistance;
 	private Component parentComponent;
+	private String mergeByColumnName = null;
+	private String tablesDirectory = "";
 
 	public TableRowsTableView(
 			final List< T > tableRows,
@@ -328,11 +329,29 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		menuItem.addActionListener( e ->
 				SwingUtilities.invokeLater( () ->
 						{
-							final Map< String, List< String > > columns = TableUIs.openTableForMergingUI( table );
-							addColumns( columns );
+							try
+							{
+								if ( mergeByColumnName == null )
+									addColumns( TableUIs.openTableForMergingUI( table, tablesDirectory ) );
+								else
+									addColumns( TableUIs.openTableForMergingUI( table, tablesDirectory, mergeByColumnName ) );
+							} catch ( IOException ioOException )
+							{
+								ioOException.printStackTrace();
+							}
 						} ) );
 
 		return menuItem;
+	}
+
+	public void setMergeByColumnName( String mergeByColumnName )
+	{
+		this.mergeByColumnName = mergeByColumnName;
+	}
+
+	public void setTablesDirectory( String tablesDirectory )
+	{
+		this.tablesDirectory = tablesDirectory;
 	}
 
 	private JMenuItem createSaveTableAsMenuItem()

@@ -1,12 +1,12 @@
 package de.embl.cba.tables;
 
-import de.embl.cba.tables.morpholibj.ExploreMorphoLibJLabelImage;
 import de.embl.cba.tables.view.TableRowsTableView;
 import ij.gui.GenericDialog;
 
 import javax.swing.*;
-import javax.swing.table.TableModel;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -110,31 +110,73 @@ public class TableUIs
 		return null;
 	}
 
-	public static Map< String, List< String > > openTableForMergingUI( JTable table )
+	public static Map< String, List< String > > openTableForMergingUI( JTable table, String directory ) throws IOException
 	{
 		final String mergeByColumnName = selectColumnNameUI( table, "Merge by " );
 
+		return openTableForMergingUI( table, directory, mergeByColumnName );
+	}
+
+
+
+	public static Map< String, List< String > > openTableForMergingUI( JTable table,
+																	   String tablesLocation,
+																	   String mergeByColumnName ) throws IOException
+	{
 		final ArrayList< Double > orderColumn = TableColumns.getNumericColumnAsDoubleList(
 				table,
 				mergeByColumnName );
 
-		final JFileChooser jFileChooser = new JFileChooser( "" );
 
-		if ( jFileChooser.showOpenDialog( null ) == JFileChooser.APPROVE_OPTION )
+		String newTablePath = null;
+
+		if ( tablesLocation.startsWith( "http" ) )
 		{
-			final File selectedFile = jFileChooser.getSelectedFile();
+			newTablePath = selectGitRepoTablePathUI( tablesLocation );
+			if ( newTablePath == null ) return null;
+		}
+		else
+		{
+			final JFileChooser jFileChooser = new JFileChooser( tablesLocation );
 
-			Map< String, List< String > > columns =
-					TableColumns.orderedStringColumnsFromTableFile(
-							selectedFile.getAbsolutePath(),
-							null,
-							mergeByColumnName,
-							orderColumn );
-
-			return columns;
+			if ( jFileChooser.showOpenDialog( null ) == JFileChooser.APPROVE_OPTION )
+				newTablePath = jFileChooser.getSelectedFile().getAbsolutePath();
 		}
 
-		return null;
+		if ( newTablePath == null ) return null;
+
+		Map< String, List< String > > columns =
+				TableColumns.orderedStringColumnsFromTableFile(
+						newTablePath,
+						null,
+						mergeByColumnName,
+						orderColumn );
+
+		return columns;
+
+
+	}
+
+	public static String selectGitRepoTablePathUI( String tablesLocation ) throws IOException
+	{
+		String newTablePath;// TODO: do not hard-code
+		final BufferedReader reader = Tables.getReader( tablesLocation + "/" + "additional_tables.txt" );
+
+		final ArrayList< String > lines = new ArrayList<>();
+		String line = reader.readLine();
+		while ( line != null )
+		{
+			lines.add( line );
+			line = reader.readLine();
+		}
+		final String[] strings = lines.toArray( new String[]{} );
+		final GenericDialog gd = new GenericDialog( "Select Table" );
+		gd.addChoice( "Table", strings, strings[ 0 ] );
+		gd.showDialog();
+		if ( gd.wasCanceled() ) return null;
+		final String tableFileName = gd.getNextChoice();
+		newTablePath = tablesLocation + "/" + tableFileName;
+		return newTablePath;
 	}
 
 }

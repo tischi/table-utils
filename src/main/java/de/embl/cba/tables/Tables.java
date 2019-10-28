@@ -120,6 +120,7 @@ public class Tables
 		return rows;
 	}
 
+	// TODO: put into some other class (e.g. Files)
 	public static BufferedReader getReader( String path )
 	{
 		if ( path.startsWith( "http" )  )
