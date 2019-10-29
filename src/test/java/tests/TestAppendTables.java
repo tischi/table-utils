@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class TestAppendTables
 {
+	// TODO: write a proper test without any UI popping up
 	public static void main( String[] args )
 	{
 		final ImageJ ij = new ImageJ();
@@ -42,6 +43,5 @@ public class TestAppendTables
 
 		views.getTableRowsTableView().addColumns( columns2 );
 	}
-
 }
 

@@ -1,6 +1,9 @@
 package de.embl.cba.tables;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -22,6 +25,49 @@ public class FileUtils
 				recursive );
 
 		return files;
+	}
+
+	public static String resolveTableURL( URI uri )
+	{
+		while( isRelativePath( uri.toString() ) )
+		{
+			URI relativeURI = URI.create( getRelativePath( uri.toString() ) );
+			uri = uri.resolve( relativeURI ).normalize();
+		}
+
+		return uri.toString();
+	}
+
+	public static boolean isRelativePath( String tablePath )
+	{
+		final BufferedReader reader = Tables.getReader( tablePath );
+		final String firstLine;
+		try
+		{
+			firstLine = reader.readLine();
+			return firstLine.startsWith( ".." );
+		}
+		catch ( IOException e )
+		{
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public static String getRelativePath( String tablePath )
+	{
+		final BufferedReader reader = Tables.getReader( tablePath );
+		try
+		{
+			String link = reader.readLine();
+			return link;
+		}
+		catch ( IOException e )
+		{
+			e.printStackTrace();
+			return null;
+		}
+
 	}
 
 	public static void populateFileList(

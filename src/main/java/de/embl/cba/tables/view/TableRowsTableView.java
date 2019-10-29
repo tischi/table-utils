@@ -328,20 +328,30 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		final JMenuItem menuItem = new JMenuItem( "Append Table..." );
 		menuItem.addActionListener( e ->
 				SwingUtilities.invokeLater( () ->
-						{
-							try
-							{
-								if ( mergeByColumnName == null )
-									addColumns( TableUIs.openTableForMergingUI( table, tablesDirectory ) );
-								else
-									addColumns( TableUIs.openTableForMergingUI( table, tablesDirectory, mergeByColumnName ) );
-							} catch ( IOException ioOException )
-							{
-								ioOException.printStackTrace();
-							}
-						} ) );
+				{
+					try
+					{
+						String mergeByColumnName = getMergeByColumnName();
+						Map< String, List< String > > columnNameToStringList = TableUIs.openTableForMergingUI( table, tablesDirectory, mergeByColumnName );
+						columnNameToStringList.remove( mergeByColumnName );
+						addColumns( columnNameToStringList );
+					} catch ( IOException ioOException )
+					{
+						ioOException.printStackTrace();
+					}
+				} ) );
 
 		return menuItem;
+	}
+
+	private String getMergeByColumnName()
+	{
+		String aMergeByColumnName;
+		if ( mergeByColumnName == null )
+			aMergeByColumnName = TableUIs.selectColumnNameUI( table, "Merge by " );
+		else
+			aMergeByColumnName = mergeByColumnName;
+		return aMergeByColumnName;
 	}
 
 	public void setMergeByColumnName( String mergeByColumnName )

@@ -7,9 +7,12 @@ import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static de.embl.cba.tables.FileUtils.resolveTableURL;
 
 
 public class TableUIs
@@ -110,15 +113,6 @@ public class TableUIs
 		return null;
 	}
 
-	public static Map< String, List< String > > openTableForMergingUI( JTable table, String directory ) throws IOException
-	{
-		final String mergeByColumnName = selectColumnNameUI( table, "Merge by " );
-
-		return openTableForMergingUI( table, directory, mergeByColumnName );
-	}
-
-
-
 	public static Map< String, List< String > > openTableForMergingUI( JTable table,
 																	   String tablesLocation,
 																	   String mergeByColumnName ) throws IOException
@@ -145,6 +139,9 @@ public class TableUIs
 
 		if ( newTablePath == null ) return null;
 
+		if ( newTablePath.startsWith( "http" ) )
+			newTablePath = resolveTableURL( URI.create( newTablePath ) );
+
 		Map< String, List< String > > columns =
 				TableColumns.orderedStringColumnsFromTableFile(
 						newTablePath,
@@ -153,8 +150,6 @@ public class TableUIs
 						orderColumn );
 
 		return columns;
-
-
 	}
 
 	public static String selectGitRepoTablePathUI( String tablesLocation ) throws IOException

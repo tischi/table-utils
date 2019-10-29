@@ -125,7 +125,7 @@ public class TableColumns
 
 		final Map< String, List< String > > columnNameToStrings = new LinkedHashMap<>();
 
-		int orderColumnIndex = -1;
+		int mergeByColumnIndex = -1;
 
 		final int numRowsTargetTable = mergeByColumnValues.size();
 		final int numColumns = columnNames.size();
@@ -136,10 +136,10 @@ public class TableColumns
 			final ArrayList< String > values = new ArrayList< >( Collections.nCopies( numRowsTargetTable, "NaN"));
 			columnNameToStrings.put( columnName, values );
 			if ( columnName.equals( mergeByColumnName ) )
-				orderColumnIndex = columnIndex;
+				mergeByColumnIndex = columnIndex;
 		}
 
-		if ( orderColumnIndex == -1 )
+		if ( mergeByColumnIndex == -1 )
 			throw new UnsupportedOperationException( "Column by which to merge not found: " + mergeByColumnName );
 
 //		final long start = System.currentTimeMillis();
@@ -148,7 +148,7 @@ public class TableColumns
 		for ( int rowIndex = 0; rowIndex < numRowsSourceTable; ++rowIndex )
 		{
 			final String[] split = rowsInTableIncludingHeader.get( rowIndex + 1 ).split( delim );
-			final Double orderValue = Double.parseDouble( split[ orderColumnIndex ] );
+			final Double orderValue = Double.parseDouble( split[ mergeByColumnIndex ] );
 			final int targetRowIndex = mergeByColumnValues.indexOf( orderValue );
 
 			for ( int columnIndex = 0; columnIndex < numColumns; columnIndex++ )
