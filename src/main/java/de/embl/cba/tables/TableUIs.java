@@ -165,12 +165,14 @@ public class TableUIs
 			line = reader.readLine();
 		}
 		final String[] strings = lines.toArray( new String[]{} );
+
 		final GenericDialog gd = new GenericDialog( "Select Table" );
 		gd.addChoice( "Table", strings, strings[ 0 ] );
 		gd.showDialog();
 		if ( gd.wasCanceled() ) return null;
 		final String tableFileName = gd.getNextChoice();
 		newTablePath = tablesLocation + "/" + tableFileName;
+
 		return newTablePath;
 	}
 

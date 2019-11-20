@@ -275,7 +275,7 @@ public class TableColumns
 
 	public static boolean isNaN( String s )
 	{
-		return s.equals( "NA" );
+		return s.toLowerCase().equals( "na" ) || s.toLowerCase().equals( "nan" );
 	}
 
 	public static boolean isInf( String s )

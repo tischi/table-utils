@@ -132,6 +132,7 @@ public class Tables
 			}
 			catch ( MalformedURLException e )
 			{
+				System.err.println( "Could not open URL: " + path );
 				e.printStackTrace();
 			}
 
@@ -144,6 +145,7 @@ public class Tables
 			}
 			catch ( IOException e )
 			{
+				System.err.println( "Could not read URL: " + path );
 				e.printStackTrace();
 			}
 		}
@@ -153,11 +155,12 @@ public class Tables
 			try
 			{
 				fin = new FileInputStream( path );
+				return new BufferedReader( new InputStreamReader( fin ) );
 			} catch ( FileNotFoundException e )
 			{
+				System.err.println( "Could not open file: " + path );
 				e.printStackTrace();
 			}
-			return new BufferedReader( new InputStreamReader( fin ) );
 		}
 
 		return null;
