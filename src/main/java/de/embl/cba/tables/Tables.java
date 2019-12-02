@@ -608,6 +608,19 @@ public class Tables
 		return max;
 	}
 
+	public static Set< Object > columnUnique( JTable jTable, int col )
+	{
+		TreeSet set = new TreeSet();
+
+		TableModel tableModel = jTable.getModel() ;
+		final int rowCount = tableModel.getRowCount();
+
+		for( int row = 0; row < rowCount; row++)
+			set.add( tableModel.getValueAt(row, col) );
+
+		return set;
+	}
+
 	public static void addColumn( JTable table, String column, Object defaultValue )
 	{
 		addColumn( table.getModel(), column, defaultValue );
