@@ -219,6 +219,15 @@ public class Tables
 			{
 				delim = ",";
 			}
+			else if ( strings.get( 0 ).contains( ";" )  )
+			{
+				delim = ";";
+			}
+			else
+			{
+				throw new UnsupportedOperationException( "Could not identify table delimiter." );
+			}
+
 		}
 		return delim;
 	}
@@ -608,17 +617,26 @@ public class Tables
 		return max;
 	}
 
-	public static Set< Object > columnUnique( JTable jTable, int col )
+	public static HashMap< String, ArrayList< Integer > > uniqueColumnEntries( JTable jTable, int col )
 	{
-		TreeSet set = new TreeSet();
+		final HashMap< String, ArrayList< Integer > > uniqueEntryToRowIndexSet = new HashMap<>();
 
 		TableModel tableModel = jTable.getModel() ;
 		final int rowCount = tableModel.getRowCount();
 
-		for( int row = 0; row < rowCount; row++)
-			set.add( tableModel.getValueAt(row, col) );
+		for( int rowIndex = 0; rowIndex < rowCount; rowIndex++)
+		{
+			final String valueAt = tableModel.getValueAt( rowIndex, col ).toString();
 
-		return set;
+			if ( ! uniqueEntryToRowIndexSet.keySet().contains( valueAt ) )
+			{
+				uniqueEntryToRowIndexSet.put( valueAt, new ArrayList<>(  ) );
+			}
+
+			uniqueEntryToRowIndexSet.get( valueAt ).add( rowIndex );
+		}
+
+		return uniqueEntryToRowIndexSet;
 	}
 
 	public static void addColumn( JTable table, String column, Object defaultValue )
@@ -675,9 +693,9 @@ public class Tables
 	}
 
 
-	public static Path getAbsolutePath( String referenceFile, String relativePath )
+	public static Path getAbsolutePath( String rootPath, String relativePath )
 	{
-		final Path path = Paths.get( referenceFile, relativePath );
+		final Path path = Paths.get( rootPath, relativePath );
 		final Path normalize = path.normalize();
 		return normalize;
 	}
@@ -753,7 +771,6 @@ public class Tables
 		mean /= rowCount;
 		return mean;
 	}
-
 
 	public static boolean isNumeric( JTable table, String columnName )
 	{
