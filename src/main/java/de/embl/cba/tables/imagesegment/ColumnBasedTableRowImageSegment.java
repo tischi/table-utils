@@ -5,7 +5,6 @@ import net.imglib2.FinalRealInterval;
 
 import java.util.*;
 
-
 /**
  * All values are dynamically fetched from the columns.
  * This might be slow, but allows changes in columns to be reflected.

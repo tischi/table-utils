@@ -1,7 +1,6 @@
 package de.embl.cba.tables.imagesegment;
 
-import de.embl.cba.tables.tablerow.TableRowImageSegment;
-import de.embl.cba.tables.tablerow.TableRowMap;
+import de.embl.cba.tables.tablerow.*;
 import net.imglib2.util.ValuePair;
 
 import java.util.*;
@@ -156,7 +155,6 @@ public class SegmentUtils
 		return segmentBuilder.build();
 	}
 
-
 	public static List< TableRowImageSegment > tableRowImageSegmentsFromColumns(
 			final Map< String, List< String > > columns,
 			final Map< SegmentProperty, List< String > > segmentPropertiesToColumn,
@@ -180,7 +178,22 @@ public class SegmentUtils
 		}
 
 		return columnBasedTableRowImageSegments;
+	}
 
+	public static List< ColumnBasedTableRow > columnBasedTableRowsFromColumns( final Map< String, List< String > > columnNamesToColumns )
+	{
+		final List< ColumnBasedTableRow > columnBasedTableRows = new ArrayList<>();
+
+		final int numRows = columnNamesToColumns.values().iterator().next().size();
+
+		for ( int row = 0; row < numRows; row++ )
+		{
+			final DefaultColumnBasedTableRow tableRow = new DefaultColumnBasedTableRow( row, columnNamesToColumns );
+
+			columnBasedTableRows.add( tableRow );
+		}
+
+		return columnBasedTableRows;
 	}
 
 	public static < T extends ImageSegment >

@@ -144,8 +144,7 @@ public class ExploreIntensityImageAndLabelImageAndTable
 				= createPropertyToColumnMap( columns.keySet() );
 
 		final List< TableRowImageSegment > segments
-				= SegmentUtils.tableRowImageSegmentsFromColumns(
-				columns, propertyToColumn, isOneBasedTimePoint );
+				= SegmentUtils.tableRowImageSegmentsFromColumns( columns, propertyToColumn, isOneBasedTimePoint );
 
 		return segments;
 	}
