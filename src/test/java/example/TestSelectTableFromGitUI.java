@@ -1,4 +1,4 @@
-package playground;
+package example;
 
 import de.embl.cba.table.ui.TableUIs;
 

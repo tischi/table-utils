@@ -2,6 +2,7 @@ package de.embl.cba.table.util;
 
 import de.embl.cba.table.model.ColumnClassAwareTableModel;
 import de.embl.cba.table.tablerow.ColumnBasedTableRow;
+import de.embl.cba.table.tablerow.DefaultColumnBasedTableRow;
 import de.embl.cba.table.tablerow.TableRow;
 import ij.measure.ResultsTable;
 import org.fife.rsta.ac.js.Logger;
@@ -83,29 +84,28 @@ public class TableUtils
 
 	public static JTable loadTable( final String path )
 	{
-		List< String > rows = readRows( path );
+		List< String > rows = loadRows( path );
 
 		return createJTableFromStringList( rows, null );
 	}
 
 	public static JTable loadTable( final String path, String delim )
 	{
-		List< String > rows = readRows( path );
+		List< String > rows = loadRows( path );
 
 		return createJTableFromStringList( rows, delim );
 	}
 
-	
-	public static List< String > readRows( String path )
+	public static List< String > loadRows( String path )
 	{
 		BufferedReader br = getReader( path );
 
-		List< String > rows = readRows( br );
+		List< String > rows = loadRows( br );
 
 		return rows;
 	}
 
-	public static List< String > readRows( BufferedReader br )
+	public static List< String > loadRows( BufferedReader br )
 	{
 		List< String > rows = new ArrayList<>();
 		try
@@ -169,7 +169,7 @@ public class TableUtils
 
 	}
 
-	public static List< String > readRows( File file, int numRows )
+	public static List< String > loadRows( File file, int numRows )
 	{
 		List< String > rows = new ArrayList<>();
 
@@ -872,7 +872,7 @@ public class TableUtils
 			final String path,
 			String delim )
 	{
-		final List< String > rowsInTableIncludingHeader = TableUtils.readRows( path );
+		final List< String > rowsInTableIncludingHeader = TableUtils.loadRows( path );
 
 		delim = TableUtils.autoDelim( delim, rowsInTableIncludingHeader );
 
@@ -909,7 +909,7 @@ public class TableUtils
 			String mergeByColumnName,
 			ArrayList< Double > mergeByColumnValues )
 	{
-		final List< String > rowsInTableIncludingHeader = TableUtils.readRows( path );
+		final List< String > rowsInTableIncludingHeader = TableUtils.loadRows( path );
 
 		delim = TableUtils.autoDelim( delim, rowsInTableIncludingHeader );
 
@@ -1209,4 +1209,21 @@ public class TableUtils
 			row.setCell( column, attribute );
 		}
 	}
+
+	public static List< ColumnBasedTableRow > columnBasedTableRowsFromColumns( final Map< String, List< String > > columnNamesToColumns )
+	{
+		final List< ColumnBasedTableRow > columnBasedTableRows = new ArrayList<>();
+
+		final int numRows = columnNamesToColumns.values().iterator().next().size();
+
+		for ( int row = 0; row < numRows; row++ )
+		{
+			final DefaultColumnBasedTableRow tableRow = new DefaultColumnBasedTableRow( row, columnNamesToColumns );
+
+			columnBasedTableRows.add( tableRow );
+		}
+
+		return columnBasedTableRows;
+	}
+
 }
