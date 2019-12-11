@@ -27,6 +27,7 @@ import java.util.Map;
 public class TableRowsTableView < T extends TableRow > extends JPanel
 {
 	private final List< T > tableRows;
+	private final ColoringModel< T > coloringModel;
 	private final SelectionModel< T > selectionModel;
 	private final SelectionColoringModel< T > selectionColoringModel;
 	private final String tableName;
@@ -38,7 +39,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private JTable table;
 	private int recentlySelectedRowInView;
 	private AssignValuesToSelectedRowsDialog assignObjectAttributesUI;
-//	private HelpDialog helpDialog;
 	private ColumnBasedColoring< T > columnBasedColoring;
 	private Component parentComponent;
 	private String mergeByColumnName = null;
@@ -47,20 +47,23 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	public TableRowsTableView(
 			final List< T > tableRows,
 			final SelectionModel< T > selectionModel,
-			final SelectionColoringModel< T > selectionColoringModel )
+			final ColoringModel< T > coloringModel )
 	{
-		this( tableRows, selectionModel, selectionColoringModel, "" );
+		this( tableRows, selectionModel, coloringModel, "" );
 	}
 	
 	public TableRowsTableView(
 			final List< T > tableRows,
 			final SelectionModel< T > selectionModel,
-			final SelectionColoringModel< T > selectionColoringModel,
+			final ColoringModel< T > coloringModel,
 			String tableName )
 	{
 		super( new GridLayout(1, 0 ) );
 		this.tableRows = tableRows;
-		this.selectionColoringModel = selectionColoringModel;
+		this.coloringModel = coloringModel;
+		this.selectionColoringModel = new SelectionColoringModel<>(
+				coloringModel,
+				selectionModel );
 		this.selectionModel = selectionModel;
 		this.tableName = tableName;
 
@@ -247,8 +250,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		menuBar.add( createColoringMenu() );
 
 		menuBar.add( createAnnotateMenu() );
-
-//		menuBar.add( createHelpMenu() );
 	}
 
 	private JMenu createSelectionMenu()
@@ -270,27 +271,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		return menu;
 	}
-
-
-	// TODO
-//	private JMenu createHelpMenu()
-//	{
-//		JMenu menu = new JMenu( "Help" );
-//
-//		menu.add( createShowHelpMenuItem() );
-//
-//		return menu;
-//	}
-//
-//	private JMenuItem createShowHelpMenuItem()
-//	{
-//		initHelpDialog();
-//		final JMenuItem menuItem = new JMenuItem( "Show help" );
-//		menuItem.addActionListener( e ->
-//				SwingUtilities.invokeLater( () ->
-//						helpDialog.setVisible( ! helpDialog.isVisible() ) ) );
-//		return menuItem;
-//	}
 
 	public void addMenu( JMenuItem menuItem )
 	{
@@ -627,15 +607,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		coloringMenu.add( menuItem );
 	}
-
-	// TODO
-//	public void initHelpDialog()
-//	{
-//		helpDialog =
-//				new HelpDialog(
-//						frame,
-//						TableUtils.class.getResource( "/TableUtilsHelp.html" ) );
-//	}
 
 	public void close()
 	{

@@ -1,6 +1,6 @@
 package de.embl.cba.table.color;
 
-import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
+import de.embl.cba.table.lut.GlasbeyARGBLut;
 import net.imglib2.Volatile;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;

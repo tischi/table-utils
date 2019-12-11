@@ -2,7 +2,8 @@ package de.embl.cba.table.select;
 
 import de.embl.cba.table.util.SwingUtils;
 import de.embl.cba.table.tablerow.TableRow;
-import de.embl.cba.table.view.TableUtilsTableView;
+import de.embl.cba.table.util.TableUtils;
+import de.embl.cba.table.view.TableRowsTableView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +14,7 @@ import java.util.Set;
 public class AssignValuesToSelectedRowsDialog< T extends TableRow > extends JPanel
 {
 	public static final String NEW_ATTRIBUTE = "None";
-	final TableUtilsTableView< T > tableView;
+	final TableRowsTableView< T > tableView;
 	Set< T > selectedRows;
 	private JComboBox attributeComboBox;
 	private JComboBox columnComboBox;
@@ -27,7 +28,7 @@ public class AssignValuesToSelectedRowsDialog< T extends TableRow > extends JPan
 
 	// TODO: make this only work on TableUtils (sources rid of TableView dependency)
 
-	public AssignValuesToSelectedRowsDialog( TableUtilsTableView tableView )
+	public AssignValuesToSelectedRowsDialog( TableRowsTableView tableView )
 	{
 		this.tableView = tableView;
 		this.selectedAttributes = new HashSet<>();

@@ -1,7 +1,7 @@
 package de.embl.cba.table.ui;
 
 import de.embl.cba.table.util.TableUtils;
-import de.embl.cba.table.view.TableUtilsTableView;
+import de.embl.cba.table.view.TableRowsTableView;
 import ij.gui.GenericDialog;
 
 import javax.swing.*;
@@ -17,7 +17,7 @@ import static de.embl.cba.table.util.FileUtils.resolveTableURL;
 
 public class TableUIs
 {
-	public static void addColumnUI( TableUtilsTableView tableView )
+	public static void addColumnUI( TableRowsTableView tableView )
 	{
 		final GenericDialog gd = new GenericDialog( "Add Custom Column" );
 		gd.addStringField( "Column Name", "Column", 30 );
