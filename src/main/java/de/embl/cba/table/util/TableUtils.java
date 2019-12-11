@@ -862,13 +862,13 @@ public class TableUtils
 	}
 
 	public static Map< String, List< String > >
-	stringColumnsFromTableFile( final String path )
+	loadColumns( final String path )
 	{
-		return stringColumnsFromTableFile( path, null );
+		return loadColumns( path, null );
 	}
 
 	public static Map< String, List< String > >
-	stringColumnsFromTableFile(
+	loadColumns(
 			final String path,
 			String delim )
 	{

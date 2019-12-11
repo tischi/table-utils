@@ -16,7 +16,6 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 		selected = new HashSet();
 	}
 
-
 	@Override
 	public boolean isSelected( T object )
 	{

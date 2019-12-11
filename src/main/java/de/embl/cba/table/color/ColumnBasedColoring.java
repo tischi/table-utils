@@ -1,10 +1,10 @@
 package de.embl.cba.table.color;
 
-import de.embl.cba.bdv.utils.lut.BlueWhiteRedARGBLut;
-import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.table.Logger;
-import de.embl.cba.table.util.TableUtils;
+import de.embl.cba.table.lut.BlueWhiteRedARGBLut;
+import de.embl.cba.table.lut.GlasbeyARGBLut;
 import de.embl.cba.table.tablerow.TableRow;
+import de.embl.cba.table.util.TableUtils;
 import ij.gui.GenericDialog;
 import net.imglib2.type.numeric.ARGBType;
 

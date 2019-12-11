@@ -1,6 +1,6 @@
 package de.embl.cba.table.view;
 
-import bdv.tools.HelpDialog;
+// import bdv.tools.HelpDialog; // TODO
 import de.embl.cba.table.Logger;
 import de.embl.cba.table.annotate.Annotator;
 import de.embl.cba.table.color.ColorUtils;
@@ -38,7 +38,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private JTable table;
 	private int recentlySelectedRowInView;
 	private AssignValuesToSelectedRowsDialog assignObjectAttributesUI;
-	private HelpDialog helpDialog;
+//	private HelpDialog helpDialog;
 	private ColumnBasedColoring< T > columnBasedColoring;
 	private Component parentComponent;
 	private String mergeByColumnName = null;
@@ -248,7 +248,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		menuBar.add( createAnnotateMenu() );
 
-		menuBar.add( createHelpMenu() );
+//		menuBar.add( createHelpMenu() );
 	}
 
 	private JMenu createSelectionMenu()
@@ -272,24 +272,25 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	}
 
 
-	private JMenu createHelpMenu()
-	{
-		JMenu menu = new JMenu( "Help" );
-
-		menu.add( createShowHelpMenuItem() );
-
-		return menu;
-	}
-
-	private JMenuItem createShowHelpMenuItem()
-	{
-		initHelpDialog();
-		final JMenuItem menuItem = new JMenuItem( "Show help" );
-		menuItem.addActionListener( e ->
-				SwingUtilities.invokeLater( () ->
-						helpDialog.setVisible( ! helpDialog.isVisible() ) ) );
-		return menuItem;
-	}
+	// TODO
+//	private JMenu createHelpMenu()
+//	{
+//		JMenu menu = new JMenu( "Help" );
+//
+//		menu.add( createShowHelpMenuItem() );
+//
+//		return menu;
+//	}
+//
+//	private JMenuItem createShowHelpMenuItem()
+//	{
+//		initHelpDialog();
+//		final JMenuItem menuItem = new JMenuItem( "Show help" );
+//		menuItem.addActionListener( e ->
+//				SwingUtilities.invokeLater( () ->
+//						helpDialog.setVisible( ! helpDialog.isVisible() ) ) );
+//		return menuItem;
+//	}
 
 	public void addMenu( JMenuItem menuItem )
 	{
@@ -627,15 +628,14 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		coloringMenu.add( menuItem );
 	}
 
-
-	public void initHelpDialog()
-	{
-		helpDialog =
-				new HelpDialog(
-						frame,
-						TableUtils.class.getResource( "/TableUtilsHelp.html" ) );
-	}
-
+	// TODO
+//	public void initHelpDialog()
+//	{
+//		helpDialog =
+//				new HelpDialog(
+//						frame,
+//						TableUtils.class.getResource( "/TableUtilsHelp.html" ) );
+//	}
 
 	public void close()
 	{

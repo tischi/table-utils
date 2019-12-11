@@ -1,13 +1,11 @@
 package de.embl.cba.table.color;
 
-import de.embl.cba.bdv.utils.lut.ARGBLut;
+import de.embl.cba.table.lut.ARGBLut;
 import de.embl.cba.table.tablerow.TableRow;
 import net.imglib2.type.numeric.ARGBType;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 
 public class CategoryTableRowColumnColoringModel< T extends TableRow >
 		extends AbstractColoringModel< T > implements CategoryColoringModel< T >
@@ -17,6 +15,8 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	private final String column;
 	private ARGBLut argbLut;
 	private int randomSeed;
+
+	final static public double goldenRatio = 1.0 / ( 0.5 * Math.sqrt( 5 ) + 0.5 );
 
 	/**
 	 *

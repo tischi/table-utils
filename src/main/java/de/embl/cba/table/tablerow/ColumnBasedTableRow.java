@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface ColumnBasedTableRow
+public interface ColumnBasedTableRow extends TableRow
 {
 	String getCell( String columnName );
 

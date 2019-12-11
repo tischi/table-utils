@@ -107,7 +107,7 @@ public class TableUIs
 		{
 			final File selectedFile = jFileChooser.getSelectedFile();
 
-			return TableUtils.stringColumnsFromTableFile( selectedFile.toString() );
+			return TableUtils.loadColumns( selectedFile.toString() );
 		}
 
 		return null;

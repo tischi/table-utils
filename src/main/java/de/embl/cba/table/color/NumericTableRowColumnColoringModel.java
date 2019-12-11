@@ -1,9 +1,8 @@
 package de.embl.cba.table.color;
 
-import de.embl.cba.bdv.utils.lut.ARGBLut;
+import de.embl.cba.table.lut.ARGBLut;
 import de.embl.cba.table.tablerow.TableRow;
 import net.imglib2.type.numeric.ARGBType;
-
 
 // TODO: extract abstract class NumericFeatureColoringModel
 public class NumericTableRowColumnColoringModel< T extends TableRow >
