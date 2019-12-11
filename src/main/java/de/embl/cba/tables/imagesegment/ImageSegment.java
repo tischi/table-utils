@@ -18,6 +18,4 @@ public interface ImageSegment extends RealLocalizable
 	float[] getMesh();
 
 	void setMesh( float[] mesh );
-
-
 }
