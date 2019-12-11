@@ -3,6 +3,7 @@ package de.embl.cba.table.annotate;
 import de.embl.cba.table.color.ColoringModel;
 import de.embl.cba.table.select.SelectionModel;
 import de.embl.cba.table.tablerow.TableRow;
+import de.embl.cba.table.util.TableUtils;
 import ij.gui.GenericDialog;
 import net.imglib2.type.numeric.ARGBType;
 

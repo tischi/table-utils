@@ -14,7 +14,7 @@ public class OpenAndShowTable
 {
 	public static void main( String[] args )
 	{
-		final String tablePath = OpenAndShowTable.class.getResource( "tables/3d-image-lbl-morpho.csv" ).getFile();
+		final String tablePath = OpenAndShowTable.class.getResource( "../tables/3d-image-lbl-morpho.csv" ).getFile();
 
 		final Map< String, List< String > > columnNamesToColumns = TableUtils.loadColumns( tablePath );
 
