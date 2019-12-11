@@ -1,9 +1,6 @@
 package users;
 
-import de.embl.cba.tables.ExploreIntensityImageAndLabelImageAndTable;
 import net.imagej.ImageJ;
-
-import java.io.File;
 
 public class ChristianWenzlExplore3DCells
 {
@@ -14,7 +11,7 @@ public class ChristianWenzlExplore3DCells
 		new ExploreIntensityImageAndLabelImageAndTable(
 				"/Users/tischer/Documents/christian-wenzl--data/Archive_new/test_raw.tif",
 				 "/Users/tischer/Documents/christian-wenzl--data/Archive_new/test_labels.tif",
-				"/Users/tischer/Documents/christian-wenzl--data/Archive_new/table.csv",
+				"/Users/tischer/Documents/christian-wenzl--data/Archive_new/model.csv",
 				true,
 				false
 		);

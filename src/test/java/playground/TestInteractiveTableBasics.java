@@ -28,7 +28,7 @@ public class TestInteractiveTableBasics
 
 		JTable table = new JTable( data, colNames );
 
-//		final ObjectTablePanel panel = new ObjectTablePanel( table );
+//		final ObjectTablePanel panel = new ObjectTablePanel( model );
 //
 //		final Object[] newStringRow = new Object[ tablerow ];
 //		for ( int i = 0; i < tablerow; i++ )

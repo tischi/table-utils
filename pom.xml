@@ -69,7 +69,7 @@
 		<system>None</system>
 	</ciManagement>
 	<properties>
-		<package-name>de.embl.cba.tables</package-name>
+		<package-name>de.embl.cba.table</package-name>
 		<license.licenseName>bsd_2</license.licenseName>
 		<license.copyrightOwners>EMBL</license.copyrightOwners>
 		<imagej.app.directory>/Applications/Fiji.app/</imagej.app.directory>

@@ -1,8 +1,8 @@
 package tests;
 
-import de.embl.cba.tables.TableColumns;
-import de.embl.cba.tables.morpholibj.ExploreMorphoLibJLabelImage;
-import de.embl.cba.tables.view.combined.SegmentsTableBdvAnd3dViews;
+import de.embl.cba.table.TableColumns;
+import de.embl.cba.table.morpholibj.ExploreMorphoLibJLabelImage;
+import de.embl.cba.table.view.combined.SegmentsTableBdvAnd3dViews;
 import ij.IJ;
 import net.imagej.ImageJ;
 

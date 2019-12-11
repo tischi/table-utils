@@ -13,7 +13,7 @@ public class PathMapping
 
 	private static void test01()
 	{
-		final Path rootPath = Paths.get( "/Volumes/table/table.txt");
+		final Path rootPath = Paths.get( "/Volumes/model/model.txt");
 
 		final String relativeImagePath = "../image/image.tif";
 

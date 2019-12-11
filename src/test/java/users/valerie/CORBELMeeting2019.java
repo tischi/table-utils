@@ -1,7 +1,7 @@
 package users.valerie;
 
-import de.embl.cba.tables.command.ExploreObjectsTableCommand;
-import de.embl.cba.tables.imagesegment.SegmentProperty;
+import de.embl.cba.table.command.ExploreObjectsTableCommand;
+import de.embl.cba.table.imagesegment.SegmentProperty;
 
 import java.io.File;
 import java.util.HashMap;

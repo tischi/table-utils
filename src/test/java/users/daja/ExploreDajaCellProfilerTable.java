@@ -1,6 +1,6 @@
 package users.daja;
 
-import de.embl.cba.tables.command.ExploreObjectsTableCommand;
+import de.embl.cba.table.command.ExploreObjectsTableCommand;
 import net.imagej.ImageJ;
 
 import java.io.File;

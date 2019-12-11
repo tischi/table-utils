@@ -1,6 +1,6 @@
 package playground;
 
-import de.embl.cba.tables.TableUIs;
+import de.embl.cba.table.TableUIs;
 
 import java.io.IOException;
 

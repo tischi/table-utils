@@ -1,12 +1,11 @@
 package playground;
 
-import de.embl.cba.tables.TableColumns;
-import de.embl.cba.tables.command.ExploreMorphoLibJLabelImageCommand;
-import de.embl.cba.tables.imagesegment.SegmentProperty;
-import de.embl.cba.tables.imagesegment.SegmentUtils;
-import de.embl.cba.tables.morpholibj.ExploreMorphoLibJLabelImage;
-import de.embl.cba.tables.tablerow.TableRowImageSegment;
-import de.embl.cba.tables.view.combined.SegmentsTableBdvAnd3dViews;
+import de.embl.cba.table.TableColumns;
+import de.embl.cba.table.command.ExploreMorphoLibJLabelImageCommand;
+import de.embl.cba.table.imagesegment.SegmentProperty;
+import de.embl.cba.table.imagesegment.SegmentUtils;
+import de.embl.cba.table.morpholibj.ExploreMorphoLibJLabelImage;
+import de.embl.cba.table.view.combined.SegmentsTableBdvAnd3dViews;
 import ij.IJ;
 import net.imagej.ImageJ;
 

@@ -1,6 +1,6 @@
 package playground;
 
-import de.embl.cba.tables.Tables;
+import de.embl.cba.table.util.TableUtils;
 
 import javax.swing.*;
 import java.util.TreeMap;
@@ -11,7 +11,7 @@ public class TestColumnsAsTreeMap
 	{
 		JTable jTable = createTable();
 
-		final TreeMap< Number, Number > map = Tables.columnsAsTreeMap(
+		final TreeMap< Number, Number > map = TableUtils.columnsAsTreeMap(
 				jTable,
 				jTable.getColumnName( 0 ),
 				jTable.getColumnName( 1 ) );
