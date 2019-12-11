@@ -1,6 +1,5 @@
 package tests;
 
-import de.embl.cba.table.TableColumns;
 import de.embl.cba.table.morpholibj.ExploreMorphoLibJLabelImage;
 import de.embl.cba.table.view.combined.SegmentsTableBdvAnd3dViews;
 import ij.IJ;

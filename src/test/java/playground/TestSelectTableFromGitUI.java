@@ -1,10 +1,10 @@
 package playground;
 
-import de.embl.cba.table.TableUIs;
+import de.embl.cba.table.ui.TableUIs;
 
 import java.io.IOException;
 
-public class TestSelectTableFromGitlab
+public class TestSelectTableFromGitUI
 {
 	public static void main( String[] args ) throws IOException
 	{

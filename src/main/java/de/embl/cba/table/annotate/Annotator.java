@@ -1,6 +1,5 @@
 package de.embl.cba.table.annotate;
 
-import de.embl.cba.table.TableRows;
 import de.embl.cba.table.color.ColoringModel;
 import de.embl.cba.table.select.SelectionModel;
 import de.embl.cba.table.tablerow.TableRow;
@@ -102,7 +101,7 @@ public class Annotator < T extends TableRow > extends JFrame
 
 			final Set< T > selected = selectionModel.getSelected();
 
-			TableRows.assignValues(
+			TableUtils.assignValues(
 					annotationColumnName,
 					selected,
 					annotation,

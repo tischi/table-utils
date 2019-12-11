@@ -83,7 +83,7 @@ public class ConcatenatedTableModel extends AbstractTableModel implements TableM
 
 		model.addTableModelListener(this);
 		updateRowCount();
-		fireTableRowsInserted(firstRow, lastRow);
+		fireTableUtilsInserted(firstRow, lastRow);
 	}
 
 	public void remove(TableModel model) {
@@ -94,7 +94,7 @@ public class ConcatenatedTableModel extends AbstractTableModel implements TableM
 			model.removeTableModelListener(this);
 			models.remove(model);
 			updateRowCount();
-			fireTableRowsDeleted(firstRow, lastRow);
+			fireTableUtilsDeleted(firstRow, lastRow);
 		}
 	}
 

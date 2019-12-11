@@ -1,4 +1,4 @@
-package de.embl.cba.table;
+package de.embl.cba.table.util;
 
 import javax.swing.*;
 import java.awt.*;

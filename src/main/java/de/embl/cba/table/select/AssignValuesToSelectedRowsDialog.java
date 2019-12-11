@@ -1,9 +1,8 @@
 package de.embl.cba.table.select;
 
-import de.embl.cba.table.SwingUtils;
-import de.embl.cba.table.TableRows;
+import de.embl.cba.table.util.SwingUtils;
 import de.embl.cba.table.tablerow.TableRow;
-import de.embl.cba.table.view.TableRowsTableView;
+import de.embl.cba.table.view.TableUtilsTableView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +13,7 @@ import java.util.Set;
 public class AssignValuesToSelectedRowsDialog< T extends TableRow > extends JPanel
 {
 	public static final String NEW_ATTRIBUTE = "None";
-	final TableRowsTableView< T > tableView;
+	final TableUtilsTableView< T > tableView;
 	Set< T > selectedRows;
 	private JComboBox attributeComboBox;
 	private JComboBox columnComboBox;
@@ -26,9 +25,9 @@ public class AssignValuesToSelectedRowsDialog< T extends TableRow > extends JPan
 	private Point location;
 
 
-	// TODO: make this only work on TableRows (sources rid of TableView dependency)
+	// TODO: make this only work on TableUtils (sources rid of TableView dependency)
 
-	public AssignValuesToSelectedRowsDialog( TableRowsTableView tableView )
+	public AssignValuesToSelectedRowsDialog( TableUtilsTableView tableView )
 	{
 		this.tableView = tableView;
 		this.selectedAttributes = new HashSet<>();
@@ -59,7 +58,7 @@ public class AssignValuesToSelectedRowsDialog< T extends TableRow > extends JPan
 			selectedColumn = ( String ) columnComboBox.getSelectedItem();
 			selectedAttribute = ( String ) attributeComboBox.getSelectedItem();
 
-			TableRows.assignValues(
+			TableUtils.assignValues(
 					selectedColumn,
 					selectedRows,
 					selectedAttribute,
@@ -75,9 +74,9 @@ public class AssignValuesToSelectedRowsDialog< T extends TableRow > extends JPan
 
 	public void updateUIComponents()
 	{
-		System.out.println( "AssignValuesToTableRowsUI.Debug.updateColumnComboBox" );
+		System.out.println( "AssignValuesToTableUtilsUI.Debug.updateColumnComboBox" );
 		updateColumnComboBox();
-		System.out.println( "AssignValuesToTableRowsUI.Debug.updateAttributeComboBox" );
+		System.out.println( "AssignValuesToTableUtilsUI.Debug.updateAttributeComboBox" );
 		updateAttributeComboBox();
 	}
 

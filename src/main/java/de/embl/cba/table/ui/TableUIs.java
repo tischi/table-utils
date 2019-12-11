@@ -1,7 +1,7 @@
-package de.embl.cba.table;
+package de.embl.cba.table.ui;
 
 import de.embl.cba.table.util.TableUtils;
-import de.embl.cba.table.view.TableRowsTableView;
+import de.embl.cba.table.view.TableUtilsTableView;
 import ij.gui.GenericDialog;
 
 import javax.swing.*;
@@ -15,10 +15,9 @@ import java.util.Map;
 
 import static de.embl.cba.table.util.FileUtils.resolveTableURL;
 
-
 public class TableUIs
 {
-	public static void addColumnUI( TableRowsTableView tableView )
+	public static void addColumnUI( TableUtilsTableView tableView )
 	{
 		final GenericDialog gd = new GenericDialog( "Add Custom Column" );
 		gd.addStringField( "Column Name", "Column", 30 );
@@ -108,7 +107,7 @@ public class TableUIs
 		{
 			final File selectedFile = jFileChooser.getSelectedFile();
 
-			return TableColumns.stringColumnsFromTableFile( selectedFile.toString() );
+			return TableUtils.stringColumnsFromTableFile( selectedFile.toString() );
 		}
 
 		return null;
@@ -118,7 +117,7 @@ public class TableUIs
 																	   String tablesLocation,
 																	   String mergeByColumnName ) throws IOException
 	{
-		final ArrayList< Double > orderColumn = TableColumns.getNumericColumnAsDoubleList(
+		final ArrayList< Double > orderColumn = TableUtils.getNumericColumnAsDoubleList(
 				table,
 				mergeByColumnName );
 
@@ -144,7 +143,7 @@ public class TableUIs
 			newTablePath = resolveTableURL( URI.create( newTablePath ) );
 
 		Map< String, List< String > > columns =
-				TableColumns.orderedStringColumnsFromTableFile(
+				TableUtils.orderedStringColumnsFromTableFile(
 						newTablePath,
 						null,
 						mergeByColumnName,

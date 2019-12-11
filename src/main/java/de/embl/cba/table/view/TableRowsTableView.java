@@ -1,17 +1,18 @@
 package de.embl.cba.table.view;
 
 import bdv.tools.HelpDialog;
-import de.embl.cba.table.*;
+import de.embl.cba.table.Logger;
 import de.embl.cba.table.annotate.Annotator;
-import de.embl.cba.table.color.*;
-import de.embl.cba.table.tablerow.TableRow;
+import de.embl.cba.table.color.ColorUtils;
+import de.embl.cba.table.color.ColoringModel;
+import de.embl.cba.table.color.ColumnBasedColoring;
+import de.embl.cba.table.color.SelectionColoringModel;
+import de.embl.cba.table.select.AssignValuesToSelectedRowsDialog;
 import de.embl.cba.table.select.SelectionListener;
 import de.embl.cba.table.select.SelectionModel;
-import de.embl.cba.table.select.AssignValuesToSelectedRowsDialog;
-import de.embl.cba.table.color.ColumnBasedColoring;
-import de.embl.cba.table.measure.MeasureDistance;
+import de.embl.cba.table.tablerow.TableRow;
+import de.embl.cba.table.ui.TableUIs;
 import de.embl.cba.table.util.TableUtils;
-import ij.IJ;
 import ij.gui.GenericDialog;
 import net.imglib2.type.numeric.ARGBType;
 
@@ -22,7 +23,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
 
 public class TableRowsTableView < T extends TableRow > extends JPanel
 {
@@ -40,7 +40,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private AssignValuesToSelectedRowsDialog assignObjectAttributesUI;
 	private HelpDialog helpDialog;
 	private ColumnBasedColoring< T > columnBasedColoring;
-	private MeasureDistance< T > measureDistance;
 	private Component parentComponent;
 	private String mergeByColumnName = null;
 	private String tablesDirectory = "";
@@ -71,7 +70,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		registerAsColoringListener( selectionColoringModel );
 	}
 
-	public List< T > getTableRows()
+	public List< T > getTableUtils()
 	{
 		return tableRows;
 	}
@@ -197,7 +196,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		final int row = table.convertRowIndexToModel( rowInView );
 
-//		if ( selectionModel.isFocused( tableRows.getTableRows().get( row ) ) )
+//		if ( selectionModel.isFocused( tableRows.getTableUtils().get( row ) ) )
 //		{
 //			return Color.BLUE;
 //		}
@@ -218,7 +217,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private void configureJTable()
 	{
-		table = TableUtils.jTableFromTableRows( tableRows );
+		table = TableUtils.jTableFromTableUtils( tableRows );
 		table.setPreferredScrollableViewportSize( new Dimension(500, 200) );
 		table.setFillsViewportHeight( true );
 		table.setAutoCreateRowSorter( true );
@@ -249,8 +248,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		menuBar.add( createAnnotateMenu() );
 
-		menuBar.add( createMeasureMenu() );
-
 		menuBar.add( createHelpMenu() );
 	}
 
@@ -274,14 +271,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menu;
 	}
 
-	private JMenu createMeasureMenu()
-	{
-		JMenu menu = new JMenu( "Measure" );
-
-		addMeasureSimilarityMenuItem( menu );
-
-		return menu;
-	}
 
 	private JMenu createHelpMenu()
 	{
@@ -508,13 +497,13 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	public void addColumn( String column, Object defaultValue )
 	{
 		TableUtils.addColumn( table.getModel(), column, defaultValue );
-		TableRows.addColumn( tableRows, column, defaultValue );
+		TableUtils.addColumn( tableRows, column, defaultValue );
 	}
 
 	public void addColumn( String column, Object[] values )
 	{
 		TableUtils.addColumn( table.getModel(), column, values );
-		TableRows.addColumn( tableRows, column, values );
+		TableUtils.addColumn( tableRows, column, values );
 	}
 
 	public void addColumns( Map< String, List< String > > columns )
@@ -523,7 +512,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		{
 			try
 			{
-				final Object[] values = TableColumns.asTypedArray( columns.get( columnName ) );
+				final Object[] values = TableUtils.asTypedArray( columns.get( columnName ) );
 				addColumn( columnName, values );
 			} catch ( UnsupportedDataTypeException e )
 			{
@@ -638,41 +627,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		coloringMenu.add( menuItem );
 	}
 
-	private void addMeasureSimilarityMenuItem( JMenu menu )
-	{
-		final JMenuItem menuItem = new JMenuItem( "Measure Distance to Selected Rows..." );
-
-		this.measureDistance = new MeasureDistance( table, tableRows );
-
-		menuItem.addActionListener( e ->
-				new Thread( () ->
-				{
-					if ( selectionModel.isEmpty() )
-					{
-						IJ.showMessage( "Please select one or more objects." );
-						return;
-					}
-					else
-					{
-						if ( measureDistance.showDialog( selectionModel.getSelected() ) )
-						{
-							columnBasedColoring.getColumnBasedColoringModel(
-									measureDistance.getNewColumnName(),
-									ColumnBasedColoring.LINEAR_BLUE_WHITE_RED );
-
-							selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
-						}
-					}
-				}
- 				).start() );
-
-		menu.add( menuItem );
-	}
-
-	public MeasureDistance< T > getMeasureDistance()
-	{
-		return measureDistance;
-	}
 
 	public void initHelpDialog()
 	{
