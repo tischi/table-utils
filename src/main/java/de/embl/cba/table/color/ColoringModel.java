@@ -8,7 +8,7 @@ public interface ColoringModel< T > extends Converter< T, ARGBType >
 {
 	/**
 	 * Get the list of color listeners. Add a {@link ColoringListener} to
-	 * this list, for being notified when the object/edge select changes.
+	 * this list, for being notified when the coloring changes.
 	 *
 	 * @return the list of listeners
 	 */
