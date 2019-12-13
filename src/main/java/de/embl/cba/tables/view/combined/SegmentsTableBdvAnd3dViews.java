@@ -58,8 +58,7 @@ public class SegmentsTableBdvAnd3dViews
 
 		final SelectionColoringModel< TableRowImageSegment > selectionColoringModel
 				= new SelectionColoringModel<>(
-					coloringModel,
-				selectionModel );
+					coloringModel, selectionModel );
 
 		segmentsBdvView = new SegmentsBdvView<>(
 				tableRowImageSegments,
