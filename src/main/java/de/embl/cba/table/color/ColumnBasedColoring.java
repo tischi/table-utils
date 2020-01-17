@@ -45,7 +45,6 @@ public class ColumnBasedColoring< T extends TableRow >
 		this.columnNameToRangeSettings = new HashMap<>();
 	}
 
-
 	public void showDialog()
 	{
 		final String[] columnNames = TableUtils.getColumnNamesAsArray( table );
@@ -71,7 +70,6 @@ public class ColumnBasedColoring< T extends TableRow >
 			String selectedColumnName,
 			String selectedColoringMode )
 	{
-
 		switch ( selectedColoringMode )
 		{
 			case LINEAR_BLUE_WHITE_RED:
@@ -165,4 +163,8 @@ public class ColumnBasedColoring< T extends TableRow >
 		return columnNameToMinMax.get( column );
 	}
 
+	public String getSelectedColumnName()
+	{
+		return selectedColumnName;
+	}
 }

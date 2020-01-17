@@ -585,12 +585,13 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	}
 
 
-
 	private JMenu createColoringMenu()
 	{
 		JMenu coloringMenu = new JMenu( "Color" );
 
 		addColorByColumnMenuItem( coloringMenu );
+
+
 
 		return coloringMenu;
 	}
@@ -607,6 +608,36 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		coloringMenu.add( menuItem );
 	}
+
+	private void addColorLoggingMenuItem( JMenu coloringMenu )
+	{
+		final JMenuItem menuItem = new JMenuItem( "Log Current Value to Color Map" );
+
+		menuItem.addActionListener( e ->
+				new Thread( () ->
+						logCurrentValueToColorMap() ).start() );
+
+		coloringMenu.add( menuItem );
+	}
+
+	private void logCurrentValueToColorMap()
+	{
+		final String selectedColumnName = columnBasedColoring.getSelectedColumnName();
+
+		Logger.info( " "  );
+		Logger.info( "# Value: R, G, B"  );
+
+		for ( T tableRow : tableRows )
+		{
+			final String value = tableRow.getCell( selectedColumnName );
+
+			final ARGBType argbType = new ARGBType();
+			selectionColoringModel.convert( tableRow, argbType );
+			final int colorIndex = argbType.get();
+			Logger.info( value + ": " + ARGBType.red( colorIndex ) + ", " + ARGBType.green( colorIndex ) + ", " + ARGBType.blue( colorIndex ) );
+		}
+	}
+
 
 	public void close()
 	{

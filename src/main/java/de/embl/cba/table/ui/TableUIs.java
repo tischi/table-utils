@@ -3,6 +3,14 @@ package de.embl.cba.table.ui;
 import de.embl.cba.table.util.TableUtils;
 import de.embl.cba.table.view.TableRowsTableView;
 import ij.gui.GenericDialog;
+import net.imagej.ImageJ;
+import org.scijava.Context;
+import org.scijava.ItemIO;
+import org.scijava.command.DynamicCommand;
+import org.scijava.module.Module;
+import org.scijava.module.ModuleService;
+import org.scijava.module.MutableModuleItem;
+import org.scijava.script.ScriptService;
 
 import javax.swing.*;
 import java.io.BufferedReader;
@@ -12,6 +20,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static de.embl.cba.table.util.FileUtils.resolveTableURL;
 
@@ -44,13 +53,28 @@ public class TableUIs
 	public static String selectColumnNameUI( JTable table, String text )
 	{
 		final String[] columnNames = TableUtils.getColumnNamesAsArray( table );
+
 		final GenericDialog gd = new GenericDialog( "" );
 		gd.addChoice( text, columnNames, columnNames[ 0 ] );
 		gd.showDialog();
 		if ( gd.wasCanceled() ) return null;
 		final String columnName = gd.getNextChoice();
+
 		return columnName;
 	}
+
+	public static String getStringChoiceSciJavaUI( String choiceName, List< String > columnNames, Context context ) throws InterruptedException, ExecutionException
+	{
+		final String choiceInputName = "choice";
+		final DynamicCommand command = new DynamicCommand() {};
+		MutableModuleItem<String> choiceInput = command.addInput( choiceInputName, String.class );
+		choiceInput.setLabel(choiceName);
+		choiceInput.setChoices(columnNames);
+		ModuleService moduleService = context.getService( ModuleService.class );
+		String choiceValue = (String) moduleService.run( command, true ).get().getInput(choiceInputName);
+		return choiceValue;
+	}
+
 
 	public static ArrayList< String > selectColumnNamesUI( JTable table, String text )
 	{
