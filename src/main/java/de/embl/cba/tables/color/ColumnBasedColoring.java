@@ -165,4 +165,8 @@ public class ColumnBasedColoring< T extends TableRow >
 		return columnNameToMinMax.get( column );
 	}
 
+	public String getSelectedColumnName()
+	{
+		return selectedColumnName;
+	}
 }
