@@ -23,7 +23,7 @@ import de.embl.cba.tables.imagesegment.LabelFrameAndImage;
 import de.embl.cba.tables.imagesegment.SegmentUtils;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
-import de.embl.cba.tables.view.dialogs.BdvViewSourceSetSelectionDialog;
+import de.embl.cba.tables.view.dialogs.BdvViewSourcesBrowsingAndActionsDialog;
 import ij.gui.GenericDialog;
 import net.imglib2.RealPoint;
 import net.imglib2.algorithm.neighborhood.HyperSphereShape;
@@ -147,7 +147,7 @@ public class SegmentsBdvView < T extends ImageSegment >
 
 	public void showSourceSetSelectionDialog()
 	{
-		new BdvViewSourceSetSelectionDialog( this );
+		new BdvViewSourcesBrowsingAndActionsDialog( this );
 	}
 
 	public void addGrayValueOverlay()

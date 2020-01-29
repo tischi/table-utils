@@ -639,9 +639,16 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private void logCurrentValueToColorMap()
 	{
 		final String selectedColumnName = columnBasedColoring.getSelectedColumnName();
+		if ( selectedColumnName == null )
+		{
+			Logger.error( "Please first use the [ Color > Color by Column ] menu item to configure the coloring." );
+			return;
+		}
 
 		Logger.info( " "  );
-		Logger.info( "# Value: R, G, B"  );
+		Logger.info( "Column used for coloring: " + selectedColumnName );
+		Logger.info( " "  );
+		Logger.info( "Value, R, G, B"  );
 
 		for ( T tableRow : tableRows )
 		{

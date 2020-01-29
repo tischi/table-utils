@@ -85,7 +85,6 @@ public class ExploreObjectsTableCommand implements Command
 		final FileImageSourcesModel imageSourcesModel = factory.getImageSourcesModel();
 
 		showViews( tableRowImageSegments, imageSourcesModel );
-
 	}
 
 	public void showViews(
