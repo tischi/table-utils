@@ -34,23 +34,24 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	@Override
 	public void convert( T input, ARGBType output )
 	{
-		final Object featureValue = input.getCell( column );
+		final String cellContent = input.getCell( column );
 
-		if ( inputToFixedColor.keySet().contains( featureValue ) )
+		if ( inputToFixedColor.keySet().contains( cellContent ) )
 		{
-			final int color = inputToFixedColor.get( featureValue ).get();
+			final int color = inputToFixedColor.get( cellContent ).get();
 			output.set( color );
 		}
- 		else if ( inputToRandomColor.keySet().contains( featureValue ) )
+ 		else if ( inputToRandomColor.keySet().contains( cellContent ) )
 		{
-			final int color = inputToRandomColor.get( featureValue ).get();
+			final int color = inputToRandomColor.get( cellContent ).get();
 			output.set( color );
 		}
 		else
 		{
-			final double random = createRandom( inputToRandomColor.size() + 1 );
-			inputToRandomColor.put( featureValue, new ARGBType( argbLut.getARGB( random ) ) );
-			final int color = inputToRandomColor.get( featureValue ).get();
+			// final double random = createRandom( inputToRandomColor.size() + 1 );
+			final double random = createRandom( cellContent.hashCode() );
+			inputToRandomColor.put( cellContent, new ARGBType( argbLut.getARGB( random ) ) );
+			final int color = inputToRandomColor.get( cellContent ).get();
 			output.set( color );
 		}
 	}

@@ -1,6 +1,7 @@
 package de.embl.cba.tables.color;
 
 import de.embl.cba.bdv.utils.lut.ARGBLut;
+import de.embl.cba.tables.tablerow.TableRow;
 import net.imglib2.type.numeric.ARGBType;
 
 import java.util.HashMap;
