@@ -5,7 +5,7 @@ import net.imagej.ImageJ;
 
 import java.io.File;
 
-public class RunExploreCellProfilerOutput
+public class ExploreCellProfilerOutput
 {
 	public static void main( String[] args )
 	{

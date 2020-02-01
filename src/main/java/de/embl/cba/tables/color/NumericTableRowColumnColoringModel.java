@@ -79,11 +79,19 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	private void setColorLinearly( Double value, ARGBType output )
 	{
 		if ( paintZeroTransparent )
+		{
 			if ( value == 0 )
 			{
-				output.set( ARGBType.rgba( 0,0,0,0 ) );
+				output.set( ARGBType.rgba( 0, 0, 0, 0 ) );
 				return;
 			}
+		}
+
+		if ( value.isNaN() )
+		{
+			output.set( ARGBType.rgba( 0, 0, 0, 0 ) );
+			return;
+		}
 
 		double normalisedValue = computeLinearNormalisedValue( value );
 		final int colorIndex = lut.getARGB( normalisedValue );

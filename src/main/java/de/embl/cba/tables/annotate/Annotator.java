@@ -1,7 +1,9 @@
 package de.embl.cba.tables.annotate;
 
+import de.embl.cba.tables.SwingUtils;
 import de.embl.cba.tables.TableRows;
-import de.embl.cba.tables.color.ColoringModel;
+import de.embl.cba.tables.color.CategoryTableRowColumnColoringModel;
+import de.embl.cba.tables.color.ColorUtils;
 import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.tablerow.TableRow;
 import ij.gui.GenericDialog;
@@ -18,16 +20,15 @@ public class Annotator < T extends TableRow > extends JFrame
 	private final List< T > tableRows;
 	private final JTable table;
 	private final SelectionModel< T > selectionModel;
-	private final ColoringModel< T > coloringModel;
+	private final CategoryTableRowColumnColoringModel< T > coloringModel;
 	private final JPanel panel;
-	private Map< JButton, T  > buttonToTableRow;
 
 	public Annotator(
 			String annotationColumnName,
 			List tableRows,
 			JTable table,
-			SelectionModel selectionModel,
-			ColoringModel< T > coloringModel )
+			SelectionModel< T > selectionModel,
+			CategoryTableRowColumnColoringModel< T > coloringModel )
 	{
 		super("");
 		this.annotationColumnName = annotationColumnName;
@@ -35,20 +36,13 @@ public class Annotator < T extends TableRow > extends JFrame
 		this.table = table;
 		this.selectionModel = selectionModel;
 		this.coloringModel = coloringModel;
-
-		buttonToTableRow = new HashMap<>(  );
-
-		coloringModel.listeners().add( () -> {
-			for ( JButton button : buttonToTableRow.keySet() )
-				setButtonColor( button, buttonToTableRow.get( button ) );
-		} );
-
-		panel = new JPanel();
+		coloringModel.fixedColorMode( true );
+		this.panel = new JPanel();
 	}
 
 	public void showDialog()
 	{
-		addNewAnnotationButton();
+		addAddNewAnnotationButton();
 		addAnnotationButtons();
 		showFrame();
 	}
@@ -64,17 +58,16 @@ public class Annotator < T extends TableRow > extends JFrame
 		this.setVisible( true );
 	}
 
-
-	private void addNewAnnotationButton()
+	private void addAddNewAnnotationButton()
 	{
-		final JButton button = new JButton( "Add new category" );
+		final JButton button = new JButton( "Add New Category" );
 		panel.add( button );
 		button.addActionListener( e -> {
 			final GenericDialog gd = new GenericDialog( "" );
-			gd.addStringField( "New category", "", 10 );
+			gd.addStringField( "New Category Name", "", 10 );
 			gd.showDialog();
 			if( gd.wasCanceled() ) return;
-			addAnnotationButton( gd.getNextString(), null );
+			addAnnotationButtonPanel( gd.getNextString(), null );
 			refreshDialog();
 		});
 	}
@@ -83,35 +76,46 @@ public class Annotator < T extends TableRow > extends JFrame
 	{
 		final HashMap< String, T > annotations = getAnnotations();
 		for ( String annotation : annotations.keySet() )
-			addAnnotationButton( annotation, annotations.get( annotation ) );
+			addAnnotationButtonPanel( annotation, annotations.get( annotation ) );
 	}
 
-	private void addAnnotationButton( String annotation, T tableRow )
+	private void addAnnotationButtonPanel( String annotationName, T tableRow )
 	{
-		final JButton button = new JButton( String.format("%1$15s", annotation) );
+		final JPanel panel = SwingUtils.horizontalLayoutPanel();
+
+		final JButton button = new JButton( String.format("%1$15s", annotationName) );
 		button.setFont( new Font("monospaced", Font.PLAIN, 12) );
 		button.setOpaque( true );
 		setButtonColor( button, tableRow );
 		button.setAlignmentX( Component.CENTER_ALIGNMENT );
-		buttonToTableRow.put( button, tableRow );
-		panel.add( button );
+
+		final ARGBType argbType = new ARGBType();
+		coloringModel.convert( annotationName, argbType );
+		button.setBackground( ColorUtils.getColor( argbType ) );
 
 		button.addActionListener( e -> {
-
 			if ( selectionModel.isEmpty() ) return;
-
-			final Set< T > selected = selectionModel.getSelected();
 
 			TableRows.assignValues(
 					annotationColumnName,
-					selected,
-					annotation,
+					selectionModel.getSelected(),
+					annotationName,
 					table );
 
-			buttonToTableRow.put( button, selected.iterator().next() );
-			setButtonColor( button, buttonToTableRow.get( button ) );
 			selectionModel.clearSelection();
 		} );
+
+		final JButton changeColor = new JButton( "Change Color" );
+		changeColor.addActionListener( e -> {
+			Color color = JColorChooser.showDialog( this.panel, "", null );
+			if ( color == null ) return;
+			button.setBackground( color );
+			coloringModel.putInputToFixedColor( annotationName, ColorUtils.getARGBType( color ) );
+		} );
+
+		panel.add( button );
+		panel.add( changeColor );
+		this.panel.add( panel );
 	}
 
 	private void setButtonColor( JButton button, T tableRow )
@@ -123,7 +127,6 @@ public class Annotator < T extends TableRow > extends JFrame
 			button.setBackground( new Color( argbType.get() ) );
 		}
 	}
-
 
 	private HashMap< String, T > getAnnotations()
 	{
@@ -144,6 +147,4 @@ public class Annotator < T extends TableRow > extends JFrame
 		panel.repaint();
 		this.pack();
 	}
-
-
 }

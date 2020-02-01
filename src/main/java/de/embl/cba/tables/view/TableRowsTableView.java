@@ -454,19 +454,13 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
 
-		final ColoringModel< T > coloringModel = columnBasedColoring.getColumnBasedColoringModel(
-				columnName,
-				ColumnBasedColoring.RANDOM_GLASBEY );
-
-//		(( CategoryTableRowColumnColoringModel< TableRowImageSegment > ) coloringModel )
-//				.getSpecialInputToColor().put( "None", new ARGBType( 0 ) );
-
 		final Annotator annotator = new Annotator(
 				columnName,
 				tableRows,
 				table,
 				selectionModel,
-				coloringModel );
+				columnBasedColoring.getCategoricalColoringModel( columnName )
+		);
 
 		annotator.showDialog();
 	}

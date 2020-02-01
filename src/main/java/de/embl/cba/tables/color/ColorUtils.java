@@ -16,4 +16,9 @@ public abstract class ColorUtils
 				ARGBType.blue( colorIndex ),
 				ARGBType.alpha( colorIndex ));
 	}
+
+	public static ARGBType getARGBType( Color color )
+	{
+		return new ARGBType( ARGBType.rgba( color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha() ) );
+	}
 }

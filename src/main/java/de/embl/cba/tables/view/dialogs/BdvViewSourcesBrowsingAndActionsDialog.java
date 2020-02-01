@@ -6,10 +6,13 @@ import bdv.viewer.ViewerPanel;
 import bdv.viewer.overlay.ScaleBarOverlayRenderer;
 import bdv.viewer.render.MultiResolutionRenderer;
 import bdv.viewer.state.ViewerState;
+import de.embl.cba.bdv.utils.Logger;
+import de.embl.cba.tables.SwingUtils;
 import de.embl.cba.tables.view.SegmentsBdvView;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.ui.PainterThread;
 import net.imglib2.ui.RenderTarget;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -18,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 import static de.embl.cba.tables.SwingUtils.horizontalLayoutPanel;
@@ -82,16 +86,37 @@ public class BdvViewSourcesBrowsingAndActionsDialog extends JPanel
 		final ArrayList< String > sourceSetIds = bdvView.getSourceSetIds();
 
 		final JButton button = new JButton( "Save current view for all image sets" );
-
-		button.addActionListener( e -> {
-			sourceSetIds.forEach( sourceSetId -> {
-				bdvView.updateImageSet( sourceSetId );
-				saveScreenShot( new File( "/Users/tischer/Desktop/daja-out/" + sourceSetId + ".png" ), bdvView.getBdv().getViewerPanel() );
-			} );
-		} );
+		button.addActionListener( e -> SwingUtilities.invokeLater( () -> runBatchSourceSaving( sourceSetIds ) ) );
 
 		horizontalLayoutPanel.add( button );
 		this.add( horizontalLayoutPanel );
+	}
+
+	private void runBatchSourceSaving( ArrayList< String > sourceSetIds )
+	{
+		final JFileChooser jFileChooser = new JFileChooser();
+		jFileChooser.setDialogTitle("Select output directory");
+		jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		if ( jFileChooser.showSaveDialog( this ) == JFileChooser.APPROVE_OPTION )
+		{
+			final File selectedDirectory = jFileChooser.getSelectedFile();
+			final long startTimeMillis = System.currentTimeMillis();
+			final AtomicInteger atomicInteger = new AtomicInteger( 0 );
+			final int n = sourceSetIds.size();
+			sourceSetIds.forEach( sourceSetId -> {
+				updateAndSaveView( sourceSetId, selectedDirectory );
+				Logger.progress( "Saved", startTimeMillis, atomicInteger.incrementAndGet(), n );
+			} );
+			Logger.log( "Saving Image Files: Done." );
+		}
+	}
+
+	private void updateAndSaveView( String sourceSetId, File outputDirectory )
+	{
+		bdvView.updateImageSet( sourceSetId );
+		final File outputFile = new File( outputDirectory + File.separator + FilenameUtils.removeExtension( sourceSetId ) + ".jpg" );
+		outputFile.mkdirs();
+		saveScreenShot( outputFile, bdvView.getBdv().getViewerPanel() );
 	}
 
 	public void saveScreenShot( final File outputFile, ViewerPanel viewer )
@@ -163,7 +188,7 @@ public class BdvViewSourcesBrowsingAndActionsDialog extends JPanel
 
 			try
 			{
-				ImageIO.write( target.bi, "png", outputFile );
+				ImageIO.write( target.bi, "jpg", outputFile );
 			} catch ( IOException e )
 			{
 				e.printStackTrace();

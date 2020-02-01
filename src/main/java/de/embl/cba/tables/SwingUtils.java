@@ -12,7 +12,6 @@ public class SwingUtils
 		panel.setBorder( BorderFactory.createEmptyBorder(0, 10, 10, 10) );
 		panel.add( Box.createHorizontalGlue() );
 		panel.setAlignmentX( Component.LEFT_ALIGNMENT );
-
 		return panel;
 	}
 }

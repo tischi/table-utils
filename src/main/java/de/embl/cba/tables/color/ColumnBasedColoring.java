@@ -1,7 +1,9 @@
 package de.embl.cba.tables.color;
 
+import de.embl.cba.bdv.utils.lut.ARGBLut;
 import de.embl.cba.bdv.utils.lut.BlueWhiteRedARGBLut;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
+import de.embl.cba.bdv.utils.lut.SingleColorARGBLut;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.tablerow.TableRow;
@@ -14,6 +16,7 @@ import java.util.Map;
 
 public class ColumnBasedColoring< T extends TableRow >
 {
+	public static final String LINEAR_RED = "Linear - Red";
 	public static final String LINEAR_BLUE_WHITE_RED = "Linear - Blue White Red";
 	public static final String LINEAR_ZERO_BLACK_BLUE_WHITE_RED = "Linear - Transparent Blue White Red";
 	public static final String RANDOM_GLASBEY = "Categorical - Glasbey";
@@ -29,6 +32,7 @@ public class ColumnBasedColoring< T extends TableRow >
 
 	public static final String[] COLORING_MODES = new String[]
 			{
+					LINEAR_RED,
 					LINEAR_BLUE_WHITE_RED,
 					LINEAR_ZERO_BLACK_BLUE_WHITE_RED,
 					RANDOM_GLASBEY
@@ -71,25 +75,37 @@ public class ColumnBasedColoring< T extends TableRow >
 			String selectedColumnName,
 			String selectedColoringMode )
 	{
-
 		switch ( selectedColoringMode )
 		{
+			case LINEAR_RED:
+				return getLinearColoringModel(
+						coloringModel,
+						selectedColumnName,
+						false,
+						new SingleColorARGBLut( 255, 0,0 ) );
 			case LINEAR_BLUE_WHITE_RED:
 				return getLinearColoringModel(
 						coloringModel,
 						selectedColumnName,
-						false );
+						false,
+						new BlueWhiteRedARGBLut( 1000 ) );
 			case LINEAR_ZERO_BLACK_BLUE_WHITE_RED:
 				return getLinearColoringModel(
 						coloringModel,
 						selectedColumnName,
-						true );
+						true,
+						new BlueWhiteRedARGBLut( 1000 ) );
 			case RANDOM_GLASBEY:
 				return getCategoricalColoringModel(
 						coloringModel,
 						selectedColumnName );
 		}
 		return null;
+	}
+
+	public CategoryTableRowColumnColoringModel< T > getCategoricalColoringModel( String selectedColumnName )
+	{
+		return getCategoricalColoringModel( coloringModel, selectedColumnName );
 	}
 
 	private CategoryTableRowColumnColoringModel< T > getCategoricalColoringModel(
@@ -101,8 +117,6 @@ public class ColumnBasedColoring< T extends TableRow >
 						selectedColumnName,
 						new GlasbeyARGBLut( 255 ) );
 
-		coloringModel.addInputToFixedColor( "None", new ARGBType( ARGBType.rgba( 0,0,0,0 ) ) );
-
 		selectionColoringModel.setColoringModel( coloringModel );
 
 		return coloringModel;
@@ -111,7 +125,8 @@ public class ColumnBasedColoring< T extends TableRow >
 	private NumericTableRowColumnColoringModel< T > getLinearColoringModel(
 			SelectionColoringModel< T > selectionColoringModel,
 			String selectedColumnName,
-			boolean paintZeroTransparent )
+			boolean paintZeroTransparent,
+			ARGBLut argbLut )
 	{
 
 		if ( ! Tables.isNumeric( table, selectedColumnName ) )
@@ -125,9 +140,9 @@ public class ColumnBasedColoring< T extends TableRow >
 		double[] valueSettings = getValueSettings( selectedColumnName, valueRange );
 
 		final NumericTableRowColumnColoringModel< T > coloringModel
-				= new NumericTableRowColumnColoringModel< >(
+				= new NumericTableRowColumnColoringModel(
 						selectedColumnName,
-						new BlueWhiteRedARGBLut( 1000 ),
+						argbLut,
 						valueSettings,
 						valueRange,
 						paintZeroTransparent );

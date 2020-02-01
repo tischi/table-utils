@@ -12,11 +12,13 @@ import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 public class CategoryTableRowColumnColoringModel< T extends TableRow >
 		extends AbstractColoringModel< T > implements CategoryColoringModel< T >
 {
+	// TODO: The maps could go to int instead of ARGBType
 	private Map< Object, ARGBType > inputToFixedColor;
 	private Map< Object, ARGBType > inputToRandomColor;
 	private final String column;
 	private ARGBLut argbLut;
 	private int randomSeed;
+	private boolean fixedColorMode = false;
 
 	/**
 	 *
@@ -34,8 +36,11 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	@Override
 	public void convert( T input, ARGBType output )
 	{
-		final String cellContent = input.getCell( column );
+		convert( input.getCell( column ), output );
+	}
 
+	public void convert( String cellContent, ARGBType output )
+	{
 		if ( inputToFixedColor.keySet().contains( cellContent ) )
 		{
 			final int color = inputToFixedColor.get( cellContent ).get();
@@ -46,13 +51,21 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 			final int color = inputToRandomColor.get( cellContent ).get();
 			output.set( color );
 		}
+ 		else if ( cellContent.equals( "NaN" ) || cellContent.equals( "None" ) )
+		{
+			final int color = ARGBType.rgba( 0, 0, 0, 0 );
+			inputToRandomColor.put( cellContent, new ARGBType( color ) );
+			output.set( color );
+			return;
+		}
 		else
 		{
 			// final double random = createRandom( inputToRandomColor.size() + 1 );
 			final double random = createRandom( cellContent.hashCode() );
-			inputToRandomColor.put( cellContent, new ARGBType( argbLut.getARGB( random ) ) );
-			final int color = inputToRandomColor.get( cellContent ).get();
+			final int color = argbLut.getARGB( random );
+			inputToRandomColor.put( cellContent, new ARGBType( color ) );
 			output.set( color );
+			return;
 		}
 	}
 
@@ -66,15 +79,22 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	@Override
 	public void incRandomSeed( )
 	{
+		if ( fixedColorMode ) return;
+
 		inputToRandomColor.clear();
 		this.randomSeed++;
-
 		notifyColoringListeners();
 	}
 
-	public void addInputToFixedColor( Object input, ARGBType color )
+	public void fixedColorMode( boolean fixedColorMode )
+	{
+		this.fixedColorMode = fixedColorMode;
+	}
+
+	public void putInputToFixedColor( Object input, ARGBType color )
 	{
 		inputToFixedColor.put( input, color );
+		notifyColoringListeners();
 	}
 
 }

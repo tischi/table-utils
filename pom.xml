@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>table-utils</artifactId>
 	<url>https://github.com/tischi/table-utils</url>
-	<version>0.3.19</version>
+	<version>0.3.20</version>
 	<name>Table Utils</name>
 	<description>TODO</description>
 	<inceptionYear>2018</inceptionYear>
