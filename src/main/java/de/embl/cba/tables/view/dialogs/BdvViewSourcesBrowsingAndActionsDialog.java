@@ -40,7 +40,6 @@ public class BdvViewSourcesBrowsingAndActionsDialog extends JPanel
 		showFrame();
 	}
 
-
 	private void configPanel()
 	{
 		setLayout( new BoxLayout(this, BoxLayout.Y_AXIS ) );
@@ -100,14 +99,17 @@ public class BdvViewSourcesBrowsingAndActionsDialog extends JPanel
 		if ( jFileChooser.showSaveDialog( this ) == JFileChooser.APPROVE_OPTION )
 		{
 			final File selectedDirectory = jFileChooser.getSelectedFile();
-			final long startTimeMillis = System.currentTimeMillis();
-			final AtomicInteger atomicInteger = new AtomicInteger( 0 );
-			final int n = sourceSetIds.size();
-			sourceSetIds.forEach( sourceSetId -> {
-				updateAndSaveView( sourceSetId, selectedDirectory );
-				Logger.progress( "Saved", startTimeMillis, atomicInteger.incrementAndGet(), n );
-			} );
-			Logger.log( "Saving Image Files: Done." );
+
+			SwingUtilities.invokeLater( () -> {
+				final long startTimeMillis = System.currentTimeMillis();
+				final AtomicInteger atomicInteger = new AtomicInteger( 0 );
+				final int n = sourceSetIds.size();
+				sourceSetIds.forEach( sourceSetId -> {
+					updateAndSaveView( sourceSetId, selectedDirectory );
+					Logger.progress( "Saved", startTimeMillis, atomicInteger.incrementAndGet(), n );
+				} );
+				Logger.log( "Saving Image Files: Done." );
+			});
 		}
 	}
 
@@ -119,7 +121,8 @@ public class BdvViewSourcesBrowsingAndActionsDialog extends JPanel
 		saveScreenShot( outputFile, bdvView.getBdv().getViewerPanel() );
 	}
 
-	public void saveScreenShot( final File outputFile, ViewerPanel viewer )
+	// TODO move to bdv-utils or bdv-playground
+	public static void saveScreenShot( final File outputFile, ViewerPanel viewer )
 	{
 		final ViewerState renderState = viewer.getState();
 		final int canvasW = viewer.getDisplay().getWidth();

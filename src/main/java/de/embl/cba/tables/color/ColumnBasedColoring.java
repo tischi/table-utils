@@ -1,9 +1,6 @@
 package de.embl.cba.tables.color;
 
-import de.embl.cba.bdv.utils.lut.ARGBLut;
-import de.embl.cba.bdv.utils.lut.BlueWhiteRedARGBLut;
-import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
-import de.embl.cba.bdv.utils.lut.SingleColorARGBLut;
+import de.embl.cba.bdv.utils.lut.*;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.tablerow.TableRow;
@@ -19,6 +16,7 @@ public class ColumnBasedColoring< T extends TableRow >
 	public static final String LINEAR_RED = "Linear - Red";
 	public static final String LINEAR_BLUE_WHITE_RED = "Linear - Blue White Red";
 	public static final String LINEAR_ZERO_BLACK_BLUE_WHITE_RED = "Linear - Transparent Blue White Red";
+	public static final String LINEAR_VIRIDIS = "Linear - Viridis";
 	public static final String RANDOM_GLASBEY = "Categorical - Glasbey";
 
 	private final JTable table;
@@ -35,6 +33,7 @@ public class ColumnBasedColoring< T extends TableRow >
 					LINEAR_RED,
 					LINEAR_BLUE_WHITE_RED,
 					LINEAR_ZERO_BLACK_BLUE_WHITE_RED,
+					LINEAR_VIRIDIS,
 					RANDOM_GLASBEY
 			};
 
@@ -95,6 +94,12 @@ public class ColumnBasedColoring< T extends TableRow >
 						selectedColumnName,
 						true,
 						new BlueWhiteRedARGBLut( 1000 ) );
+			case LINEAR_VIRIDIS:
+				return getLinearColoringModel(
+						coloringModel,
+						selectedColumnName,
+						true,
+						new ViridisARGBLut( ) );
 			case RANDOM_GLASBEY:
 				return getCategoricalColoringModel(
 						coloringModel,
