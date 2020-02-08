@@ -64,6 +64,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		this.selectionModel = selectionModel;
 		this.tableName = tableName;
 
+		columnColoringModelCreator = new ColumnColoringModelCreator( table );
 		recentlySelectedRowInView = -1;
 
 		registerAsSelectionListener( selectionModel );
@@ -632,6 +633,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		addColorByColumnMenuItem( coloringMenu );
 
+		// TODO: add menu item to configure values that should be transparent
+
 		addColorLoggingMenuItem( coloringMenu );
 
 		return coloringMenu;
@@ -692,12 +695,11 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		final JMenuItem menuItem = new JMenuItem( "Color by Column..." );
 
-		columnColoringModelCreator = new ColumnColoringModelCreator( table );
-
 		menuItem.addActionListener( e ->
 				new Thread( () ->
 				{
 					final ColoringModel< T > coloringModel = columnColoringModelCreator.showDialog();
+					// TODO: Here, one could add logic to configure which values should be painted transparent
 					if ( coloringModel != null )
 						selectionColoringModel.setColoringModel( coloringModel );
 				}

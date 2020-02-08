@@ -33,6 +33,7 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 		this.inputToRandomColor = new ConcurrentHashMap<>(  );
 		this.inputToFixedColor = new ConcurrentHashMap<>(  );
 		this.randomSeed = 50;
+		// TODO: make this configurable
 		this.inputToFixedColor.put( "NaN", NO_COLOR );
 		this.inputToFixedColor.put( "None", NO_COLOR );
 		this.inputToFixedColor.put( "0", NO_COLOR );
