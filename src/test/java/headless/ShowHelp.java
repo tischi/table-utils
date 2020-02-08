@@ -6,6 +6,6 @@ public class ShowHelp
 {
 	public static void main( String[] args )
 	{
-		Help.showObjectSelectionHelp();
+		Help.showSegmentationImageHelp();
 	}
 }

@@ -7,7 +7,7 @@ import net.imglib2.type.numeric.ARGBType;
 
 // TODO: extract abstract class NumericFeatureColoringModel
 public class NumericTableRowColumnColoringModel< T extends TableRow >
-		extends AbstractColoringModel< T > implements NumericColoringModel< T >
+		extends AbstractColoringModel< T > implements NumericColoringModel< T >, ColumnColoringModel
 {
 	private final String columnName;
 	private final ARGBLut lut;
@@ -119,4 +119,9 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 		return normalisedValue;
 	}
 
+	@Override
+	public String getColumnName()
+	{
+		return columnName;
+	}
 }

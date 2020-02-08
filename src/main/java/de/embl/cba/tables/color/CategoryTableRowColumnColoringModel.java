@@ -10,12 +10,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import static de.embl.cba.bdv.utils.converters.RandomARGBConverter.goldenRatio;
 
 public class CategoryTableRowColumnColoringModel< T extends TableRow >
-		extends AbstractColoringModel< T > implements CategoryColoringModel< T >
+		extends AbstractColoringModel< T > implements CategoryColoringModel< T >, ColumnColoringModel
 {
+	public static final ARGBType NO_COLOR = new ARGBType( ARGBType.rgba( 0, 0, 0, 0 ) );
+
 	// TODO: The maps could go to int instead of ARGBType
 	private Map< Object, ARGBType > inputToFixedColor;
 	private Map< Object, ARGBType > inputToRandomColor;
-	private final String column;
+	private final String columnName;
 	private ARGBLut argbLut;
 	private int randomSeed;
 	private boolean fixedColorMode = false;
@@ -24,19 +26,22 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 	 *
 	 * @param argbLut
 	 */
-	public CategoryTableRowColumnColoringModel( String column, ARGBLut argbLut )
+	public CategoryTableRowColumnColoringModel( String columnName, ARGBLut argbLut )
 	{
-		this.column = column;
+		this.columnName = columnName;
 		this.argbLut = argbLut;
 		this.inputToRandomColor = new ConcurrentHashMap<>(  );
 		this.inputToFixedColor = new ConcurrentHashMap<>(  );
 		this.randomSeed = 50;
+		this.inputToFixedColor.put( "NaN", NO_COLOR );
+		this.inputToFixedColor.put( "None", NO_COLOR );
+		this.inputToFixedColor.put( "0", NO_COLOR );
 	}
 
 	@Override
 	public void convert( T input, ARGBType output )
 	{
-		convert( input.getCell( column ), output );
+		convert( input.getCell( columnName ), output );
 	}
 
 	public void convert( String cellContent, ARGBType output )
@@ -50,13 +55,6 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 		{
 			final int color = inputToRandomColor.get( cellContent ).get();
 			output.set( color );
-		}
- 		else if ( cellContent.equals( "NaN" ) || cellContent.equals( "None" ) )
-		{
-			final int color = ARGBType.rgba( 0, 0, 0, 0 );
-			inputToRandomColor.put( cellContent, new ARGBType( color ) );
-			output.set( color );
-			return;
 		}
 		else
 		{
@@ -97,4 +95,14 @@ public class CategoryTableRowColumnColoringModel< T extends TableRow >
 		notifyColoringListeners();
 	}
 
+	public void removeInputToFixedColor( Object input )
+	{
+		inputToFixedColor.remove( input );
+		notifyColoringListeners();
+	}
+
+	public String getColumnName()
+	{
+		return columnName;
+	}
 }

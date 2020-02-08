@@ -8,7 +8,7 @@ import de.embl.cba.tables.tablerow.TableRow;
 import de.embl.cba.tables.select.SelectionListener;
 import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.select.AssignValuesToSelectedRowsDialog;
-import de.embl.cba.tables.color.ColumnBasedColoring;
+import de.embl.cba.tables.color.ColumnColoringModelCreator;
 import de.embl.cba.tables.measure.MeasureDistance;
 import ij.IJ;
 import ij.gui.GenericDialog;
@@ -38,7 +38,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private int recentlySelectedRowInView;
 	private AssignValuesToSelectedRowsDialog assignObjectAttributesUI;
 	private HelpDialog helpDialog;
-	private ColumnBasedColoring< T > columnBasedColoring;
+	private ColumnColoringModelCreator< T > columnColoringModelCreator;
 	private MeasureDistance< T > measureDistance;
 	private Component parentComponent;
 	private String mergeByColumnName = null;
@@ -236,6 +236,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		updateUI();
 	}
 
+	// TODO: factor out the whole menu into an own class
 	private void createMenuBar()
 	{
 		menuBar = new JMenuBar();
@@ -286,18 +287,38 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		JMenu menu = new JMenu( "Help" );
 
-		menu.add( createShowHelpMenuItem() );
+		menu.add( createShowSegmentationHelpMenuItem() );
 
 		return menu;
 	}
 
-	private JMenuItem createShowHelpMenuItem()
+	private JMenuItem createShowSegmentationHelpMenuItem()
 	{
 		initHelpDialog();
-		final JMenuItem menuItem = new JMenuItem( "Show help" );
+		final JMenuItem menuItem = new JMenuItem( "Show Segmentation Help" );
 		menuItem.addActionListener( e ->
-				SwingUtilities.invokeLater( () ->
-						helpDialog.setVisible( ! helpDialog.isVisible() ) ) );
+			{
+			final HelpDialog helpDialog = new HelpDialog(
+					frame,
+					Tables.class.getResource( "/MultiImageSetNavigationHelp.html" ) );
+			helpDialog.setVisible( true );
+			}
+		);
+		return menuItem;
+	}
+
+	private JMenuItem createShowNavigationHelpMenuItem()
+	{
+		initHelpDialog();
+		final JMenuItem menuItem = new JMenuItem( "Show Navigation Help" );
+		menuItem.addActionListener( e ->
+				{
+					final HelpDialog helpDialog = new HelpDialog(
+							frame,
+							Tables.class.getResource( "/MultiImageSetNavigationHelp.html" ) );
+					helpDialog.setVisible( true );
+				}
+		);
 		return menuItem;
 	}
 
@@ -434,7 +455,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private void startNewAnnotation()
 	{
-
 		final GenericDialog gd = new GenericDialog( "" );
 		gd.addStringField( "Annotation column name", "", 30 );
 		gd.showDialog();
@@ -447,19 +467,17 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private void continueExistingAnnotation( String columnName )
 	{
-		final ColumnBasedColoring< T > columnBasedColoring =
-				new ColumnBasedColoring<>(
-					table,
-					selectionColoringModel );
+		final CategoryTableRowColumnColoringModel< T > categoricalColoringModel = columnColoringModelCreator.createCategoricalColoringModel( columnName );
 
 		selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
+		selectionColoringModel.setColoringModel( categoricalColoringModel );
 
 		final Annotator annotator = new Annotator(
 				columnName,
 				tableRows,
 				table,
 				selectionModel,
-				columnBasedColoring.getCategoricalColoringModel( columnName )
+				categoricalColoringModel
 		);
 
 		annotator.showDialog();
@@ -632,21 +650,22 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private void logCurrentValueToColorMap()
 	{
-		final String selectedColumnName = columnBasedColoring.getSelectedColumnName();
-		if ( selectedColumnName == null )
+		String coloringColumnName = getColoringColumnName();
+
+		if ( coloringColumnName == null )
 		{
 			Logger.error( "Please first use the [ Color > Color by Column ] menu item to configure the coloring." );
 			return;
 		}
 
 		Logger.info( " "  );
-		Logger.info( "Column used for coloring: " + selectedColumnName );
+		Logger.info( "Column used for coloring: " + coloringColumnName );
 		Logger.info( " "  );
 		Logger.info( "Value, R, G, B"  );
 
 		for ( T tableRow : tableRows )
 		{
-			final String value = tableRow.getCell( selectedColumnName );
+			final String value = tableRow.getCell( coloringColumnName );
 
 			final ARGBType argbType = new ARGBType();
 			selectionColoringModel.convert( tableRow, argbType );
@@ -655,15 +674,34 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		}
 	}
 
+	private String getColoringColumnName()
+	{
+		final ColoringModel< T > coloringModel = selectionColoringModel.getColoringModel();
+
+		if ( coloringModel instanceof ColumnColoringModel )
+		{
+			return ((ColumnColoringModel) coloringModel).getColumnName();
+		}
+		else
+		{
+			return null;
+		}
+	}
+
 	private void addColorByColumnMenuItem( JMenu coloringMenu )
 	{
 		final JMenuItem menuItem = new JMenuItem( "Color by Column..." );
 
-		this.columnBasedColoring = new ColumnBasedColoring( table, selectionColoringModel );
+		columnColoringModelCreator = new ColumnColoringModelCreator( table );
 
 		menuItem.addActionListener( e ->
 				new Thread( () ->
-						columnBasedColoring.showDialog() ).start() );
+				{
+					final ColoringModel< T > coloringModel = columnColoringModelCreator.showDialog();
+					if ( coloringModel != null )
+						selectionColoringModel.setColoringModel( coloringModel );
+				}
+				).start() );
 
 		coloringMenu.add( menuItem );
 	}
@@ -686,10 +724,11 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 					{
 						if ( measureDistance.showDialog( selectionModel.getSelected() ) )
 						{
-							columnBasedColoring.getColumnBasedColoringModel(
+							final ColoringModel< T > coloringModel = columnColoringModelCreator.createColoringModel(
 									measureDistance.getNewColumnName(),
-									ColumnBasedColoring.LINEAR_BLUE_WHITE_RED );
+									ColumnColoringModelCreator.LINEAR_BLUE_WHITE_RED );
 
+							selectionColoringModel.setColoringModel( coloringModel );
 							selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
 						}
 					}
@@ -709,7 +748,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		helpDialog =
 				new HelpDialog(
 						frame,
-						Tables.class.getResource( "/TableUtilsHelp.html" ) );
+						Tables.class.getResource( "/MultiImageSetNavigationHelp.html" ) );
 	}
 
 

@@ -5,13 +5,12 @@ import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.Tables;
 import de.embl.cba.tables.tablerow.TableRow;
 import ij.gui.GenericDialog;
-import net.imglib2.type.numeric.ARGBType;
 
 import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ColumnBasedColoring< T extends TableRow >
+public class ColumnColoringModelCreator< T extends TableRow >
 {
 	public static final String LINEAR_RED = "Linear - Red";
 	public static final String LINEAR_BLUE_WHITE_RED = "Linear - Blue White Red";
@@ -20,7 +19,6 @@ public class ColumnBasedColoring< T extends TableRow >
 	public static final String RANDOM_GLASBEY = "Categorical - Glasbey";
 
 	private final JTable table;
-	private final SelectionColoringModel< T > coloringModel; // TODO
 
 	private String selectedColumnName;
 	private String selectedColoringMode;
@@ -38,18 +36,15 @@ public class ColumnBasedColoring< T extends TableRow >
 			};
 
 
-	public ColumnBasedColoring( JTable table,
-								SelectionColoringModel< T > coloringModel )
+	public ColumnColoringModelCreator( JTable table )
 	{
 		this.table = table;
-		this.coloringModel = coloringModel;
 
 		this.columnNameToMinMax = new HashMap<>();
 		this.columnNameToRangeSettings = new HashMap<>();
 	}
 
-
-	public void showDialog()
+	public ColoringModel< T > showDialog()
 	{
 		final String[] columnNames = Tables.getColumnNamesAsArray( table );
 
@@ -62,78 +57,62 @@ public class ColumnBasedColoring< T extends TableRow >
 		gd.addChoice( "Coloring Mode", COLORING_MODES, selectedColoringMode );
 
 		gd.showDialog();
-		if ( gd.wasCanceled() ) return;
+		if ( gd.wasCanceled() ) return null;
 
 		selectedColumnName = gd.getNextChoice();
 		selectedColoringMode = gd.getNextChoice();
 
-		getColumnBasedColoringModel( selectedColumnName, selectedColoringMode );
+		return createColoringModel( selectedColumnName, selectedColoringMode );
 	}
 
-	public ColoringModel< T > getColumnBasedColoringModel(
+	public ColoringModel< T > createColoringModel(
 			String selectedColumnName,
 			String selectedColoringMode )
 	{
 		switch ( selectedColoringMode )
 		{
 			case LINEAR_RED:
-				return getLinearColoringModel(
-						coloringModel,
+				return createLinearColoringModel(
 						selectedColumnName,
 						false,
 						new SingleColorARGBLut( 255, 0,0 ) );
 			case LINEAR_BLUE_WHITE_RED:
-				return getLinearColoringModel(
-						coloringModel,
+				return createLinearColoringModel(
 						selectedColumnName,
 						false,
 						new BlueWhiteRedARGBLut( 1000 ) );
 			case LINEAR_ZERO_BLACK_BLUE_WHITE_RED:
-				return getLinearColoringModel(
-						coloringModel,
+				return createLinearColoringModel(
 						selectedColumnName,
 						true,
 						new BlueWhiteRedARGBLut( 1000 ) );
 			case LINEAR_VIRIDIS:
-				return getLinearColoringModel(
-						coloringModel,
+				return createLinearColoringModel(
 						selectedColumnName,
 						true,
 						new ViridisARGBLut( ) );
 			case RANDOM_GLASBEY:
-				return getCategoricalColoringModel(
-						coloringModel,
+				return createCategoricalColoringModel(
 						selectedColumnName );
 		}
 		return null;
 	}
 
-	public CategoryTableRowColumnColoringModel< T > getCategoricalColoringModel( String selectedColumnName )
-	{
-		return getCategoricalColoringModel( coloringModel, selectedColumnName );
-	}
-
-	private CategoryTableRowColumnColoringModel< T > getCategoricalColoringModel(
-			SelectionColoringModel< T > selectionColoringModel,
-			String selectedColumnName )
+	public CategoryTableRowColumnColoringModel< T > createCategoricalColoringModel( String selectedColumnName )
 	{
 		final CategoryTableRowColumnColoringModel< T > coloringModel
 				= new CategoryTableRowColumnColoringModel< >(
 						selectedColumnName,
 						new GlasbeyARGBLut( 255 ) );
 
-		selectionColoringModel.setColoringModel( coloringModel );
-
 		return coloringModel;
 	}
 
-	private NumericTableRowColumnColoringModel< T > getLinearColoringModel(
-			SelectionColoringModel< T > selectionColoringModel,
+	private NumericTableRowColumnColoringModel< T > createLinearColoringModel(
 			String selectedColumnName,
 			boolean paintZeroTransparent,
 			ARGBLut argbLut )
 	{
-
 		if ( ! Tables.isNumeric( table, selectedColumnName ) )
 		{
 			Logger.error( "Linear color mode is only available for numeric columns.\n" +
@@ -151,8 +130,6 @@ public class ColumnBasedColoring< T extends TableRow >
 						valueSettings,
 						valueRange,
 						paintZeroTransparent );
-
-		selectionColoringModel.setColoringModel( coloringModel );
 
 		SwingUtilities.invokeLater( () ->
 				new NumericColoringModelDialog( selectedColumnName, coloringModel, valueRange ) );
@@ -183,10 +160,5 @@ public class ColumnBasedColoring< T extends TableRow >
 		}
 
 		return columnNameToMinMax.get( column );
-	}
-
-	public String getSelectedColumnName()
-	{
-		return selectedColumnName;
 	}
 }

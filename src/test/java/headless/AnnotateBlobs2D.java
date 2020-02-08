@@ -4,6 +4,7 @@ import de.embl.cba.tables.TableRows;
 import de.embl.cba.tables.annotate.Annotator;
 import de.embl.cba.tables.color.*;
 import de.embl.cba.tables.morpholibj.ExploreMorphoLibJLabelImage;
+import de.embl.cba.tables.tablerow.TableRow;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import de.embl.cba.tables.view.TableRowsTableView;
 import de.embl.cba.tables.view.combined.SegmentsTableAndBdvViews;
@@ -39,20 +40,20 @@ public class AnnotateBlobs2D
 				"BBB",
 				tableView.getTable() );
 
-		final ColumnBasedColoring< TableRowImageSegment > columnBasedColoring
-				= new ColumnBasedColoring<>(
-					tableView.getTable(),
-					views.getSelectionColoringModel()
-		);
+		final CategoryTableRowColumnColoringModel< TableRowImageSegment > coloringModel
+				= new ColumnColoringModelCreator< TableRowImageSegment >( tableView.getTable()
+		).createCategoricalColoringModel( "Annotation" );
 
+		views.getSelectionColoringModel().setColoringModel( coloringModel );
 		views.getSelectionColoringModel().setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
+
 
 		final Annotator annotator = new Annotator(
 				annotationColumnName,
 				tableRows,
 				tableView.getTable(),
 				views.getSelectionModel(),
-				columnBasedColoring.getCategoricalColoringModel( "Annotation" )
+				coloringModel
 		);
 
 		annotator.showDialog();
