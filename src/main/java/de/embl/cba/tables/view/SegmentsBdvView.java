@@ -691,6 +691,11 @@ public class SegmentsBdvView < T extends ImageSegment >
 
 		final double labelId = getLabelIdAtCurrentMouseCoordinates( labelsSource );
 
+		selectAndFocus( labelId );
+	}
+
+	public void selectAndFocus( double labelId )
+	{
 		if ( labelId == BACKGROUND ) return;
 
 		final String labelImageId = labelsSource.metadata().imageId;
@@ -707,6 +712,29 @@ public class SegmentsBdvView < T extends ImageSegment >
 			recentFocus = segment;
 			selectionModel.focus( segment );
 		}
+	}
+
+	public void select( ArrayList< Double > labelIds )
+	{
+		ArrayList< T > segments = getSegments( labelIds );
+
+		selectionModel.setSelected( segments, true );
+	}
+
+	private ArrayList< T > getSegments( ArrayList< Double > labelIds )
+	{
+		final String labelImageId = labelsSource.metadata().imageId;
+
+		ArrayList< T > segments = new ArrayList<>(  );
+
+		for ( Double labelId : labelIds )
+		{
+			final LabelFrameAndImage labelFrameAndImage =
+					new LabelFrameAndImage( labelId, getCurrentTimePoint(), labelImageId );
+
+			segments.add( labelFrameAndImageToSegment.get( labelFrameAndImage ) );
+		}
+		return segments;
 	}
 
 	private boolean isLabelSourceActive()
