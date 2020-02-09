@@ -105,7 +105,7 @@ public class TableColumns
 				columnNameToStrings.get( column ).add( st.nextToken().replace( "\"", "" ) );
 		}
 
-		System.out.println( ( System.currentTimeMillis() - start ) / 1000.0 ) ;
+		// System.out.println( ( System.currentTimeMillis() - start ) / 1000.0 ) ;
 
 		return columnNameToStrings;
 	}

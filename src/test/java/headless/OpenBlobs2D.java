@@ -12,6 +12,8 @@ public class OpenBlobs2D
 	{
 		final SegmentsTableAndBdvViews views = getViews();
 
+		views.close();
+
 //		Tables.saveTable( tableView.getTable(),
 //				new File( "/Users/tischer/Desktop/annotated_blobs.txt") );
 

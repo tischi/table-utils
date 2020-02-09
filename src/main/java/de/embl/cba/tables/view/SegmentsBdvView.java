@@ -370,11 +370,10 @@ public class SegmentsBdvView < T extends ImageSegment >
 
 		bdvStackSource.setActive( true );
 
-		// TODO: only do this if not null
-		bdvStackSource.setDisplayRange( metadata.displayRangeMin, metadata.displayRangeMax );
+		if ( metadata.displayRangeMin != null && metadata.displayRangeMax != null)
+			bdvStackSource.setDisplayRange( metadata.displayRangeMin, metadata.displayRangeMax );
 
-		// Implement auto-contrast
-		// Take code from bdp2
+		// TODO: Implement auto-contrast; Take code from bdp2
 
 		bdv = bdvStackSource.getBdvHandle();
 

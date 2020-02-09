@@ -753,10 +753,10 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 						Tables.class.getResource( "/MultiImageSetNavigationHelp.html" ) );
 	}
 
-
 	public void close()
 	{
-		// TODO
+		frame.dispose();
+		this.setVisible( false );
 	}
 
 	public void setParentComponent( Component component )
