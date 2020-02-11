@@ -13,6 +13,7 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	private final ARGBLut lut;
 	private double[] lutMinMax;
 	private double[] lutRange;
+	// TODO: also capture this with  inputToFixedColor logic
 	private final boolean paintZeroTransparent;
 
 	public NumericTableRowColumnColoringModel(

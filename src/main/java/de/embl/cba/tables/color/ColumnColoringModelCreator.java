@@ -14,9 +14,10 @@ public class ColumnColoringModelCreator< T extends TableRow >
 {
 	public static final String LINEAR_RED = "Linear - Red";
 	public static final String LINEAR_BLUE_WHITE_RED = "Linear - Blue White Red";
-	public static final String LINEAR_ZERO_BLACK_BLUE_WHITE_RED = "Linear - Transparent Blue White Red";
+	public static final String LINEAR_BLUE_WHITE_RED_ZERO_TRANSPARENT = "Linear - Blue White Red (0 transparent)";
 	public static final String LINEAR_VIRIDIS = "Linear - Viridis";
-	public static final String RANDOM_GLASBEY = "Categorical - Glasbey";
+	public static final String CATEGORICAL_GLASBEY = "Categorical - Glasbey";
+	public static final String CATEGORICAL_GLASBEY_ZERO_TRANSPARENT = "Categorical - Glasbey (0 transparent)";
 
 	private final JTable table;
 
@@ -28,11 +29,11 @@ public class ColumnColoringModelCreator< T extends TableRow >
 
 	public static final String[] COLORING_MODES = new String[]
 			{
-					LINEAR_RED,
 					LINEAR_BLUE_WHITE_RED,
-					LINEAR_ZERO_BLACK_BLUE_WHITE_RED,
+					LINEAR_BLUE_WHITE_RED_ZERO_TRANSPARENT,
 					LINEAR_VIRIDIS,
-					RANDOM_GLASBEY
+					CATEGORICAL_GLASBEY,
+					CATEGORICAL_GLASBEY_ZERO_TRANSPARENT
 			};
 
 
@@ -81,7 +82,7 @@ public class ColumnColoringModelCreator< T extends TableRow >
 						selectedColumnName,
 						false,
 						new BlueWhiteRedARGBLut( 1000 ) );
-			case LINEAR_ZERO_BLACK_BLUE_WHITE_RED:
+			case LINEAR_BLUE_WHITE_RED_ZERO_TRANSPARENT:
 				return createLinearColoringModel(
 						selectedColumnName,
 						true,
@@ -91,26 +92,39 @@ public class ColumnColoringModelCreator< T extends TableRow >
 						selectedColumnName,
 						true,
 						new ViridisARGBLut( ) );
-			case RANDOM_GLASBEY:
+			case CATEGORICAL_GLASBEY:
 				return createCategoricalColoringModel(
-						selectedColumnName );
+						selectedColumnName, false );
+			case CATEGORICAL_GLASBEY_ZERO_TRANSPARENT:
+				return createCategoricalColoringModel(
+						selectedColumnName, true );
+
+
+
 		}
 		return null;
 	}
 
-	public CategoryTableRowColumnColoringModel< T > createCategoricalColoringModel( String selectedColumnName )
+	public CategoryTableRowColumnColoringModel< T > createCategoricalColoringModel( String selectedColumnName, boolean isZeroTransparent )
 	{
 		final CategoryTableRowColumnColoringModel< T > coloringModel
 				= new CategoryTableRowColumnColoringModel< >(
 						selectedColumnName,
 						new GlasbeyARGBLut( 255 ) );
 
+		if ( isZeroTransparent )
+		{
+			coloringModel.putInputToFixedColor( "0", CategoryTableRowColumnColoringModel.TRANSPARENT );
+			coloringModel.putInputToFixedColor( "0.0", CategoryTableRowColumnColoringModel.TRANSPARENT );
+		}
+
+
 		return coloringModel;
 	}
 
 	private NumericTableRowColumnColoringModel< T > createLinearColoringModel(
 			String selectedColumnName,
-			boolean paintZeroTransparent,
+			boolean isZeroTransparent,
 			ARGBLut argbLut )
 	{
 		if ( ! Tables.isNumeric( table, selectedColumnName ) )
@@ -129,7 +143,7 @@ public class ColumnColoringModelCreator< T extends TableRow >
 						argbLut,
 						valueSettings,
 						valueRange,
-						paintZeroTransparent );
+						isZeroTransparent );
 
 		SwingUtilities.invokeLater( () ->
 				new NumericColoringModelDialog( selectedColumnName, coloringModel, valueRange ) );

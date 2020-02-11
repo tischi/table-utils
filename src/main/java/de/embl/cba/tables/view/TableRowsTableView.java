@@ -64,7 +64,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		this.selectionModel = selectionModel;
 		this.tableName = tableName;
 
-		columnColoringModelCreator = new ColumnColoringModelCreator( table );
 		recentlySelectedRowInView = -1;
 
 		registerAsSelectionListener( selectionModel );
@@ -234,6 +233,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 
+		columnColoringModelCreator = new ColumnColoringModelCreator( table );
+
 		updateUI();
 	}
 
@@ -250,7 +251,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		menuBar.add( createAnnotateMenu() );
 
-		menuBar.add( createMeasureMenu() );
+		// menuBar.add( createMeasureMenu() ); // TODO: finish implementing this
 
 		menuBar.add( createHelpMenu() );
 	}
@@ -468,7 +469,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private void continueExistingAnnotation( String columnName )
 	{
-		final CategoryTableRowColumnColoringModel< T > categoricalColoringModel = columnColoringModelCreator.createCategoricalColoringModel( columnName );
+		final CategoryTableRowColumnColoringModel< T > categoricalColoringModel = columnColoringModelCreator.createCategoricalColoringModel( columnName, false );
 
 		selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
 		selectionColoringModel.setColoringModel( categoricalColoringModel );
