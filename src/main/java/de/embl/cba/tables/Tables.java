@@ -92,7 +92,6 @@ public class Tables
 
 		return createJTableFromStringList( rows, delim );
 	}
-
 	
 	public static List< String > readRows( String path )
 	{
@@ -105,19 +104,20 @@ public class Tables
 
 	public static List< String > readRows( BufferedReader br )
 	{
-		List< String > rows = new ArrayList<>();
 		try
 		{
+			List< String > rows = new ArrayList<>();
 			String aRow;
 			while ( ( aRow = br.readLine() ) != null )
 				rows.add( aRow );
 			br.close();
+			return rows;
 		}
 		catch ( IOException e )
 		{
-			e.printStackTrace();
+			throw new RuntimeException( e );
 		}
-		return rows;
+
 	}
 
 	// TODO: put into some other class (e.g. Files)
@@ -132,8 +132,7 @@ public class Tables
 			}
 			catch ( MalformedURLException e )
 			{
-				System.err.println( "Could not open URL: " + path );
-				e.printStackTrace();
+				throw new RuntimeException( "Could not open URL: " + path  );
 			}
 
 			try
@@ -145,8 +144,7 @@ public class Tables
 			}
 			catch ( IOException e )
 			{
-				System.err.println( "Could not read URL: " + path );
-				e.printStackTrace();
+				throw new RuntimeException( "Could not open URL: " + path  );
 			}
 		}
 		else
@@ -158,13 +156,9 @@ public class Tables
 				return new BufferedReader( new InputStreamReader( fin ) );
 			} catch ( FileNotFoundException e )
 			{
-				System.err.println( "Could not open file: " + path );
-				e.printStackTrace();
+				throw new RuntimeException( "Could not open file: " + path  );
 			}
 		}
-
-		return null;
-
 	}
 
 	public static List< String > readRows( File file, int numRows )
@@ -177,11 +171,10 @@ public class Tables
 			BufferedReader br = new BufferedReader( new InputStreamReader( fin ) );
 
 			int rowIdx = 0;
+
 			String aRow;
 			while ( ( aRow = br.readLine() ) != null && rowIdx++ < numRows )
-			{
 				rows.add( aRow );
-			}
 
 			br.close();
 		}
@@ -225,7 +218,7 @@ public class Tables
 			}
 			else
 			{
-				throw new UnsupportedOperationException( "Could not identify table delimiter." );
+				throw new RuntimeException( "Could not identify table delimiter." );
 			}
 
 		}

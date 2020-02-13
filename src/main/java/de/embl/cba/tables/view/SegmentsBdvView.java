@@ -357,7 +357,7 @@ public class SegmentsBdvView < T extends ImageSegment >
 		final Metadata metadata = sourceAndMetadata.metadata();
 		Source< ? > source = sourceAndMetadata.source();
 
-		if ( metadata.modality == Metadata.Modality.Segmentation )
+		if ( isLabelSource( metadata) )
 		{
 			source = asLabelsSource( sourceAndMetadata );
 			if ( isLabelMaskShownAsBoundaries ) showLabelMaskAsBoundaries();
@@ -387,6 +387,24 @@ public class SegmentsBdvView < T extends ImageSegment >
 			bdv.getViewerPanel().addTimePointListener( labelsSourceConverter );
 
 		return bdvStackSource;
+	}
+
+	// TODO: clean this up! There should only be one way to decide whether this is a labelSource
+	public boolean isLabelSource( Metadata metadata )
+	{
+		if ( metadata.type != null && metadata.type.equals( Metadata.Type.Segmentation ) )
+		{
+				return true;
+		}
+		else if ( metadata.modality == Metadata.Modality.Segmentation  )
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+
 	}
 
 	public int getNumTimePoints( Source< ? > source )

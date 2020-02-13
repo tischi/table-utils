@@ -118,7 +118,6 @@ public class ColumnColoringModelCreator< T extends TableRow >
 			coloringModel.putInputToFixedColor( "0.0", CategoryTableRowColumnColoringModel.TRANSPARENT );
 		}
 
-
 		return coloringModel;
 	}
 

@@ -75,8 +75,7 @@ public class TableColumns
 		return stringColumnsFromTableFile( path, null );
 	}
 
-	public static Map< String, List< String > >
-	stringColumnsFromTableFile(
+	public static Map< String, List< String > > stringColumnsFromTableFile(
 			final String path,
 			String delim )
 	{
@@ -118,6 +117,9 @@ public class TableColumns
 			ArrayList< Double > mergeByColumnValues )
 	{
 		final List< String > rowsInTableIncludingHeader = Tables.readRows( path );
+
+		if ( rowsInTableIncludingHeader.size() == 0 )
+			throw new RuntimeException( "Could not read table rows from " + path );
 
 		delim = Tables.autoDelim( delim, rowsInTableIncludingHeader );
 
