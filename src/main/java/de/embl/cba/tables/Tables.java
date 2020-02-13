@@ -99,6 +99,9 @@ public class Tables
 
 		List< String > rows = readRows( br );
 
+		if ( rows.size() == 0 )
+			throw new RuntimeException( "Could not read rows from table: " + path );
+
 		return rows;
 	}
 

@@ -118,9 +118,6 @@ public class TableColumns
 	{
 		final List< String > rowsInTableIncludingHeader = Tables.readRows( path );
 
-		if ( rowsInTableIncludingHeader.size() == 0 )
-			throw new RuntimeException( "Could not read table rows from " + path );
-
 		delim = Tables.autoDelim( delim, rowsInTableIncludingHeader );
 
 		List< String > columnNames = Tables.getColumnNames( rowsInTableIncludingHeader, delim );
