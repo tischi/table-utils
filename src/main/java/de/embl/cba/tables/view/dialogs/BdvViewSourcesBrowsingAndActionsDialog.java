@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -29,7 +30,7 @@ import static de.embl.cba.tables.SwingUtils.horizontalLayoutPanel;
 
 public class BdvViewSourcesBrowsingAndActionsDialog extends JPanel
 {
-	private final SegmentsBdvView bdvView;
+	private final SegmentsBdvView< ? > bdvView;
 
 	public BdvViewSourcesBrowsingAndActionsDialog( SegmentsBdvView bdvView )
 	{
@@ -60,7 +61,8 @@ public class BdvViewSourcesBrowsingAndActionsDialog extends JPanel
 		final JPanel horizontalLayoutPanel = horizontalLayoutPanel();
 
 		final JComboBox< String > comboBox = new JComboBox();
-		final ArrayList< String > sourceSetIds = bdvView.getSourceSetIds();
+
+		final List< String > sourceSetIds = bdvView.getSourceSetIds();
 
 		for ( String sourceSet : sourceSetIds )
 			comboBox.addItem( new File( sourceSet ).getName() );
@@ -82,7 +84,7 @@ public class BdvViewSourcesBrowsingAndActionsDialog extends JPanel
 	{
 		final JPanel horizontalLayoutPanel = horizontalLayoutPanel();
 
-		final ArrayList< String > sourceSetIds = bdvView.getSourceSetIds();
+		final List< String > sourceSetIds = bdvView.getSourceSetIds();
 
 		final JButton button = new JButton( "Save current view for all image sets" );
 		button.addActionListener( e -> SwingUtilities.invokeLater( () -> runBatchSourceSaving( sourceSetIds ) ) );
@@ -91,7 +93,7 @@ public class BdvViewSourcesBrowsingAndActionsDialog extends JPanel
 		this.add( horizontalLayoutPanel );
 	}
 
-	private void runBatchSourceSaving( ArrayList< String > sourceSetIds )
+	private void runBatchSourceSaving( List< String > sourceSetIds )
 	{
 		final JFileChooser jFileChooser = new JFileChooser();
 		jFileChooser.setDialogTitle("Select output directory");

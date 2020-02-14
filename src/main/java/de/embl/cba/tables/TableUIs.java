@@ -117,11 +117,6 @@ public class TableUIs
 																	   String tablesLocation,
 																	   String mergeByColumnName ) throws IOException
 	{
-		final ArrayList< Double > orderColumn = TableColumns.getNumericColumnAsDoubleList(
-				table,
-				mergeByColumnName );
-
-
 		String newTablePath = null;
 
 		if ( tablesLocation.startsWith( "http" ) )
@@ -142,12 +137,7 @@ public class TableUIs
 		if ( newTablePath.startsWith( "http" ) )
 			newTablePath = resolveTableURL( URI.create( newTablePath ) );
 
-		Map< String, List< String > > columns =
-				TableColumns.orderedStringColumnsFromTableFile(
-						newTablePath,
-						null,
-						mergeByColumnName,
-						orderColumn );
+		Map< String, List< String > > columns = TableColumns.openAndOrderNewColumns( table, mergeByColumnName, newTablePath );
 
 		return columns;
 	}

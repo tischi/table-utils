@@ -72,7 +72,7 @@ public class SegmentsBdvView < T extends ImageSegment >
 	private HashMap< LabelFrameAndImage, T > labelFrameAndImageToSegment;
 	private List< T > segments;
 	private int segmentFocusAnimationDurationMillis;
-	private ArrayList< String > labelSourceIds;
+	private List< String > labelSourceIds;
 	private ARGBType labelSourceSingleColor;
 	private boolean isLabelMaskShownAsBinaryMask;
 	private boolean isLabelMaskShownAsBoundaries;
@@ -140,7 +140,7 @@ public class SegmentsBdvView < T extends ImageSegment >
 		}
 	}
 
-	public ArrayList< String > getSourceSetIds()
+	public List< String > getSourceSetIds()
 	{
 		return labelSourceIds;
 	}
@@ -420,7 +420,7 @@ public class SegmentsBdvView < T extends ImageSegment >
 		BdvUtils.removeSource( bdv, bdvStackSource );
 	}
 
-	public ArrayList< SourceAndMetadata< ? extends RealType< ? > > > getCurrentSources()
+	public List< SourceAndMetadata< ? extends RealType< ? > > > getCurrentSources()
 	{
 		return new ArrayList<>( currentSources );
 	}
@@ -732,14 +732,14 @@ public class SegmentsBdvView < T extends ImageSegment >
 		}
 	}
 
-	public void select( ArrayList< Double > labelIds )
+	public void select( List< Double > labelIds )
 	{
-		ArrayList< T > segments = getSegments( labelIds );
+		List< T > segments = getSegments( labelIds );
 
 		selectionModel.setSelected( segments, true );
 	}
 
-	private ArrayList< T > getSegments( ArrayList< Double > labelIds )
+	private List< T > getSegments( List< Double > labelIds )
 	{
 		final String labelImageId = labelsSource.metadata().imageId;
 

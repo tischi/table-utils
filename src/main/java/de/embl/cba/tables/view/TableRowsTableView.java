@@ -43,6 +43,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private Component parentComponent;
 	private String mergeByColumnName = null;
 	private String tablesDirectory = "";
+	private boolean isZeroTransparent;
 
 	public TableRowsTableView(
 			final List< T > tableRows,
@@ -355,9 +356,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 					try
 					{
 						String mergeByColumnName = getMergeByColumnName();
-						Map< String, List< String > > columnNameToStringList = TableUIs.openTableForMergingUI( table, tablesDirectory, mergeByColumnName );
-						columnNameToStringList.remove( mergeByColumnName );
-						addColumns( columnNameToStringList );
+						Map< String, List< String > > newColumnsOrdered = TableUIs.openTableForMergingUI( table, tablesDirectory, mergeByColumnName );
+						newColumnsOrdered.remove( mergeByColumnName );
+						addColumns( newColumnsOrdered );
 					} catch ( IOException ioOException )
 					{
 						ioOException.printStackTrace();
@@ -366,6 +367,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		return menuItem;
 	}
+
+
 
 	private String getMergeByColumnName()
 	{
@@ -703,10 +706,17 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 					// TODO: Here, one could add logic to configure which values should be painted transparent
 					if ( coloringModel != null )
 						selectionColoringModel.setColoringModel( coloringModel );
+
 				}
 				).start() );
 
 		coloringMenu.add( menuItem );
+	}
+
+	public void colorByColumn( String columnName, String coloringMode )
+	{
+		final ColoringModel< T > coloringModel = columnColoringModelCreator.createColoringModel( columnName, coloringMode );
+		selectionColoringModel.setColoringModel( coloringModel );
 	}
 
 	private void addMeasureSimilarityMenuItem( JMenu menu )

@@ -323,4 +323,17 @@ public class TableColumns
 			orderColumn.add( Double.parseDouble( model.getValueAt( rowIndex, objectLabelColumnIndex ).toString() ) );
 		return orderColumn;
 	}
+
+	public static Map< String, List< String > > openAndOrderNewColumns( JTable table, String mergeByColumnName, String newTablePath )
+	{
+		final ArrayList< Double > orderColumn = getNumericColumnAsDoubleList(
+				table,
+				mergeByColumnName );
+
+		return orderedStringColumnsFromTableFile(
+				newTablePath,
+				null,
+				mergeByColumnName,
+				orderColumn );
+	}
 }
