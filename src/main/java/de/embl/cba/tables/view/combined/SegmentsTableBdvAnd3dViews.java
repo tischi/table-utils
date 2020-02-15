@@ -69,8 +69,6 @@ public class SegmentsTableBdvAnd3dViews
 
 		bdv = segmentsBdvView.getBdv();
 
-		BdvUtils.centerBdvWindowLocation( bdv );
-
 		tableRowsTableView = new TableRowsTableView<>(
 				tableRowImageSegments,
 				selectionModel,

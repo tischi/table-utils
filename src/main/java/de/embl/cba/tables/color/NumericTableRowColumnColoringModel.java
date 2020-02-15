@@ -14,20 +14,20 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	private double[] lutMinMax;
 	private double[] lutRange;
 	// TODO: also capture this with  inputToFixedColor logic
-	private final boolean paintZeroTransparent;
+	private final boolean isZeroTransparent;
 
 	public NumericTableRowColumnColoringModel(
 			String columnName,
 			ARGBLut lut,
 			double[] lutMinMax,
 			double[] lutRange,
-			boolean paintZeroTransparent )
+			boolean isZeroTransparent )
 	{
 		this.columnName = columnName;
 		this.lut = lut;
 		this.lutMinMax = lutMinMax;
 		this.lutRange = lutRange;
-		this.paintZeroTransparent = paintZeroTransparent;
+		this.isZeroTransparent = isZeroTransparent;
 	}
 
 	@Override
@@ -66,20 +66,9 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 		notifyColoringListeners();
 	}
 
-//	public void setColumnName( String columnName )
-//	{
-//		this.columnName = columnName;
-//	}
-//
-//	public String getColumnName()
-//	{
-//		return columnName;
-//	}
-
-
 	private void setColorLinearly( Double value, ARGBType output )
 	{
-		if ( paintZeroTransparent )
+		if ( isZeroTransparent )
 		{
 			if ( value == 0 )
 			{

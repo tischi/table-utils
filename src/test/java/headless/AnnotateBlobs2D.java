@@ -1,5 +1,6 @@
 package headless;
 
+import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.TableRows;
 import de.embl.cba.tables.annotate.Annotator;
 import de.embl.cba.tables.color.*;
@@ -41,7 +42,7 @@ public class AnnotateBlobs2D
 
 		final CategoryTableRowColumnColoringModel< TableRowImageSegment > coloringModel
 				= new ColumnColoringModelCreator< TableRowImageSegment >( tableView.getTable()
-		).createCategoricalColoringModel( "Annotation", false );
+		).createCategoricalColoringModel( "Annotation", false, new GlasbeyARGBLut() );
 
 		views.getSelectionColoringModel().setColoringModel( coloringModel );
 		views.getSelectionColoringModel().setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );

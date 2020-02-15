@@ -1,6 +1,7 @@
 package de.embl.cba.tables.view;
 
 import bdv.tools.HelpDialog;
+import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.*;
 import de.embl.cba.tables.annotate.Annotator;
 import de.embl.cba.tables.color.*;
@@ -368,8 +369,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
-
-
 	private String getMergeByColumnName()
 	{
 		String aMergeByColumnName;
@@ -472,7 +471,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private void continueExistingAnnotation( String columnName )
 	{
-		final CategoryTableRowColumnColoringModel< T > categoricalColoringModel = columnColoringModelCreator.createCategoricalColoringModel( columnName, false );
+		final CategoryTableRowColumnColoringModel< T > categoricalColoringModel = columnColoringModelCreator.createCategoricalColoringModel( columnName, false, new GlasbeyARGBLut() );
 
 		selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
 		selectionColoringModel.setColoringModel( categoricalColoringModel );
@@ -514,7 +513,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 					parentComponent.getWidth(),
 					parentComponent.getHeight() / 3  ) );
 		}
-
 
 		//Display the window.
 		frame.pack();
@@ -739,7 +737,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 						{
 							final ColoringModel< T > coloringModel = columnColoringModelCreator.createColoringModel(
 									measureDistance.getNewColumnName(),
-									ColumnColoringModelCreator.LINEAR_BLUE_WHITE_RED );
+									ColumnColoringModelCreator.BLUE_WHITE_RED );
 
 							selectionColoringModel.setColoringModel( coloringModel );
 							selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );

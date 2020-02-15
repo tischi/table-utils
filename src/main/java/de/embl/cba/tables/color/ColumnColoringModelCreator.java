@@ -12,30 +12,26 @@ import java.util.Map;
 
 public class ColumnColoringModelCreator< T extends TableRow >
 {
-	public static final String LINEAR_RED = "Linear - Red";
-	public static final String LINEAR_BLUE_WHITE_RED = "Linear - Blue White Red";
-	public static final String LINEAR_BLUE_WHITE_RED_ZERO_TRANSPARENT = "Linear - Blue White Red (0 transparent)";
-	public static final String LINEAR_VIRIDIS = "Linear - Viridis";
-	public static final String CATEGORICAL_GLASBEY = "Categorical - Glasbey";
-	public static final String CATEGORICAL_GLASBEY_ZERO_TRANSPARENT = "Categorical - Glasbey (0 transparent)";
+	public static final String ZERO_TRANSPARENT = "ZeroTransparent";
+	public static final String BLUE_WHITE_RED = "BlueWhiteRed";
+	public static final String VIRIDIS = "Viridis";
+	public static final String GLASBEY = "Glasbey";
 
 	private final JTable table;
 
 	private String selectedColumnName;
 	private String selectedColoringMode;
+	private boolean isZeroTransparent = false;
 
 	private Map< String, double[] > columnNameToMinMax;
 	private HashMap< String, double[] > columnNameToRangeSettings;
 
 	public static final String[] COLORING_MODES = new String[]
 			{
-					LINEAR_BLUE_WHITE_RED,
-					LINEAR_BLUE_WHITE_RED_ZERO_TRANSPARENT,
-					LINEAR_VIRIDIS,
-					CATEGORICAL_GLASBEY,
-					CATEGORICAL_GLASBEY_ZERO_TRANSPARENT
+					BLUE_WHITE_RED,
+					VIRIDIS,
+					GLASBEY,
 			};
-
 
 	public ColumnColoringModelCreator( JTable table )
 	{
@@ -57,11 +53,17 @@ public class ColumnColoringModelCreator< T extends TableRow >
 		if ( selectedColoringMode == null ) selectedColoringMode = COLORING_MODES[ 0 ];
 		gd.addChoice( "Coloring Mode", COLORING_MODES, selectedColoringMode );
 
+		gd.addCheckbox( "Paint Zero Transparent", isZeroTransparent );
+
 		gd.showDialog();
 		if ( gd.wasCanceled() ) return null;
 
 		selectedColumnName = gd.getNextChoice();
 		selectedColoringMode = gd.getNextChoice();
+		isZeroTransparent = gd.getNextBoolean();
+
+		if ( isZeroTransparent )
+			selectedColoringMode += ZERO_TRANSPARENT;
 
 		return createColoringModel( selectedColumnName, selectedColoringMode );
 	}
@@ -70,47 +72,63 @@ public class ColumnColoringModelCreator< T extends TableRow >
 			String selectedColumnName,
 			String selectedColoringMode )
 	{
+		rememberChoices( selectedColumnName, selectedColoringMode );
+
 		switch ( selectedColoringMode )
 		{
-			case LINEAR_RED:
-				return createLinearColoringModel(
-						selectedColumnName,
-						false,
-						new SingleColorARGBLut( 255, 0,0 ) );
-			case LINEAR_BLUE_WHITE_RED:
+			case BLUE_WHITE_RED:
 				return createLinearColoringModel(
 						selectedColumnName,
 						false,
 						new BlueWhiteRedARGBLut( 1000 ) );
-			case LINEAR_BLUE_WHITE_RED_ZERO_TRANSPARENT:
+			case BLUE_WHITE_RED + ZERO_TRANSPARENT:
 				return createLinearColoringModel(
 						selectedColumnName,
 						true,
 						new BlueWhiteRedARGBLut( 1000 ) );
-			case LINEAR_VIRIDIS:
+			case VIRIDIS:
+				return createLinearColoringModel(
+						selectedColumnName,
+						false,
+						new ViridisARGBLut() );
+			case VIRIDIS + ZERO_TRANSPARENT:
 				return createLinearColoringModel(
 						selectedColumnName,
 						true,
-						new ViridisARGBLut( ) );
-			case CATEGORICAL_GLASBEY:
+						new ViridisARGBLut() );
+			case GLASBEY:
 				return createCategoricalColoringModel(
-						selectedColumnName, false );
-			case CATEGORICAL_GLASBEY_ZERO_TRANSPARENT:
+						selectedColumnName,
+						false, new GlasbeyARGBLut() );
+			case GLASBEY + ZERO_TRANSPARENT:
 				return createCategoricalColoringModel(
-						selectedColumnName, true );
-
-
-
+						selectedColumnName,
+						true, new GlasbeyARGBLut() );
 		}
+
 		return null;
 	}
 
-	public CategoryTableRowColumnColoringModel< T > createCategoricalColoringModel( String selectedColumnName, boolean isZeroTransparent )
+	public void rememberChoices( String selectedColumnName, String selectedColoringMode )
+	{
+		this.selectedColumnName = selectedColumnName;
+		this.selectedColoringMode = selectedColoringMode;
+
+		if ( selectedColoringMode.contains( ZERO_TRANSPARENT ) )
+			this.isZeroTransparent = true;
+		else
+			this.isZeroTransparent = false;
+	}
+
+	public CategoryTableRowColumnColoringModel< T > createCategoricalColoringModel(
+			String selectedColumnName,
+			boolean isZeroTransparent,
+			ARGBLut argbLut )
 	{
 		final CategoryTableRowColumnColoringModel< T > coloringModel
 				= new CategoryTableRowColumnColoringModel< >(
 						selectedColumnName,
-						new GlasbeyARGBLut( 255 ) );
+						argbLut );
 
 		if ( isZeroTransparent )
 		{
@@ -128,9 +146,9 @@ public class ColumnColoringModelCreator< T extends TableRow >
 	{
 		if ( ! Tables.isNumeric( table, selectedColumnName ) )
 		{
-			Logger.error( "Linear color mode is only available for numeric columns.\n" +
-					"The selected " + selectedColumnName + " column however appears to be non-numeric.");
-			return null;
+			Logger.error( "This coloring mode is only available for numeric columns.\n" +
+					"The selected " + selectedColumnName + " column however appears to contain non-numeric values.");
+			return null; // TODO: Make this work without null pointer exception
 		}
 
 		final double[] valueRange = getValueRange( table, selectedColumnName );
