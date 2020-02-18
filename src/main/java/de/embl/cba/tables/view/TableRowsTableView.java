@@ -711,10 +711,22 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		coloringMenu.add( menuItem );
 	}
 
-	public void colorByColumn( String columnName, String coloringMode )
+
+	/**
+	 * TODO: min & max only make sense for a NumericColoringModel...
+	 *
+	 * @param columnName
+	 * @param coloringMode
+	 * @param min
+	 * @param max
+	 */
+	public void colorByColumn( String columnName, String coloringMode, Double min, Double max )
 	{
-		final ColoringModel< T > coloringModel = columnColoringModelCreator.createColoringModel( columnName, coloringMode );
-		selectionColoringModel.setColoringModel( coloringModel );
+		final ColoringModel< T > coloringModel =
+				columnColoringModelCreator.createColoringModel( columnName, coloringMode, min, max );
+
+		if ( coloringModel instanceof NumericColoringModel )
+			selectionColoringModel.setColoringModel( coloringModel );
 	}
 
 	private void addMeasureSimilarityMenuItem( JMenu menu )
@@ -737,7 +749,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 						{
 							final ColoringModel< T > coloringModel = columnColoringModelCreator.createColoringModel(
 									measureDistance.getNewColumnName(),
-									ColumnColoringModelCreator.BLUE_WHITE_RED );
+									ColumnColoringModelCreator.BLUE_WHITE_RED, null, null );
 
 							selectionColoringModel.setColoringModel( coloringModel );
 							selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );

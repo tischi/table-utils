@@ -65,12 +65,14 @@ public class ColumnColoringModelCreator< T extends TableRow >
 		if ( isZeroTransparent )
 			selectedColoringMode += ZERO_TRANSPARENT;
 
-		return createColoringModel( selectedColumnName, selectedColoringMode );
+		return createColoringModel( selectedColumnName, selectedColoringMode, null, null );
 	}
 
 	public ColoringModel< T > createColoringModel(
 			String selectedColumnName,
-			String selectedColoringMode )
+			String selectedColoringMode,
+			Double min,
+			Double max)
 	{
 		rememberChoices( selectedColumnName, selectedColoringMode );
 
@@ -80,21 +82,25 @@ public class ColumnColoringModelCreator< T extends TableRow >
 				return createLinearColoringModel(
 						selectedColumnName,
 						false,
+						min, max,
 						new BlueWhiteRedARGBLut( 1000 ) );
 			case BLUE_WHITE_RED + ZERO_TRANSPARENT:
 				return createLinearColoringModel(
 						selectedColumnName,
 						true,
+						min, max,
 						new BlueWhiteRedARGBLut( 1000 ) );
 			case VIRIDIS:
 				return createLinearColoringModel(
 						selectedColumnName,
 						false,
+						min, max,
 						new ViridisARGBLut() );
 			case VIRIDIS + ZERO_TRANSPARENT:
 				return createLinearColoringModel(
 						selectedColumnName,
 						true,
+						min, max,
 						new ViridisARGBLut() );
 			case GLASBEY:
 				return createCategoricalColoringModel(
@@ -142,6 +148,8 @@ public class ColumnColoringModelCreator< T extends TableRow >
 	private NumericTableRowColumnColoringModel< T > createLinearColoringModel(
 			String selectedColumnName,
 			boolean isZeroTransparent,
+			Double min,
+			Double max,
 			ARGBLut argbLut )
 	{
 		if ( ! Tables.isNumeric( table, selectedColumnName ) )
@@ -161,6 +169,13 @@ public class ColumnColoringModelCreator< T extends TableRow >
 						valueSettings,
 						valueRange,
 						isZeroTransparent );
+
+		if ( min != null )
+			coloringModel.setMin( min );
+
+		if ( max != null )
+			coloringModel.setMin( max );
+
 
 		SwingUtilities.invokeLater( () ->
 				new NumericColoringModelDialog( selectedColumnName, coloringModel, valueRange ) );
