@@ -174,7 +174,7 @@ public class ColumnColoringModelCreator< T extends TableRow >
 			coloringModel.setMin( min );
 
 		if ( max != null )
-			coloringModel.setMin( max );
+			coloringModel.setMax( max );
 
 
 		SwingUtilities.invokeLater( () ->
