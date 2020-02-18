@@ -724,9 +724,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		final ColoringModel< T > coloringModel =
 				columnColoringModelCreator.createColoringModel( columnName, coloringMode, min, max );
-
-		if ( coloringModel instanceof NumericColoringModel )
-			selectionColoringModel.setColoringModel( coloringModel );
+		selectionColoringModel.setColoringModel( coloringModel );
 	}
 
 	private void addMeasureSimilarityMenuItem( JMenu menu )
