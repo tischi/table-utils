@@ -103,7 +103,7 @@ public class Segments3dView < T extends ImageSegment >
 
 		this.objectsName = "";
 
-		this.executorService = Executors.newFixedThreadPool( 2 * Runtime.getRuntime().availableProcessors() );
+		this.executorService = Executors.newFixedThreadPool( Runtime.getRuntime().availableProcessors() );
 
 		this.segmentToMesh = new ConcurrentHashMap<>();
 		this.segmentToContent = new ConcurrentHashMap<>();
@@ -115,6 +115,9 @@ public class Segments3dView < T extends ImageSegment >
 
 	public void setObjectsName( String objectsName )
 	{
+		if ( objectsName == null )
+			throw new RuntimeException( "Cannot set objects name in Segments3dView to null." );
+
 		this.objectsName = objectsName;
 	}
 
@@ -250,6 +253,29 @@ public class Segments3dView < T extends ImageSegment >
 	}
 
 	private synchronized void showSelectedSegments( Set< T > segments )
+	{
+		initUniverseAndListener();
+
+		for ( T segment : segments )
+		{
+			if ( !segmentToContent.containsKey( segment ) )
+			{
+				final CustomTriangleMesh mesh = getCustomTriangleMesh( segment );
+				if ( mesh != null )
+					addMeshToUniverse( segment, mesh );
+				else
+					Logger.error( "Error creating mesh of segment " + segment.labelId() );
+			}
+		}
+	}
+
+
+	/**
+	 * TODO: On Windows 10 this seems to throw an error
+	 *
+	 * @param segments
+	 */
+	private synchronized void showSelectedSegmentsMultiThreaded( Set< T > segments )
 	{
 		initUniverseAndListener();
 
@@ -484,8 +510,13 @@ public class Segments3dView < T extends ImageSegment >
 
 	private void addMeshToUniverse( T segment, CustomTriangleMesh mesh )
 	{
-		final Content content =
-				universe.addCustomMesh( mesh, objectsName + "_" + segment.labelId() );
+		if ( mesh == null )
+			throw new RuntimeException( "Mesh of segment " + objectsName + "_" + segment.labelId() + " is null." );
+
+		if ( universe == null )
+			throw new RuntimeException( "Universe is null." );
+
+		final Content content = universe.addCustomMesh( mesh, objectsName + "_" + segment.labelId() );
 
 		content.setTransparency( ( float ) transparency );
 		content.setLocked( true );
