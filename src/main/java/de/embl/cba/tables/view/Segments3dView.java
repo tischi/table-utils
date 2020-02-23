@@ -556,7 +556,7 @@ public class Segments3dView < T extends ImageSegment >
 		universe.setAutoAdjustView( false );
 	}
 
-	private synchronized void initUniverseAndListener()
+	public synchronized void initUniverseAndListener()
 	{
 		if ( universe == null )
 			universe = new Image3DUniverse();

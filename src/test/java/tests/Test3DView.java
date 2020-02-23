@@ -62,7 +62,8 @@ public class Test3DView
 
 		final Source< ? > source = Utils.getSource( spimData, 0 );
 
-		IJ.wait( 5000 );  // Universe needs to be created...
+
+		segments3dView.initUniverseAndListener();
 
 		UniverseUtils.addSourceToUniverse(
 				segments3dView.getUniverse(),

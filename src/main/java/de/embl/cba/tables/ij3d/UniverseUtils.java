@@ -5,9 +5,12 @@ import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.tables.Logger;
 import de.embl.cba.tables.Utils;
 import de.embl.cba.tables.color.ColorUtils;
+import ij.IJ;
 import ij.ImagePlus;
+import ij.Prefs;
 import ij3d.Content;
 import ij3d.Image3DUniverse;
+import itc.utilities.CopyUtils;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.converter.RealUnsignedByteConverter;
 import net.imglib2.img.display.imagej.ImageJFunctions;
@@ -53,6 +56,7 @@ public class UniverseUtils
 
 		final ImagePlus wrap = getImagePlus( source, min, max, level );
 
+
 		final Content content = universe.addContent( wrap, displayType );
 
 		content.setTransparency( transparency );
@@ -67,12 +71,15 @@ public class UniverseUtils
 		return content;
 	}
 
-	public static < R extends RealType< R > > ImagePlus getImagePlus( Source< ? > source, int min, int max, Integer level )
+	private static < R extends RealType< R > > ImagePlus getImagePlus( Source< ? > source, int min, int max, Integer level )
 	{
 		RandomAccessibleInterval< ? extends RealType< ? > > rai
 				= BdvUtils.getRealTypeNonVolatileRandomAccessibleInterval( source, 0, level );
 
+		rai = CopyUtils.copyVolumeRaiMultiThreaded( ( RandomAccessibleInterval ) rai, Prefs.getThreads() -1  ); // TODO: make multi-threading configurable.
+
 		rai = Views.permute( Views.addDimension( rai, 0, 0 ), 2, 3 );
+
 		final ImagePlus wrap = ImageJFunctions.wrapUnsignedByte(
 				( RandomAccessibleInterval ) rai,
 				new RealUnsignedByteConverter< R >( min, max ),
@@ -82,6 +89,7 @@ public class UniverseUtils
 		wrap.getCalibration().pixelWidth = voxelSpacing[ 0 ];
 		wrap.getCalibration().pixelHeight = voxelSpacing[ 1 ];
 		wrap.getCalibration().pixelDepth = voxelSpacing[ 2 ];
+
 		return wrap;
 	}
 
@@ -123,6 +131,13 @@ public class UniverseUtils
 
 			}
 
+			try
+			{
+				Thread.sleep( 5000 ); // Creating of Universe takes time
+			} catch ( InterruptedException e )
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 }
