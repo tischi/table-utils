@@ -130,14 +130,6 @@ public class UniverseUtils
 				);
 
 			}
-
-			try
-			{
-				Thread.sleep( 5000 ); // Creating of Universe takes time
-			} catch ( InterruptedException e )
-			{
-				e.printStackTrace();
-			}
 		}
 	}
 }
