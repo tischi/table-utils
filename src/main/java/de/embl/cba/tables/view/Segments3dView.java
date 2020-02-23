@@ -33,7 +33,6 @@ import java.awt.Component;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Segments3dView < T extends ImageSegment >
 {
@@ -61,7 +60,7 @@ public class Segments3dView < T extends ImageSegment >
 	private boolean autoResolutionLevel;
 	private String objectsName;
 	private Component parentComponent;
-	private AtomicBoolean showSegments = new AtomicBoolean( true );
+	private boolean showSelectedSegmentsIn3D = true;
 	private ConcurrentHashMap< T, CustomTriangleMesh > segmentToTriangleMesh;
 	private ExecutorService executorService;
 
@@ -202,21 +201,20 @@ public class Segments3dView < T extends ImageSegment >
 			@Override
 			public synchronized void selectionChanged()
 			{
-				if ( ! showSegments.get() ) return;
+				if ( ! showSelectedSegmentsIn3D ) return;
 
 				contentModificationInProgress = true;
-				final Set< T > selected = selectionModel.getSelected();
-				showSelectedSegments( selected );
-				removeUnselectedSegments( selected );
+				showSelectedSegments();
+				removeUnselectedSegments();
 				contentModificationInProgress = false;
 			}
 
 			@Override
 			public synchronized void focusEvent( T selection )
 			{
-				if ( ! showSegments.get() ) return;
+				if ( ! showSelectedSegmentsIn3D ) return;
 
-				if ( universe == null ) return;
+				initUniverseAndListener();
 				if ( universe.getContents().size() == 0 ) return;
 				if ( selection == recentFocus ) return;
 				if ( ! segmentToContent.containsKey( selection ) ) return;
@@ -239,8 +237,9 @@ public class Segments3dView < T extends ImageSegment >
 		} );
 	}
 
-	private void removeUnselectedSegments( Set< T > selectedSegments )
+	private void removeUnselectedSegments( )
 	{
+		final Set< T > selectedSegments = selectionModel.getSelected();
 		final Set< T > currentSegments = segmentToContent.keySet();
 		final Set< T > remove = new HashSet<>();
 
@@ -252,11 +251,13 @@ public class Segments3dView < T extends ImageSegment >
 			removeSegmentFrom3DView( segment );
 	}
 
-	private synchronized void showSelectedSegments( Set< T > segments )
+	public synchronized void showSelectedSegments()
 	{
+		final Set< T > selected = selectionModel.getSelected();
+
 		initUniverseAndListener();
 
-		for ( T segment : segments )
+		for ( T segment : selected )
 		{
 			if ( ! segmentToContent.containsKey( segment ) )
 			{
@@ -435,9 +436,9 @@ public class Segments3dView < T extends ImageSegment >
 		return level;
 	}
 
-	public synchronized void setShowSegments( AtomicBoolean showSegments )
+	public synchronized void setShowSelectedSegmentsIn3D( boolean showSelectedSegmentsIn3D )
 	{
-		this.showSegments = showSegments;
+		this.showSelectedSegmentsIn3D = showSelectedSegmentsIn3D;
 	}
 
 	private void setSegmentBoundingBox(
