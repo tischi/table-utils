@@ -133,7 +133,7 @@ public class Tables
 			{
 				url = new URL( path );
 			}
-			catch ( MalformedURLException e )
+			catch ( Exception e )
 			{
 				throw new RuntimeException( "Could not open URL: " + path  );
 			}
@@ -145,7 +145,7 @@ public class Tables
 				final BufferedReader bufferedReader = new BufferedReader( inReader );
 				return bufferedReader;
 			}
-			catch ( IOException e )
+			catch ( Exception e )
 			{
 				throw new RuntimeException( "Could not open URL: " + path  );
 			}

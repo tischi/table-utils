@@ -258,7 +258,7 @@ public class Segments3dView < T extends ImageSegment >
 
 		for ( T segment : segments )
 		{
-			if ( !segmentToContent.containsKey( segment ) )
+			if ( ! segmentToContent.containsKey( segment ) )
 			{
 				final CustomTriangleMesh mesh = getCustomTriangleMesh( segment );
 				if ( mesh != null )

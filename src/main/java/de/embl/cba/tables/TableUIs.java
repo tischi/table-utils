@@ -144,8 +144,9 @@ public class TableUIs
 
 	public static String selectGitRepoTablePathUI( String tablesLocation ) throws IOException
 	{
-		String newTablePath;// TODO: do not hard-code
-		final BufferedReader reader = Tables.getReader( tablesLocation + "/" + "additional_tables.txt" );
+		String additionalTablesUrl = getAdditionalTablesUrl( tablesLocation );
+
+		final BufferedReader reader = Tables.getReader( additionalTablesUrl );
 
 		final ArrayList< String > lines = new ArrayList<>();
 		String line = reader.readLine();
@@ -161,9 +162,23 @@ public class TableUIs
 		gd.showDialog();
 		if ( gd.wasCanceled() ) return null;
 		final String tableFileName = gd.getNextChoice();
-		newTablePath = tablesLocation + "/" + tableFileName;
+		String newTablePath = tablesLocation + "/" + tableFileName;
 
 		return newTablePath;
+	}
+
+	public static String getAdditionalTablesUrl( String tablesLocation )
+	{
+		String additionalTablesUrl;
+		if ( tablesLocation.endsWith( "/" ) )
+		{
+			additionalTablesUrl = tablesLocation + "additional_tables.txt";
+		}
+		else
+		{
+			additionalTablesUrl = tablesLocation + "/" + "additional_tables.txt";
+		}
+		return additionalTablesUrl;
 	}
 
 }
