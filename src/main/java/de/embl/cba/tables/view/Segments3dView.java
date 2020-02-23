@@ -203,10 +203,7 @@ public class Segments3dView < T extends ImageSegment >
 			{
 				if ( ! showSelectedSegmentsIn3D ) return;
 
-				contentModificationInProgress = true;
-				showSelectedSegments();
-				removeUnselectedSegments();
-				contentModificationInProgress = false;
+				updateAndShowSelectedSegments();
 			}
 
 			@Override
@@ -237,6 +234,14 @@ public class Segments3dView < T extends ImageSegment >
 		} );
 	}
 
+	private void updateAndShowSelectedSegments()
+	{
+		contentModificationInProgress = true;
+		showSelectedSegments();
+		removeUnselectedSegments();
+		contentModificationInProgress = false;
+	}
+
 	private void removeUnselectedSegments( )
 	{
 		final Set< T > selectedSegments = selectionModel.getSelected();
@@ -251,7 +256,7 @@ public class Segments3dView < T extends ImageSegment >
 			removeSegmentFrom3DView( segment );
 	}
 
-	public synchronized void showSelectedSegments()
+	private synchronized void showSelectedSegments()
 	{
 		final Set< T > selected = selectionModel.getSelected();
 
@@ -300,9 +305,12 @@ public class Segments3dView < T extends ImageSegment >
 	private synchronized void removeSegmentFrom3DView( T segment )
 	{
 		final Content content = segmentToContent.get( segment );
-		universe.removeContent( content.getName() );
-		segmentToContent.remove( segment );
-		contentToSegment.remove( content );
+		if ( content != null && universe != null )
+		{
+			universe.removeContent( content.getName() );
+			segmentToContent.remove( segment );
+			contentToSegment.remove( content );
+		}
 	}
 
 	private CustomTriangleMesh getCustomTriangleMesh( T segment )
@@ -439,6 +447,26 @@ public class Segments3dView < T extends ImageSegment >
 	public synchronized void setShowSelectedSegmentsIn3D( boolean showSelectedSegmentsIn3D )
 	{
 		this.showSelectedSegmentsIn3D = showSelectedSegmentsIn3D;
+
+		if ( showSelectedSegmentsIn3D )
+		{
+			updateAndShowSelectedSegments();
+		}
+		else
+		{
+			removeSelectedSegmentsFromView();
+		}
+
+	}
+
+	private void removeSelectedSegmentsFromView()
+	{
+		final Set< T > selected = selectionModel.getSelected();
+
+		for ( T segment : selected )
+		{
+			removeSegmentFrom3DView( segment );
+		}
 	}
 
 	private void setSegmentBoundingBox(
