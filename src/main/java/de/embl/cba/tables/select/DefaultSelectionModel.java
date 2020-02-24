@@ -118,7 +118,7 @@ public class DefaultSelectionModel< T > implements SelectionModel< T >
 	@Override
 	public Set< T > getSelected()
 	{
-		return selected;
+		return new HashSet< T >( selected );
 	}
 
 	@Override

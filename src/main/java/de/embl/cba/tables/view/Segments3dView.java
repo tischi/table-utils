@@ -234,7 +234,7 @@ public class Segments3dView < T extends ImageSegment >
 		} );
 	}
 
-	private void updateAndShowSelectedSegments()
+	private synchronized void updateAndShowSelectedSegments()
 	{
 		contentModificationInProgress = true;
 		showSelectedSegments();
