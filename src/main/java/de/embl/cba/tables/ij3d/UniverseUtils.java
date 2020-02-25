@@ -124,8 +124,7 @@ public class UniverseUtils
 						parentComponent.getHeight() / 2  ) );
 
 				universe.getWindow().setLocation(
-						parentComponent.getLocationOnScreen().x
-								- universe.getWindow().getWidth() - 10,
+						parentComponent.getLocationOnScreen().x + parentComponent.getWidth(),
 						parentComponent.getLocationOnScreen().y
 				);
 			}

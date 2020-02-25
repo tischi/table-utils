@@ -275,7 +275,6 @@ public class Segments3dView < T extends ImageSegment >
 		}
 	}
 
-
 	/**
 	 * TODO: On Windows 10 this seems to throw an error
 	 *
