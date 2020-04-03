@@ -15,5 +15,4 @@ public class Help
 		HelpDialog helpDialog = new HelpDialog( null, Help.class.getResource( "/MultiImageSetNavigationHelp.html" ) );
 		helpDialog.setVisible( true );
 	}
-
 }

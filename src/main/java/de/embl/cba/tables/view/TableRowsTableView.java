@@ -292,6 +292,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		JMenu menu = new JMenu( "Help" );
 
 		menu.add( createShowSegmentationHelpMenuItem() );
+		menu.add( createShowNavigationHelpMenuItem() );
 
 		return menu;
 	}
@@ -299,12 +300,12 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private JMenuItem createShowSegmentationHelpMenuItem()
 	{
 		initHelpDialog();
-		final JMenuItem menuItem = new JMenuItem( "Show Segmentation Help" );
+		final JMenuItem menuItem = new JMenuItem( "Show Segmentation Image Help" );
 		menuItem.addActionListener( e ->
 			{
 			final HelpDialog helpDialog = new HelpDialog(
 					frame,
-					Tables.class.getResource( "/MultiImageSetNavigationHelp.html" ) );
+					Tables.class.getResource( "/SegmentationImageActionsHelp.html" ) );
 			helpDialog.setVisible( true );
 			}
 		);

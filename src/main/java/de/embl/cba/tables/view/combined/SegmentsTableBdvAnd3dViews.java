@@ -1,21 +1,18 @@
 package de.embl.cba.tables.view.combined;
 
 import bdv.util.BdvHandle;
-import bdv.viewer.ViewerFrame;
-import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.color.LazyCategoryColoringModel;
 import de.embl.cba.tables.color.SelectionColoringModel;
 import de.embl.cba.tables.image.ImageSourcesModel;
-import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import de.embl.cba.tables.select.DefaultSelectionModel;
 import de.embl.cba.tables.select.SelectionModel;
+import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import de.embl.cba.tables.view.Segments3dView;
 import de.embl.cba.tables.view.SegmentsBdvView;
 import de.embl.cba.tables.view.TableRowsTableView;
 import ij3d.Image3DUniverse;
 
-import java.awt.*;
 import java.util.List;
 
 public class SegmentsTableBdvAnd3dViews
