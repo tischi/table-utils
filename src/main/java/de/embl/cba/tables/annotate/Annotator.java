@@ -1,5 +1,7 @@
 package de.embl.cba.tables.annotate;
 
+import bdv.util.BdvHandle;
+import de.embl.cba.bdv.utils.behaviour.BdvBehaviours;
 import de.embl.cba.tables.SwingUtils;
 import de.embl.cba.tables.TableRows;
 import de.embl.cba.tables.color.CategoryTableRowColumnColoringModel;
@@ -8,6 +10,8 @@ import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.tablerow.TableRow;
 import ij.gui.GenericDialog;
 import net.imglib2.type.numeric.ARGBType;
+import org.scijava.ui.behaviour.util.Behaviours;
+import org.scijava.ui.behaviour.io.InputTriggerConfig;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +26,7 @@ public class Annotator < T extends TableRow > extends JFrame
 	private final SelectionModel< T > selectionModel;
 	private final CategoryTableRowColumnColoringModel< T > coloringModel;
 	private final JPanel panel;
+	private BdvHandle bdv;
 
 	public Annotator(
 			String annotationColumnName,
@@ -38,6 +43,17 @@ public class Annotator < T extends TableRow > extends JFrame
 		this.coloringModel = coloringModel;
 		coloringModel.fixedColorMode( true );
 		this.panel = new JPanel();
+		this.bdv = null;
+	}
+
+	public void setBdv(BdvHandle handle) {
+	{
+		this.bdv = handle;
+	}
+
+	public BdvHandle getBdv() {
+	{
+		return this.bdv;
 	}
 
 	public void showDialog()
@@ -70,6 +86,21 @@ public class Annotator < T extends TableRow > extends JFrame
 			addAnnotationButtonPanel( gd.getNextString(), null );
 			refreshDialog();
 		});
+
+        // if we have a bdv handle, set the bdv shortcut for the new label
+        if(this.bdv != null) {
+		    Behaviours behaviours = new Behaviours( new InputTriggerConfig() );
+		    behaviours.install( bdv.getTriggerbindings(), "behaviours" );
+            // add key binding that assigns the currently selected label to the
+            // to numerical category corresponding to input key (= 1, 2, 3, ..., 0 (equiv to None))
+            // TODO unclear to me:
+            // - what is the correct behaviour? 'addViewCaptureBehaviour' does not sound right
+            // - how do we get the current category id from the lambda passed to 'addActionListener' abvoe?
+            // - how do we get acceess to the current selection here
+            // - maybe this needs to go t o'addAnnotationButtonPanel' instead ? 
+
+		    // BdvBehaviours.addViewCaptureBehaviour( bdv, behaviours, "C", false );
+        }
 	}
 
 	private void addAnnotationButtons()

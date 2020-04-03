@@ -72,6 +72,7 @@ public class SegmentsTableBdvAnd3dViews
 				selectionColoringModel,
 				viewName );
 
+		tableRowsTableView.setBdv( bdv );
 		tableRowsTableView.setParentComponent( bdv.getViewerPanel() );
 
 		tableRowsTableView.showTableAndMenu();

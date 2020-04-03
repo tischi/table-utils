@@ -1,6 +1,7 @@
 package de.embl.cba.tables.view;
 
 import bdv.tools.HelpDialog;
+import bdv.util.BdvHandle;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.*;
 import de.embl.cba.tables.annotate.Annotator;
@@ -46,6 +47,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private String tablesDirectory = "";
 	private boolean isZeroTransparent;
 
+	private BdvHandle bdv;
+
 	public TableRowsTableView(
 			final List< T > tableRows,
 			final SelectionModel< T > selectionModel,
@@ -70,6 +73,18 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		registerAsSelectionListener( selectionModel );
 		registerAsColoringListener( selectionColoringModel );
+
+		this.bdv = null;
+	}
+
+	public void setBdv(BdvHandle handle)
+	{
+		this.bdv = handle;
+	}
+
+	public BdvHandle getBdv()
+	{
+		return bdv;
 	}
 
 	public List< T > getTableRows()
@@ -484,6 +499,11 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 				selectionModel,
 				categoricalColoringModel
 		);
+
+        // pass on the bdv handle to the annotator if it is not null
+        if(this.bdv != null) {
+            annotator.setBdv( this.bdv );
+        }
 
 		annotator.showDialog();
 	}
