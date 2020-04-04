@@ -1,6 +1,7 @@
 package de.embl.cba.tables.annotate;
 
 import bdv.util.BdvHandle;
+import de.embl.cba.bdv.utils.BdvUtils;
 import de.embl.cba.bdv.utils.behaviour.BdvBehaviours;
 import de.embl.cba.tables.SwingUtils;
 import de.embl.cba.tables.TableRows;
@@ -10,6 +11,7 @@ import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.tablerow.TableRow;
 import ij.gui.GenericDialog;
 import net.imglib2.type.numeric.ARGBType;
+import org.scijava.ui.behaviour.ClickBehaviour;
 import org.scijava.ui.behaviour.util.Behaviours;
 import org.scijava.ui.behaviour.io.InputTriggerConfig;
 
@@ -96,7 +98,8 @@ public class Annotator < T extends TableRow > extends JFrame
             // - how do we get access to the current selection here
             // - maybe this needs to go t o'addAnnotationButtonPanel' instead ? 
 
-		    // BdvBehaviours.addViewCaptureBehaviour( bdv, behaviours, "C", false );
+		    // dummy
+			BdvBehaviours.addPositionAndViewLoggingBehaviour( bdv, behaviours, "K" );
         }
 	}
 
