@@ -26,7 +26,7 @@ public class Annotator < T extends TableRow > extends JFrame
 	private final SelectionModel< T > selectionModel;
 	private final CategoryTableRowColumnColoringModel< T > coloringModel;
 	private final JPanel panel;
-	private BdvHandle bdv;
+	private BdvHandle bdv = null;
 
 	public Annotator(
 			String annotationColumnName,
@@ -43,17 +43,14 @@ public class Annotator < T extends TableRow > extends JFrame
 		this.coloringModel = coloringModel;
 		coloringModel.fixedColorMode( true );
 		this.panel = new JPanel();
-		this.bdv = null;
-	}
-
-	public void setBdv(BdvHandle handle) {
-	{
-		this.bdv = handle;
 	}
 
 	public BdvHandle getBdv() {
-	{
-		return this.bdv;
+		return bdv;
+	}
+
+	public void setBdv(BdvHandle bdv) {
+		this.bdv = bdv;
 	}
 
 	public void showDialog()
@@ -96,7 +93,7 @@ public class Annotator < T extends TableRow > extends JFrame
             // TODO unclear to me:
             // - what is the correct behaviour? 'addViewCaptureBehaviour' does not sound right
             // - how do we get the current category id from the lambda passed to 'addActionListener' abvoe?
-            // - how do we get acceess to the current selection here
+            // - how do we get access to the current selection here
             // - maybe this needs to go t o'addAnnotationButtonPanel' instead ? 
 
 		    // BdvBehaviours.addViewCaptureBehaviour( bdv, behaviours, "C", false );
