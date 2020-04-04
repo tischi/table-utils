@@ -64,6 +64,7 @@ public class SegmentsTableBdvAnd3dViews
 				imageSourcesModel,
 				bdv );
 
+
 		bdv = segmentsBdvView.getBdv();
 
 		tableRowsTableView = new TableRowsTableView<>(

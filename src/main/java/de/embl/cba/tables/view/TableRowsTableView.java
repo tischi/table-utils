@@ -636,7 +636,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 			{
 				SwingUtilities.invokeLater( () -> moveToSelectedTableRow( selection ) );
 			}
-
 		} );
 	}
 
