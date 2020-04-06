@@ -132,5 +132,10 @@
 			<groupId>de.embl.cba</groupId>
 			<artifactId>imglib2-lazy-algorithm</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>de.embl.cba</groupId>
+			<artifactId>imglib2-lazy-algorithm</artifactId>
+			<version>0.2.2</version>
+		</dependency>
 	</dependencies>
 </project>
