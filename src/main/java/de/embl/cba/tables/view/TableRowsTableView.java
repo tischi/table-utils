@@ -1,6 +1,7 @@
 package de.embl.cba.tables.view;
 
 import bdv.tools.HelpDialog;
+import bdv.viewer.ViewerPanel;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.*;
 import de.embl.cba.tables.annotate.Annotator;
@@ -22,7 +23,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
 
 public class TableRowsTableView < T extends TableRow > extends JPanel
 {
@@ -47,6 +47,19 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private boolean isZeroTransparent;
 
 	public TableRowsTableView(
+			final List< T > tableRows )
+	{
+		this( tableRows, null, null, "" );
+	}
+
+	public TableRowsTableView(
+			final List< T > tableRows,
+			final SelectionModel< T > selectionModel )
+	{
+		this( tableRows, selectionModel, null, "" );
+	}
+
+	public TableRowsTableView(
 			final List< T > tableRows,
 			final SelectionModel< T > selectionModel,
 			final SelectionColoringModel< T > selectionColoringModel )
@@ -65,11 +78,13 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		this.selectionColoringModel = selectionColoringModel;
 		this.selectionModel = selectionModel;
 		this.tableName = tableName;
+		this.recentlySelectedRowInView = -1;
 
-		recentlySelectedRowInView = -1;
+		if ( selectionModel != null )
+			registerAsSelectionListener( selectionModel );
 
-		registerAsSelectionListener( selectionModel );
-		registerAsColoringListener( selectionColoringModel );
+		if ( selectionColoringModel != null )
+			registerAsColoringListener( selectionColoringModel );
 	}
 
 	public List< T > getTableRows()
@@ -77,11 +92,22 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return tableRows;
 	}
 
+	public void showTableAndMenu( Component parentComponent )
+	{
+		this.parentComponent = parentComponent;
+		showTableAndMenu();
+	}
+
 	public void showTableAndMenu()
 	{
 		configureJTable();
-		registerAsListSelectionListener();
-		configureTableRowColoring();
+
+		if ( selectionModel != null )
+			installSelectionModelNotification();
+
+		if ( selectionColoringModel != null)
+			configureTableRowColoring();
+
 		createMenuAndShow();
 	}
 
@@ -244,14 +270,16 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private void createMenuBar()
 	{
 		menuBar = new JMenuBar();
-
 		menuBar.add( createTableMenu() );
 
-		menuBar.add( createSelectionMenu() );
+		if ( selectionModel != null )
+			menuBar.add( createSelectionMenu() );
 
-		menuBar.add( createColoringMenu() );
-
-		menuBar.add( createAnnotateMenu() );
+		if ( selectionColoringModel != null )
+		{
+			menuBar.add( createColoringMenu() );
+			menuBar.add( createAnnotateMenu() );
+		}
 
 		// menuBar.add( createMeasureMenu() ); // TODO: finish implementing this
 
@@ -312,17 +340,18 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		return menuItem;
 	}
 
+	// TODO: This does not always make sense. Should be added only on demand
 	private JMenuItem createShowNavigationHelpMenuItem()
 	{
 		initHelpDialog();
 		final JMenuItem menuItem = new JMenuItem( "Show Navigation Help" );
 		menuItem.addActionListener( e ->
-				{
-					final HelpDialog helpDialog = new HelpDialog(
-							frame,
-							Tables.class.getResource( "/MultiImageSetNavigationHelp.html" ) );
-					helpDialog.setVisible( true );
-				}
+		{
+			final HelpDialog helpDialog = new HelpDialog(
+				frame,
+				Tables.class.getResource( "/MultiImageSetNavigationHelp.html" ) );
+				helpDialog.setVisible( true );
+			}
 		);
 		return menuItem;
 	}
@@ -448,7 +477,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 	private void selectAll()
 	{
-
 		selectionModel.setSelected( tableRows, true );
 //		for ( T tableRow : tableRows )
 //		{
@@ -491,16 +519,10 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private void createMenuAndShow()
 	{
 		frame = new JFrame( tableName );
-
 		createMenuBar();
-
 		frame.setJMenuBar( menuBar );
 
-		//Show the table
-		//frame.add( scrollPane );
-
-		//Create and set up the content pane.
-		this.setOpaque( true ); //content panes must be opaque
+		this.setOpaque( true );
 		frame.setContentPane( this );
 
 		if ( parentComponent != null )
@@ -569,7 +591,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		table.repaint();
 	}
 
-	public void registerAsListSelectionListener()
+	public void installSelectionModelNotification()
 	{
 		table.getSelectionModel().addListSelectionListener( e ->
 				SwingUtilities.invokeLater( () ->
@@ -627,7 +649,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		moveToRowInView( rowInView );
 	}
-
 
 	private JMenu createColoringMenu()
 	{
@@ -711,7 +732,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		coloringMenu.add( menuItem );
 	}
 
-
 	/**
 	 * TODO: min & max only make sense for a NumericColoringModel...
 	 *
@@ -776,10 +796,5 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		frame.dispose();
 		this.setVisible( false );
-	}
-
-	public void setParentComponent( Component component )
-	{
-		this.parentComponent = component;
 	}
 }

@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>table-utils</artifactId>
 	<url>https://github.com/tischi/table-utils</url>
-	<version>0.3.21</version>
+	<version>0.3.22</version>
 	<name>Table Utils</name>
 	<description>TODO</description>
 	<inceptionYear>2018</inceptionYear>
@@ -127,6 +127,11 @@
 		<dependency>
 			<groupId>de.embl.cba</groupId>
 			<artifactId>bdv-utils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.embl.cba</groupId>
+			<artifactId>imglib2-lazy-algorithm</artifactId>
+			<version>0.2.2</version>
 		</dependency>
 	</dependencies>
 </project>

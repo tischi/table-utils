@@ -70,10 +70,7 @@ public class SegmentsTableAndBdvViews
 				selectionModel,
 				selectionColoringModel );
 
-		tableRowsTableView.setParentComponent( segmentsBdvView.getBdv().getViewerPanel() );
-
-		tableRowsTableView.showTableAndMenu();
-
+		tableRowsTableView.showTableAndMenu( segmentsBdvView.getBdv().getViewerPanel() );
 	}
 
 	public SelectionModel< TableRowImageSegment > getSelectionModel()

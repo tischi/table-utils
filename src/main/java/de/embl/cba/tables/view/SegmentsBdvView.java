@@ -176,7 +176,6 @@ public class SegmentsBdvView < T extends ImageSegment >
 			}
 		}
 
-
 		if ( isShownNone )
 		{
 			showSourceSet(

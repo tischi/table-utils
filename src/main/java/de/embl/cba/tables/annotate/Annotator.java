@@ -66,10 +66,10 @@ public class Annotator < T extends TableRow > extends JFrame
 			final GenericDialog gd = new GenericDialog( "" );
 			gd.addStringField( "New Category Name", "", 10 );
 			gd.showDialog();
-			if( gd.wasCanceled() ) return;
+			if ( gd.wasCanceled() ) return;
 			addAnnotationButtonPanel( gd.getNextString(), null );
 			refreshDialog();
-		});
+		} );
 	}
 
 	private void addAnnotationButtons()
