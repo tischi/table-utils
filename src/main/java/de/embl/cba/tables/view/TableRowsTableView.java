@@ -610,9 +610,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 					final T object = tableRows.get( row );
 
-					selectionModel.toggle( object );
-					if ( selectionModel.isSelected( object ) )
-						selectionModel.focus( object );
+					//selectionModel.toggle( object );
+					//if ( selectionModel.isSelected( object ) )
+					selectionModel.focus( object );
 
 					table.repaint();
 				}) );
