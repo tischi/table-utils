@@ -23,6 +23,5 @@ public class RunExploreObjectsTableCommand
 		command.imagePathColumnsId = ExploreObjectsTableCommand.IMAGE_PATH_COLUMNS_ID_DEFAULT;
 
 		command.run();
-
 	}
 }

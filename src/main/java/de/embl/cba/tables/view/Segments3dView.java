@@ -41,7 +41,6 @@ public class Segments3dView < T extends ImageSegment >
 	private final SelectionColoringModel< T > selectionColoringModel;
 	private final ImageSourcesModel imageSourcesModel;
 
-
 	private Image3DUniverse universe;
 	private T recentFocus;
 	private Double voxelSpacing3DView;

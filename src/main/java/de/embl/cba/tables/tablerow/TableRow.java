@@ -1,10 +1,14 @@
 package de.embl.cba.tables.tablerow;
 
-import java.util.Set;
+import de.embl.cba.tables.select.Listeners;
+import de.embl.cba.tables.select.SelectionListener;
 
+import java.util.Set;
 
 public interface TableRow
 {
+	Listeners< TableRowListener > listeners();
+
 	String getCell( String columnName );
 
 	void setCell( String columnName, String value );

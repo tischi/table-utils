@@ -18,22 +18,19 @@ public class Annotator < T extends TableRow > extends JFrame
 {
 	private final String annotationColumnName;
 	private final List< T > tableRows;
-	private final JTable table;
 	private final SelectionModel< T > selectionModel;
 	private final CategoryTableRowColumnColoringModel< T > coloringModel;
 	private final JPanel panel;
 
 	public Annotator(
 			String annotationColumnName,
-			List tableRows,
-			JTable table,
+			List< T > tableRows,
 			SelectionModel< T > selectionModel,
 			CategoryTableRowColumnColoringModel< T > coloringModel )
 	{
 		super("");
 		this.annotationColumnName = annotationColumnName;
 		this.tableRows = tableRows;
-		this.table = table;
 		this.selectionModel = selectionModel;
 		this.coloringModel = coloringModel;
 		coloringModel.fixedColorMode( true );
@@ -96,11 +93,8 @@ public class Annotator < T extends TableRow > extends JFrame
 		button.addActionListener( e -> {
 			if ( selectionModel.isEmpty() ) return;
 
-			TableRows.assignValues(
-					annotationColumnName,
-					selectionModel.getSelected(),
-					annotationName,
-					table );
+			for ( T row : selectionModel.getSelected() )
+				row.setCell( annotationColumnName, annotationName );
 
 			selectionModel.clearSelection();
 		} );

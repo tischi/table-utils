@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class NumericColoringModelDialog extends JFrame implements ColoringListener
 {
-	private static Point dialogLocation;
+	public static Point dialogLocation;
 
 	public NumericColoringModelDialog(
 			final String coloringFeature,

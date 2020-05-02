@@ -1,6 +1,7 @@
 package de.embl.cba.tables.color;
 
 import de.embl.cba.bdv.utils.lut.ARGBLut;
+import de.embl.cba.tables.Utils;
 import de.embl.cba.tables.tablerow.TableRow;
 import net.imglib2.type.numeric.ARGBType;
 
@@ -33,10 +34,10 @@ public class NumericTableRowColumnColoringModel< T extends TableRow >
 	@Override
 	public void convert( T tableRow, ARGBType output )
 	{
-		final Double featureValue = Double.parseDouble( tableRow.getCell( columnName ) );
-		setColorLinearly( featureValue, output );
+		final String cell = tableRow.getCell( columnName );
+		final Double value = Utils.parseDouble( cell );
+		setColorLinearly( value, output );
 	}
-
 
 	@Override
 	public double getMin()

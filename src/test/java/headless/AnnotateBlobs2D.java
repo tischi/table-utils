@@ -27,18 +27,8 @@ public class AnnotateBlobs2D
 		tableView.addColumn( annotationColumnName, "None" );
 
 		final List< TableRowImageSegment > tableRows = tableView.getTableRows();
-
-		TableRows.assignValue(
-				annotationColumnName,
-				tableRows.get( 0 ),
-				"AAA",
-				tableView.getTable() );
-
-		TableRows.assignValue(
-				annotationColumnName,
-				tableRows.get( 1 ),
-				"BBB",
-				tableView.getTable() );
+		tableRows.get( 0 ).setCell( annotationColumnName, "AAA" );
+		tableRows.get( 1 ).setCell( annotationColumnName, "BBB" );
 
 		final CategoryTableRowColumnColoringModel< TableRowImageSegment > coloringModel
 				= new ColumnColoringModelCreator< TableRowImageSegment >( tableView.getTable()
@@ -47,11 +37,9 @@ public class AnnotateBlobs2D
 		views.getSelectionColoringModel().setColoringModel( coloringModel );
 		views.getSelectionColoringModel().setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
 
-
 		final Annotator annotator = new Annotator(
 				annotationColumnName,
 				tableRows,
-				tableView.getTable(),
 				views.getSelectionModel(),
 				coloringModel
 		);

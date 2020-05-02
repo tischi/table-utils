@@ -74,4 +74,14 @@ public class Utils
 			}
 		}
 	}
+
+	public static Double parseDouble( String cell )
+	{
+		Double value;
+		if ( cell.toLowerCase().equals( "nan" ) || cell.equals( "" ) )
+			value = Double.NaN;
+		else
+			value = Double.parseDouble( cell );
+		return value;
+	}
 }

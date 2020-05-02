@@ -87,7 +87,9 @@ public class TableColumns
 
 		final Map< String, List< String > > columnNameToStrings = new LinkedHashMap<>();
 
-		for ( int columnIndex = 0; columnIndex < columnNames.size(); columnIndex++ )
+		final int numColumns = columnNames.size();
+
+		for ( int columnIndex = 0; columnIndex < numColumns; columnIndex++ )
 		{
 			final String columnName = columnNames.get( columnIndex );
 			columnNameToStrings.put( columnName, new ArrayList<>( ) );
@@ -96,12 +98,14 @@ public class TableColumns
 		final int numRows = rowsInTableIncludingHeader.size() - 1;
 
 		final long start = System.currentTimeMillis();
+
 		for ( int row = 1; row <= numRows; ++row )
 		{
-			final StringTokenizer st = new StringTokenizer( rowsInTableIncludingHeader.get( row ), delim );
-
-			for ( String column : columnNames )
-				columnNameToStrings.get( column ).add( st.nextToken().replace( "\"", "" ) );
+			final String[] split = rowsInTableIncludingHeader.get( row ).split( delim );
+			for ( int columnIndex = 0; columnIndex < numColumns; columnIndex++ )
+			{
+				columnNameToStrings.get( columnNames.get( columnIndex ) ).add( split[ columnIndex ].replace( "\"", "" ) );
+			}
 		}
 
 		// System.out.println( ( System.currentTimeMillis() - start ) / 1000.0 ) ;
@@ -282,11 +286,11 @@ public class TableColumns
 		return s.equals( "Inf" );
 	}
 
-	private static Class getColumnType( String string )
+	private static Class getColumnType( String cell )
 	{
 		try
 		{
-			Double.parseDouble( string );
+			Double.parseDouble( cell );
 			return Double.class;
 		}
 		catch ( Exception e2 )

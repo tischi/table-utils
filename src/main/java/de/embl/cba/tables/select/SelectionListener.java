@@ -9,12 +9,12 @@ public interface SelectionListener< T >
 	/**
 	 * Notifies when the select has changed.
 	 */
-	public void selectionChanged();
+	void selectionChanged();
 
 	/**
 	 * Notifies when a focus event happened.
 	 * Focus events do not necessarily enter the select at all..
 	 */
-	public void focusEvent( T selection );
+	void focusEvent( T selection );
 
 }

@@ -1,5 +1,6 @@
 package de.embl.cba.tables.imagesegment;
 
+import de.embl.cba.tables.tablerow.AbstractTableRow;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import net.imglib2.FinalRealInterval;
 
@@ -10,7 +11,7 @@ import java.util.*;
  * This might be slow, but allows changes in columns to be reflected.
  * // TODO: make interface for ColumnBasedTableRow
  */
-public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
+public class ColumnBasedTableRowImageSegment extends AbstractTableRow implements TableRowImageSegment
 {
 	private final int row;
 	private final Map< String, List< String > > columns;
@@ -193,6 +194,7 @@ public class ColumnBasedTableRowImageSegment implements TableRowImageSegment
 	public void setCell( String columnName, String value )
 	{
 		columns.get( columnName ).set( row, value );
+		this.notifyCellChangedListeners( columnName, value );
 	}
 
 	@Override

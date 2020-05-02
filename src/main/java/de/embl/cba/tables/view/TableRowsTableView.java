@@ -1,7 +1,6 @@
 package de.embl.cba.tables.view;
 
 import bdv.tools.HelpDialog;
-import bdv.viewer.ViewerPanel;
 import de.embl.cba.bdv.utils.lut.GlasbeyARGBLut;
 import de.embl.cba.tables.*;
 import de.embl.cba.tables.annotate.Annotator;
@@ -12,6 +11,7 @@ import de.embl.cba.tables.select.SelectionModel;
 import de.embl.cba.tables.select.AssignValuesToSelectedRowsDialog;
 import de.embl.cba.tables.color.ColumnColoringModelCreator;
 import de.embl.cba.tables.measure.MeasureDistance;
+import de.embl.cba.tables.tablerow.TableRowListener;
 import ij.IJ;
 import ij.gui.GenericDialog;
 import net.imglib2.type.numeric.ARGBType;
@@ -23,6 +23,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import static de.embl.cba.tables.TableRows.setTableCell;
 
 public class TableRowsTableView < T extends TableRow > extends JPanel
 {
@@ -45,6 +47,16 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private String mergeByColumnName = null;
 	private String tablesDirectory = "";
 	private boolean isZeroTransparent;
+
+	private SelectionMode selectionMode = SelectionMode.SelectAndFocus;
+
+	public enum SelectionMode
+	{
+		None,
+		FocusOnly,
+		SelectAndFocus,
+		SelectAndDeselectAndFocusSelected
+	}
 
 	public TableRowsTableView(
 			final List< T > tableRows )
@@ -75,6 +87,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		super( new GridLayout(1, 0 ) );
 		this.tableRows = tableRows;
+
+		registerAsTableRowListener( tableRows );
+
 		this.selectionColoringModel = selectionColoringModel;
 		this.selectionModel = selectionModel;
 		this.tableName = tableName;
@@ -85,6 +100,21 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		if ( selectionColoringModel != null )
 			registerAsColoringListener( selectionColoringModel );
+	}
+
+	public void registerAsTableRowListener( List< T > tableRows )
+	{
+		for ( T tableRow : tableRows )
+		{
+			tableRow.listeners().add( new TableRowListener()
+			{
+				@Override
+				public void cellChanged( String columnName, String value )
+				{
+					setTableCell( tableRow.rowIndex(), columnName, value, getTable() );
+				}
+			} );
+		}
 	}
 
 	public List< T > getTableRows()
@@ -387,6 +417,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 					try
 					{
 						String mergeByColumnName = getMergeByColumnName();
+						// TODO: below should be based on the TableRows and not on the jTable
 						Map< String, List< String > > newColumnsOrdered = TableUIs.openTableForMergingUI( table, tablesDirectory, mergeByColumnName );
 						newColumnsOrdered.remove( mergeByColumnName );
 						addColumns( newColumnsOrdered );
@@ -508,7 +539,6 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		final Annotator annotator = new Annotator(
 				columnName,
 				tableRows,
-				table,
 				selectionModel,
 				categoricalColoringModel
 		);
@@ -532,9 +562,12 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 					parentComponent.getLocationOnScreen().y + parentComponent.getHeight() + 10
 			);
 
+
+			final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
 			frame.setPreferredSize( new Dimension(
 					parentComponent.getWidth(),
-					parentComponent.getHeight() / 3  ) );
+					screenSize.height - parentComponent.getHeight() - 50  ) );
 		}
 
 		//Display the window.
@@ -596,6 +629,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		table.getSelectionModel().addListSelectionListener( e ->
 				SwingUtilities.invokeLater( () ->
 				{
+					if ( selectionMode.equals( SelectionMode.None ) ) return;
+
 					if ( e.getValueIsAdjusting() ) return;
 
 					final int selectedRowInView = table.getSelectedRow();
@@ -610,9 +645,21 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 					final T object = tableRows.get( row );
 
-					//selectionModel.toggle( object );
-					//if ( selectionModel.isSelected( object ) )
-					selectionModel.focus( object );
+					if ( selectionMode.equals( SelectionMode.FocusOnly ) )
+					{
+						selectionModel.focus( object );
+					}
+					else if ( selectionMode.equals( SelectionMode.SelectAndFocus ) )
+					{
+						selectionModel.setSelected( object, true );
+						selectionModel.focus( object );
+					}
+					else if ( selectionMode.equals( SelectionMode.SelectAndDeselectAndFocusSelected ) )
+					{
+						selectionModel.toggle( object );
+						if ( selectionModel.isSelected( object ) )
+							selectionModel.focus( object );
+					}
 
 					table.repaint();
 				}) );
@@ -719,31 +766,43 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		final JMenuItem menuItem = new JMenuItem( "Color by Column..." );
 
 		menuItem.addActionListener( e ->
-				new Thread( () ->
-				{
-					final ColoringModel< T > coloringModel = columnColoringModelCreator.showDialog();
-					// TODO: Here, one could add logic to configure which values should be painted transparent
-					if ( coloringModel != null )
-						selectionColoringModel.setColoringModel( coloringModel );
-
-				}
+				new Thread( () -> TableRowsTableView.this.showColorByColumnDialog()
 				).start() );
 
 		coloringMenu.add( menuItem );
+	}
+
+	public void showColorByColumnDialog()
+	{
+		final ColoringModel< T > coloringModel = columnColoringModelCreator.showDialog();
+
+		if ( coloringModel != null )
+			selectionColoringModel.setColoringModel( coloringModel );
+	}
+
+	/**
+	 * This method call auto-computes the contrast limits for the coloring
+	 *
+	 * @param columnName
+	 * @param coloringLut choose from ColoringLuts
+	 */
+	public void colorByColumn( String columnName, String coloringLut )
+	{
+		colorByColumn( columnName, coloringLut, null, null );
 	}
 
 	/**
 	 * TODO: min & max only make sense for a NumericColoringModel...
 	 *
 	 * @param columnName
-	 * @param coloringMode
+	 * @param coloringLut choose from ColoringLuts
 	 * @param min
 	 * @param max
 	 */
-	public void colorByColumn( String columnName, String coloringMode, Double min, Double max )
+	public void colorByColumn( String columnName, String coloringLut, Double min, Double max )
 	{
 		final ColoringModel< T > coloringModel =
-				columnColoringModelCreator.createColoringModel( columnName, coloringMode, min, max );
+				columnColoringModelCreator.createColoringModel( columnName, coloringLut, min, max );
 		selectionColoringModel.setColoringModel( coloringModel );
 	}
 
@@ -767,7 +826,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 						{
 							final ColoringModel< T > coloringModel = columnColoringModelCreator.createColoringModel(
 									measureDistance.getNewColumnName(),
-									ColumnColoringModelCreator.BLUE_WHITE_RED, null, null );
+									ColoringLuts.BLUE_WHITE_RED, null, null );
 
 							selectionColoringModel.setColoringModel( coloringModel );
 							selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );
@@ -796,5 +855,10 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		frame.dispose();
 		this.setVisible( false );
+	}
+
+	public void setSelectionMode( SelectionMode selectionMode )
+	{
+		this.selectionMode = selectionMode;
 	}
 }

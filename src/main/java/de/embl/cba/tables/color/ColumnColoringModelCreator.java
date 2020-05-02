@@ -12,11 +12,6 @@ import java.util.Map;
 
 public class ColumnColoringModelCreator< T extends TableRow >
 {
-	public static final String ZERO_TRANSPARENT = "ZeroTransparent";
-	public static final String BLUE_WHITE_RED = "BlueWhiteRed";
-	public static final String VIRIDIS = "Viridis";
-	public static final String GLASBEY = "Glasbey";
-
 	private final JTable table;
 
 	private String selectedColumnName;
@@ -27,11 +22,11 @@ public class ColumnColoringModelCreator< T extends TableRow >
 	private HashMap< String, double[] > columnNameToRangeSettings;
 
 	public static final String[] COLORING_MODES = new String[]
-			{
-					BLUE_WHITE_RED,
-					VIRIDIS,
-					GLASBEY,
-			};
+	{
+			ColoringLuts.BLUE_WHITE_RED,
+			ColoringLuts.VIRIDIS,
+			ColoringLuts.GLASBEY,
+	};
 
 	public ColumnColoringModelCreator( JTable table )
 	{
@@ -63,50 +58,50 @@ public class ColumnColoringModelCreator< T extends TableRow >
 		isZeroTransparent = gd.getNextBoolean();
 
 		if ( isZeroTransparent )
-			selectedColoringMode += ZERO_TRANSPARENT;
+			selectedColoringMode += ColoringLuts.ZERO_TRANSPARENT;
 
 		return createColoringModel( selectedColumnName, selectedColoringMode, null, null );
 	}
 
 	public ColoringModel< T > createColoringModel(
 			String selectedColumnName,
-			String selectedColoringMode,
+			String coloringLut,
 			Double min,
 			Double max)
 	{
-		rememberChoices( selectedColumnName, selectedColoringMode );
+		rememberChoices( selectedColumnName, coloringLut );
 
-		switch ( selectedColoringMode )
+		switch ( coloringLut )
 		{
-			case BLUE_WHITE_RED:
+			case ColoringLuts.BLUE_WHITE_RED:
 				return createLinearColoringModel(
 						selectedColumnName,
 						false,
 						min, max,
 						new BlueWhiteRedARGBLut( 1000 ) );
-			case BLUE_WHITE_RED + ZERO_TRANSPARENT:
+			case ColoringLuts.BLUE_WHITE_RED + ColoringLuts.ZERO_TRANSPARENT:
 				return createLinearColoringModel(
 						selectedColumnName,
 						true,
 						min, max,
 						new BlueWhiteRedARGBLut( 1000 ) );
-			case VIRIDIS:
+			case ColoringLuts.VIRIDIS:
 				return createLinearColoringModel(
 						selectedColumnName,
 						false,
 						min, max,
 						new ViridisARGBLut() );
-			case VIRIDIS + ZERO_TRANSPARENT:
+			case ColoringLuts.VIRIDIS + ColoringLuts.ZERO_TRANSPARENT:
 				return createLinearColoringModel(
 						selectedColumnName,
 						true,
 						min, max,
 						new ViridisARGBLut() );
-			case GLASBEY:
+			case ColoringLuts.GLASBEY:
 				return createCategoricalColoringModel(
 						selectedColumnName,
 						false, new GlasbeyARGBLut() );
-			case GLASBEY + ZERO_TRANSPARENT:
+			case ColoringLuts.GLASBEY + ColoringLuts.ZERO_TRANSPARENT:
 				return createCategoricalColoringModel(
 						selectedColumnName,
 						true, new GlasbeyARGBLut() );
@@ -120,7 +115,7 @@ public class ColumnColoringModelCreator< T extends TableRow >
 		this.selectedColumnName = selectedColumnName;
 		this.selectedColoringMode = selectedColoringMode;
 
-		if ( selectedColoringMode.contains( ZERO_TRANSPARENT ) )
+		if ( selectedColoringMode.contains( ColoringLuts.ZERO_TRANSPARENT ) )
 			this.isZeroTransparent = true;
 		else
 			this.isZeroTransparent = false;
@@ -175,7 +170,6 @@ public class ColumnColoringModelCreator< T extends TableRow >
 
 		if ( max != null )
 			coloringModel.setMax( max );
-
 
 		SwingUtilities.invokeLater( () ->
 				new NumericColoringModelDialog( selectedColumnName, coloringModel, valueRange ) );
