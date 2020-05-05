@@ -283,7 +283,7 @@ public class TableColumns
 
 	public static boolean isInf( String s )
 	{
-		return s.equals( "Inf" );
+		return s.toLowerCase().equals( "inf" );
 	}
 
 	private static Class getColumnType( String cell )
