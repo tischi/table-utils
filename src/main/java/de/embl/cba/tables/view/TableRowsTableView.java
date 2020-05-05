@@ -803,7 +803,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	{
 		final ColoringModel< T > coloringModel =
 				columnColoringModelCreator.createColoringModel( columnName, coloringLut, min, max );
-		selectionColoringModel.setColoringModel( coloringModel );
+		if ( coloringModel != null )
+			selectionColoringModel.setColoringModel( coloringModel );
 	}
 
 	private void addMeasureSimilarityMenuItem( JMenu menu )
@@ -827,6 +828,8 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 							final ColoringModel< T > coloringModel = columnColoringModelCreator.createColoringModel(
 									measureDistance.getNewColumnName(),
 									ColoringLuts.BLUE_WHITE_RED, null, null );
+
+							if ( coloringModel == null ) return;
 
 							selectionColoringModel.setColoringModel( coloringModel );
 							selectionColoringModel.setSelectionMode( SelectionColoringModel.SelectionMode.SelectionColor );

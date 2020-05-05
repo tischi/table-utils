@@ -266,7 +266,7 @@ public class Tables
 
 				try
 				{
-					final Double numericValue = Double.parseDouble( stringValue );
+					final Double numericValue = Utils.parseDouble( stringValue );
 					model.setValueAt( numericValue, iString - 1, iCol );
 				}
 				catch ( Exception e )
@@ -402,7 +402,7 @@ public class Tables
 		{
 			try
 			{
-				final double number = Double.parseDouble( string );
+				final double number = Utils.parseDouble( string );
 				columnValueMap.put( column, number );
 			}
 			catch ( Exception e2 )
@@ -427,7 +427,7 @@ public class Tables
 ////		{
 ////			try
 ////			{
-////				final double number = Double.parseDouble( string );
+////				final double number = Utils.parseDouble( string );
 ////				columnValueMap.put( column, number );
 ////			}
 ////			catch ( Exception e2 )
@@ -480,7 +480,7 @@ public class Tables
 //
 //	public static double getDouble( int columnIndex, String[] rowEntries )
 //	{
-//		return Double.parseDouble( rowEntries[ columnIndex ] );
+//		return Utils.parseDouble( rowEntries[ columnIndex ] );
 //	}
 
 	public static JTable jTableFromTableRows( List< ? extends TableRow > tableRows )
@@ -701,7 +701,7 @@ public class Tables
 		if ( featureValue instanceof Number )
 			return (( Number ) featureValue).doubleValue();
 		else
-			return Double.parseDouble( featureValue.toString() );
+			return Utils.parseDouble( featureValue.toString() );
 	}
 
 	public static double[] minMax( String column, JTable table )

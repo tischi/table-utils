@@ -50,7 +50,7 @@ public class TableColumns
 			for (int r = 0; r < nr; r++)
 			{
 				String label = table.getLabel(r);
-				values[r] = Double.parseDouble(label);
+				values[r] = Utils.parseDouble(label);
 			}
 			return values;
 		}
@@ -151,7 +151,7 @@ public class TableColumns
 		for ( int rowIndex = 0; rowIndex < numRowsSourceTable; ++rowIndex )
 		{
 			final String[] split = rowsInTableIncludingHeader.get( rowIndex + 1 ).split( delim );
-			final Double orderValue = Double.parseDouble( split[ mergeByColumnIndex ] );
+			final Double orderValue = Utils.parseDouble( split[ mergeByColumnIndex ] );
 			final int targetRowIndex = mergeByColumnValues.indexOf( orderValue );
 
 			for ( int columnIndex = 0; columnIndex < numColumns; columnIndex++ )
@@ -262,7 +262,7 @@ public class TableColumns
 		if ( isNaN( s ) )
 			doubles.add( Double.NaN );
 		else
-			doubles.add( Double.parseDouble( s ) );
+			doubles.add( Utils.parseDouble( s ) );
 	}
 
 	public static void toDouble( List< String > strings, Double[] doubles, int row )
@@ -273,7 +273,7 @@ public class TableColumns
 		else if ( isInf( s ) )
 			doubles[ row ] =  Double.POSITIVE_INFINITY;
 		else
-			doubles[ row ] =  Double.parseDouble( s );
+			doubles[ row ] =  Utils.parseDouble( s );
 	}
 
 	public static boolean isNaN( String s )
@@ -290,7 +290,7 @@ public class TableColumns
 	{
 		try
 		{
-			Double.parseDouble( cell );
+			Utils.parseDouble( cell );
 			return Double.class;
 		}
 		catch ( Exception e2 )
@@ -324,7 +324,7 @@ public class TableColumns
 		final int numRows = model.getRowCount();
 		final ArrayList< Double > orderColumn = new ArrayList<>();
 		for ( int rowIndex = 0; rowIndex < numRows; ++rowIndex )
-			orderColumn.add( Double.parseDouble( model.getValueAt( rowIndex, objectLabelColumnIndex ).toString() ) );
+			orderColumn.add( Utils.parseDouble( model.getValueAt( rowIndex, objectLabelColumnIndex ).toString() ) );
 		return orderColumn;
 	}
 

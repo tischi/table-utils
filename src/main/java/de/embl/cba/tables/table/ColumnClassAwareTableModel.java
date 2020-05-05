@@ -1,5 +1,7 @@
 package de.embl.cba.tables.table;
 
+import de.embl.cba.tables.Utils;
+
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +45,7 @@ public class ColumnClassAwareTableModel extends DefaultTableModel
 
 			try
 			{
-				Double.parseDouble( string );
+				Utils.parseDouble( string );
 				columnClasses.add( Double.class );
 			}
 			catch ( Exception e )

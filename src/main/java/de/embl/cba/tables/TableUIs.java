@@ -31,7 +31,7 @@ public class TableUIs
 
 		Object defaultValue;
 		try	{
-			defaultValue = Double.parseDouble( defaultValueString );
+			defaultValue = Utils.parseDouble( defaultValueString );
 		}
 		catch ( Exception e )
 		{

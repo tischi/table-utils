@@ -45,19 +45,19 @@ public class ColumnBasedTableRowImageSegment extends AbstractTableRow implements
 		position = new double[ 3 ];
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.X ) )
-			position[ 0 ] = Double.parseDouble(
+			position[ 0 ] = Utils.parseDouble(
 								segmentPropertyToColumn
 								.get( SegmentProperty.X )
 								.get( row ) );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.Y ) )
-			position[ 1 ] = Double.parseDouble(
+			position[ 1 ] = Utils.parseDouble(
 								segmentPropertyToColumn
 								.get( SegmentProperty.Y )
 								.get( row ) );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.Z ) )
-			position[ 2 ] = Double.parseDouble(
+			position[ 2 ] = Utils.parseDouble(
 								segmentPropertyToColumn
 								.get( SegmentProperty.Z )
 								.get( row ) );
@@ -74,7 +74,7 @@ public class ColumnBasedTableRowImageSegment extends AbstractTableRow implements
 	@Override
 	public double labelId()
 	{
-		return Double.parseDouble( segmentPropertyToColumn
+		return Utils.parseDouble( segmentPropertyToColumn
 				.get( SegmentProperty.ObjectLabel )
 				.get( row ) );
 	}
@@ -85,7 +85,7 @@ public class ColumnBasedTableRowImageSegment extends AbstractTableRow implements
 		if ( segmentPropertyToColumn.get( SegmentProperty.T ) == null )
 			return 0;
 
-		int timePoint = (int) Double.parseDouble( segmentPropertyToColumn
+		int timePoint = (int) Utils.parseDouble( segmentPropertyToColumn
 				.get( SegmentProperty.T )
 				.get( row ) );
 
@@ -141,19 +141,19 @@ public class ColumnBasedTableRowImageSegment extends AbstractTableRow implements
 		final double[] max = new double[ numDimensions() ];
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxXMax ) )
-			max[ 0 ] = Double.parseDouble(
+			max[ 0 ] = Utils.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxXMax )
 							.get( row ) );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxYMax ) )
-			max[ 1 ] = Double.parseDouble(
+			max[ 1 ] = Utils.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxYMax )
 							.get( row ) );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxZMax ) )
-			max[ 2 ] = Double.parseDouble(
+			max[ 2 ] = Utils.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxZMax )
 							.get( row ) );
@@ -165,19 +165,19 @@ public class ColumnBasedTableRowImageSegment extends AbstractTableRow implements
 		final double[] min = new double[ numDimensions() ];
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxXMin ) )
-			min[ 0 ] = Double.parseDouble(
+			min[ 0 ] = Utils.parseDouble(
 							segmentPropertyToColumn
 								.get( SegmentProperty.BoundingBoxXMin )
 								.get( row ) );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxYMin ) )
-			min[ 1 ] = Double.parseDouble(
+			min[ 1 ] = Utils.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxYMin )
 							.get( row ) );
 
 		if ( segmentPropertyToColumn.containsKey( SegmentProperty.BoundingBoxZMin ) )
-			min[ 2 ] = Double.parseDouble(
+			min[ 2 ] = Utils.parseDouble(
 					segmentPropertyToColumn
 							.get( SegmentProperty.BoundingBoxZMin )
 							.get( row ) );

@@ -84,7 +84,7 @@ public abstract class TableRows
 		{
 			try
 			{
-				final double number = Double.parseDouble( attribute );
+				final double number = Utils.parseDouble( attribute );
 
 				model.setValueAt(
 						number,
@@ -139,7 +139,7 @@ public abstract class TableRows
 		{
 			try
 			{
-				final double number = Double.parseDouble( value );
+				final double number = Utils.parseDouble( value );
 
 				model.setValueAt(
 						number,
