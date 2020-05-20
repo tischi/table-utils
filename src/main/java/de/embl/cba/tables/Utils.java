@@ -81,6 +81,8 @@ public class Utils
 			value = Double.NaN;
 		else if ( cell.toLowerCase().equals( "inf" ) )
 			value = Double.POSITIVE_INFINITY;
+		else if ( cell.toLowerCase().equals( "-inf" ) )
+			value = Double.NEGATIVE_INFINITY;
 		else
 			value = Double.parseDouble( cell );
 		return value;

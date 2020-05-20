@@ -1,5 +1,6 @@
 package de.embl.cba.tables.imagesegment;
 
+import de.embl.cba.tables.Utils;
 import de.embl.cba.tables.tablerow.AbstractTableRow;
 import de.embl.cba.tables.tablerow.TableRowImageSegment;
 import net.imglib2.FinalRealInterval;
@@ -85,9 +86,8 @@ public class ColumnBasedTableRowImageSegment extends AbstractTableRow implements
 		if ( segmentPropertyToColumn.get( SegmentProperty.T ) == null )
 			return 0;
 
-		int timePoint = (int) Utils.parseDouble( segmentPropertyToColumn
-				.get( SegmentProperty.T )
-				.get( row ) );
+		int timePoint = Utils.parseDouble( segmentPropertyToColumn.get( SegmentProperty.T )
+				.get( row ) ).intValue();
 
 		if ( isOneBasedTimePoint ) timePoint -= 1;
 

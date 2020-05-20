@@ -572,7 +572,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 
 		//Display the window.
 		frame.pack();
-		frame.setVisible( true );
+		SwingUtilities.invokeLater( () -> frame.setVisible( true ) );
 	}
 
 	public void addColumn( String column, Object defaultValue )

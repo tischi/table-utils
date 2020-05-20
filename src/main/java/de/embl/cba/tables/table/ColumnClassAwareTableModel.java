@@ -64,8 +64,17 @@ public class ColumnClassAwareTableModel extends DefaultTableModel
 
 		for ( int column = 0; column < getColumnCount(); column++ )
 		{
-			final Object value = this.getValueAt( 0, column );
-			columnClasses.add( value.getClass() );
+			try
+			{
+				final Object value = this.getValueAt( 0, column );
+				columnClasses.add( value.getClass() );
+			}
+			catch ( Exception e )
+			{
+				e.printStackTrace();
+				final String columnName = this.getColumnName( column );
+				throw new RuntimeException( "Got null at row 0 for column: " + columnName );
+			}
 		}
 	}
 
