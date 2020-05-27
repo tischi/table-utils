@@ -45,7 +45,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 	private MeasureDistance< T > measureDistance;
 	private Component parentComponent;
 	private String mergeByColumnName = null;
-	private String tablesDirectory = "";
+	private String tablesForMergingDirectory = "";
 	private boolean isZeroTransparent;
 
 	private SelectionMode selectionMode = SelectionMode.SelectAndFocus;
@@ -418,7 +418,7 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 					{
 						String mergeByColumnName = getMergeByColumnName();
 						// TODO: below should be based on the TableRows and not on the jTable
-						Map< String, List< String > > newColumnsOrdered = TableUIs.openTableForMergingUI( table, tablesDirectory, mergeByColumnName );
+						Map< String, List< String > > newColumnsOrdered = TableUIs.openTableForMergingUI( table, tablesForMergingDirectory, mergeByColumnName );
 						newColumnsOrdered.remove( mergeByColumnName );
 						addColumns( newColumnsOrdered );
 					} catch ( IOException ioOException )
@@ -445,9 +445,9 @@ public class TableRowsTableView < T extends TableRow > extends JPanel
 		this.mergeByColumnName = mergeByColumnName;
 	}
 
-	public void setTablesDirectory( String tablesDirectory )
+	public void setTablesForMergingDirectory( String tablesForMergingDirectory )
 	{
-		this.tablesDirectory = tablesDirectory;
+		this.tablesForMergingDirectory = tablesForMergingDirectory;
 	}
 
 	private JMenuItem createSaveTableAsMenuItem()

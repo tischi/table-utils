@@ -1,5 +1,8 @@
 package de.embl.cba.tables;
 
+import de.embl.cba.tables.github.GitHubContentGetter;
+import de.embl.cba.tables.github.GitHubUtils;
+import de.embl.cba.tables.github.GitLocation;
 import de.embl.cba.tables.view.TableRowsTableView;
 import ij.gui.GenericDialog;
 
@@ -119,9 +122,9 @@ public class TableUIs
 	{
 		String newTablePath = null;
 
-		if ( tablesLocation.startsWith( "http" ) )
+		if ( tablesLocation.contains( "raw.githubusercontent" ) )
 		{
-			newTablePath = selectGitRepoTablePathUI( tablesLocation );
+			newTablePath = selectGitHubTablePathUI( tablesLocation );
 			if ( newTablePath == null ) return null;
 		}
 		else
@@ -142,9 +145,27 @@ public class TableUIs
 		return columns;
 	}
 
-	public static String selectGitRepoTablePathUI( String tablesLocation ) throws IOException
+	public static String selectGitHubTablePathUI( String tablesLocation ) throws IOException
 	{
-		String additionalTablesUrl = getAdditionalTablesUrl( tablesLocation );
+//		final String[] tableNames = getTableNamesFromFile( tablesLocation, "additional_tables.txt" );
+		final GitLocation gitLocation = GitHubUtils.rawUrlToGitLocation( tablesLocation );
+		final ArrayList< String > filePaths = GitHubUtils.getFilePaths( gitLocation );
+		final String[] fileNames = filePaths.stream().map( File::new ).map( File::getName ).toArray( String[]::new );
+
+
+		final GenericDialog gd = new GenericDialog( "Select Table" );
+		gd.addChoice( "Table", fileNames, fileNames[ 0 ] );
+		gd.showDialog();
+		if ( gd.wasCanceled() ) return null;
+		final String tableFileName = gd.getNextChoice();
+		String newTablePath = FileAndUrlUtils.combinePath( tablesLocation, tableFileName );
+
+		return newTablePath;
+	}
+
+	public static String[] getTableNamesFromFile( String tablesLocation, String additionalTableNamesFile ) throws IOException
+	{
+		String additionalTablesUrl = getAdditionalTablesUrl( tablesLocation, additionalTableNamesFile );
 
 		final BufferedReader reader = Tables.getReader( additionalTablesUrl );
 
@@ -155,28 +176,19 @@ public class TableUIs
 			lines.add( line );
 			line = reader.readLine();
 		}
-		final String[] strings = lines.toArray( new String[]{} );
-
-		final GenericDialog gd = new GenericDialog( "Select Table" );
-		gd.addChoice( "Table", strings, strings[ 0 ] );
-		gd.showDialog();
-		if ( gd.wasCanceled() ) return null;
-		final String tableFileName = gd.getNextChoice();
-		String newTablePath = tablesLocation + "/" + tableFileName;
-
-		return newTablePath;
+		return lines.toArray( new String[]{} );
 	}
 
-	public static String getAdditionalTablesUrl( String tablesLocation )
+	public static String getAdditionalTablesUrl( String tablesLocation, String additionalTableNamesFile )
 	{
 		String additionalTablesUrl;
 		if ( tablesLocation.endsWith( "/" ) )
 		{
-			additionalTablesUrl = tablesLocation + "additional_tables.txt";
+			additionalTablesUrl = tablesLocation + additionalTableNamesFile;
 		}
 		else
 		{
-			additionalTablesUrl = tablesLocation + "/" + "additional_tables.txt";
+			additionalTablesUrl = tablesLocation + "/" + additionalTableNamesFile;
 		}
 		return additionalTablesUrl;
 	}
