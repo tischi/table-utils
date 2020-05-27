@@ -45,7 +45,7 @@ public class DefaultImageSourcesModel implements ImageSourcesModel
 		metadata.modality = flavor;
 		metadata.numSpatialDimensions = numSpatialDimensions;
 		metadata.segmentsTablePath = segmentsTablePath;
-		metadata.displayRangeMax = displayRangeMax;
+		metadata.contrastLimits = new double[]{ 0, displayRangeMax };
 
 		nameToSourceAndMetadata.put( imageId, new SourceAndMetadata( source, metadata ) );
 	}

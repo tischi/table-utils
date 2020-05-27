@@ -19,7 +19,6 @@ import java.util.Set;
 
 import static de.embl.cba.tables.imagesegment.SegmentPropertyColumnsSelectionDialog.NO_COLUMN_SELECTED;
 
-
 public class ExploreIntensityImageAndLabelImageAndTable
 {
 	private final ImagePlus intensityImage;
@@ -121,16 +120,12 @@ public class ExploreIntensityImageAndLabelImageAndTable
 					.metadata().imageSetIDs.add( intensityImageId );
 
 			imageSourcesModel.sources().get( intensityImageId )
-					.metadata().displayRangeMax = intensityImage.getProcessor().getMax();
+					.metadata().contrastLimits = new double[]{ 0, intensityImage.getProcessor().getMax() };
 
 		}
 
-
-
 		imageSourcesModel.sources().get( labelImageId )
-				.metadata().displayRangeMax = 500D;
-
-
+				.metadata().contrastLimits = new double[]{ 0, 500 };
 
 		return imageSourcesModel;
 	}

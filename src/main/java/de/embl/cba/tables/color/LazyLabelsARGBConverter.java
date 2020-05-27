@@ -8,7 +8,7 @@ import net.imglib2.type.volatiles.VolatileARGBType;
 
 public class LazyLabelsARGBConverter implements LabelsARGBConverter
 {
-	private final ColoringModel< Double > coloringModel;
+	private final LazyCategoryColoringModel< Double > coloringModel;
 	private ARGBType singleColor;
 	private int timePointIndex; // TODO: ??
 
@@ -50,6 +50,11 @@ public class LazyLabelsARGBConverter implements LabelsARGBConverter
 		coloringModel.convert( realDouble, color.get() );
 		color.setValid( true );
 
+	}
+
+	public LazyCategoryColoringModel< Double > getColoringModel()
+	{
+		return coloringModel;
 	}
 
 	@Override

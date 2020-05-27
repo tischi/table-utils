@@ -346,8 +346,7 @@ public class SegmentsBdvView < T extends ImageSegment >
 			final double displayRangeMax = recentConverterSetups.get( recentConverterSetupIndex ).getDisplayRangeMax();
 			final double displayRangeMin = recentConverterSetups.get( recentConverterSetupIndex ).getDisplayRangeMin();
 
-			associatedSourceAndMetadata.metadata().displayRangeMin = new Double( displayRangeMin );
-			associatedSourceAndMetadata.metadata().displayRangeMax = new Double( displayRangeMax );
+			associatedSourceAndMetadata.metadata().contrastLimits = new double[]{ displayRangeMin, displayRangeMax };
 		}
 	}
 
@@ -369,8 +368,8 @@ public class SegmentsBdvView < T extends ImageSegment >
 
 		bdvStackSource.setActive( true );
 
-		if ( metadata.displayRangeMin != null && metadata.displayRangeMax != null)
-			bdvStackSource.setDisplayRange( metadata.displayRangeMin, metadata.displayRangeMax );
+		if ( metadata.contrastLimits != null )
+			bdvStackSource.setDisplayRange( metadata.contrastLimits[ 0 ], metadata.contrastLimits[ 1 ] );
 
 		// TODO: Implement auto-contrast; Take code from bdp2
 

@@ -1,33 +1,34 @@
 package de.embl.cba.tables.github;
 
+import com.drew.lang.annotations.Nullable;
+
 public class GitHubContentGetter
 {
 	private String repository;
-	private String accessToken;
 	private String path;
+	private String branch;
+	private String accessToken;
 
 	/**
 	 * https://developer.github.com/v3/repos/contents/
 	 *
-	 *
-	 * @param repository
-	 * @param path
 	 */
-	public GitHubContentGetter( String repository, String path )
+	public GitHubContentGetter(
+			String repository,
+			String path,
+			@Nullable String branch,
+			@Nullable String accessToken
+	)
 	{
 		this.repository = repository;
 		this.path = path;
-	}
-
-	public GitHubContentGetter( String repository, String path, String accessToken )
-	{
-		this( repository, path );
+		this.branch = branch;
 		this.accessToken = accessToken;
 	}
 
 	public String getContent()
 	{
-		// GET /repos/:owner/:repo/contents/:path
+		// GET /repos/:owner/:repo/contents/:path?ref=:branch
 
 		String url = createGetContentApiUrl( path );
 		final String requestMethod = "GET";
@@ -41,12 +42,14 @@ public class GitHubContentGetter
 		if ( ! url.endsWith( "/" ) ) url += "/";
 		if ( ! path.startsWith( "/" ) ) path = "/" + path;
 		url += "contents" + path;
+		if ( branch != null )
+			url += "?ref=" + branch;
 		return url;
 	}
 
 	public static void main( String[] args )
 	{
-		final GitHubContentGetter contentGetter = new GitHubContentGetter( "https://github.com/constantinpape/autophagosomes-clem", "data/10spd/misc/bookmarks" );
+		final GitHubContentGetter contentGetter = new GitHubContentGetter( "https://github.com/platybrowser/platybrowser", "data/1.0.1/misc/bookmarks" , "mobie", null );
 
 		System.out.println( contentGetter.getContent() );
 	}
